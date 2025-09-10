@@ -89,32 +89,32 @@ Branch names use the same types as commit messages.
 
 1. Switch to the branch you want to make the PR with:
 
-   ```sh
+   ```txt
    git switch <BRANCH_NAME>
    ```
 
 2. Update local `main` branch from anywhere:
 
-   ```sh
+   ```txt
    git fetch origin main:main
    ```
 
 3. Update your branch with `main`:
 
-   ```sh
+   ```txt
    git merge main
    ```
 
    - If a conflict happened, solve the conflict, then:
 
-     ```sh
+     ```txt
      git add -p &&
      git merge --continue
      ```
 
 4. Push the latest version of your branch to GitHub.
 
-   ```sh
+   ```txt
    git push -u origin HEAD
    ```
 
@@ -191,13 +191,13 @@ The naming of the suggestion branch should follow the usual branch naming guidel
 
 If you made a mistake in your last commit message or forgot to include a file, you can fix it with `git commit --amend`.
 
-```sh
+```txt
 git commit --amend
 ```
 
 If you don't want to change the commit message:
 
-```sh
+```txt
 git commit --amend --no-edit
 ```
 
@@ -207,13 +207,13 @@ With interactive rebase you can fix old commit messages, squash small fixup comm
 
 To edit any of the last 10 commits of the current branch:
 
-```sh
+```txt
 git rebase -i HEAD~10
 ```
 
 If you do this on a branch that already has a PR open, you should avoid changing the commit dates to keep the pull request page on GitHub in a chronological order:
 
-```sh
+```txt
 git rebase -i --committer-date-is-author-date HEAD~10
 ```
 
@@ -222,7 +222,7 @@ git rebase -i --committer-date-is-author-date HEAD~10
 
 Since you are still changing the commit hashes, you will need to force push:
 
-```sh
+```txt
 git push --force-with-lease
 ```
 
