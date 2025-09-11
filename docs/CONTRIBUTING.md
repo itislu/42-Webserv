@@ -1,3 +1,22 @@
+# Table of Contents
+
+- [Commit Messages](#commit-messages)
+  - [Commit types](#commit-types)
+  - [Commit scope (optional)](#commit-scope-optional)
+  - [Commit description](#commit-description)
+  - [Commit body (optional)](#commit-body-optional)
+- [Branches](#branches)
+- [Create a Pull Request](#create-a-pull-request)
+  - [Git part](#git-part)
+  - [GitHub part](#github-part)
+  - [Dependent pull request](#dependent-pull-request)
+- [Review a Pull Request](#review-a-pull-request)
+  - [Suggestion branch](#suggestion-branch)
+- [Git Cheatsheet](#git-cheatsheet)
+  - [Commit parts of files](#commit-parts-of-files)
+  - [Change the last commit](#change-the-last-commit)
+  - [Change commit history](#change-commit-history)
+
 # Commit Messages
 
 We follow the [Conventional Commits](https://www.conventionalcommits.org/en/) specification.
