@@ -193,9 +193,22 @@ The naming of the suggestion branch should follow the usual branch naming guidel
 
 # Git Cheatsheet
 
+## Commit parts of files
+
+If you want to stage only specific changes from your working directory (only some files or just parts of a file), use:
+
+```txt
+git add -p
+```
+
+`-p` stands for "patch" mode. This command lets you interactively review each change ("hunk") and decide whether to stage it.
+You can split hunks, skip them, or stage only the parts you want. Use `?` to see what each letter does.
+
+This is useful for making clean, focused commits.
+
 ## Change the last commit
 
-If you made a mistake in your last commit message or forgot to include a file, you can fix it with `git commit --amend`.
+If you made a mistake in your last commit message or forgot to include a file, you can fix it with:
 
 ```txt
 git commit --amend
