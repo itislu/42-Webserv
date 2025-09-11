@@ -5,6 +5,7 @@
   - [Commit scope (optional)](#commit-scope-optional)
   - [Commit description](#commit-description)
   - [Commit body (optional)](#commit-body-optional)
+  - [Commit footer (optional)](#commit-footer-optional)
 - [Branches](#branches)
 - [Create a Pull Request](#create-a-pull-request)
   - [Git part](#git-part)
@@ -86,6 +87,15 @@ The description should be a concise summary of the change.
 The body should describe the **rationale** behind the changes (the *why*, not just the *what*).
 
 The body must be separated from the header by a **blank line**.
+
+## Commit footer (optional)
+
+If a commit resolves an issue on GitHub, the issue number should be mentioned at the end of the commit message on a separate line, prefixed with `Closes`:
+
+- `Closes #234`
+- `Closes #123, #245, #992`
+
+This links commits to issues automatically and closes them if they land on the `main` branch.
 
 # Branches
 
