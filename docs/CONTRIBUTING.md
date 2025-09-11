@@ -6,7 +6,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/en/) sp
 <type>[(scope)]: <description>
 ```
 
-## Commit Types
+## Commit types
 
 | Type      | Description                                                                            | Example                                                             |
 |-----------|----------------------------------------------------------------------------------------|---------------------------------------------------------------------|
@@ -23,7 +23,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/en/) sp
 | `chore`   | Repository mainenance, "housekeeping". Doesn't touch source files.                     | `chore: Whitelist image files in .gitignore`                        |
 | `revert`  | Git reverts.                                                                           | `revert: "perf: Use new hash function for 2x address lookup speed"` |
 
-## Commit Scope (optional)
+## Commit scope (optional)
 
 The scope is optional but provides helpful context. For source code changes it is often the name of the component or directory being modified.
 
@@ -36,7 +36,7 @@ The scope is placed in parentheses after the commit type.
 > [!TIP]
 > Whenever you notice yourself writing a location of the change in the description, you can put it as a scope instead.
 
-## Commit Description
+## Commit description
 
 The description should be a concise summary of the change.
 
@@ -62,7 +62,7 @@ The description should be a concise summary of the change.
 > Adding a verb only to end up with a title like `fix: Fix memory leak` might seem redundant, but using a verb is always preferred for consistency and clarity.
 > `Fix` as a verb usually can and should be replaced with a more specific one anyway (see `fix: Fix session expiration`).
 
-## Commit Body (optional)
+## Commit body (optional)
 
 The body should describe the **rationale** behind the changes.
 
@@ -83,7 +83,7 @@ Branch names use the same types as commit messages.
 
 # Create a Pull Request
 
-## Git Part
+## Git part
 
 1. Update local `main` branch:
 
@@ -124,7 +124,7 @@ Branch names use the same types as commit messages.
 > git fetch origin main:main
 > ```
 
-## GitHub Part
+## GitHub part
 
 1. **Create a pull request on GitHub:**
 
@@ -146,7 +146,7 @@ Branch names use the same types as commit messages.
    - If you want to choose explicitly who should review your PR, request a reviewer.
    - You can request multiple reviewers if you think more pairs of eyes should take a look.
 
-## Dependent PRs
+## Dependent pull request
 
 If you need to start work that depends on changes from a branch that is still under review (not yet merged):
 
