@@ -85,16 +85,17 @@ Branch names use the same types as commit messages.
 
 ## Git Part
 
-1. Switch to the branch you want to make the PR with:
+1. Update local `main` branch:
+
+   ```txt
+   git switch main &&
+   git pull
+   ```
+
+2. Switch to the branch you want to make the PR with:
 
    ```txt
    git switch <BRANCH_NAME>
-   ```
-
-2. Update local `main` branch from anywhere:
-
-   ```txt
-   git fetch origin main:main
    ```
 
 3. Update your branch with `main`:
@@ -115,6 +116,13 @@ Branch names use the same types as commit messages.
    ```txt
    git push -u origin HEAD
    ```
+
+> [!TIP]
+> You can update the local `main` branch without switching to it:
+>
+> ```txt
+> git fetch origin main:main
+> ```
 
 ## GitHub Part
 
