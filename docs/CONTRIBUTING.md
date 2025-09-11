@@ -150,7 +150,9 @@ Branch names use the same types as commit messages.
 
 1. **Assign yourself to the PR.**
 
-   By assigning yourself to the PR you make it clear that you will do the full review and are responsible for the merge.
+   By assigning yourself to the PR you make it clear that you will be **responsible** for the merge. You will do your best to make sure the PR does not introduce new bugs.
+
+   Other members of the team can still do a review, but the assigned person will click the `Merge` button.
 
 2. **Go to the "Files changed" tab.**
 
@@ -167,7 +169,7 @@ Branch names use the same types as commit messages.
 
 5. **Merge:**
 
-   If all requested reviewers approved and there are no more requested changes, you as the reviewer can merge the PR.
+   If you are assigned to this PR (self-assigned or by others), all requested reviewers approved, and there are no more requested changes, you can merge the PR.
 
 > [!TIP]
 > You can click-and-drag or shift-click on the line numbers to select a range of lines your comment applies to.
