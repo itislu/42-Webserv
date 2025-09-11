@@ -146,6 +146,38 @@ Branch names use the same types as commit messages.
    - If you want to choose explicitly who should review your PR, request a reviewer.
    - You can request multiple reviewers if you think more pairs of eyes should take a look.
 
+## Dependent PRs
+
+If you need to start work that depends on changes from a branch that is still under review (not yet merged):
+
+1. **Branch off the in-review branch.**
+
+   Create your new branch from the branch that is still in review, not from `main`:
+
+   ```txt
+   git switch feat/login-form &&
+   git pull &&
+   git switch -c feat/oauth-support
+   ```
+
+2. **Mark your pull request as a draft.**
+
+   When you open a PR for your new branch, mark it as a **draft** until the base branch has been merged.
+
+3. **Mention the dependency in the PR description.**
+
+   In your PR description, clearly state that your branch depends on another PR and link to it:
+   > **Depends on:** #123
+
+   This helps reviewers understand the relationship between PRs and prevents accidental merging before the base branch is ready.
+
+4. **Once the base branch has been merged:**
+
+   Update your branch to include the latest changes from `main` and mark your PR as ready for review.
+
+> [!NOTE]
+> While your PR is open, you will see extra commits from the base branch in the commit list. They will disappear automatically once you update your branch after the base branch has been merged.
+
 # Review a Pull Request
 
 1. **Assign yourself to the PR.**
