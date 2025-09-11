@@ -31,15 +31,15 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/en/) sp
 |-----------|----------------------------------------------------------------------------------------|---------------------------------------------------------------------|
 | `feat`    | A new feature for the user or the codebase.                                            | `feat: Add logging for HTTP requests`                               |
 | `improve` | An enhancement to an existing feature. Use for changes too minor for `feat`.           | `improve: Make error messages more descriptive`                     |
-| `fix`     | Fix of a bug or a potential bug.                                                       | `fix: Handle URI decoding correctly`                                |
-| `refactor`| Structural code change that doesn't change the behavior of the program.                | `refactor: Restructure config parser to be easier extendable`       |
+| `fix`     | Fix of a bug or potential bug.                                                         | `fix: Handle URI decoding correctly`                                |
+| `refactor`| Structural code change that doesn't change program behavior.                           | `refactor: Restructure config parser to be easier to extend`        |
 | `style`   | Code style, not style of the program output. Significant logic changes are `refactor`. | `style: Rename local variables`                                     |
-| `perf`    | Change purely for measurable performance improvements.                                 | `perf: Use new hash function for 2x address lookup speed`           |
+| `perf`    | Change made purely for measurable performance improvements.                            | `perf: Use new hash function for 2x address lookup speed`           |
 | `test`    | Addition or fix of tests.                                                              | `test: Add unit test for parsing HTTP header`                       |
-| `docs`    | Addition or fix of documentation and comments only, in any file.                       | `docs: Add install guide to readme`                                 |
+| `docs`    | Addition or fix of documentation or comments only, in any file.                        | `docs: Add install guide to readme`                                 |
 | `build`   | Related to build system and dependencies.                                              | `build: Use more compiler warnings for default build`               |
 | `devops`  | Related to development automations and CI/CD.                                          | `devops: Add formatting check to GitHub Actions`                    |
-| `chore`   | Repository mainenance, "housekeeping". Doesn't touch source files.                     | `chore: Whitelist image files in .gitignore`                        |
+| `chore`   | Repository maintenance / "housekeeping". Does not touch source files.                  | `chore: Whitelist image files in .gitignore`                        |
 | `revert`  | Git reverts.                                                                           | `revert: "perf: Use new hash function for 2x address lookup speed"` |
 
 ## Commit scope (optional)
@@ -53,7 +53,7 @@ The scope is placed in parentheses after the commit type.
 - `docs(readme): Update installation instructions`
 
 > [!TIP]
-> Whenever you notice yourself writing a location of the change in the description, you can put it as a scope instead.
+> Whenever you find yourself writing the location of the change in the description, use a scope instead.
 
 ## Commit description
 
@@ -63,27 +63,27 @@ The description should be a concise summary of the change.
 |--------------------------------------------|---------------------------------------------------------------------------------------------|
 | Use imperative mood.                       | Write what the commit *does*, not what it *did* (e.g., `Add feature`, not `Added feature`). |
 | Start with a verb.                         | Prevents ambiguity.                                                                         |
-| Capitalize the first letter.               | Increases readability when looking through a long commit history.                           |
+| Capitalize the first letter.               | Improves readability in long commit histories.                                              |
 | Do not end with a period.                  | Convention.                                                                                 |
-| Keep the line length within 72 characters. | This is GitHub's commit title cutoff length.                                                |
+| Keep the line length within 72 characters. | GitHub truncates titles at this length.                                                     |
 
 > [!NOTE]
 >
-> Always starting with a verb prevents ambiguity. For example, a commit titled `fix: Session expiration` is unclear. Does it mean the session expired but shouldn't, or the other way?
+> Always starting with a verb prevents ambiguity. For example, `fix: Session expiration` is unclear. Does it mean the session expired but shouldn't, or the opposite?
 >
 > Using a more specific verb clarifies the intent:
 >
 > - `fix: Prevent session expiration`
 > - `fix: Ensure session expiration`
 >
-> While there are examples where there is no ambiguity even without a verb (`fix: Memory leak`), it is better to be consistent.
+> While some cases are unambiguous even without a verb (`fix: Memory leak`), consistency is preferred.
 >
-> Adding a verb only to end up with a title like `fix: Fix memory leak` might seem redundant, but using a verb is always preferred for consistency and clarity.
+> Adding a verb only to end up with a title like `fix: Fix memory leak` might seem redundant, but using a verb is still preferred for consistency and clarity.
 > `Fix` as a verb usually can and should be replaced with a more specific one anyway (see `fix: Fix session expiration`).
 
 ## Commit body (optional)
 
-The body should describe the **rationale** behind the changes.
+The body should describe the **rationale** behind the changes (the *why*, not just the *what*).
 
 The body must be separated from the header by a **blank line**.
 
@@ -123,14 +123,14 @@ Branch names use the same types as commit messages.
    git merge main
    ```
 
-   - If a conflict happened, solve the conflict, then:
+   - If a conflict occurs, resolve it, then:
 
      ```txt
      git add -p &&
      git merge --continue
      ```
 
-4. Push the latest version of your branch to GitHub.
+4. Push your branch to GitHub.
 
    ```txt
    git push -u origin HEAD
@@ -151,16 +151,16 @@ Branch names use the same types as commit messages.
 
 2. **Title and description:**
 
-   **Title format**: Always start with a verb in uppercase and imperative mood.
+   **Title format**: Always start with an uppercase imperative verb.
 
-3. **Assign Labels and Milestone.**
+3. **Assign labels and a milestone.**
 
 4. **Normal vs draft pull request:**
 
    - **Normal PR**: You are sure your branch is ready to be merged.
    - **Draft PR**: You want to finish the description later or still need to push a few more commits.
 
-5. **Request reviewer (optional):**
+5. **Request reviewer(s) (optional):**
 
    - If you want to choose explicitly who should review your PR, request a reviewer.
    - You can request multiple reviewers if you think more pairs of eyes should take a look.
@@ -171,7 +171,7 @@ If you need to start work that depends on changes from a branch that is still un
 
 1. **Branch off the in-review branch.**
 
-   Create your new branch from the branch that is still in review, not from `main`:
+   Create your new branch from the branch that is still under review, not from `main`:
 
    ```txt
    git switch feat/login-form &&
@@ -238,9 +238,9 @@ If you need to start work that depends on changes from a branch that is still un
 
 ## Suggestion branch
 
-If you as the reviewer want to suggest a bigger change to a PR and know how to implement it, you can create a new branch from the just reviewed PR's source branch and create a new PR with the previous source branch as your target branch.
+If you as a reviewer want to suggest a larger change to a PR and know how to implement it, you can create a new branch from the PR's source branch and create a new PR with that original source branch as your target branch.
 
-The naming of the suggestion branch should follow the usual branch naming guidelines.
+The name of the suggestion branch should follow the usual branch naming guidelines.
 
 ![PR suggestion branch](/docs/assets/pr-suggestion-branch.png)
 
@@ -283,7 +283,7 @@ To edit any of the last 10 commits of the current branch:
 git rebase -i HEAD~10
 ```
 
-If you do this on a branch that already has a PR open, you should avoid changing the commit dates to keep the pull request page on GitHub in a chronological order:
+If you do this on a branch that already has an open PR, you should preserve commit dates to keep the pull request page on GitHub in chronological order:
 
 ```txt
 git rebase -i --committer-date-is-author-date HEAD~10
@@ -292,7 +292,7 @@ git rebase -i --committer-date-is-author-date HEAD~10
 > [!NOTE]
 > You need Git version 2.29 to use `--committer-date-is-author-date` in combination with `-i`.
 
-Since you are still changing the commit hashes, you will need to force push:
+Because you are still changing the commit hashes, you will need to force push:
 
 ```txt
 git push --force-with-lease
