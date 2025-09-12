@@ -1,0 +1,39 @@
+# Automatically apply labels based on PR source (head) branch name.
+# Each label corresponds to a commit/branch type defined in CONTRIBUTING.md.
+# Branch naming convention: <type>/<description>
+
+feature:
+  - head-branch: '^feat'
+
+improvement:
+  - head-branch: '^improve'
+
+bug:
+  - head-branch: '^fix'
+
+refactor:
+  - head-branch: '^refactor'
+
+style:
+  - head-branch: '^style'
+
+performance:
+  - head-branch: '^perf'
+
+test:
+  - head-branch: '^test'
+
+documentation:
+  - head-branch: '^docs'
+
+build:
+  - head-branch: '^build'
+
+devops:
+  - head-branch: '^devops'
+
+chore:
+  - head-branch: '^chore'
+
+revert:
+  - head-branch: '^revert'

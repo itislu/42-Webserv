@@ -6,6 +6,7 @@
 !*.md
 !*.mk
 !*.tpp
+!*.yaml
 !.clang-format
 !.clang-tidy
 !.clang-uml
