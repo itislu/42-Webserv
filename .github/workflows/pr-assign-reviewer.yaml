@@ -1,0 +1,34 @@
+# Automatically add any reviewer who submits a review to a PR to the its assignees.
+
+name: PR Assign Reviewer
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  assign-reviewer:
+    # Prevents the job from running if:
+    # 1. The reviewer is the same as the PR author, OR
+    # 2. The reviewer is already assigned to the PR.
+    if: |
+      github.event.review.user.login != github.event.pull_request.user.login &&
+      !contains(github.event.pull_request.assignees.*.login, github.event.review.user.login)
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Assign reviewer as assignee
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const reviewer = context.payload.review.user;
+
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              assignees: [reviewer.login]
+            });
