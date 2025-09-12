@@ -196,9 +196,12 @@ If you need to start work that depends on changes from a branch that is still un
 3. **Mention the dependency in the PR description.**
 
    In your PR description, clearly state that your branch depends on another PR and link to it:
-   > **Depends on:** #123
+   > `* Depends on: #123`
 
-   This helps reviewers understand the relationship between PRs and prevents accidental merging before the base branch is ready.
+   This helps reviewers understand the relationship between PRs.
+
+  > [!TIP]
+  > The `*` is useful to enable GitHub's title preview. With the preview you can see at one glance if the base branch has been merged already or not.
 
 4. **Once the base branch has been merged:**
 
