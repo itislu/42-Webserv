@@ -1,4 +1,4 @@
-# Automatically add any reviewer who submits a review to a PR to the its assignees.
+# Automatically add any reviewer who submits a review to a PR to its assignees.
 
 name: PR Assign Reviewer
 
