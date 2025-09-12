@@ -212,34 +212,27 @@ If you need to start work that depends on changes from a branch that is still un
 
 # Review a Pull Request
 
-1. **Assign yourself to the PR.**
+1. **Go to the "Files changed" tab.**
 
-   By assigning yourself to the PR you make it clear that you will be **responsible** for the merge. You will do your best to make sure the PR does not introduce new bugs.
-
-   Other members of the team can still do a review, but the assigned person will click the `Merge` button.
-
-2. **Go to the "Files changed" tab.**
-
-3. **Leave feedback:**
+2. **Leave feedback:**
 
    - **Comment**: Use this for a single, standalone comment. It's sent immediately.
    - **Start a review**: This is the preferred method. It allows you to batch multiple comments together into a single review. Your comments are held as "pending" until you submit the full review, which prevents spamming the author with notifications.
 
-4. **Submit review:**
+3. **Submit review:**
 
    - **Approve**: The changes are good to go.
    - **Request changes**: The PR needs modifications before it can be merged.
    - **Comment**: You have general feedback but are not formally approving or requesting changes.
 
-5. **Merge:**
+4. **Merge.**
 
-   If you are assigned to this PR (self-assigned or by others), all requested reviewers approved, and there are no more requested changes, you can merge the PR.
+   If all requested reviewers approved and there are no more requested changes, you can merge the PR.
 
 > [!TIP]
 > You can click-and-drag or shift-click on the line numbers to select a range of lines your comment applies to.
 
 > [!TIP]
->
 > To suggest specific code changes, use a `suggestion` block in your comment.
 > The author can then apply your suggestion with a single click.
 >
@@ -248,6 +241,12 @@ If you need to start work that depends on changes from a branch that is still un
 > // Suggested code replacing the selected lines.
 > ```
 > ````
+
+> [!NOTE]
+> **About assignments**
+>
+> Assignments on PRs are commonly used to take ownership of the PR, ensuring it progresses and gets merged.
+> In a small team this is usually not needed.
 
 ## Suggestion branch
 
