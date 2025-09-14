@@ -1,0 +1,76 @@
+# TODO: Add short description.
+
+name: PR No Pending Reviews
+
+# TODO Unrequesting reviewers doesn't trigger this workflow.
+# TODO Requesting reviewers after an approval also doesn't.
+on:
+  pull_request_review:
+    types: [submitted, dismissed]
+
+jobs:
+  no-pending-reviews:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Check all requested reviewers
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.issue.number;
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number,
+            });
+            
+            // A reviewer is only considered if they are a real user.
+            const pendingReviewers = pr.requested_reviewers
+              .filter(reviewer => reviewer.type === 'User')
+              .map(reviewer => reviewer.login);
+
+            if (pendingReviewers.length > 0) {
+              core.setFailed(`These requested reviewers have not yet reviewed: ${pendingReviewers.join(', ')}.`);
+              return;
+            }
+
+            // Now process reviews.
+
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner,
+              repo,
+              pull_number,
+            });
+
+            // Track the latest review state per reviewer.
+            const reviewStates = {};
+            for (const review of reviews) {
+              if (review.user && review.state !== 'COMMENTED') {
+                reviewStates[review.user.login] = review.state;
+              }
+            }
+
+            const approvers = [];
+            const changeRequesters = [];
+            for (const [reviewer, state] of Object.entries(reviewStates)) {
+              if (state === 'APPROVED') {
+                approvers.push(reviewer);
+              } else if (state === 'CHANGES_REQUESTED') {
+                changeRequesters.push(reviewer);
+              }
+            }
+
+            if (changeRequesters.length > 0) {
+              core.setFailed(`These reviewers have requested changes: ${changeRequesters.join(', ')}.`);
+              return;
+            }
+
+            if (approvers.length === 0) {
+              core.setFailed('The PR must have at least one approval and no pending requests.');
+              return;
+            }
+
+            core.info('All requested reviewers have approved and there are no change requests.');

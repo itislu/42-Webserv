@@ -175,6 +175,8 @@ Branch names use the same types as commit messages.
    - If you want to choose explicitly who should review your PR, request a reviewer.
    - You can request multiple reviewers if you think more pairs of eyes should take a look.
 
+   All requested reviewers have to approve in order to merge the PR. If needed, a review request can be removed again.
+
 ## Dependent pull request
 
 If you need to start work that depends on changes from a branch that is still under review (not yet merged):
