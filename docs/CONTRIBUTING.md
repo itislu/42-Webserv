@@ -99,11 +99,18 @@ This links commits to issues automatically and closes them if they land on the `
 
 # Branches
 
-Branch names use the same types as commit messages.
-
 ```txt
 <type>/<description>
 ```
+
+**`type`**:
+
+- Same [types](#commit-messages) as commit messages.
+
+**`description`**:
+
+- kebab-case (lowercase, words separated by hyphens).
+- Words may only contain alphanumeric characters or dots.
 
 **Examples:**
 
