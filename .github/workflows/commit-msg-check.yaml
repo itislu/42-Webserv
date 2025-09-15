@@ -1,0 +1,69 @@
+# Check that commit messages follow the specification described in CONTRIBUTING.md#commit-messages.
+
+name: Commit Message Check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  commit-msg-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+
+      - name: Install commitlint
+        run: npm install @commitlint/cli @commitlint/config-conventional
+      - name: Print versions
+        run: |
+          git --version
+          node --version
+          npm --version
+          npx commitlint --version
+      - name: Validate latest commit with commitlint
+        if: github.event_name == 'push'
+        run: npx commitlint --last --verbose
+      - name: Validate PR commits with commitlint
+        if: github.event_name == 'pull_request'
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose --config .github/commitlint.config.mjs
+
+      - name: Install is-verb
+        if: ${{ !cancelled() }}
+        run: npm install git+https://github.com/itislu/is-verb.git
+      - name: Check capitalized verb in imperative mood
+        if: ${{ !cancelled() }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const isVerb = require('is-verb');
+
+            const commitShaRange = context.eventName === 'pull_request'
+              ? `${context.payload.pull_request.base.sha}..${context.payload.pull_request.head.sha}`
+              : '-1';
+
+            const { stdout } = await exec.getExecOutput('git', ['log', '--format=%s', commitShaRange]);
+            const commits = stdout.trim().split('\n');
+
+            for (const commit of commits) {
+              const words = commit.split(' ');
+              if (!words[0].endsWith(':')) {
+                core.notice(`Skipping commit without type prefix: ${commit}`);
+                continue;
+              }
+
+              const firstWord = words[1];
+              core.info(`Checking word: ${firstWord}`);
+
+              if (!isVerb.capitalized(firstWord)) {
+                core.setFailed(`Error: '${firstWord}' in commit '${commit}' is not a capitalized verb in imperative mood.`);
+              }
+            }
