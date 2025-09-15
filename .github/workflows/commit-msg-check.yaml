@@ -60,6 +60,11 @@ jobs:
                 continue;
               }
 
+              if (words.length < 2) {
+                core.notice(`Skipping commit without subject after type prefix: ${commit}`);
+                continue;
+              }
+
               const firstWord = words[1];
               core.info(`Checking word: ${firstWord}`);
 
