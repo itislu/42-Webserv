@@ -1,4 +1,4 @@
-# Automatically apply labels based on PR source (head) branch name.
+# Needed for PR Labeler GitHub Action workflow.
 # Each label corresponds to a commit/branch type defined in CONTRIBUTING.md.
 # Branch naming convention: <type>/<description>
 

@@ -1,12 +1,14 @@
-name: Pull Request Labeler
+# Automatically apply labels based on PR source (head) branch name.
+# Branch-label relationships are defined in .github/labeler.yaml.
+
+name: PR Labeler
 
 on:
   pull_request_target:
-    types: [opened]
+    types: [opened, closed]
 
 jobs:
   labeler:
-    name: Labeler
     permissions:
       contents: read
       pull-requests: write

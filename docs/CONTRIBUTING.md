@@ -247,6 +247,8 @@ If you need to start work that depends on changes from a branch that is still un
 >
 > Assignments on PRs are commonly used to take ownership of the PR, ensuring it progresses and gets merged.
 > In a small team this is usually not needed.
+>
+> Instead, all reviewers of a PR can automatically get assigned to it, making it easy to see in the list of PRs who is involved.
 
 ## Suggestion branch
 
