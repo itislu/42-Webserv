@@ -1,0 +1,36 @@
+# Check that pull request titles follow the specification described in CONTRIBUTING.md#github-part.
+
+name: PR Title Check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pr-title-check:
+    if: github.event.action == 'opened' || github.event.action == 'edited'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+      - name: Install is-verb
+        run: npm install git+https://github.com/itislu/is-verb.git
+      - name: Check capitalized verb in imperative mood
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const isVerb = require('is-verb');
+            const prTitle = context.payload.pull_request.title;
+            const firstWord = prTitle.split(' ')[0];
+
+            core.info(`Checking PR title: "${prTitle}"`);
+            core.info(`First word: "${firstWord}"`);
+
+            if (!isVerb.capitalized(firstWord)) {
+              core.setFailed(`Error: The first word '${firstWord}' of the PR title is not a capitalized verb in imperative mood.`);
+            } else {
+              core.info("Success: PR title starts with a capitalized verb in imperative mood.");
+            }
