@@ -55,13 +55,17 @@ jobs:
 
             for (const commit of commits) {
               const words = commit.split(' ');
+
               if (!words[0].endsWith(':')) {
                 core.notice(`Skipping commit without type prefix: ${commit}`);
                 continue;
               }
-
               if (words.length < 2) {
                 core.notice(`Skipping commit without subject after type prefix: ${commit}`);
+                continue;
+              }
+              if (words[0].toLowerCase() === 'revert:' && words[1].startsWith('"')) {
+                core.notice(`Skipping revert commit: ${commit}`);
                 continue;
               }
 

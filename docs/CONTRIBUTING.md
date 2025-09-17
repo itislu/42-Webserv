@@ -68,6 +68,11 @@ The description should be a concise summary of the change.
 | Do not end with a period.                  | Convention.                                                                                 |
 | Keep the line length within 72 characters. | GitHub truncates titles at this length.                                                     |
 
+Revert commits may have the message of the reverted commit in quotes instead:
+
+- `revert: "perf: Use new hash function for 2x address lookup speed"`
+- `revert: Revert cd1de75, 0d32423`
+
 > [!NOTE]
 >
 > Always starting with a verb prevents ambiguity. For example, `fix: Session expiration` is unclear. Does it mean the session expired but shouldn't, or the opposite?
