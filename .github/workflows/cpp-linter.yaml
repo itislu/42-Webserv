@@ -1,0 +1,45 @@
+# Run clang-format and clang-tidy on C/C++ files.
+
+name: CPP Linter
+
+on:
+  pull_request:
+    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**.cmake', '**/CMakeLists.txt', '**/cpp-linter.yaml']
+  push:
+    branches: [main, master]
+    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**.cmake', '**/CMakeLists.txt', '**/cpp-linter.yaml']
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  cpp-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create compilation database
+        run: |
+          cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          mv build/compile_commands.json .
+          rm -rf build
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: 'file' # Use .clang-format config file.
+          extensions: 'c,cpp,h,hpp,ipp,tpp'
+          tidy-checks: '' # Use .clang-tidy config file.
+          version: '21'
+          files-changed-only: false # Changes in header files can affect other files.
+          step-summary: true
+          tidy-review: true
+          format-review: true
+      - name: Fail if checks failed
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
