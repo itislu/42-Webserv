@@ -5,7 +5,6 @@
 !*.ipp
 !*.md
 !*.mk
-!*.png
 !*.tpp
 !*.yaml
 !.clang-format
@@ -17,6 +16,7 @@
 !.gitkeep
 !CMakeLists.txt
 !Dockerfile
+!docs/**/*.png
 !Doxyfile
 !Makefile
 .VSCodeCounter/
