@@ -8,7 +8,6 @@ on:
 
 jobs:
   branch-name-check:
-    if: github.event_name != 'pull_request' || github.event.action == 'opened'
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}

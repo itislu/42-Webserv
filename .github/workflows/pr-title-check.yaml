@@ -4,13 +4,13 @@ name: PR Title Check
 
 on:
   pull_request:
+    types: [opened, edited, reopened, synchronize]
 
 permissions:
   contents: read
 
 jobs:
   pr-title-check:
-    if: github.event.action == 'opened' || github.event.action == 'edited'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v5
