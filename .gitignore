@@ -1,11 +1,11 @@
 *
-build/
 !*/
 !*.cpp
 !*.hpp
 !*.ipp
 !*.md
 !*.mk
+!*.png
 !*.tpp
 !*.yaml
 !.clang-format
@@ -15,11 +15,10 @@ build/
 !.devcontainer/**
 !.gitignore
 !.gitkeep
+!CMakeLists.txt
 !Dockerfile
-!docs/**
 !Doxyfile
 !Makefile
 .VSCodeCounter/
+build/
 latex/
-!CMakeLists.txt
-.DS_Store
