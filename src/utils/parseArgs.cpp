@@ -1,31 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   parseArgs.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dpotsch <poetschdavid@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/10 11:54:00 by dpotsch           #+#    #+#             */
-/*   Updated: 2025/09/24 14:52:39 by dpotsch          ###   ########.fr       */
+/*   Created: 2025/09/11 13:09:31 by dpotsch           #+#    #+#             */
+/*   Updated: 2025/09/12 09:08:15 by dpotsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <ostream>
-#include <string>
+#include "parseArgs.hpp"
 #include "libftpp/trim/trim.hpp"
-#include "utils/parseArgs.hpp"
+#include <iostream>
+#include <string>
 
-int main(int argc, char** argv)
-{
-  if (argc != 2) {
-    std::cerr << "invalid arguments" << std::endl;
-    return 1;
-  }
-  if (argc >= 2) {
-    parseArgs();
-    std::string str(argv[1]);
-    std::cout << trim(str) << "\n";
-  }
-  return 0;
+int parseArgs() {
+  std::cout << "test\n";
+  std::string test("   test   ");
+  trim(test);
+  std::cout << "parse args: " << test << '\n';
+  return 1;
 }
+

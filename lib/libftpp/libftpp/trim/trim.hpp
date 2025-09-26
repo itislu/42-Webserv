@@ -1,31 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   trim.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dpotsch <poetschdavid@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/10 11:54:00 by dpotsch           #+#    #+#             */
-/*   Updated: 2025/09/24 14:52:39 by dpotsch          ###   ########.fr       */
+/*   Created: 2025/09/10 14:23:23 by dpotsch           #+#    #+#             */
+/*   Updated: 2025/09/11 16:00:41 by dpotsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <ostream>
-#include <string>
-#include "libftpp/trim/trim.hpp"
-#include "utils/parseArgs.hpp"
+#pragma once
+#ifndef TRIM_HPP
+#define TRIM_HPP
 
-int main(int argc, char** argv)
-{
-  if (argc != 2) {
-    std::cerr << "invalid arguments" << std::endl;
-    return 1;
-  }
-  if (argc >= 2) {
-    parseArgs();
-    std::string str(argv[1]);
-    std::cout << trim(str) << "\n";
-  }
-  return 0;
-}
+#include "string"
+
+std::string& trim(std::string& str);
+
+#endif // TRIM_HPP
