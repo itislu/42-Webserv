@@ -27,7 +27,7 @@ set_target_properties(${LIB_NAME} PROPERTIES
 )
 
 target_compile_options(${LIB_NAME}
-  PRIVATE -Wall -Wextra -Werror
+  PRIVATE -Wall -Wextra -Werror -Wpedantic
 )
 
 target_include_directories(${LIB_NAME}
