@@ -23,7 +23,6 @@ set(MEMORYCHECK_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
                                  --leak-check=full \
                                  --show-error-list=yes \
                                  --show-leak-kinds=all \
-                                 --suppressions=minishell.supp \
                                  --trace-children=yes \
                                  --track-origins=yes \
                                  --track-fds=yes"
