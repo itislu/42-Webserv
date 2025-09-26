@@ -1,0 +1,67 @@
+# Check that branch names follow the specification described in CONTRIBUTING.md#branches.
+
+name: Branch Name Check
+
+on:
+  create:
+  pull_request:
+
+jobs:
+  branch-name-check:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+      ALLOWED_TYPES: feat,improve,fix,refactor,style,perf,test,docs,build,devops,chore,revert
+      IGNORE_BRANCHES: main,master
+    steps:
+      - name: Check branch name
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const branchName = process.env.BRANCH_NAME;
+            const allowedTypes = process.env.ALLOWED_TYPES;
+            const ignoreBranches = process.env.IGNORE_BRANCHES.split(',');
+
+            core.info(`Event name: ${{ github.event_name }}`);
+            core.info(`Branch name: '${branchName}'`);
+            core.summary.addHeading('Branch Name Check', 2);
+
+            if (ignoreBranches.includes(branchName)) {
+              core.summary.addRaw(`\nIgnored protected branch \`${branchName}\`.`);
+              core.notice(`Ignored protected branch '${branchName}'.`, { title: 'Branch name check' });
+              await core.summary.write();
+              return;
+            }
+
+            const regex = new RegExp(`^(${allowedTypes.replace(/,/g, '|')})/[a-z0-9]+([-.][a-z0-9]+)*$`);
+
+            if (regex.test(branchName)) {
+              core.summary.addRaw(`\n✅ Branch name OK: \`${branchName}\``);
+              await core.summary.write();
+              return;
+            }
+
+            const summary = `
+              **❌ Invalid branch name**: \`${branchName}\`
+
+              **Expected format:** \`<type>/<description>\`
+
+              **Allowed types:** \`${allowedTypes.replace(/,/g, '`, `')}\`
+
+              **Description rules:**
+              - dash-case (lowercase, words separated by hyphens)
+              - Words may only contain alphanumeric characters or dots.
+
+              **Examples:**
+              - \`feat/add-login-page\`
+              - \`fix/uri-decoding\`
+
+              [Contribution guidelines](https://github.com/${{ github.repository }}?tab=contributing-ov-file#branches)
+            `;
+            core.summary.addRaw(summary);
+            await core.summary.write();
+
+            const jobUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            core.info(`\nSee the job summary for details:\n${jobUrl}`);
+
+            core.setFailed(`Invalid branch name: '${branchName}'`);
