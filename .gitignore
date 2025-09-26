@@ -15,6 +15,7 @@
 !.gitignore
 !.gitkeep
 !CMakeLists.txt
+!commitlint.*
 !Dockerfile
 !docs/**/*.png
 !Doxyfile
