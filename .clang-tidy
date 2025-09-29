@@ -1,0 +1,59 @@
+Checks:
+  # Add
+  - bugprone-*,
+    cert-*,
+    clang-analyzer-*,
+    cppcoreguidelines-*,
+    google-explicit-constructor,
+    hicpp-*,
+    misc-*,
+    performance-*,
+    readability-*,
+  # Remove
+  - -bugprone-easily-swappable-parameters # C++98 is too limited to deal with this (no designated initializers, no compound literals, no scoped enums).
+  - -misc-use-anonymous-namespace # static for functions is more visible.
+  # Aliases
+  - -cert-dcl37-c,
+    -cert-dcl51-cpp,
+    -cert-dcl59-cpp,
+    -cert-err09-cpp,
+    -cert-err61-cpp,
+    -cert-exp42-c,
+    -cert-oop54-cpp,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-c-copy-assignment-signature,
+    -cppcoreguidelines-non-private-member-variables-in-classes,
+    -hicpp-avoid-goto,
+    -hicpp-braces-around-statements,
+    -hicpp-deprecated-headers,
+    -hicpp-explicit-conversions,
+    -hicpp-member-init,
+    -hicpp-no-array-decay,
+    -hicpp-no-malloc,
+    -hicpp-special-member-functions,
+    -hicpp-uppercase-literal-suffix,
+    -hicpp-use-auto,
+    -hicpp-use-equals-delete,
+    -hicpp-use-nullptr,
+
+CheckOptions:
+  - key: bugprone-empty-catch.IgnoreCatchWithKeywords
+    value: 'EMPTY: '
+  - key: misc-header-include-cycle.IgnoredFilesList
+    value: '.tpp' # pragma once does not seem to be recognized by clang-tidy.
+  - key: modernize-deprecated-headers.CheckHeaderFile
+    value: 'true'
+  - key: readability-magic-numbers.IgnoredIntegerValues
+    value: '1;2;3;4;10' # 1-4 are default, 10 for decimal base operations.
+  - key: readability-magic-numbers.IgnoredFloatingPointValues
+    value: '1.0;100.0;0.1' # 1.0 and 100.0 are default, 0.1 for decimal base operations.
+
+ExtraArgsBefore:
+  - -Wall
+  - -Wextra
+  - -Wpedantic
+  - -Wdocumentation
+  - -std=c++98
+  - --language=c++
+
+HeaderFileExtensions: ['', 'h', 'hh', 'hpp', 'hxx', 'ipp', 'tpp']
