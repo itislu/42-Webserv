@@ -173,7 +173,22 @@ This links commits to issues automatically and closes them if they land on the `
 
 2. **Title and description:**
 
-   **Title format**: Always start with an uppercase imperative verb.
+   - **Title format**: Always start with an uppercase imperative verb.
+   - **Description**: If the PR fixes a GitHub issue, link the issue with the keyword `closes` so it automatically gets closed when the PR gets merged. List all issues in a markdown list so GitHub's title preview is enabled.
+
+     - Single issue:
+
+       ```md
+       - closes #234
+       ```
+
+     - Multiple issues:
+
+       ```md
+       - closes #123
+       - closes #245
+       - closes #992
+       ```
 
 3. **Assign labels and a milestone.**
 
