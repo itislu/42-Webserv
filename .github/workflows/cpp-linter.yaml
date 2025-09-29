@@ -4,10 +4,10 @@ name: CPP Linter
 
 on:
   pull_request:
-    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**.cmake', '**/CMakeLists.txt', '**/cpp-linter.yaml']
+    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**/CMake*', '**.cmake', '**/Makefile', '**.mk', '**/.clang-*', '**/cpp-linter.yaml']
   push:
     branches: [main, master]
-    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**.cmake', '**/CMakeLists.txt', '**/cpp-linter.yaml']
+    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**/CMake*', '**.cmake', '**/Makefile', '**.mk', '**/.clang-*', '**/cpp-linter.yaml']
 
 permissions:
   contents: read
@@ -40,6 +40,8 @@ jobs:
           step-summary: true
           tidy-review: true
           format-review: true
-      - name: Fail if checks failed
+      - name: Fail if any cpp-linter checks failed
         if: steps.linter.outputs.checks-failed > 0
-        run: exit 1
+        run: |
+          echo "Go to Summary to see the details."
+          exit 1
