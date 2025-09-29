@@ -95,10 +95,10 @@ The body must be separated from the header by a **blank line**.
 
 ## Commit footer (optional)
 
-If a commit resolves an issue on GitHub, the issue number should be mentioned at the end of the commit message on a separate line, prefixed with `Closes`:
+If a commit resolves an issue on GitHub, the issue number should be mentioned at the end of the commit message on a separate line, prefixed with `closes`:
 
-- `Closes #234`
-- `Closes #123, #245, #992`
+- `closes #234`
+- `closes #123, closes #245, closes #992`
 
 This links commits to issues automatically and closes them if they land on the `main` branch.
 
