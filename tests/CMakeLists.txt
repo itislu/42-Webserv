@@ -1,22 +1,27 @@
 # **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    CMakeLists.txt                                     :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: dpotsch <poetschdavid@gmail.com>           +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/08/07 10:39:24 by dpotsch           #+#    #+#              #
-#    Updated: 2025/09/10 12:29:00 by dpotsch          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-# **************************************************************************** #
 # TESTS
 # **************************************************************************** #
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build")
 
 
+
+# **************************************************************************** #
+# Download & add googletest
+include(FetchContent)
+
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        release-1.11.0
+)
+
+FetchContent_MakeAvailable(googletest)
+
+
+
+# **************************************************************************** #
+# Download & add googletest
 include(CTest)
 set(MEMORYCHECK_COMMAND valgrind)
 set(MEMORYCHECK_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
@@ -27,9 +32,6 @@ set(MEMORYCHECK_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
                                  --track-origins=yes \
                                  --track-fds=all"
 )
-
-
-find_package(GTest REQUIRED)
 
 
 

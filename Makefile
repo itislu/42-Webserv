@@ -1,23 +1,19 @@
 # **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: dpotsch <poetschdavid@gmail.com>           +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/08/07 10:39:24 by dpotsch           #+#    #+#              #
-#    Updated: 2025/09/28 12:08:35 by dpotsch          ###   ########.fr        #
-#                                                                              #
+# ROOT MAKEFILE
 # **************************************************************************** #
 
 NAME := webserv
 BUILD_DIR := build
 
 
+
 # **************************************************************************** #
+PRESET ?= default
+BUILD_DIR_PRESET := build/$(PRESET)
+
 .PHONY: all
 all:
-	@if [ ! -d build ]; then \
+	@if [ ! -d $(BUILD_DIR_PRESET) ]; then \
 		$(MAKE) -s config; \
 	fi
 	@$(MAKE) -s build
@@ -26,7 +22,7 @@ $(NAME): all
 
 .PHONY: build
 build:
-	@cmake --build build -- --no-print-directory
+	@MAKEFLAGS=-s cmake --build --preset=$(PRESET) 
 
 .PHONY: re
 re: fclean all
@@ -35,19 +31,9 @@ re: fclean all
 
 # **************************************************************************** #
 .PHONY: config
-config: fclean
-	@mkdir -p $(BUILD_DIR)
-	@(cd $(BUILD_DIR) && cmake ..)
-
-.PHONY: config_debug
-config_debug: fclean
-	@mkdir -p $(BUILD_DIR)
-	@(cd $(BUILD_DIR) && cmake -D CMAKE_BUILD_TYPE=Debug ..)
-
-.PHONY: config_ubsan
-config_ubsan: fclean
-	@mkdir -p $(BUILD_DIR)
-	@(cd $(BUILD_DIR) && cmake -D CMAKE_BUILD_TYPE=Debug -D ENABLE_UBSAN=ON ..)
+config:
+	cmake --preset=$(PRESET)
+	@$(MAKE) -s copy-compile-commands
 
 
 
@@ -91,10 +77,24 @@ runv: build
 # **************************************************************************** #
 .PHONY: test
 test: all
-	(cd $(BUILD_DIR) && ctest $(ARGS))
+	(cd $(BUILD_DIR_PRESET) && ctest)
 
 .PHONY: testv
 testv: all
-	(cd $(BUILD_DIR) && ctest -T memcheck)
+	(cd $(BUILD_DIR_PRESET) && ctest -T memcheck)
+
+
+
+# **************************************************************************** #
+COPY_TARGET := build/compile_commands.json
+copy-compile-commands:
+	@if [ -f $(BUILD_DIR_PRESET)/compile_commands.json ]; then \
+		echo "Copy $(BUILD_DIR_PRESET)/compile_commands.json -> $(COPY_TARGET)"; \
+		cp $(BUILD_DIR_PRESET)/compile_commands.json $(COPY_TARGET); \
+	else \
+		echo "Error: $(BUILD_DIR_PRESET)/compile_commands.json not found. Did you run cmake --preset=$(PRESET)?"; \
+		exit 1; \
+	fi
+
 
 include utils.mk

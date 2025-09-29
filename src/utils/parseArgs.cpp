@@ -6,7 +6,7 @@
 /*   By: dpotsch <poetschdavid@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 13:09:31 by dpotsch           #+#    #+#             */
-/*   Updated: 2025/09/12 09:08:15 by dpotsch          ###   ########.fr       */
+/*   Updated: 2025/09/29 12:23:52 by dpotsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@
 #include <string>
 
 int parseArgs() {
+  float x = 10.34;
+  if (x / 0) {
+    std::cout << "alarm" << std::endl;
+  }
+
   std::cout << "test\n";
   std::string test("   test   ");
   trim(test);

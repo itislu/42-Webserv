@@ -14,7 +14,7 @@
 !.devcontainer/**
 !.gitignore
 !.gitkeep
-!CMakeLists.txt
+!CMake*
 !commitlint.*
 !Dockerfile
 !docs/**/*.png
