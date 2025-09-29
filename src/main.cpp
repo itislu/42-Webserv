@@ -1,21 +1,17 @@
-#include "libftpp/trim/trim.hpp"
-#include "utils/parseArgs.hpp"
+#include "Server.hpp"
 #include <iostream>
-#include <ostream>
-#include <string>
 
-// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
+  (void)argv;
   if (argc != 2) {
-    std::cerr << "invalid arguments" << '\n';
+    std::cerr << "Error: Usage: ./webserv [configuration file]\n";
     return 1;
   }
-  if (argc >= 2) {
-    parseArgs();
-    std::string str(argv[1]);
-    std::cout << trim(str) << "\n";
-  }
+
+  Server server(8080);
+  server.run();
+
   return 0;
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
