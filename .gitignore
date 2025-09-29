@@ -14,9 +14,12 @@
 !.devcontainer/**
 !.gitignore
 !.gitkeep
+!CMake*
+!commitlint.*
 !Dockerfile
-!docs/**
+!docs/**/*.png
 !Doxyfile
 !Makefile
 .VSCodeCounter/
+build/
 latex/
