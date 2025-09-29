@@ -3,11 +3,11 @@
 #include <iostream>
 #include <string>
 
-int parseArgs() {
+int parseArgs()
+{
   std::cout << "test\n";
   std::string test("   test   ");
   trim(test);
   std::cout << "parse args: " << test << '\n';
   return 1;
 }
-

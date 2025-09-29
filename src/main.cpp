@@ -1,8 +1,8 @@
+#include "libftpp/trim/trim.hpp"
+#include "utils/parseArgs.hpp"
 #include <iostream>
 #include <ostream>
 #include <string>
-#include "libftpp/trim/trim.hpp"
-#include "utils/parseArgs.hpp"
 
 int main(int argc, char** argv)
 {
