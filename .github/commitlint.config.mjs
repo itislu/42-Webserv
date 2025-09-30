@@ -15,6 +15,7 @@ export default {
   rules: {
     "body-leading-blank": [2, "always"],
     "body-max-line-length": [2, "always", Infinity],
+    "footer-max-line-length": [2, "always", Infinity],
     "header-max-length": [2, "always", 72],
     "scope-case": [
       2,
