@@ -14,9 +14,13 @@ public:
 
   int getFd() const;
   Buffer getInBuff() const;
+  Buffer getOutBuff();
 
   void addToInBuff(std::string str);
   void addToInBuff(char* buffer, int bytes);
+
+  void addToOutBuff(std::string str);
+  void addToOutBuff(char* buffer, int bytes);
 
 private:
   int _fd;

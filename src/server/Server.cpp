@@ -43,15 +43,13 @@ void Server::initSocket()
   if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
     error("setting options for server socket failed");
 
-  struct sockaddr_in serverAddr;
-  std::memset(&serverAddr, 0, sizeof(serverAddr));
-  serverAddr.sin_family = AF_INET;
-  serverAddr.sin_addr.s_addr =
-    htonl(INADDR_ANY); // htonl(2130706433); localhost: 127.0.0.1
-  serverAddr.sin_port = htons(_port);
+  struct sockaddr_in servAddr;
+  std::memset(&servAddr, 0, sizeof(servAddr));
+  servAddr.sin_family = AF_INET;
+  servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  servAddr.sin_port = htons(_port);
 
-  if (bind(_serverFd, (const struct sockaddr*)&serverAddr, sizeof(serverAddr)) <
-      0)
+  if (bind(_serverFd, (const struct sockaddr*)&servAddr, sizeof(servAddr)) < 0)
     error("failed to bind server socket");
 
   if (listen(_serverFd, SOMAXCONN) < 0)
@@ -90,9 +88,8 @@ void Server::disconnectClient(Client& client, size_t i)
   _clients.erase(_clients.begin() + i - 1);
 }
 
-void Server::handleClient(Client& client, size_t i)
+void Server::receiveFromClient(Client& client, size_t i) // Receive from Client
 {
-  // CLIENT STATE READING
   char buffer[1024];
   int bytes = recv(client.getFd(), buffer, sizeof(buffer), 0);
   if (bytes > 0) {
@@ -101,6 +98,8 @@ void Server::handleClient(Client& client, size_t i)
     std::cout << "Client " << i << ": " << buffer;
     // TODO: STATEMACHINE
     // processBuffer(client);
+    if (!client.getOutBuff().empty())
+      _pfds[i].events |= POLLOUT;
   } else if (bytes == 0) {
     std::cout << "[SERVER] Client " << i << " disconnected\n";
     disconnectClient(client, i);
@@ -108,10 +107,20 @@ void Server::handleClient(Client& client, size_t i)
   {
     std::cout << "[SERVER] No data from Client " << i << std::endl;
   }
+}
 
-  // CLIENT STATE SENDING...
-  // send(client.getFd(), response, response.size(), 0);
-  // send(fd, buffer, sizeof(buffer), flags);
+void Server::sendToClient(Client& client, size_t i) // Send to Client
+{
+  size_t toSend = 1024;
+  if (client.getOutBuff().size() < toSend)
+    toSend = client.getOutBuff().size();
+  int bytes = send(client.getFd(), client.getOutBuff().data(), toSend, 0);
+  if (bytes > 0) {
+    client.getOutBuff().erase(client.getOutBuff().begin(),
+                              client.getOutBuff().begin() + bytes);
+    if (client.getOutBuff().empty())
+      _pfds[i].events &= ~POLLOUT;
+  }
 }
 
 void Server::run()
@@ -122,11 +131,16 @@ void Server::run()
     if (ready < 0)
       error("poll failed");
     for (size_t i = 0; i < _pfds.size(); i++) {
-      if (_pfds[i].revents & POLLIN) {
-        if (_pfds[i].fd == _serverFd)
-          acceptClient();
-        else
-          handleClient(_clients[i - 1], i);
+      if (_pfds[i].fd == _serverFd && (_pfds[i].revents & POLLIN))
+        acceptClient();
+      else {
+        Client& client = _clients[i - 1];
+        if (_pfds[i].revents & POLLIN) // Receive Data
+          receiveFromClient(client, i);
+        if ((_pfds[i].revents & POLLOUT)) // Send Data
+          sendToClient(client, i);
+        if (_pfds[i].revents & (POLLHUP | POLLERR)) // Error
+          disconnectClient(client, i);
       }
     }
   }
