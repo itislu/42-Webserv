@@ -1,8 +1,8 @@
 #pragma once
-#include "client/Client.hpp"
 #ifndef STATE_READ_START_LINE_HPP
 #define STATE_READ_START_LINE_HPP
 
+#include "client/Client.hpp"
 #include "http/states/IState.hpp"
 #include <cstddef>
 

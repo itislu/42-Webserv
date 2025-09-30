@@ -4,11 +4,14 @@
 #include <string>
 #include <unistd.h>
 
-Client::Client() {}
-
-Client::Client(int fd)
+Client::Client()
+  : _fd(0)
 {
-  _fd = fd;
+}
+
+Client::Client(int fdes)
+  : _fd(fdes)
+{
 }
 
 Client::~Client()

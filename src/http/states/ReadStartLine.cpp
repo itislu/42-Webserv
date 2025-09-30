@@ -65,16 +65,16 @@ ReadStartLine& ReadStartLine::operator=(const ReadStartLine& other)
 
 void ReadStartLine::_parseMethod()
 {
-  Client::Buffer buff = client->getBuffer();
+  Client::Buffer buff = getClient()->getBuffer();
   Client::Buffer tokens;
 
   tokens.push_back(http::SP); // todo const ??
   try {
     std::string strMethod =
-      tryGetStrUntil(client->getBuffer(), _iStart, tokens);
+      tryGetStrUntil(getClient()->getBuffer(), _iStart, tokens);
     _iStart += strMethod.size() + tokens.size();
     Request::Method method = Request::strToMethod(strMethod);
-    client->getRequest().setMethod(method);
+    getClient()->getRequest().setMethod(method);
     if (method == Request::UNDEFINED) {
       // TODO ALAAAAARM "method not defined/available"
       return;
@@ -87,14 +87,15 @@ void ReadStartLine::_parseMethod()
 
 void ReadStartLine::_parseUri()
 {
-  Client::Buffer buff = client->getBuffer();
+  Client::Buffer buff = getClient()->getBuffer();
   Client::Buffer tokens;
 
   tokens.push_back(http::SP); // todo const ??
   try {
-    std::string rawUri = tryGetStrUntil(client->getBuffer(), _iStart, tokens);
+    std::string rawUri =
+      tryGetStrUntil(getClient()->getBuffer(), _iStart, tokens);
     _iStart += rawUri.size() + tokens.size();
-    client->getRequest().getUri().setRaw(rawUri);
+    getClient()->getRequest().getUri().setRaw(rawUri);
     _parseState = ParseVersion;
 
     // TODO validate URI --> OK/ALARM
@@ -105,16 +106,16 @@ void ReadStartLine::_parseUri()
 
 void ReadStartLine::_parseVersion()
 {
-  Client::Buffer buff = client->getBuffer();
+  Client::Buffer buff = getClient()->getBuffer();
   Client::Buffer tokens;
 
   tokens.push_back(http::CR); // todo const ??
   tokens.push_back(http::LF); // todo const ??
   try {
     std::string strVersion =
-      tryGetStrUntil(client->getBuffer(), _iStart, tokens);
+      tryGetStrUntil(getClient()->getBuffer(), _iStart, tokens);
     _iStart += strVersion.size() + tokens.size();
-    client->getRequest().setVersion(strVersion);
+    getClient()->getRequest().setVersion(strVersion);
 
     // TODO validate Version --> OK/ALARM
   } catch (const std::out_of_range& e) {

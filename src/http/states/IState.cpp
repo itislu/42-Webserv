@@ -4,17 +4,28 @@
 /* ************************************************************************** */
 // PUBLIC
 
-IState::IState() {}
-
 IState::IState(Client* client)
-  : client(client)
+  : _client(client)
 {
 }
 
 IState::~IState() {}
 
+Client* IState::getClient() const
+{
+  return _client;
+}
+
+/* ************************************************************************** */
+// PRIVATE
+
+IState::IState()
+  : _client(NULL)
+{
+}
+
 IState::IState(const IState& other)
-  : client(other.client)
+  : _client(other._client)
 {
   *this = other;
 }
@@ -26,6 +37,3 @@ IState& IState::operator=(const IState& other)
   }
   return *this;
 }
-
-/* ************************************************************************** */
-// PRIVATE

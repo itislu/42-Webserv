@@ -12,13 +12,14 @@ public:
   virtual ~IState();
   virtual void run() = 0;
 
-protected:
-  Client* client;
+  Client* getClient() const;
 
 private:
   IState();
   IState(const IState& other);
   IState& operator=(const IState& other);
+
+  Client* _client;
 };
 
 #endif // I_STATE_HPP

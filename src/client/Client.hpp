@@ -12,7 +12,9 @@ public:
   typedef std::vector<unsigned char> Buffer;
 
   Client();
-  Client(int fd);
+  explicit Client(int fdes);
+  Client(const Client& other);
+  Client& operator=(const Client& other);
   ~Client();
 
   int getFd() const;
