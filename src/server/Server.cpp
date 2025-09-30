@@ -102,10 +102,9 @@ void Server::receiveFromClient(Client& client, size_t& i)
     client.addToInBuff(buffer, bytes);
     std::cout << "Client " << i << ": ";
     std::cout.write(buffer, bytes);
-    std::cout << std::endl;
-    std::cout << "Client " << i << ": " << buffer;
 
     // TODO: STATEMACHINE/PARSING
+
     if (client.hasDataToSend())
       _pfds[i].events |= POLLOUT; // enable POLLOUT
   } else if (bytes == 0) {
