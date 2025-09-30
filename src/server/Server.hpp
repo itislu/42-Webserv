@@ -15,9 +15,9 @@ public:
   void run();
   void initSocket();
   void acceptClient();
-  void receiveFromClient(Client& client, size_t i);
-  void disconnectClient(Client& client, size_t i);
-  void sendToClient(Client& client);
+  void receiveFromClient(Client& client, size_t& i);
+  void disconnectClient(Client& client, size_t& i);
+  void sendToClient(Client& client, size_t i);
 
 private:
   int _port;

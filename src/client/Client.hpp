@@ -1,7 +1,6 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <poll.h>
 #include <string>
 #include <vector>
 
@@ -10,7 +9,7 @@ class Client
 public:
   typedef std::vector<unsigned char> Buffer;
   Client();
-  Client(int fd, struct pollfd* pfd);
+  Client(int fd);
   ~Client();
 
   int getFd() const;
@@ -32,7 +31,6 @@ private:
   int _state;
   Buffer _inBuff;
   Buffer _outBuff;
-  struct pollfd* _pfd;
 };
 
 #endif

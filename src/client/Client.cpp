@@ -2,11 +2,10 @@
 
 Client::Client() {}
 
-Client::Client(int fd, struct pollfd* pfd)
+Client::Client(int fd)
 {
   _fd = fd;
   _state = 0;
-  _pfd = pfd;
 }
 
 Client::~Client() {}
@@ -39,20 +38,16 @@ void Client::addToInBuff(char* buffer, int bytes)
 void Client::addToOutBuff(std::string str)
 {
   _outBuff.insert(_outBuff.end(), str.begin(), str.end());
-  _pfd->events |= POLLOUT;
 }
 
 void Client::addToOutBuff(char* buffer, int bytes)
 {
   _outBuff.insert(_outBuff.end(), buffer, buffer + bytes);
-  _pfd->events |= POLLOUT;
 }
 
 void Client::removeFromOutBuff(int bytes)
 {
   _outBuff.erase(_outBuff.begin(), _outBuff.begin() + bytes);
-  if (!hasDataToSend())
-    _pfd->events &= ~POLLOUT;
 }
 
 bool Client::hasDataToSend() const

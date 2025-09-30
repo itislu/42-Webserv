@@ -64,10 +64,14 @@ void Server::initSocket()
 void Server::acceptClient()
 {
   int clientFd = accept(_serverFd, NULL, NULL);
-  if (clientFd < 0)
+  if (clientFd < 0) {
     error("failed to accept new client");
+  }
 
-  fcntl(clientFd, F_SETFL, O_NONBLOCK);
+  if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
+    close(clientFd);
+    error("failed to set client non-blocking");
+  }
 
   struct pollfd pfd;
   pfd.fd = clientFd;
@@ -75,29 +79,35 @@ void Server::acceptClient()
   pfd.revents = 0;
   _pfds.push_back(pfd);
 
-  Client client(clientFd, &pfd);
+  Client client(clientFd);
   _clients.push_back(client);
 
   std::cout << "[SERVER] new client connected, fd=" << clientFd << std::endl;
 }
 
-void Server::disconnectClient(Client& client, size_t i)
+void Server::disconnectClient(Client& client, size_t& i)
 {
   std::cout << "[SERVER] Client " << i << " disconnected\n";
   close(client.getFd());
   _pfds.erase(_pfds.begin() + i);
   _clients.erase(_clients.begin() + i - 1);
+  i--;
 }
 
-void Server::receiveFromClient(Client& client, size_t i)
+void Server::receiveFromClient(Client& client, size_t& i)
 {
   char buffer[1024];
   int bytes = recv(client.getFd(), buffer, sizeof(buffer), 0);
   if (bytes > 0) {
     client.addToInBuff(buffer, bytes);
-    buffer[bytes] = '\0';
+    std::cout << "Client " << i << ": ";
+    std::cout.write(buffer, bytes);
+    std::cout << std::endl;
     std::cout << "Client " << i << ": " << buffer;
-    // TODO: STATEMACHINE
+
+    // TODO: STATEMACHINE/PARSING
+    if (client.hasDataToSend())
+      _pfds[i].events |= POLLOUT; // enable POLLOUT
   } else if (bytes == 0) {
     disconnectClient(client, i);
   } else // bytes < 0
@@ -106,13 +116,17 @@ void Server::receiveFromClient(Client& client, size_t i)
   }
 }
 
-void Server::sendToClient(Client& client)
+void Server::sendToClient(Client& client, size_t i)
 {
   size_t maxChunk = 1024;
   size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
   int bytes = send(client.getFd(), client.getOutBuff().data(), toSend, 0);
-  if (bytes > 0)
+  if (bytes > 0) {
     client.removeFromOutBuff(bytes);
+    if (!client.hasDataToSend()) {
+      _pfds[i].events &= ~POLLOUT; // disable POLLOUT
+    }
+  }
 }
 
 void Server::run()
@@ -130,7 +144,7 @@ void Server::run()
         if (_pfds[i].revents & POLLIN) // Receive Data
           receiveFromClient(client, i);
         if ((_pfds[i].revents & POLLOUT)) // Send Data
-          sendToClient(client);
+          sendToClient(client, i);
         if (_pfds[i].revents & (POLLHUP | POLLERR)) // Error
           disconnectClient(client, i);
       }
