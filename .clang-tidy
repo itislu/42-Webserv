@@ -49,8 +49,13 @@ CheckOptions:
     value: '1.0;100.0;0.1' # 1.0 and 100.0 are default, 0.1 for decimal base operations.
 
 ExtraArgsBefore:
+  - -Wall
+  - -Wextra
+  - -Wpedantic
   - -Wdocumentation
   - -Wno-pragma-once-outside-header # Avoid 'clang-diagnostic-pragma-once-outside-header' warning when analyzing a header file on its own.
+  - -std=c++98
+  - --language=c++
 
 HeaderFileExtensions: ['', 'h', 'hh', 'hpp', 'hxx', 'ipp', 'tpp']
 
