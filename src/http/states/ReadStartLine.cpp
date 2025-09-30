@@ -4,6 +4,7 @@
 #include "http/http.hpp"
 #include "http/states/IState.hpp"
 #include "utils/tryGetStrUntil.hpp"
+#include <cstddef>
 #include <stdexcept>
 
 /* ************************************************************************** */
@@ -11,8 +12,9 @@
 
 ReadStartLine::ReadStartLine(Client* client)
   : IState(client)
+  , _parseState(ParseMethod)
+  , _iStart(0)
 {
-  _parseState = ParseMethod;
 }
 
 ReadStartLine::~ReadStartLine() {}
@@ -38,6 +40,29 @@ void ReadStartLine::run()
 /* ************************************************************************** */
 // PRIVATE
 
+ReadStartLine::ReadStartLine()
+  : IState(NULL)
+  , _parseState(ParseMethod)
+  , _iStart(0)
+{
+}
+
+ReadStartLine::ReadStartLine(const ReadStartLine& other)
+  : IState(NULL)
+  , _parseState(ParseMethod)
+  , _iStart(0)
+{
+  *this = other;
+}
+
+ReadStartLine& ReadStartLine::operator=(const ReadStartLine& other)
+{
+  if (this != &other) {
+    // todo copy logic
+  }
+  return *this;
+}
+
 void ReadStartLine::_parseMethod()
 {
   Client::Buffer buff = client->getBuffer();
@@ -55,7 +80,7 @@ void ReadStartLine::_parseMethod()
       return;
     }
     _parseState = ParseUri;
-  } catch (std::out_of_range e) {
+  } catch (const std::out_of_range& e) {
     return; // no space found
   }
 }
@@ -73,7 +98,7 @@ void ReadStartLine::_parseUri()
     _parseState = ParseVersion;
 
     // TODO validate URI --> OK/ALARM
-  } catch (std::out_of_range e) {
+  } catch (const std::out_of_range& e) {
     return; // no space found
   }
 }
@@ -92,7 +117,7 @@ void ReadStartLine::_parseVersion()
     client->getRequest().setVersion(strVersion);
 
     // TODO validate Version --> OK/ALARM
-  } catch (std::out_of_range e) {
+  } catch (const std::out_of_range& e) {
     return; // no space found
   }
 }

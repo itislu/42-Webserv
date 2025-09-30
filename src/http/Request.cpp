@@ -13,7 +13,10 @@ const Request::MethodMap Request::_methodMap[_methods] = {
 /* ************************************************************************** */
 // PUBLIC
 
-Request::Request() {}
+Request::Request()
+  : _method(UNDEFINED)
+{
+}
 
 Request::~Request() {}
 
@@ -58,9 +61,9 @@ void Request::setVersion(std::string& version)
   _version = version;
 }
 
+// NOLINTBEGIN (clang-tidy cppcoreguidelines-pro-bounds-constant-array-index)
 Request::Method Request::strToMethod(std::string& strMethod)
 {
-
   for (std::size_t i = 0; i < _methods; i++) {
     if (_methodMap[i].methodStr == strMethod) {
       return _methodMap[i].method;
@@ -68,6 +71,7 @@ Request::Method Request::strToMethod(std::string& strMethod)
   }
   return Request::UNDEFINED;
 }
+// NOLINTEND
 
 /* ************************************************************************** */
 // PRIVATE

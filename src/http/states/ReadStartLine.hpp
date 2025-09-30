@@ -12,7 +12,7 @@ class Client;
 class ReadStartLine : public IState
 {
 public:
-  ReadStartLine(Client* client);
+  explicit ReadStartLine(Client* client);
   ~ReadStartLine();
   void run();
 
@@ -23,6 +23,10 @@ private:
     ParseUri,
     ParseVersion
   };
+
+  ReadStartLine();
+  ReadStartLine(const ReadStartLine& other);
+  ReadStartLine& operator=(const ReadStartLine& other);
 
   ParseState _parseState;
   std::size_t _iStart;
