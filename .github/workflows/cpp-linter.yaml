@@ -23,10 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Create compilation database
-        run: |
-          cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          mv build/compile_commands.json .
-          rm -rf build
+        run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -37,7 +34,9 @@ jobs:
           tidy-checks: '' # Use .clang-tidy config file.
           version: '21'
           files-changed-only: false # Changes in header files can affect other files.
+          ignore: 'build'
           step-summary: true
+          database: 'build'
           tidy-review: true
           format-review: true
       - name: Fail if any cpp-linter checks failed
