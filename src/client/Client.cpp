@@ -2,7 +2,6 @@
 #include "http/Request.hpp"
 #include <cstddef>
 #include <string>
-#include <unistd.h>
 
 Client::Client()
   : _fd(0)

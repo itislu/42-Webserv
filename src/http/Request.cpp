@@ -1,5 +1,7 @@
 #include "Request.hpp"
+#include "http/Uri.hpp"
 #include <cstddef>
+#include <string>
 
 /* ************************************************************************** */
 // INIT

@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 // NOLINTBEGIN (clang-tidy cppcoreguidelines-narrowing-conversions)
 std::string tryGetStrUntil(const std::vector<unsigned char>& buffer,

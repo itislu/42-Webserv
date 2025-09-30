@@ -3,6 +3,7 @@
 #define REQUEST_HPP
 
 #include "http/Uri.hpp"
+#include <string>
 
 /* ************************************************************************** */
 class Request

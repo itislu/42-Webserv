@@ -1,5 +1,6 @@
 #include "IState.hpp"
 #include "client/Client.hpp"
+#include <cstddef>
 
 /* ************************************************************************** */
 // PUBLIC

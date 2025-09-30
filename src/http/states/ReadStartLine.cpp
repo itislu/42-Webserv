@@ -6,6 +6,7 @@
 #include "utils/tryGetStrUntil.hpp"
 #include <cstddef>
 #include <stdexcept>
+#include <string>
 
 /* ************************************************************************** */
 // PUBLIC
@@ -65,15 +66,14 @@ ReadStartLine& ReadStartLine::operator=(const ReadStartLine& other)
 
 void ReadStartLine::_parseMethod()
 {
-  Client::Buffer buff = getClient()->getBuffer();
+  const Client::Buffer buff = getClient()->getBuffer();
   Client::Buffer tokens;
 
   tokens.push_back(http::SP); // todo const ??
   try {
-    std::string strMethod =
-      tryGetStrUntil(getClient()->getBuffer(), _iStart, tokens);
+    std::string strMethod = tryGetStrUntil(buff, _iStart, tokens);
     _iStart += strMethod.size() + tokens.size();
-    Request::Method method = Request::strToMethod(strMethod);
+    const Request::Method method = Request::strToMethod(strMethod);
     getClient()->getRequest().setMethod(method);
     if (method == Request::UNDEFINED) {
       // TODO ALAAAAARM "method not defined/available"
@@ -87,13 +87,12 @@ void ReadStartLine::_parseMethod()
 
 void ReadStartLine::_parseUri()
 {
-  Client::Buffer buff = getClient()->getBuffer();
+  const Client::Buffer buff = getClient()->getBuffer();
   Client::Buffer tokens;
 
   tokens.push_back(http::SP); // todo const ??
   try {
-    std::string rawUri =
-      tryGetStrUntil(getClient()->getBuffer(), _iStart, tokens);
+    std::string rawUri = tryGetStrUntil(buff, _iStart, tokens);
     _iStart += rawUri.size() + tokens.size();
     getClient()->getRequest().getUri().setRaw(rawUri);
     _parseState = ParseVersion;
@@ -106,14 +105,13 @@ void ReadStartLine::_parseUri()
 
 void ReadStartLine::_parseVersion()
 {
-  Client::Buffer buff = getClient()->getBuffer();
+  const Client::Buffer buff = getClient()->getBuffer();
   Client::Buffer tokens;
 
   tokens.push_back(http::CR); // todo const ??
   tokens.push_back(http::LF); // todo const ??
   try {
-    std::string strVersion =
-      tryGetStrUntil(getClient()->getBuffer(), _iStart, tokens);
+    std::string strVersion = tryGetStrUntil(buff, _iStart, tokens);
     _iStart += strVersion.size() + tokens.size();
     getClient()->getRequest().setVersion(strVersion);
 

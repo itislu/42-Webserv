@@ -1,8 +1,8 @@
 #pragma once
-#include <cstddef>
 #ifndef TRY_GET_STR_UNTIL_HPP
 #define TRY_GET_STR_UNTIL_HPP
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

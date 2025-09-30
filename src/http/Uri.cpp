@@ -1,4 +1,5 @@
 #include "Uri.hpp"
+#include <string>
 
 /* ************************************************************************** */
 // PUBLIC
@@ -7,9 +8,13 @@ Uri::Uri() {}
 
 Uri::~Uri() {}
 
-Uri::Uri(const Uri& other) { *this = other; }
+Uri::Uri(const Uri& other)
+{
+  *this = other;
+}
 
-Uri& Uri::operator=(const Uri& other) {
+Uri& Uri::operator=(const Uri& other)
+{
   if (this != &other) {
     // todo copy logic
   }
