@@ -6,24 +6,21 @@ Client::Client(int fd)
   _state = 0;
 }
 
-Client::~Client()
-{
-
-}
+Client::~Client() {}
 
 int Client::getFd() const
 {
   return _fd;
 }
 
-int Client::getBytes() const
+Client::Buffer Client::getInBuff() const
 {
-  return _bytes;
+  return inBuff;
 }
 
-void Client::setBytes(int bytes)
+void Client::addToInBuff(std::string str)
 {
-  _bytes = bytes;
+  inBuff.insert(inBuff.end(), str.begin(), str.end());
 }
 
 void Client::addToInBuff(char* buffer, int bytes)

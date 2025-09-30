@@ -19,8 +19,6 @@ project(webserv VERSION 1.0)
 
 add_executable(${PROJECT_NAME}
   src/main.cpp
-  src/Server.cpp
-  src/Client.cpp
 )
 
 include_directories(PUBLIC ${PROJECT_SOURCE_DIR}/src)
@@ -29,6 +27,8 @@ target_link_libraries(${PROJECT_NAME}
   PRIVATE
   ftpp
   utils
+  server
+  client
 )
 
 
@@ -38,11 +38,11 @@ target_link_libraries(${PROJECT_NAME}
 add_subdirectory(lib/libftpp)
 
 
-
 # **************************************************************************** #
 # MODULES
 add_subdirectory(src/utils)
-
+add_subdirectory(src/server)
+add_subdirectory(src/client)
 
 
 # **************************************************************************** #
