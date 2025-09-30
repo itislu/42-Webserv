@@ -1,9 +1,10 @@
 #include "Client.hpp"
 
-Client::Client(int fd)
+Client::Client(int fd, struct pollfd* pfd)
 {
   _fd = fd;
   _state = 0;
+  _pfd = pfd;
 }
 
 Client::~Client() {}
@@ -15,30 +16,42 @@ int Client::getFd() const
 
 Client::Buffer Client::getInBuff() const
 {
-  return inBuff;
+  return _inBuff;
 }
 
 Client::Buffer Client::getOutBuff()
 {
-  return outBuff;
+  return _outBuff;
 }
 
 void Client::addToInBuff(std::string str)
 {
-  inBuff.insert(inBuff.end(), str.begin(), str.end());
+  _inBuff.insert(_inBuff.end(), str.begin(), str.end());
 }
 
 void Client::addToInBuff(char* buffer, int bytes)
 {
-  inBuff.insert(inBuff.end(), buffer, buffer + bytes);
+  _inBuff.insert(_inBuff.end(), buffer, buffer + bytes);
 }
 
 void Client::addToOutBuff(std::string str)
 {
-  outBuff.insert(outBuff.end(), str.begin(), str.end());
+  _outBuff.insert(_outBuff.end(), str.begin(), str.end());
 }
 
 void Client::addToOutBuff(char* buffer, int bytes)
 {
-  outBuff.insert(outBuff.end(), buffer, buffer + bytes);
+  _outBuff.insert(_outBuff.end(), buffer, buffer + bytes);
+}
+
+void Client::removeFromOutBuff(int bytes)
+{
+  _outBuff.erase(_outBuff.begin(), _outBuff.begin() + bytes);
+  // if (hasDataToSend())
+  //  _pfds[i].events &= ~POLLOUT;
+}
+
+bool Client::hasDataToSend() const
+{
+  return !_outBuff.empty();
 }

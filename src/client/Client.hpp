@@ -9,7 +9,7 @@ class Client
 {
 public:
   typedef std::vector<unsigned char> Buffer;
-  Client(int fd);
+  Client(int fd, struct pollfd* pfd);
   ~Client();
 
   int getFd() const;
@@ -22,11 +22,16 @@ public:
   void addToOutBuff(std::string str);
   void addToOutBuff(char* buffer, int bytes);
 
+  void removeFromOutBuff(int bytes);
+
+  bool hasDataToSend() const;
+
 private:
   int _fd;
   int _state;
-  Buffer inBuff;
-  Buffer outBuff;
+  Buffer _inBuff;
+  Buffer _outBuff;
+  struct pollfd* _pfd;
 };
 
 #endif
