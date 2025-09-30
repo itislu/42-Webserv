@@ -4,6 +4,7 @@ name: CPP Linter
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
     paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**/CMake*', '**.cmake', '**/Makefile', '**.mk', '**/.clang-*', '**/cpp-linter.yaml']
   push:
     branches: [main, master]
