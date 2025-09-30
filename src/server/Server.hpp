@@ -17,7 +17,7 @@ public:
   void acceptClient();
   void receiveFromClient(Client& client, size_t i);
   void disconnectClient(Client& client, size_t i);
-  void sendToClient(Client& client, size_t i);
+  void sendToClient(Client& client);
 
 private:
   int _port;

@@ -1,20 +1,21 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include <poll.h>
 #include <string>
-#include <unistd.h>
 #include <vector>
 
 class Client
 {
 public:
   typedef std::vector<unsigned char> Buffer;
+  Client();
   Client(int fd, struct pollfd* pfd);
   ~Client();
 
   int getFd() const;
   Buffer getInBuff() const;
-  Buffer getOutBuff();
+  Buffer getOutBuff() const;
 
   void addToInBuff(std::string str);
   void addToInBuff(char* buffer, int bytes);
