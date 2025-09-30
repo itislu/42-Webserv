@@ -1,38 +1,35 @@
 #pragma once
+#include "client/Client.hpp"
 #ifndef STATE_READ_START_LINE_HPP
 #define STATE_READ_START_LINE_HPP
 
-#include "client/Client.hpp"
 #include "http/states/IState.hpp"
 #include <cstddef>
 
-namespace {
-enum ParseState
-{
-  ParseMethod,
-  ParseUri,
-  ParseVersion
-};
-}
+class Client;
 
 /* ************************************************************************** */
 class ReadStartLine : public IState
 {
 public:
-  ReadStartLine();
+  ReadStartLine(Client* client);
   ~ReadStartLine();
-  ReadStartLine(const ReadStartLine& other);
-  ReadStartLine& operator=(const ReadStartLine& other);
-
-  void run(Client& client);
+  void run();
 
 private:
+  enum ParseState
+  {
+    ParseMethod,
+    ParseUri,
+    ParseVersion
+  };
+
   ParseState _parseState;
   std::size_t _iStart;
 
-  void _parseMethod(Client& client);
-  void _parseUri(Client& client);
-  void _parseVersion(Client& client);
+  void _parseMethod();
+  void _parseUri();
+  void _parseVersion();
 };
 
-#endif // STATE_READ_FIRST_LINE_HPP
+#endif

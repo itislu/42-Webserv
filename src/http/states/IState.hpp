@@ -2,18 +2,23 @@
 #ifndef I_STATE_HPP
 #define I_STATE_HPP
 
-#include "client/Client.hpp"
+class Client;
 
 /* ************************************************************************** */
 class IState
 {
 public:
-  IState();
+  explicit IState(Client* client);
   virtual ~IState();
+  virtual void run() = 0;
+
+protected:
+  Client* client;
+
+private:
+  IState();
   IState(const IState& other);
   IState& operator=(const IState& other);
-
-  virtual void run(Client& client) = 0;
 };
 
 #endif // I_STATE_HPP

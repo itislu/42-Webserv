@@ -4,10 +4,10 @@
 /* ************************************************************************** */
 // INIT
 
-const request::MethodMap Request::_methodMap[_methods] = {
-  { "GET", request::GET },
-  { "POST", request::POST },
-  { "DELETE", request::DELETE },
+const Request::MethodMap Request::_methodMap[_methods] = {
+  { "GET", Request::GET },
+  { "POST", Request::POST },
+  { "DELETE", Request::DELETE },
 };
 
 /* ************************************************************************** */
@@ -18,6 +18,9 @@ Request::Request() {}
 Request::~Request() {}
 
 Request::Request(const Request& other)
+  : _method(other._method)
+  , _uri(other._uri)
+  , _version(other._version)
 {
   *this = other;
 }
@@ -30,12 +33,12 @@ Request& Request::operator=(const Request& other)
   return *this;
 }
 
-request::Method Request::getMethod() const
+Request::Method Request::getMethod() const
 {
   return _method;
 }
 
-void Request::setMethod(request::Method method)
+void Request::setMethod(Request::Method method)
 {
   _method = method;
 }
@@ -55,7 +58,7 @@ void Request::setVersion(std::string& version)
   _version = version;
 }
 
-request::Method Request::strToMethod(std::string& strMethod)
+Request::Method Request::strToMethod(std::string& strMethod)
 {
 
   for (std::size_t i = 0; i < _methods; i++) {
@@ -63,7 +66,7 @@ request::Method Request::strToMethod(std::string& strMethod)
       return _methodMap[i].method;
     }
   }
-  return request::UNDEFINED;
+  return Request::UNDEFINED;
 }
 
 /* ************************************************************************** */

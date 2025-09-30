@@ -1,6 +1,5 @@
 
 #include "client/Client.hpp"
-#include "http/states/IState.hpp"
 #include "http/Request.hpp"
 #include "http/states/IState.hpp"
 #include "http/states/ReadStartLine.hpp"
@@ -11,10 +10,10 @@ static const std::string TESTER_NAME = "ReadStartLineTester";
 
 Client StateTest(std::string startLine)
 {
-  Client client =  Client(1);
+  Client client = Client();
   client.inBuffAddStr(startLine);
-  IState* state = new ReadStartLine();
-  state->run(client);
+  IState* state = new ReadStartLine(&client);
+  state->run();
   return client;
 }
 
@@ -22,7 +21,7 @@ TEST(TESTER_NAME, BasicRequests)
 {
   Client client = StateTest("GET test/ HTTP/1.0\r\n");
   Request& request = client.getRequest();
-  EXPECT_EQ(request.getMethod(), request::GET);
+  EXPECT_EQ(request.getMethod(), Request::GET);
   EXPECT_EQ(request.getUri().getRaw(), "test/");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 }

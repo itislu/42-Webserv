@@ -11,6 +11,7 @@ class Client
 public:
   typedef std::vector<unsigned char> Buffer;
 
+  Client();
   Client(int fd);
   ~Client();
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <unistd.h>
 
+Client::Client() {}
+
 Client::Client(int fd)
 {
   _fd = fd;
