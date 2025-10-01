@@ -2,7 +2,6 @@
 #include "client/Client.hpp"
 #include <algorithm>
 #include <asm-generic/socket.h>
-#include <bits/stdc++.h>
 #include <cstddef>
 #include <cstdlib> //exit()
 #include <cstring> //std::memset()
@@ -99,8 +98,7 @@ void Server::acceptClient()
   pfd.revents = 0;
   _pfds.push_back(pfd);
 
-  const Client client(clientFd);
-  _clients.push_back(client);
+  _clients.push_back(Client(clientFd));
 
   std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
 }
