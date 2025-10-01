@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include <string>
+#include <sys/types.h>
 #include <vector>
 
 class Client
@@ -9,7 +10,9 @@ class Client
 public:
   typedef std::vector<unsigned char> Buffer;
   Client();
-  Client(int fd);
+  explicit Client(int sockFd);
+  Client(const Client& other);
+  Client& operator=(const Client& other);
   ~Client();
 
   int getFd() const;
@@ -17,12 +20,12 @@ public:
   Buffer getOutBuff() const;
 
   void addToInBuff(std::string str);
-  void addToInBuff(char* buffer, int bytes);
+  void addToInBuff(std::vector<char>& buffer);
 
   void addToOutBuff(std::string str);
-  void addToOutBuff(char* buffer, int bytes);
+  void addToOutBuff(std::vector<char>& buffer);
 
-  void removeFromOutBuff(int bytes);
+  void removeFromOutBuff(ssize_t bytes);
 
   bool hasDataToSend() const;
 

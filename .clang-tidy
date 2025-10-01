@@ -12,6 +12,7 @@ Checks:
   # Remove
   - -bugprone-easily-swappable-parameters # C++98 is too limited to deal with this (no designated initializers, no compound literals, no scoped enums).
   - -misc-use-anonymous-namespace # static for functions is more visible.
+  - -cppcoreguidelines-c-copy-assignment-signature # to allow fcntl(), C-Style function
   # Aliases
   - -cert-dcl37-c,
     -cert-dcl51-cpp,
@@ -21,7 +22,7 @@ Checks:
     -cert-exp42-c,
     -cert-oop54-cpp,
     -cppcoreguidelines-avoid-magic-numbers,
-    -cppcoreguidelines-c-copy-assignment-signature,
+    -cppcoreguidelines-pro-type-vararg,
     -cppcoreguidelines-non-private-member-variables-in-classes,
     -hicpp-avoid-goto,
     -hicpp-braces-around-statements,
@@ -35,6 +36,7 @@ Checks:
     -hicpp-use-auto,
     -hicpp-use-equals-delete,
     -hicpp-use-nullptr,
+    -hicpp-vararg,
 
 CheckOptions:
   - key: bugprone-empty-catch.IgnoreCatchWithKeywords

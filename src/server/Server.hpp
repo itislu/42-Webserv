@@ -1,23 +1,30 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <poll.h> //poll(), struct pollfd
+#include <cstddef>
+#include <sys/poll.h> //poll(), struct pollfd
 #include <vector>
 
 #include "client/Client.hpp"
 
+#ifndef MAX_CHUNK
+#define MAX_CHUNK 1024
+#endif
 class Server
 {
 public:
-  Server(int port);
+  explicit Server(int port);
+  Server(const Server& other);
+  Server& operator=(const Server& other);
   ~Server();
 
   void run();
   void initSocket();
   void acceptClient();
-  void receiveFromClient(Client& client, size_t& i);
-  void disconnectClient(Client& client, size_t& i);
-  void sendToClient(Client& client, size_t i);
+  void receiveFromClient(Client& client, size_t& idx);
+  void disconnectClient(Client& client, size_t& idx);
+
+  static void sendToClient(Client& client, pollfd& pfd);
 
 private:
   int _port;

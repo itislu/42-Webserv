@@ -9,9 +9,9 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Server server(8080);
+  const int port = 8080;
+  Server server(port);
   server.run();
 
   return 0;
 }
-// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
