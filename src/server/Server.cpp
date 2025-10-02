@@ -119,7 +119,9 @@ void Server::receiveFromClient(Client& client, size_t& idx)
   if (bytes > 0) {
     client.addToInBuff(buffer);
     std::cout << "Client " << idx << ": ";
-    std::cout.write(&buffer[0], static_cast<std::streamsize>(bytes));
+    // will be removed is for testing ATM
+    // NOLINTNEXTLINE (cppcoreguidelines-pro-type-reinterpret-cast)
+    std::cout.write(reinterpret_cast<const char*>(&buffer[0]), bytes);
 
     // TODO: STATEMACHINE/PARSING
 
