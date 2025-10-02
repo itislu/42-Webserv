@@ -27,6 +27,8 @@ target_link_libraries(${PROJECT_NAME}
   PRIVATE
   ftpp
   utils
+  server
+  client
 )
 
 
@@ -36,11 +38,11 @@ target_link_libraries(${PROJECT_NAME}
 add_subdirectory(lib/libftpp)
 
 
-
 # **************************************************************************** #
 # MODULES
 add_subdirectory(src/utils)
-
+add_subdirectory(src/server)
+add_subdirectory(src/client)
 
 
 # **************************************************************************** #
