@@ -13,6 +13,8 @@
 class Server
 {
 public:
+  typedef std::vector<unsigned char> Buffer;
+
   explicit Server(int port);
   Server(const Server& other);
   Server& operator=(const Server& other);
