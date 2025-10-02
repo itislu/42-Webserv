@@ -20,10 +20,10 @@ public:
   Buffer getOutBuff() const;
 
   void addToInBuff(std::string str);
-  void addToInBuff(std::vector<char>& buffer);
+  void addToInBuff(const Buffer& buffer);
 
   void addToOutBuff(std::string str);
-  void addToOutBuff(std::vector<char>& buffer);
+  void addToOutBuff(const Buffer& buffer);
 
   void removeFromOutBuff(ssize_t bytes);
 
