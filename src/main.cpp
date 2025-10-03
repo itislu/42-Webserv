@@ -1,4 +1,4 @@
-#include "server/Server.hpp"
+// #include "server/Server.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[])
@@ -9,9 +9,9 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  const int port = 8080;
-  Server server(port);
-  server.run();
+  // const int port = 8080;
+  // Server server(port);
+  // server.run();
 
   return 0;
 }

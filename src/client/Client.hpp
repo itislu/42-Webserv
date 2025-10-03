@@ -1,6 +1,10 @@
+#pragma once
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "http/Request.hpp"
+#include "http/states/IState.hpp"
+#include "utils/Buffer.hpp"
 #include <string>
 #include <sys/types.h>
 #include <vector>
@@ -8,7 +12,6 @@
 class Client
 {
 public:
-  typedef std::vector<unsigned char> Buffer;
   Client();
   explicit Client(int sockFd);
   Client(const Client& other);
@@ -16,8 +19,9 @@ public:
   ~Client();
 
   int getFd() const;
-  Buffer getInBuff() const;
-  Buffer getOutBuff() const;
+  Buffer& getInBuff();
+  Buffer& getOutBuff();
+  Request& getRequest();
 
   void addToInBuff(std::string str);
   void addToInBuff(std::vector<char>& buffer);
@@ -34,6 +38,7 @@ private:
   int _state;
   Buffer _inBuff;
   Buffer _outBuff;
+  Request _request;
 };
 
 #endif

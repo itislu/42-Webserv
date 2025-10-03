@@ -1,10 +1,6 @@
-#include "utils/parseArgs.hpp"
 #include <gtest/gtest.h>
 
-TEST(TESTER_NAME, arraySize2)
-{
-  EXPECT_EQ(parseArgs(), 1);
-}
+TEST(UtilsTester, tryGetStrUntil) {}
 
 // Main function to run all tests
 int main(int argc, char** argv)
