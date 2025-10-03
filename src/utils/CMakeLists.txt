@@ -5,7 +5,7 @@
 set(LIB_NAME utils)
 
 add_library(${LIB_NAME} STATIC
-  tryGetStrUntil.cpp
+  Buffer.cpp
 )
 
 target_link_libraries(${LIB_NAME} 

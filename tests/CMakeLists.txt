@@ -51,6 +51,7 @@ function(add_my_test test_name)
     ftpp
     client
     http
+    # server
     utils
   )
 
@@ -61,11 +62,17 @@ endfunction()
 # **************************************************************************** #
 # Tester
 
+# utils
 add_my_test(utilsTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
 )
 
+# http
+add_my_test(tokenFinderTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/tokenFinderTester.cpp
+)
 
+# http/states
 add_my_test(readStartLineTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readStartLineTester.cpp
 )

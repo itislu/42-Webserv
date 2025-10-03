@@ -10,8 +10,8 @@ class IState
 public:
   explicit IState(Client* client);
   virtual ~IState();
-  virtual void run() = 0;
 
+  virtual void run() = 0;
   Client* getClient() const;
 
 private:

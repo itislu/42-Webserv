@@ -8,18 +8,16 @@
 class Uri
 {
 public:
-  Uri();
-  ~Uri();
-  Uri(const Uri& other);
-  Uri& operator=(const Uri& other);
-
   std::string getRaw() const;
   void setRaw(std::string& rawUri);
 
 private:
   std::string _raw;
-  // querry
-  // host
+  std::string _scheme;
+  std::string _authority;
+  std::string _path;
+  std::string _query;
+  std::string _fragment;
 };
 
 #endif // URI_HPP

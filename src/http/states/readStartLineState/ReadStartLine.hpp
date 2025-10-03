@@ -2,9 +2,9 @@
 #ifndef STATE_READ_START_LINE_HPP
 #define STATE_READ_START_LINE_HPP
 
-#include "client/Client.hpp"
-#include "http/states/IState.hpp"
 #include <cstddef>
+#include "http/states/IState.hpp"
+#include "http/states/readStartLineState/IReadStartLineState.hpp"
 
 class Client;
 
@@ -17,19 +17,13 @@ public:
   void run();
 
 private:
-  enum ParseState
-  {
-    ParseMethod,
-    ParseUri,
-    ParseVersion
-  };
+  IReadStartLineState* state;
 
   ReadStartLine();
   ReadStartLine(const ReadStartLine& other);
   ReadStartLine& operator=(const ReadStartLine& other);
 
-  ParseState _parseState;
-  std::size_t _iStart;
+  std::size_t _sizeStartLine;
 
   void _parseMethod();
   void _parseUri();

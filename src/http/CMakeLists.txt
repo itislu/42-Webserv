@@ -1,5 +1,5 @@
 # **************************************************************************** #
-# UTILS MODULE
+# HTTP MODULE
 # **************************************************************************** #
 
 set(LIB_NAME http)
@@ -8,6 +8,7 @@ add_library(${LIB_NAME} STATIC
   states/IState.cpp
   states/ReadStartLine.cpp
   Request.cpp
+  TokenFinder.cpp
   Uri.cpp
 )
 

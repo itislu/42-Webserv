@@ -28,9 +28,8 @@ target_link_libraries(${PROJECT_NAME}
   ftpp
   client
   http
+  # server
   utils
-  server
-  client
 )
 
 
@@ -44,9 +43,8 @@ add_subdirectory(lib/libftpp)
 # MODULES
 add_subdirectory(src/client)
 add_subdirectory(src/http)
+# add_subdirectory(src/server)
 add_subdirectory(src/utils)
-add_subdirectory(src/server)
-add_subdirectory(src/client)
 
 
 # **************************************************************************** #
