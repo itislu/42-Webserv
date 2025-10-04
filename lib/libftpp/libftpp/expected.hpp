@@ -1,11 +1,9 @@
 #pragma once
-#ifndef LIBFTPP_EXPECTED_HPP
-#	define LIBFTPP_EXPECTED_HPP
 
-#	include "libftpp/assert.hpp"
-#	include "libftpp/safe_bool.hpp"
-#	include "libftpp/type_traits.hpp"
-#	include <exception>
+#include "libftpp/assert.hpp"
+#include "libftpp/safe_bool.hpp"
+#include "libftpp/type_traits.hpp"
+#include <exception>
 
 namespace ft {
 
@@ -244,9 +242,7 @@ extern const unexpect_t unexpect;
 
 } // namespace ft
 
-#	include "libftpp/expected/bad_expected_access.tpp" // IWYU pragma: export
-#	include "libftpp/expected/expected.tpp"            // IWYU pragma: export
-#	include "libftpp/expected/expected_void.tpp"       // IWYU pragma: export
-#	include "libftpp/expected/unexpected.tpp"          // IWYU pragma: export
-
-#endif // LIBFTPP_EXPECTED_HPP
+#include "libftpp/expected/bad_expected_access.tpp" // IWYU pragma: export
+#include "libftpp/expected/expected.tpp"            // IWYU pragma: export
+#include "libftpp/expected/expected_void.tpp"       // IWYU pragma: export
+#include "libftpp/expected/unexpected.tpp"          // IWYU pragma: export

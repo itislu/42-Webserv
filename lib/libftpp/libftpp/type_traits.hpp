@@ -1,8 +1,6 @@
 #pragma once
-#ifndef LIBFTPP_TYPE_TRAITS_HPP
-#	define LIBFTPP_TYPE_TRAITS_HPP
 
-#	include "libftpp/type_traits/has_member_function.ipp"
+#include "libftpp/type_traits/has_member_function.ipp"
 
 /**
  * @brief Generates type traits that check if a class has a specific public
@@ -13,8 +11,8 @@
  *
  * Usage example: `FT_HAS_MEMBER_FUNCTION(void, swap, (T&))`
  */
-#	define FT_HAS_MEMBER_FUNCTION(RETURN_TYPE, NAME, ARGS_IN_PARENS)       \
-		LIBFTPP_HAS_MEMBER_FUNCTION_IMPL(RETURN_TYPE, NAME, ARGS_IN_PARENS)
+#define FT_HAS_MEMBER_FUNCTION(RETURN_TYPE, NAME, ARGS_IN_PARENS)       \
+	LIBFTPP_HAS_MEMBER_FUNCTION_IMPL(RETURN_TYPE, NAME, ARGS_IN_PARENS)
 
 /**
  * @brief A macro that emulates C++20's `requires` clauses in C++98
@@ -47,7 +45,7 @@
  * `clang-format`: To help `clang-format` format code using this macro better,
  * add `FT_REQUIRES` to `StatementMacros` in the `clang-format` config.
  */
-#	define FT_REQUIRES(EXPRESSION) LIBFTPP_REQUIRES_IMPL(EXPRESSION)
+#define FT_REQUIRES(EXPRESSION) LIBFTPP_REQUIRES_IMPL(EXPRESSION)
 
 namespace ft {
 
@@ -403,7 +401,5 @@ struct is_returnable;
 
 } // namespace ft
 
-#	include "libftpp/type_traits/requires.ipp"    // IWYU pragma: keep
-#	include "libftpp/type_traits/type_traits.tpp" // IWYU pragma: export
-
-#endif // LIBFTPP_TYPE_TRAITS_HPP
+#include "libftpp/type_traits/requires.ipp"    // IWYU pragma: keep
+#include "libftpp/type_traits/type_traits.tpp" // IWYU pragma: export

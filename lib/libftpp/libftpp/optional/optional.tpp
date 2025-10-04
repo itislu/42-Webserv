@@ -1,13 +1,11 @@
 // IWYU pragma: private; include "libftpp/optional.hpp"
 #pragma once
-#ifndef LIBFTPP_OPTIONAL_OPTIONAL_TPP
-#	define LIBFTPP_OPTIONAL_OPTIONAL_TPP
 
-#	include "libftpp/optional.hpp"
-#	include "libftpp/safe_bool.hpp"
-#	include <algorithm>
-#	include <cassert>
-#	include <cstddef>
+#include "libftpp/optional.hpp"
+#include "libftpp/safe_bool.hpp"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
 
 namespace ft {
 
@@ -395,5 +393,3 @@ bool operator>=(const U& value, const optional<T>& opt)
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_OPTIONAL_OPTIONAL_TPP

@@ -1,16 +1,14 @@
 // IWYU pragma: private; include "libftpp/numeric.hpp"
 #pragma once
-#ifndef LIBFTPP_NUMERIC_NUMERIC_CAST_TPP
-#	define LIBFTPP_NUMERIC_NUMERIC_CAST_TPP
 
-#	include "libftpp/expected.hpp"
-#	include "libftpp/numeric.hpp"
-#	include "libftpp/type_traits.hpp"
-#	include <cmath>
-#	include <ios>
-#	include <limits>
-#	include <new>
-#	include <sstream>
+#include "libftpp/expected.hpp"
+#include "libftpp/numeric.hpp"
+#include "libftpp/type_traits.hpp"
+#include <cmath>
+#include <ios>
+#include <limits>
+#include <new>
+#include <sstream>
 
 namespace ft {
 
@@ -184,5 +182,3 @@ struct impl<To, unsigned char> {
 } // namespace _numeric_cast
 
 } // namespace ft
-
-#endif // LIBFTPP_NUMERIC_NUMERIC_CAST_TPP

@@ -1,10 +1,8 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
-#ifndef LIBFTPP_ITERATOR_DATA_TPP
-#	define LIBFTPP_ITERATOR_DATA_TPP
 
-#	include "libftpp/iterator.hpp"
-#	include <cstddef>
+#include "libftpp/iterator.hpp"
+#include <cstddef>
 
 namespace ft {
 
@@ -27,5 +25,3 @@ T* data(T (&array)[N]) throw()
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_ITERATOR_DATA_TPP

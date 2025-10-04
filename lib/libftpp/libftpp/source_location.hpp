@@ -1,20 +1,18 @@
 #pragma once
-#ifndef LIBFTPP_SOURCE_LOCATION_HPP
-#	define LIBFTPP_SOURCE_LOCATION_HPP
 
-#	include <stdint.h>
-#	include <string>
+#include <stdint.h>
+#include <string>
 
-#	if defined(__GNUC__) || defined(__clang__)
-#		define FT_SOURCE_LOCATION_CURRENT()                               \
-			(ft::source_location(__LINE__, __FILE__, __PRETTY_FUNCTION__))
-#	elif defined(_MSC_VER)
-#		define FT_SOURCE_LOCATION_CURRENT()                       \
-			(ft::source_location(__LINE__, __FILE__, __FUNCSIG__))
-#	else // defined(__GNUC__) || defined(__clang__)
-#		define FT_SOURCE_LOCATION_CURRENT()                    \
-			(ft::source_location(__LINE__, __FILE__, __func__))
-#	endif // defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
+#	define FT_SOURCE_LOCATION_CURRENT()                               \
+		(ft::source_location(__LINE__, __FILE__, __PRETTY_FUNCTION__))
+#elif defined(_MSC_VER)
+#	define FT_SOURCE_LOCATION_CURRENT()                       \
+		(ft::source_location(__LINE__, __FILE__, __FUNCSIG__))
+#else
+#	define FT_SOURCE_LOCATION_CURRENT()                    \
+		(ft::source_location(__LINE__, __FILE__, __func__))
+#endif
 
 namespace ft {
 
@@ -45,5 +43,3 @@ private:
 };
 
 } // namespace ft
-
-#endif // LIBFTPP_SOURCE_LOCATION_HPP

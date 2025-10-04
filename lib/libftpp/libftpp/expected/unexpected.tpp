@@ -1,10 +1,8 @@
 // IWYU pragma: private; include "libftpp/expected.hpp"
 #pragma once
-#ifndef LIBFTPP_EXPECTED_UNEXPECTED_TPP
-#	define LIBFTPP_EXPECTED_UNEXPECTED_TPP
 
-#	include "libftpp/expected.hpp"
-#	include <algorithm>
+#include "libftpp/expected.hpp"
+#include <algorithm>
 
 namespace ft {
 
@@ -70,5 +68,3 @@ struct is_unexpected<unexpected<T> > {
 } // namespace _unexpected
 
 } // namespace ft
-
-#endif // LIBFTPP_EXPECTED_UNEXPECTED_TPP

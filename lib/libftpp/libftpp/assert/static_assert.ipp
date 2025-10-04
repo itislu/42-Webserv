@@ -1,8 +1,6 @@
 #pragma once
-#ifndef LIBFTPP_ASSERT_STATIC_ASSERT_IPP
-#	define LIBFTPP_ASSERT_STATIC_ASSERT_IPP
 
-#	include "libftpp/preprocessor.hpp"
+#include "libftpp/preprocessor.hpp"
 
 /**
  * This implementation enhances a common template technique to create an
@@ -37,11 +35,11 @@
  * Inspiration:
  * https://web.archive.org/web/20130323104707/https://www.drdobbs.com/compile-time-assertions/184401873
  */
-#	define LIBFTPP_STATIC_ASSERT_IMPL(EXPR)                                  \
-		enum {                                                                \
-			FT_APPEND_UNIQUE_NUM(static_assert_) =                            \
-			    ft::_static_assert::impl<bool(EXPR)>::static_assertion_failed \
-		}
+#define LIBFTPP_STATIC_ASSERT_IMPL(EXPR)                                  \
+	enum {                                                                \
+		FT_APPEND_UNIQUE_NUM(static_assert_) =                            \
+		    ft::_static_assert::impl<bool(EXPR)>::static_assertion_failed \
+	}
 
 namespace ft {
 namespace _static_assert {
@@ -56,5 +54,3 @@ struct impl<true> {
 
 } // namespace _static_assert
 } // namespace ft
-
-#endif // LIBFTPP_ASSERT_STATIC_ASSERT_IPP

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef LIBFTPP_OPERATORS_HPP
-#	define LIBFTPP_OPERATORS_HPP
 
 namespace ft {
 namespace operators {
@@ -42,6 +40,4 @@ bool operator>=(const T& lhs, const U& rhs);
 } // namespace operators
 } // namespace ft
 
-#	include "libftpp/operators/operators.tpp" // IWYU pragma: export
-
-#endif // LIBFTPP_OPERATORS_HPP
+#include "libftpp/operators/operators.tpp" // IWYU pragma: export

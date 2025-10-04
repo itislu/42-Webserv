@@ -1,11 +1,9 @@
 // IWYU pragma: private; include "libftpp/algorithm.hpp"
 #pragma once
-#ifndef LIBFTPP_ALGORITHM_COPY_TPP
-#	define LIBFTPP_ALGORITHM_COPY_TPP
 
-#	include "libftpp/algorithm.hpp"
-#	include <algorithm>
-#	include <iterator>
+#include "libftpp/algorithm.hpp"
+#include <algorithm>
+#include <iterator>
 
 namespace ft {
 
@@ -73,5 +71,3 @@ OutputIt copy_n(InputIt first,
 } // namespace _copy
 
 } // namespace ft
-
-#endif // LIBFTPP_ALGORITHM_COPY_TPP

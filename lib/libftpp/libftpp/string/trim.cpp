@@ -51,4 +51,4 @@ int main()
 		std::cout << "'" << ft::trim(tests[i]) << "'" << '\n';
 	}
 }
-#endif // TEST_STRING
+#endif

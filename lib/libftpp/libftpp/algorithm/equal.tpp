@@ -1,10 +1,8 @@
 // IWYU pragma: private; include "libftpp/algorithm.hpp"
 #pragma once
-#ifndef LIBFTPP_ALGORITHM_EQUAL_TPP
-#	define LIBFTPP_ALGORITHM_EQUAL_TPP
 
-#	include "libftpp/algorithm.hpp"
-#	include <algorithm>
+#include "libftpp/algorithm.hpp"
+#include <algorithm>
 
 namespace ft {
 
@@ -47,5 +45,3 @@ bool equal(InputIt1 first1,
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_ALGORITHM_EQUAL_TPP

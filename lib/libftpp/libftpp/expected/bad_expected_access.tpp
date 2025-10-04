@@ -1,9 +1,7 @@
 // IWYU pragma: private; include "libftpp/expected.hpp"
 #pragma once
-#ifndef LIBFTPP_EXPECTED_BAD_EXPECTED_ACCESS_TPP
-#	define LIBFTPP_EXPECTED_BAD_EXPECTED_ACCESS_TPP
 
-#	include "libftpp/expected.hpp"
+#include "libftpp/expected.hpp"
 
 namespace ft {
 
@@ -25,5 +23,3 @@ E& bad_expected_access<E>::error() throw()
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_EXPECTED_BAD_EXPECTED_ACCESS_TPP

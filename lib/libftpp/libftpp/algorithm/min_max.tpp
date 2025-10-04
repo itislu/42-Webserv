@@ -1,9 +1,7 @@
 // IWYU pragma: private; include "libftpp/algorithm.hpp"
 #pragma once
-#ifndef LIBFTPP_ALGORITHM_MIN_MAX_TPP
-#	define LIBFTPP_ALGORITHM_MIN_MAX_TPP
 
-#	include "libftpp/algorithm.hpp"
+#include "libftpp/algorithm.hpp"
 
 namespace ft {
 
@@ -60,5 +58,3 @@ const T& min(const T& a, const T& b, Compare comp)
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_ALGORITHM_MIN_MAX_TPP

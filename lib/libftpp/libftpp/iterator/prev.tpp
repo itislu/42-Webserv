@@ -1,12 +1,10 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
-#ifndef LIBFTPP_ITERATOR_PREV_TPP
-#	define LIBFTPP_ITERATOR_PREV_TPP
 
-#	include "libftpp/assert.hpp"
-#	include "libftpp/iterator.hpp"
-#	include "libftpp/type_traits.hpp"
-#	include <iterator>
+#include "libftpp/assert.hpp"
+#include "libftpp/iterator.hpp"
+#include "libftpp/type_traits.hpp"
+#include <iterator>
 
 namespace ft {
 
@@ -41,5 +39,3 @@ BidirIt prev(BidirIt it,
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_ITERATOR_PREV_TPP

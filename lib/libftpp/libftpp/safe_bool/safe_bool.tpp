@@ -1,11 +1,9 @@
 // IWYU pragma: private; include "libftpp/safe_bool.hpp"
 #pragma once
-#ifndef LIBFTPP_SAFE_BOOL_SAFE_BOOL_TPP
-#	define LIBFTPP_SAFE_BOOL_SAFE_BOOL_TPP
 
-#	include "libftpp/safe_bool.hpp"
-#	include "safe_bool_base.hpp"
-#	include <cstddef>
+#include "libftpp/safe_bool.hpp"
+#include "safe_bool_base.hpp"
+#include <cstddef>
 
 namespace ft {
 
@@ -78,5 +76,3 @@ bool operator!=(const U& /*lhs*/, const safe_bool<T>& rhs)
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_SAFE_BOOL_SAFE_BOOL_TPP

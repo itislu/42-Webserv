@@ -1,10 +1,8 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
-#ifndef LIBFTPP_ITERATOR_EMPTY_TPP
-#	define LIBFTPP_ITERATOR_EMPTY_TPP
 
-#	include "libftpp/iterator.hpp"
-#	include <cstddef>
+#include "libftpp/iterator.hpp"
+#include <cstddef>
 
 namespace ft {
 
@@ -21,5 +19,3 @@ bool empty(const T (& /*unused*/)[N]) throw()
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_ITERATOR_EMPTY_TPP

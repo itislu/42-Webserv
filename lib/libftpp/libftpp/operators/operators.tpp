@@ -1,9 +1,7 @@
 // IWYU pragma: private; include "libftpp/operators.hpp"
 #pragma once
-#ifndef LIBFTPP_OPERATORS_OPERATORS_TPP
-#	define LIBFTPP_OPERATORS_OPERATORS_TPP
 
-#	include "libftpp/operators.hpp"
+#include "libftpp/operators.hpp"
 
 namespace ft {
 namespace operators {
@@ -40,5 +38,3 @@ bool operator>=(const T& lhs, const U& rhs)
 
 } // namespace operators
 } // namespace ft
-
-#endif // LIBFTPP_OPERATORS_OPERATORS_TPP

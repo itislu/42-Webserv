@@ -1,6 +1,4 @@
 #pragma once
-#ifndef LIBFTPP_FUNCTIONAL_HPP
-#	define LIBFTPP_FUNCTIONAL_HPP
 
 namespace ft {
 
@@ -232,7 +230,5 @@ struct less_equal<void> {
 
 } // namespace ft
 
-#	include "libftpp/functional/comparisons.tpp"     // IWYU pragma: export
-#	include "libftpp/functional/function_traits.tpp" // IWYU pragma: export
-
-#endif // LIBFTPP_FUNCTIONAL_HPP
+#include "libftpp/functional/comparisons.tpp"     // IWYU pragma: export
+#include "libftpp/functional/function_traits.tpp" // IWYU pragma: export

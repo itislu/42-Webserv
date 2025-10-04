@@ -1,10 +1,8 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
-#ifndef LIBFTPP_ITERATOR_SIZE_TPP
-#	define LIBFTPP_ITERATOR_SIZE_TPP
 
-#	include "libftpp/iterator.hpp"
-#	include <cstddef>
+#include "libftpp/iterator.hpp"
+#include <cstddef>
 
 namespace ft {
 
@@ -33,5 +31,3 @@ std::ptrdiff_t ssize(const T (& /*unused*/)[N]) throw()
 }
 
 } // namespace ft
-
-#endif // LIBFTPP_ITERATOR_SIZE_TPP
