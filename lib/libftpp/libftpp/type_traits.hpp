@@ -403,7 +403,7 @@ struct is_returnable;
 
 } // namespace ft
 
+#endif // LIBFTPP_TYPE_TRAITS_HPP
+
 #	include "libftpp/type_traits/requires.ipp"    // IWYU pragma: keep
 #	include "libftpp/type_traits/type_traits.tpp" // IWYU pragma: export
-
-#endif // LIBFTPP_TYPE_TRAITS_HPP

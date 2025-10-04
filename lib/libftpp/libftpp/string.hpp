@@ -202,10 +202,10 @@ std::string trim(const std::string& str);
 
 } // namespace ft
 
+#endif // LIBFTPP_STRING_HPP
+
 #	include "libftpp/string/ends_with.tpp"      // IWYU pragma: export
 #	include "libftpp/string/from_string.tpp"    // IWYU pragma: export
 #	include "libftpp/string/from_string_fn.tpp" // IWYU pragma: export
 #	include "libftpp/string/starts_with.tpp"    // IWYU pragma: export
 #	include "libftpp/string/to_string.tpp"      // IWYU pragma: export
-
-#endif // LIBFTPP_STRING_HPP

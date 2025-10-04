@@ -244,9 +244,9 @@ extern const unexpect_t unexpect;
 
 } // namespace ft
 
+#endif // LIBFTPP_EXPECTED_HPP
+
 #	include "libftpp/expected/bad_expected_access.tpp" // IWYU pragma: export
 #	include "libftpp/expected/expected.tpp"            // IWYU pragma: export
 #	include "libftpp/expected/expected_void.tpp"       // IWYU pragma: export
 #	include "libftpp/expected/unexpected.tpp"          // IWYU pragma: export
-
-#endif // LIBFTPP_EXPECTED_HPP
