@@ -149,7 +149,7 @@ struct impl<To, typename ft::enable_if<ft::is_integral<To>::value>::type> {
 	                       std::string::size_type& endpos_out)
 	{
 		const char* const start = str.c_str();
-		char* end = NULL;
+		char* end = NULL; // NOLINT: clang-tidy doesn't look into C functions.
 
 		// strtol works even for unsigned long since valid numbers between
 		// LONG_MAX and ULONG_MAX would not get here
@@ -217,7 +217,7 @@ struct impl<To,
 	                       std::string::size_type& endpos_out)
 	{
 		const char* const start = str.c_str();
-		char* end = NULL;
+		char* end = NULL; // NOLINT: clang-tidy doesn't look into C functions.
 
 		int errno_local = errno;
 		errno = 0;
