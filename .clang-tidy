@@ -41,10 +41,16 @@ Checks:
 CheckOptions:
   - key: bugprone-empty-catch.IgnoreCatchWithKeywords
     value: 'EMPTY: '
+  - key: misc-const-correctness.WarnPointersAsValues
+    value: true
+  - key: misc-const-correctness.TransformPointersAsValues
+    value: true
+  - key: misc-const-correctness.TransformPointersAsPointers
+    value: true
   - key: misc-header-include-cycle.IgnoredFilesList
     value: '.tpp' # pragma once does not seem to be recognized by clang-tidy.
   - key: modernize-deprecated-headers.CheckHeaderFile
-    value: 'true'
+    value: true
   - key: readability-magic-numbers.IgnoredIntegerValues
     value: '1;2;3;4;10' # 1-4 are default, 10 for decimal base operations.
   - key: readability-magic-numbers.IgnoredFloatingPointValues
