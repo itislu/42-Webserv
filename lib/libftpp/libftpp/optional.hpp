@@ -31,12 +31,12 @@ private:
 
 public:
 	optional() throw();
-	optional(nullopt_t /*unused*/) throw();
+	optional(nullopt_t /*unused*/) throw(); // NOLINT
 	optional(const optional& other);
 	template <typename U>
-	optional(const optional<U>& other);
+	optional(const optional<U>& other); // NOLINT
 	template <typename U>
-	optional(const U& value);
+	optional(const U& value); // NOLINT
 	~optional();
 	optional& operator=(nullopt_t /*unused*/) throw();
 	optional& operator=(optional other) throw();

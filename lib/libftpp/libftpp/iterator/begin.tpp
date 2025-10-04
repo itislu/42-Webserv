@@ -23,7 +23,7 @@ typename C::const_iterator begin(const C& c)
 template <typename T, std::size_t N>
 T* begin(T (&array)[N])
 {
-	return array;
+	return array; // NOLINT
 }
 
 template <typename C>

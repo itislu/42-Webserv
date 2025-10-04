@@ -5,16 +5,16 @@
 #	include <cstddef>
 #	include <string>
 
-#	define FT_BOLD(MSG)      (std::string("\033[1m") + MSG + "\033[0m")
-#	define FT_ITALIC(MSG)    (std::string("\033[3m") + MSG + "\033[0m")
-#	define FT_UNDERLINE(MSG) (std::string("\033[4m") + MSG + "\033[0m")
-#	define FT_RED(MSG)       (std::string("\033[31m") + MSG + "\033[0m")
-#	define FT_GREEN(MSG)     (std::string("\033[32m") + MSG + "\033[0m")
-#	define FT_YELLOW(MSG)    (std::string("\033[33m") + MSG + "\033[0m")
-#	define FT_BLUE(MSG)      (std::string("\033[34m") + MSG + "\033[0m")
-#	define FT_MAGENTA(MSG)   (std::string("\033[35m") + MSG + "\033[0m")
-#	define FT_CYAN(MSG)      (std::string("\033[36m") + MSG + "\033[0m")
-#	define FT_GRAY(MSG)      (std::string("\033[37m") + MSG + "\033[0m")
+#	define FT_BOLD(MSG)      (std::string("\033[1m") + (MSG) + "\033[0m")
+#	define FT_ITALIC(MSG)    (std::string("\033[3m") + (MSG) + "\033[0m")
+#	define FT_UNDERLINE(MSG) (std::string("\033[4m") + (MSG) + "\033[0m")
+#	define FT_RED(MSG)       (std::string("\033[31m") + (MSG) + "\033[0m")
+#	define FT_GREEN(MSG)     (std::string("\033[32m") + (MSG) + "\033[0m")
+#	define FT_YELLOW(MSG)    (std::string("\033[33m") + (MSG) + "\033[0m")
+#	define FT_BLUE(MSG)      (std::string("\033[34m") + (MSG) + "\033[0m")
+#	define FT_MAGENTA(MSG)   (std::string("\033[35m") + (MSG) + "\033[0m")
+#	define FT_CYAN(MSG)      (std::string("\033[36m") + (MSG) + "\033[0m")
+#	define FT_GRAY(MSG)      (std::string("\033[37m") + (MSG) + "\033[0m")
 
 namespace ft {
 

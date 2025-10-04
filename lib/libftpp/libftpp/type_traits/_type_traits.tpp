@@ -1,7 +1,7 @@
 // IWYU pragma: private; include "_type_traits.hpp"
 #pragma once
 #ifndef LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_TPP
-#	define LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_TPP
+#	define LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_TPP // NOLINT
 
 #	include "_type_traits.hpp"
 #	include "libftpp/type_traits.hpp"

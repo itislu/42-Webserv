@@ -23,7 +23,7 @@ typename C::const_iterator end(const C& c)
 template <typename T, std::size_t N>
 T* end(T (&array)[N])
 {
-	return array + N;
+	return array + N; // NOLINT
 }
 
 template <typename C>

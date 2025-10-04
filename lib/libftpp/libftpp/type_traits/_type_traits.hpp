@@ -1,6 +1,6 @@
 #pragma once
 #ifndef LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_HPP
-#	define LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_HPP
+#	define LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_HPP // NOLINT
 
 namespace ft {
 namespace _type_traits {

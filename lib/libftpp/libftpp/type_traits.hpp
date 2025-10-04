@@ -74,7 +74,7 @@ struct integral_constant {
 	typedef T value_type;
 	typedef integral_constant type;
 
-	operator value_type() const throw();
+	operator value_type() const throw(); // NOLINT
 	value_type operator()() const throw();
 };
 

@@ -17,7 +17,7 @@ std::string ok(const T& msg)
 {
 	std::ostringstream os;
 	os << std::left << std::setw(label_width_colored)
-	   << FT_BOLD(FT_GREEN("[OK]")) << msg;
+	   << FT_BOLD(FT_GREEN("[OK]")) << msg; // NOLINT
 	return os.str();
 }
 
@@ -26,7 +26,7 @@ std::string info(const T& msg)
 {
 	std::ostringstream os;
 	os << std::left << std::setw(label_width_colored)
-	   << FT_BOLD(FT_BLUE("[INFO]")) << msg;
+	   << FT_BOLD(FT_BLUE("[INFO]")) << msg; // NOLINT
 	return os.str();
 }
 
@@ -35,7 +35,7 @@ std::string warn(const T& msg)
 {
 	std::ostringstream os;
 	os << std::left << std::setw(label_width_colored)
-	   << FT_BOLD(FT_YELLOW("[WARN]")) << msg;
+	   << FT_BOLD(FT_YELLOW("[WARN]")) << msg; // NOLINT
 	return os.str();
 }
 
@@ -44,7 +44,7 @@ std::string error(const T& msg)
 {
 	std::ostringstream os;
 	os << std::left << std::setw(label_width_colored)
-	   << FT_BOLD(FT_RED("[ERROR]")) << msg;
+	   << FT_BOLD(FT_RED("[ERROR]")) << msg; // NOLINT
 	return os.str();
 }
 
@@ -52,7 +52,7 @@ template <typename T>
 std::string line(const T& msg)
 {
 	std::ostringstream os;
-	os << '\n' << std::left << std::setw(label_width_text) << "" << msg;
+	os << '\n' << std::left << std::setw(label_width_text) << "" << msg; // NOLINT
 	return os.str();
 }
 

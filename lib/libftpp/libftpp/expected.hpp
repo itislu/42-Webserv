@@ -49,11 +49,11 @@ public:
 	expected();
 	expected(const expected& other);
 	template <typename U, typename G>
-	expected(const expected<U, G>& other);
+	expected(const expected<U, G>& other); // NOLINT
 	template <typename U>
-	expected(const U& v);
+	expected(const U& v); // NOLINT
 	template <typename G>
-	expected(const unexpected<G>& e);
+	expected(const unexpected<G>& e); // NOLINT
 	explicit expected(unexpect_t /*unused*/);
 	~expected();
 	expected& operator=(expected other) throw();
@@ -127,9 +127,9 @@ public:
 	expected() throw();
 	expected(const expected& other);
 	template <typename U, typename G>
-	expected(const expected<U, G>& other);
+	expected(const expected<U, G>& other); // NOLINT
 	template <typename G>
-	expected(const unexpected<G>& e);
+	expected(const unexpected<G>& e); // NOLINT
 	explicit expected(unexpect_t /*unused*/);
 	~expected();
 	expected& operator=(expected other) throw();
