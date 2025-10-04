@@ -1,10 +1,12 @@
 // IWYU pragma: private; include "libftpp/string.hpp"
 #pragma once
+#ifndef LIBFTPP_STRING_STARTS_WITH_TPP
+#	define LIBFTPP_STRING_STARTS_WITH_TPP
 
-#include "libftpp/string.hpp"
-#include <cassert>
-#include <cstddef>
-#include <string>
+#	include "libftpp/string.hpp"
+#	include <cassert>
+#	include <cstddef>
+#	include <string>
 
 namespace ft {
 
@@ -40,3 +42,5 @@ bool starts_with(const std::basic_string<CharT, Traits, Allocator>& str,
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_STRING_STARTS_WITH_TPP

@@ -1,12 +1,14 @@
 #pragma once
+#ifndef LIBFTPP_STRING_HPP
+#	define LIBFTPP_STRING_HPP
 
-#include "libftpp/exception.hpp"
-#include "libftpp/expected.hpp"
-#include <cstddef>
-#include <ios>
-#include <new>
-#include <string>
-#include <typeinfo>
+#	include "libftpp/exception.hpp"
+#	include "libftpp/expected.hpp"
+#	include <cstddef>
+#	include <ios>
+#	include <new>
+#	include <string>
+#	include <typeinfo>
 
 namespace ft {
 
@@ -200,8 +202,10 @@ std::string trim(const std::string& str);
 
 } // namespace ft
 
-#include "libftpp/string/ends_with.tpp"      // IWYU pragma: export
-#include "libftpp/string/from_string.tpp"    // IWYU pragma: export
-#include "libftpp/string/from_string_fn.tpp" // IWYU pragma: export
-#include "libftpp/string/starts_with.tpp"    // IWYU pragma: export
-#include "libftpp/string/to_string.tpp"      // IWYU pragma: export
+#	include "libftpp/string/ends_with.tpp"      // IWYU pragma: export
+#	include "libftpp/string/from_string.tpp"    // IWYU pragma: export
+#	include "libftpp/string/from_string_fn.tpp" // IWYU pragma: export
+#	include "libftpp/string/starts_with.tpp"    // IWYU pragma: export
+#	include "libftpp/string/to_string.tpp"      // IWYU pragma: export
+
+#endif // LIBFTPP_STRING_HPP

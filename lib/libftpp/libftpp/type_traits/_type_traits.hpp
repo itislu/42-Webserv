@@ -1,4 +1,6 @@
 #pragma once
+#ifndef LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_HPP
+#	define LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_HPP
 
 namespace ft {
 namespace _type_traits {
@@ -17,4 +19,6 @@ struct type_or_null;
 } // namespace _type_traits
 } // namespace ft
 
-#include "_type_traits.tpp" // IWYU pragma: export
+#	include "_type_traits.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_TYPE_TRAITS__TYPE_TRAITS_HPP

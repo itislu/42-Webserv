@@ -1,11 +1,13 @@
 // IWYU pragma: private; include "libftpp/expected.hpp"
 #pragma once
+#ifndef LIBFTPP_EXPECTED_EXPECTED_VOID_TPP
+#	define LIBFTPP_EXPECTED_EXPECTED_VOID_TPP
 
-#include "libftpp/expected.hpp"
-#include "libftpp/safe_bool.hpp"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
+#	include "libftpp/expected.hpp"
+#	include "libftpp/safe_bool.hpp"
+#	include <algorithm>
+#	include <cassert>
+#	include <cstddef>
 
 namespace ft {
 
@@ -187,3 +189,5 @@ bool operator==(const expected<void, E>& lhs, const expected<T2, E2>& rhs)
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_EXPECTED_EXPECTED_VOID_TPP

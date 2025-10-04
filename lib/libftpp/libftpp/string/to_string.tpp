@@ -1,11 +1,13 @@
 // IWYU pragma: private; include "libftpp/string.hpp"
 #pragma once
+#ifndef LIBFTPP_STRING_TO_STRING_TPP
+#	define LIBFTPP_STRING_TO_STRING_TPP
 
-#include "libftpp/string.hpp"
-#include <cstddef>
-#include <ios>
-#include <sstream>
-#include <string>
+#	include "libftpp/string.hpp"
+#	include <cstddef>
+#	include <ios>
+#	include <sstream>
+#	include <string>
 
 namespace ft {
 
@@ -50,3 +52,5 @@ std::string to_string(T* v, std::ios::fmtflags fmt)
 } // namespace _to_string
 
 } // namespace ft
+
+#endif // LIBFTPP_STRING_TO_STRING_TPP

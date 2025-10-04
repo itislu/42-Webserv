@@ -1,10 +1,12 @@
 // IWYU pragma: private; include "libftpp/algorithm.hpp"
 #pragma once
+#ifndef LIBFTPP_ALGORITHM_SHIFT_TPP
+#	define LIBFTPP_ALGORITHM_SHIFT_TPP
 
-#include "libftpp/algorithm.hpp"
-#include "libftpp/iterator.hpp"
-#include <cassert>
-#include <iterator>
+#	include "libftpp/algorithm.hpp"
+#	include "libftpp/iterator.hpp"
+#	include <cassert>
+#	include <iterator>
 
 namespace ft {
 
@@ -112,3 +114,5 @@ BidirIt shift_right(BidirIt first,
 } // namespace _shift
 
 } // namespace ft
+
+#endif // LIBFTPP_ALGORITHM_SHIFT_TPP

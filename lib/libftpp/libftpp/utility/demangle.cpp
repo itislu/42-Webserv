@@ -5,7 +5,7 @@
 #	include <cstdlib>
 #	include <cxxabi.h>
 #	define LIBFTPP_HAVE_CXXABI_H
-#endif
+#endif // defined(__GNUC__) || defined(__clang__)
 
 namespace ft {
 
@@ -20,9 +20,9 @@ std::string demangle(const char* mangled_name)
 	result = status == 0 ? demangled : mangled_name;
 	std::free(demangled); // NOLINT(cppcoreguidelines-no-malloc)
 	return result;
-#else
+#else  // LIBFTPP_HAVE_CXXABI_H
 	return mangled_name;
-#endif
+#endif // LIBFTPP_HAVE_CXXABI_H
 }
 
 } // namespace ft

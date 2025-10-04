@@ -1,10 +1,12 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
+#ifndef LIBFTPP_ITERATOR_NEXT_TPP
+#	define LIBFTPP_ITERATOR_NEXT_TPP
 
-#include "libftpp/assert.hpp"
-#include "libftpp/iterator.hpp"
-#include "libftpp/type_traits.hpp"
-#include <iterator>
+#	include "libftpp/assert.hpp"
+#	include "libftpp/iterator.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include <iterator>
 
 namespace ft {
 
@@ -49,3 +51,5 @@ InputIt next(InputIt it,
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_ITERATOR_NEXT_TPP

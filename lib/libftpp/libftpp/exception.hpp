@@ -1,9 +1,11 @@
 #pragma once
+#ifndef LIBFTPP_EXCEPTION_HPP
+#	define LIBFTPP_EXCEPTION_HPP
 
-#include "libftpp/optional.hpp"
-#include "libftpp/source_location.hpp"
-#include <exception>
-#include <string>
+#	include "libftpp/optional.hpp"
+#	include "libftpp/source_location.hpp"
+#	include <exception>
+#	include <string>
 
 namespace ft {
 
@@ -55,3 +57,5 @@ private:
 void swap(exception& lhs, exception& rhs) throw();
 
 } // namespace ft
+
+#endif // LIBFTPP_EXCEPTION_HPP

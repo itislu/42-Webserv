@@ -1,10 +1,12 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
+#ifndef LIBFTPP_ITERATOR_ADVANCE_TPP
+#	define LIBFTPP_ITERATOR_ADVANCE_TPP
 
-#include "libftpp/iterator.hpp"
-#include "libftpp/type_traits.hpp"
-#include <cstdlib>
-#include <iterator>
+#	include "libftpp/iterator.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include <cstdlib>
+#	include <iterator>
 
 namespace ft {
 
@@ -135,3 +137,5 @@ advance(RandomIt& it,
 } // namespace _advance
 
 } // namespace ft
+
+#endif // LIBFTPP_ITERATOR_ADVANCE_TPP

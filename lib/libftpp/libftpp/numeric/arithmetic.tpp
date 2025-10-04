@@ -1,11 +1,13 @@
 // IWYU pragma: private; include "libftpp/numeric.hpp"
 #pragma once
+#ifndef LIBFTPP_NUMERIC_ARITHMETIC_TPP
+#	define LIBFTPP_NUMERIC_ARITHMETIC_TPP
 
-#include "libftpp/expected.hpp"
-#include "libftpp/numeric.hpp"
-#include "libftpp/type_traits.hpp"
-#include "libftpp/utility.hpp"
-#include <limits>
+#	include "libftpp/expected.hpp"
+#	include "libftpp/numeric.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include "libftpp/utility.hpp"
+#	include <limits>
 
 namespace ft {
 
@@ -364,3 +366,5 @@ FT_REQUIRES(ft::is_integral<T>::value)
 } // namespace _arithmetic
 
 } // namespace ft
+
+#endif // LIBFTPP_NUMERIC_ARITHMETIC_TPP

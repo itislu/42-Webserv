@@ -1,11 +1,13 @@
 // IWYU pragma: private; include "libftpp/format.hpp"
 #pragma once
+#ifndef LIBFTPP_FORMAT_LOG_TPP
+#	define LIBFTPP_FORMAT_LOG_TPP
 
-#include "libftpp/format.hpp"
-#include <iomanip>
-#include <ios>
-#include <sstream>
-#include <string>
+#	include "libftpp/format.hpp"
+#	include <iomanip>
+#	include <ios>
+#	include <sstream>
+#	include <string>
 
 namespace ft {
 namespace log {
@@ -56,3 +58,5 @@ std::string line(const T& msg)
 
 } // namespace log
 } // namespace ft
+
+#endif // LIBFTPP_FORMAT_LOG_TPP

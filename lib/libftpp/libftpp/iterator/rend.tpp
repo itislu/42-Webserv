@@ -1,9 +1,11 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
+#ifndef LIBFTPP_ITERATOR_REND_TPP
+#	define LIBFTPP_ITERATOR_REND_TPP
 
-#include "libftpp/iterator.hpp"
-#include <cstddef>
-#include <iterator>
+#	include "libftpp/iterator.hpp"
+#	include <cstddef>
+#	include <iterator>
 
 namespace ft {
 
@@ -38,3 +40,5 @@ std::reverse_iterator<const T*> crend(const T (&array)[N])
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_ITERATOR_REND_TPP

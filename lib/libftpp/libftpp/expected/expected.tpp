@@ -1,10 +1,12 @@
 // IWYU pragma: private; include "libftpp/expected.hpp"
 #pragma once
+#ifndef LIBFTPP_EXPECTED_EXPECTED_TPP
+#	define LIBFTPP_EXPECTED_EXPECTED_TPP
 
-#include "libftpp/expected.hpp"
-#include "libftpp/safe_bool.hpp"
-#include <algorithm>
-#include <cassert>
+#	include "libftpp/expected.hpp"
+#	include "libftpp/safe_bool.hpp"
+#	include <algorithm>
+#	include <cassert>
 
 namespace ft {
 
@@ -311,3 +313,5 @@ bool operator!=(const expected<T, E>& lhs, const T2& val)
 // NOLINTEND(cppcoreguidelines-pro-type-union-access)
 
 } // namespace ft
+
+#endif // LIBFTPP_EXPECTED_EXPECTED_TPP

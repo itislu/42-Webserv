@@ -1,21 +1,23 @@
 // IWYU pragma: private; include "libftpp/string.hpp"
 #pragma once
+#ifndef LIBFTPP_STRING_FROM_STRING_TPP
+#	define LIBFTPP_STRING_FROM_STRING_TPP
 
-#include "libftpp/expected.hpp"
-#include "libftpp/iterator.hpp"
-#include "libftpp/string.hpp"
-#include "libftpp/type_traits.hpp"
-#include <algorithm>
-#include <cctype>
-#include <cerrno>
-#include <cmath>
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <limits>
-#include <new>
-#include <sstream>
-#include <string>
+#	include "libftpp/expected.hpp"
+#	include "libftpp/iterator.hpp"
+#	include "libftpp/string.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include <algorithm>
+#	include <cctype>
+#	include <cerrno>
+#	include <cmath>
+#	include <cstddef>
+#	include <cstdlib>
+#	include <iostream>
+#	include <limits>
+#	include <new>
+#	include <sstream>
+#	include <string>
 
 namespace ft {
 
@@ -277,3 +279,5 @@ const char
 } // namespace _from_string
 
 } // namespace ft
+
+#endif // LIBFTPP_STRING_FROM_STRING_TPP

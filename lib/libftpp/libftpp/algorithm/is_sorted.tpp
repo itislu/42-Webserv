@@ -1,8 +1,10 @@
 // IWYU pragma: private; include "libftpp/algorithm.hpp"
 #pragma once
+#ifndef LIBFTPP_ALGORITHM_IS_SORTED_TPP
+#	define LIBFTPP_ALGORITHM_IS_SORTED_TPP
 
-#include "libftpp/algorithm.hpp"
-#include "libftpp/functional.hpp"
+#	include "libftpp/algorithm.hpp"
+#	include "libftpp/functional.hpp"
 
 namespace ft {
 
@@ -39,3 +41,5 @@ ForwardIt is_sorted_until(ForwardIt first, ForwardIt last, Compare comp)
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_ALGORITHM_IS_SORTED_TPP
