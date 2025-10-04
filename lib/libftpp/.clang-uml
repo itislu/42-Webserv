@@ -1,0 +1,33 @@
+compilation_database_dir: .
+output_directory: docs/uml
+diagrams:
+  full_overview:
+    type: class
+    glob:
+      - libftpp/*
+    exclude:
+      namespaces:
+        - std
+
+  class_relationships:
+    type: class
+    glob:
+      - libftpp/*
+    exclude:
+      namespaces:
+        - std
+    include:
+      relationships:
+        - inheritance
+        - composition
+        - aggregation
+
+  file_organization:
+    type: include
+    glob:
+      - libftpp/*
+    include:
+      paths:
+        - libftpp
+      relationships:
+        - composition
