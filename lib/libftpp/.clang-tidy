@@ -61,4 +61,4 @@ ExtraArgsBefore:
 
 HeaderFileExtensions: ['', 'h', 'hh', 'hpp', 'hxx', 'ipp', 'tpp']
 
-HeaderFilterRegex: '.*' # Show diagnostics from headers when they get included (could be different than when analyzing a header on its own).
+# HeaderFilterRegex: '.*' # Show diagnostics from headers when they get included (could be different than when analyzing a header on its own).
