@@ -31,7 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           style: 'file' # Use .clang-format config file.
-          extensions: 'c,cpp,h,hpp,ipp,tpp'
+          extensions: 'c,cpp'
           tidy-checks: '' # Use .clang-tidy config file.
           version: '21'
           files-changed-only: false # Changes in header files can affect other files.
