@@ -1,8 +1,10 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
+#ifndef LIBFTPP_ITERATOR_BEGIN_TPP
+#	define LIBFTPP_ITERATOR_BEGIN_TPP
 
-#include "libftpp/iterator.hpp"
-#include <cstddef>
+#	include "libftpp/iterator.hpp"
+#	include <cstddef>
 
 namespace ft {
 
@@ -37,3 +39,5 @@ const T* cbegin(const T (&array)[N])
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_ITERATOR_BEGIN_TPP

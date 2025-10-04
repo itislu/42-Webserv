@@ -1,9 +1,11 @@
 // IWYU pragma: private; include "libftpp/random.hpp"
 #pragma once
+#ifndef LIBFTPP_RANDOM_URANDOM_TPP
+#	define LIBFTPP_RANDOM_URANDOM_TPP
 
-#include "libftpp/random.hpp"
-#include <fstream>
-#include <ios>
+#	include "libftpp/random.hpp"
+#	include <fstream>
+#	include <ios>
 
 namespace ft {
 
@@ -29,3 +31,5 @@ T urandom()
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_RANDOM_URANDOM_TPP

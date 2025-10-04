@@ -1,10 +1,12 @@
 // IWYU pragma: private; include "libftpp/algorithm.hpp"
 #pragma once
+#ifndef LIBFTPP_ALGORITHM_SWAP_TPP
+#	define LIBFTPP_ALGORITHM_SWAP_TPP
 
-#include "libftpp/algorithm.hpp"
-#include "libftpp/type_traits.hpp"
-#include <algorithm>
-#include <cstddef>
+#	include "libftpp/algorithm.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include <algorithm>
+#	include <cstddef>
 
 namespace ft {
 
@@ -68,3 +70,5 @@ FT_REQUIRES(!ft::has_member_function_swap<T>::value)
 } // namespace _swap
 
 } // namespace ft
+
+#endif // LIBFTPP_ALGORITHM_SWAP_TPP

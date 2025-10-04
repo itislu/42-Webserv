@@ -1,11 +1,13 @@
 // IWYU pragma: private; include "libftpp/type_traits.hpp"
 #pragma once
+#ifndef LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_TPP
+#	define LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_TPP
 
-#include "libftpp/type_traits.hpp"
-#include "_type_traits.hpp"
-#include "libftpp/assert.hpp" // IWYU pragma: keep: Conditionally needed.
-#include <cstddef>
-#include <limits>
+#	include "libftpp/type_traits.hpp"
+#	include "_type_traits.hpp"
+#	include "libftpp/assert.hpp" // IWYU pragma: keep: Conditionally needed.
+#	include <cstddef>
+#	include <limits>
 
 namespace ft {
 
@@ -166,25 +168,25 @@ template <typename T>
 struct is_volatile<volatile T> : true_type {};
 
 /* is_abstract */
-#if defined(__clang__) && defined(__has_feature)
-#	if __has_feature(is_abstract)
-#		define LIBFTPP_BUILTIN_IS_ABSTRACT(T) __is_abstract(T)
-#	endif
-#elif defined(__GNUC__)                                         \
-    && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
+#	if defined(__clang__) && defined(__has_feature)
+#		if __has_feature(is_abstract)
+#			define LIBFTPP_BUILTIN_IS_ABSTRACT(T) __is_abstract(T)
+#		endif // __has_feature(is_abstract)
+#	elif defined(__GNUC__)                                         \
+	    && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
 // Introduced to gcc in commit cb68ec50055e516ac270a043f772935561b01968
-#	define LIBFTPP_BUILTIN_IS_ABSTRACT(T) __is_abstract(T)
-#elif defined(_MSC_VER) && _MSC_VER >= 1400
+#		define LIBFTPP_BUILTIN_IS_ABSTRACT(T) __is_abstract(T)
+#	elif defined(_MSC_VER) && _MSC_VER >= 1400
 // Appears in Visual Studio 2005 Docs, but not in 2003
-#	define LIBFTPP_BUILTIN_IS_ABSTRACT(T) __is_abstract(T)
-#endif
+#		define LIBFTPP_BUILTIN_IS_ABSTRACT(T) __is_abstract(T)
+#	endif // defined(__clang__) && defined(__has_feature)
 
-#ifdef LIBFTPP_BUILTIN_IS_ABSTRACT
+#	ifdef LIBFTPP_BUILTIN_IS_ABSTRACT
 
 template <typename T>
 struct is_abstract : bool_constant<LIBFTPP_BUILTIN_IS_ABSTRACT(T)> {};
 
-#else
+#	else // LIBFTPP_BUILTIN_IS_ABSTRACT
 
 /**
  * Fallback implementation.
@@ -247,7 +249,7 @@ struct impl<T,
 
 } // namespace _is_abstract
 
-#endif
+#	endif // LIBFTPP_BUILTIN_IS_ABSTRACT
 
 /* is_signed */
 namespace _is_signed {
@@ -329,31 +331,32 @@ template <typename T>
 struct is_same<T, T> : true_type {};
 
 /* is_convertible */
-#if defined(__clang__) && defined(__has_feature)
-#	if __has_feature(is_convertible_to)
-#		define LIBFTPP_BUILTIN_IS_CONVERTIBLE(FROM, TO) \
-			__is_convertible_to(FROM, TO)
-#	endif
-#elif defined(__GNUC__)                                           \
-    && (__GNUC__ > 13 || (__GNUC__ == 13 && __GNUC_MINOR__ >= 4))
+#	if defined(__clang__) && defined(__has_feature)
+#		if __has_feature(is_convertible_to)
+#			define LIBFTPP_BUILTIN_IS_CONVERTIBLE(FROM, TO) \
+				__is_convertible_to(FROM, TO)
+#		endif // __has_feature(is_convertible_to)
+#	elif defined(__GNUC__)                                           \
+	    && (__GNUC__ > 13 || (__GNUC__ == 13 && __GNUC_MINOR__ >= 4))
 // Buggy 13.1: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=106784
 // Fixed 13.4: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109680
 // Related writeup about "Abominable Function Types":
 // https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2015/p0172r0.html
-#	define LIBFTPP_BUILTIN_IS_CONVERTIBLE(FROM, TO) __is_convertible(FROM, TO)
-#elif defined(_MSC_VER) && _MSC_VER >= 1400
+#		define LIBFTPP_BUILTIN_IS_CONVERTIBLE(FROM, TO) \
+			__is_convertible(FROM, TO)
+#	elif defined(_MSC_VER) && _MSC_VER >= 1400
 // Appears in Visual Studio 2005 Docs, but not in 2003
-#	define LIBFTPP_BUILTIN_IS_CONVERTIBLE(FROM, TO) \
-		__is_convertible_to(FROM, TO)
-#endif
+#		define LIBFTPP_BUILTIN_IS_CONVERTIBLE(FROM, TO) \
+			__is_convertible_to(FROM, TO)
+#	endif // defined(__clang__) && defined(__has_feature)
 
-#ifdef LIBFTPP_BUILTIN_IS_CONVERTIBLE
+#	ifdef LIBFTPP_BUILTIN_IS_CONVERTIBLE
 
 template <typename From, typename To>
 struct is_convertible
     : bool_constant<LIBFTPP_BUILTIN_IS_CONVERTIBLE(From, To)> {};
 
-#else
+#	else // LIBFTPP_BUILTIN_IS_CONVERTIBLE
 
 namespace _is_convertible {
 template <typename From, typename To, typename = void>
@@ -452,7 +455,7 @@ struct is_impossible_array_to_ref
 
 } // namespace _is_convertible
 
-#endif
+#	endif // LIBFTPP_BUILTIN_IS_CONVERTIBLE
 
 /* Type transformations */
 
@@ -661,3 +664,5 @@ struct is_returnable
                     && !is_function<T>::value> {};
 
 } // namespace ft
+
+#endif // LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_TPP

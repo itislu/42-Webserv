@@ -1,6 +1,8 @@
 #pragma once
+#ifndef LIBFTPP_ASSERT_HPP
+#	define LIBFTPP_ASSERT_HPP
 
-#include "libftpp/assert/static_assert.ipp"
+#	include "libftpp/assert/static_assert.ipp"
 
 /**
  * @brief Performs a compile-time assertion that works in C++98
@@ -18,4 +20,6 @@
  * Inspiration:
  * https://web.archive.org/web/20130323104707/https://www.drdobbs.com/compile-time-assertions/184401873
  */
-#define FT_STATIC_ASSERT(EXPR) LIBFTPP_STATIC_ASSERT_IMPL(EXPR)
+#	define FT_STATIC_ASSERT(EXPR) LIBFTPP_STATIC_ASSERT_IMPL(EXPR)
+
+#endif // LIBFTPP_ASSERT_HPP

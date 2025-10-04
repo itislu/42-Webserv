@@ -1,9 +1,11 @@
 #pragma once
+#ifndef LIBFTPP_OPTIONAL_HPP
+#	define LIBFTPP_OPTIONAL_HPP
 
-#include "libftpp/assert.hpp"
-#include "libftpp/safe_bool.hpp"
-#include "libftpp/type_traits.hpp"
-#include <exception>
+#	include "libftpp/assert.hpp"
+#	include "libftpp/safe_bool.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include <exception>
 
 namespace ft {
 
@@ -154,4 +156,6 @@ extern const nullopt_t nullopt;
 
 } // namespace ft
 
-#include "libftpp/optional/optional.tpp" // IWYU pragma: export
+#	include "libftpp/optional/optional.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_OPTIONAL_HPP

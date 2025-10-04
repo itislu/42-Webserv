@@ -1,11 +1,13 @@
 #pragma once
+#ifndef LIBFTPP_ALGORITHM_HPP
+#	define LIBFTPP_ALGORITHM_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <utility>
+#	include <cstddef>
+#	include <iterator>
+#	include <utility>
 
-#define FT_MIN(a, b) ((b) < (a) ? (b) : (a))
-#define FT_MAX(a, b) ((b) > (a) ? (b) : (a))
+#	define FT_MIN(a, b) ((b) < (a) ? (b) : (a))
+#	define FT_MAX(a, b) ((b) > (a) ? (b) : (a))
 
 namespace ft {
 
@@ -235,10 +237,12 @@ ForwardIt2 swap_ranges(ForwardIt1 first1, ForwardIt1 last1, ForwardIt2 first2);
 
 } // namespace ft
 
-#include "libftpp/algorithm/binary_search.tpp" // IWYU pragma: export
-#include "libftpp/algorithm/copy.tpp"          // IWYU pragma: export
-#include "libftpp/algorithm/equal.tpp"         // IWYU pragma: export
-#include "libftpp/algorithm/is_sorted.tpp"     // IWYU pragma: export
-#include "libftpp/algorithm/min_max.tpp"       // IWYU pragma: export
-#include "libftpp/algorithm/shift.tpp"         // IWYU pragma: export
-#include "libftpp/algorithm/swap.tpp"          // IWYU pragma: export
+#	include "libftpp/algorithm/binary_search.tpp" // IWYU pragma: export
+#	include "libftpp/algorithm/copy.tpp"          // IWYU pragma: export
+#	include "libftpp/algorithm/equal.tpp"         // IWYU pragma: export
+#	include "libftpp/algorithm/is_sorted.tpp"     // IWYU pragma: export
+#	include "libftpp/algorithm/min_max.tpp"       // IWYU pragma: export
+#	include "libftpp/algorithm/shift.tpp"         // IWYU pragma: export
+#	include "libftpp/algorithm/swap.tpp"          // IWYU pragma: export
+
+#endif // LIBFTPP_ALGORITHM_HPP

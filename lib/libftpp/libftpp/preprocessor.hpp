@@ -1,4 +1,6 @@
 #pragma once
+#ifndef LIBFTPP_PREPROCESSOR_HPP
+#	define LIBFTPP_PREPROCESSOR_HPP
 
 /* Preprocessor Metaprogramming - Macros for manipulating code as text */
 
@@ -12,22 +14,24 @@
  *
  * Inspiration: https://stackoverflow.com/a/71899854
  */
-#ifdef __COUNTER__
-#	define FT_APPEND_UNIQUE_NUM(NAME) FT_CONCAT_EXPANDED(NAME, __COUNTER__)
-#else
-#	define FT_APPEND_UNIQUE_NUM(NAME) FT_CONCAT_EXPANDED(NAME, __LINE__)
-#endif
+#	ifdef __COUNTER__
+#		define FT_APPEND_UNIQUE_NUM(NAME) FT_CONCAT_EXPANDED(NAME, __COUNTER__)
+#	else // __COUNTER__
+#		define FT_APPEND_UNIQUE_NUM(NAME) FT_CONCAT_EXPANDED(NAME, __LINE__)
+#	endif // __COUNTER__
 
 /**
  * @brief Concatenate `PREFIX` and `SUFFIX` into `PREFIXSUFFIX`
  *
  * Inspiration: https://stackoverflow.com/a/71899854
  */
-#define FT_CONCAT(PREFIX, SUFFIX) PREFIX##SUFFIX
+#	define FT_CONCAT(PREFIX, SUFFIX) PREFIX##SUFFIX
 
 /**
  * @brief Expand `PREFIX` and `SUFFIX` before concatenating
  *
  * Inspiration: https://stackoverflow.com/a/71899854
  */
-#define FT_CONCAT_EXPANDED(PREFIX, SUFFIX) FT_CONCAT(PREFIX, SUFFIX)
+#	define FT_CONCAT_EXPANDED(PREFIX, SUFFIX) FT_CONCAT(PREFIX, SUFFIX)
+
+#endif // LIBFTPP_PREPROCESSOR_HPP

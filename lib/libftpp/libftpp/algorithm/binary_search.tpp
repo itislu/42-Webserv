@@ -1,11 +1,13 @@
 // IWYU pragma: private; include "libftpp/algorithm.hpp"
 #pragma once
+#ifndef LIBFTPP_ALGORITHM_BINARY_SEARCH_TPP
+#	define LIBFTPP_ALGORITHM_BINARY_SEARCH_TPP
 
-#include "libftpp/algorithm.hpp"
-#include "libftpp/functional.hpp"
-#include "libftpp/iterator.hpp"
-#include <iterator>
-#include <utility>
+#	include "libftpp/algorithm.hpp"
+#	include "libftpp/functional.hpp"
+#	include "libftpp/iterator.hpp"
+#	include <iterator>
+#	include <utility>
 
 namespace ft {
 
@@ -161,3 +163,5 @@ binary_search(ForwardIt first,
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_ALGORITHM_BINARY_SEARCH_TPP

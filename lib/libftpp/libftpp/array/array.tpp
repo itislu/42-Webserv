@@ -1,15 +1,17 @@
 // IWYU pragma: private; include "libftpp/array.hpp"
 #pragma once
+#ifndef LIBFTPP_ARRAY_ARRAY_TPP
+#	define LIBFTPP_ARRAY_ARRAY_TPP
 
-#include "libftpp/array.hpp"
-#include "libftpp/algorithm.hpp"
-#include "libftpp/assert.hpp"
-#include "libftpp/string.hpp"
-#include "libftpp/type_traits.hpp"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <stdexcept>
+#	include "libftpp/array.hpp"
+#	include "libftpp/algorithm.hpp"
+#	include "libftpp/assert.hpp"
+#	include "libftpp/string.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include <algorithm>
+#	include <cassert>
+#	include <cstddef>
+#	include <stdexcept>
 
 namespace ft {
 
@@ -299,3 +301,5 @@ array<typename ft::remove_cv<T>::type, N> to_array(T (&a)[N])
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_ARRAY_ARRAY_TPP

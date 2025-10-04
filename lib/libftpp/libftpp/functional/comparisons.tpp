@@ -1,8 +1,10 @@
 // IWYU pragma: private; include "libftpp/functional.hpp"
 #pragma once
+#ifndef LIBFTPP_FUNCTIONAL_COMPARISONS_TPP
+#	define LIBFTPP_FUNCTIONAL_COMPARISONS_TPP
 
-#include "libftpp/functional.hpp"
-#include <functional>
+#	include "libftpp/functional.hpp"
+#	include <functional>
 
 namespace ft {
 
@@ -127,3 +129,5 @@ bool less_equal<void>::operator()(T* a, U* b) const
 }
 
 } // namespace ft
+
+#endif // LIBFTPP_FUNCTIONAL_COMPARISONS_TPP

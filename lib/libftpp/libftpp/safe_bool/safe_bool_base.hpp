@@ -1,4 +1,6 @@
 #pragma once
+#ifndef LIBFTPP_SAFE_BOOL_SAFE_BOOL_BASE_HPP
+#	define LIBFTPP_SAFE_BOOL_SAFE_BOOL_BASE_HPP
 
 namespace ft {
 namespace _safe_bool {
@@ -20,3 +22,5 @@ private:
 
 } // namespace _safe_bool
 } // namespace ft
+
+#endif // LIBFTPP_SAFE_BOOL_SAFE_BOOL_BASE_HPP

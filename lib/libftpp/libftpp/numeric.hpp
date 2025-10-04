@@ -1,10 +1,12 @@
 #pragma once
+#ifndef LIBFTPP_NUMERIC_HPP
+#	define LIBFTPP_NUMERIC_HPP
 
-#include "libftpp/exception.hpp"
-#include "libftpp/expected.hpp"
-#include "libftpp/type_traits.hpp"
-#include <new>
-#include <string>
+#	include "libftpp/exception.hpp"
+#	include "libftpp/expected.hpp"
+#	include "libftpp/type_traits.hpp"
+#	include <new>
+#	include <string>
 
 namespace ft {
 
@@ -236,6 +238,8 @@ void iota(ForwardIt first, ForwardIt last, T value);
 
 } // namespace ft
 
-#include "libftpp/numeric/arithmetic.tpp"   // IWYU pragma: export
-#include "libftpp/numeric/iota.tpp"         // IWYU pragma: export
-#include "libftpp/numeric/numeric_cast.tpp" // IWYU pragma: export
+#	include "libftpp/numeric/arithmetic.tpp"   // IWYU pragma: export
+#	include "libftpp/numeric/iota.tpp"         // IWYU pragma: export
+#	include "libftpp/numeric/numeric_cast.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_NUMERIC_HPP

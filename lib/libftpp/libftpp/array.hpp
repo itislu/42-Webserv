@@ -1,16 +1,18 @@
 #pragma once
+#ifndef LIBFTPP_ARRAY_HPP
+#	define LIBFTPP_ARRAY_HPP
 
-#include "libftpp/algorithm.hpp"
-#include "libftpp/iterator/begin.tpp"  // IWYU pragma: export
-#include "libftpp/iterator/data.tpp"   // IWYU pragma: export
-#include "libftpp/iterator/empty.tpp"  // IWYU pragma: export
-#include "libftpp/iterator/end.tpp"    // IWYU pragma: export
-#include "libftpp/iterator/rbegin.tpp" // IWYU pragma: export
-#include "libftpp/iterator/rend.tpp"   // IWYU pragma: export
-#include "libftpp/iterator/size.tpp"   // IWYU pragma: export
-#include "libftpp/type_traits.hpp"
-#include <cstddef>
-#include <iterator>
+#	include "libftpp/algorithm.hpp"
+#	include "libftpp/iterator/begin.tpp"  // IWYU pragma: export
+#	include "libftpp/iterator/data.tpp"   // IWYU pragma: export
+#	include "libftpp/iterator/empty.tpp"  // IWYU pragma: export
+#	include "libftpp/iterator/end.tpp"    // IWYU pragma: export
+#	include "libftpp/iterator/rbegin.tpp" // IWYU pragma: export
+#	include "libftpp/iterator/rend.tpp"   // IWYU pragma: export
+#	include "libftpp/iterator/size.tpp"   // IWYU pragma: export
+#	include "libftpp/type_traits.hpp"
+#	include <cstddef>
+#	include <iterator>
 
 namespace ft {
 
@@ -110,4 +112,6 @@ array<typename ft::remove_cv<T>::type, N> to_array(T (&a)[N]);
 
 } // namespace ft
 
-#include "libftpp/array/array.tpp" // IWYU pragma: export
+#	include "libftpp/array/array.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_ARRAY_HPP

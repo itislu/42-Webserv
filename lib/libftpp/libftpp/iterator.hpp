@@ -1,8 +1,10 @@
 #pragma once
+#ifndef LIBFTPP_ITERATOR_HPP
+#	define LIBFTPP_ITERATOR_HPP
 
-#include "libftpp/type_traits.hpp"
-#include <cstddef>
-#include <iterator>
+#	include "libftpp/type_traits.hpp"
+#	include <cstddef>
+#	include <iterator>
 
 namespace ft {
 
@@ -256,14 +258,16 @@ T* data(T (&array)[N]) throw();
 
 } // namespace ft
 
-#include "libftpp/iterator/advance.tpp"         // IWYU pragma: export
-#include "libftpp/iterator/begin.tpp"           // IWYU pragma: export
-#include "libftpp/iterator/data.tpp"            // IWYU pragma: export
-#include "libftpp/iterator/empty.tpp"           // IWYU pragma: export
-#include "libftpp/iterator/end.tpp"             // IWYU pragma: export
-#include "libftpp/iterator/iterator_traits.tpp" // IWYU pragma: export
-#include "libftpp/iterator/next.tpp"            // IWYU pragma: export
-#include "libftpp/iterator/prev.tpp"            // IWYU pragma: export
-#include "libftpp/iterator/rbegin.tpp"          // IWYU pragma: export
-#include "libftpp/iterator/rend.tpp"            // IWYU pragma: export
-#include "libftpp/iterator/size.tpp"            // IWYU pragma: export
+#	include "libftpp/iterator/advance.tpp"         // IWYU pragma: export
+#	include "libftpp/iterator/begin.tpp"           // IWYU pragma: export
+#	include "libftpp/iterator/data.tpp"            // IWYU pragma: export
+#	include "libftpp/iterator/empty.tpp"           // IWYU pragma: export
+#	include "libftpp/iterator/end.tpp"             // IWYU pragma: export
+#	include "libftpp/iterator/iterator_traits.tpp" // IWYU pragma: export
+#	include "libftpp/iterator/next.tpp"            // IWYU pragma: export
+#	include "libftpp/iterator/prev.tpp"            // IWYU pragma: export
+#	include "libftpp/iterator/rbegin.tpp"          // IWYU pragma: export
+#	include "libftpp/iterator/rend.tpp"            // IWYU pragma: export
+#	include "libftpp/iterator/size.tpp"            // IWYU pragma: export
+
+#endif // LIBFTPP_ITERATOR_HPP

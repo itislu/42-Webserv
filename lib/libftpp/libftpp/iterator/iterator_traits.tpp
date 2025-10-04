@@ -1,8 +1,10 @@
 // IWYU pragma: private; include "libftpp/iterator.hpp"
 #pragma once
+#ifndef LIBFTPP_ITERATOR_ITERATOR_TRAITS_TPP
+#	define LIBFTPP_ITERATOR_ITERATOR_TRAITS_TPP
 
-#include "libftpp/type_traits.hpp"
-#include <iterator>
+#	include "libftpp/type_traits.hpp"
+#	include <iterator>
 
 namespace ft {
 
@@ -132,3 +134,5 @@ struct impl
 } // namespace _is_random_access_iterator
 
 } // namespace ft
+
+#endif // LIBFTPP_ITERATOR_ITERATOR_TRAITS_TPP
