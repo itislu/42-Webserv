@@ -258,8 +258,6 @@ T* data(T (&array)[N]) throw();
 
 } // namespace ft
 
-#endif // LIBFTPP_ITERATOR_HPP
-
 #	include "libftpp/iterator/advance.tpp"         // IWYU pragma: export
 #	include "libftpp/iterator/begin.tpp"           // IWYU pragma: export
 #	include "libftpp/iterator/data.tpp"            // IWYU pragma: export
@@ -271,3 +269,5 @@ T* data(T (&array)[N]) throw();
 #	include "libftpp/iterator/rbegin.tpp"          // IWYU pragma: export
 #	include "libftpp/iterator/rend.tpp"            // IWYU pragma: export
 #	include "libftpp/iterator/size.tpp"            // IWYU pragma: export
+
+#endif // LIBFTPP_ITERATOR_HPP

@@ -238,8 +238,8 @@ void iota(ForwardIt first, ForwardIt last, T value);
 
 } // namespace ft
 
-#endif // LIBFTPP_NUMERIC_HPP
-
 #	include "libftpp/numeric/arithmetic.tpp"   // IWYU pragma: export
 #	include "libftpp/numeric/iota.tpp"         // IWYU pragma: export
 #	include "libftpp/numeric/numeric_cast.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_NUMERIC_HPP

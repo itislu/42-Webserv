@@ -47,6 +47,6 @@ std::string line();
 
 } // namespace ft
 
-#endif // LIBFTPP_FORMAT_HPP
-
 #	include "libftpp/format/log.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_FORMAT_HPP

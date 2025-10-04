@@ -14,6 +14,6 @@ T urandom();
 
 } // namespace ft
 
-#endif // LIBFTPP_RANDOM_HPP
-
 #	include "libftpp/random/urandom.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_RANDOM_HPP

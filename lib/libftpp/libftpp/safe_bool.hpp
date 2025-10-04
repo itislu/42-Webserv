@@ -90,7 +90,7 @@ bool operator!=(const U& /*lhs*/, const safe_bool<T>& rhs);
 
 } // namespace ft
 
-#endif // LIBFTPP_SAFE_BOOL_HPP
-
 #	include "libftpp/safe_bool/safe_bool.tpp"      // IWYU pragma: export
 #	include "libftpp/safe_bool/safe_bool_void.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_SAFE_BOOL_HPP

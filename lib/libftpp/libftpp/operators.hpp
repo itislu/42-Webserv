@@ -42,6 +42,6 @@ bool operator>=(const T& lhs, const U& rhs);
 } // namespace operators
 } // namespace ft
 
-#endif // LIBFTPP_OPERATORS_HPP
-
 #	include "libftpp/operators/operators.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_OPERATORS_HPP

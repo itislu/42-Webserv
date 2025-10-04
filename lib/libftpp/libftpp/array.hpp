@@ -112,6 +112,6 @@ array<typename ft::remove_cv<T>::type, N> to_array(T (&a)[N]);
 
 } // namespace ft
 
-#endif // LIBFTPP_ARRAY_HPP
-
 #	include "libftpp/array/array.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_ARRAY_HPP

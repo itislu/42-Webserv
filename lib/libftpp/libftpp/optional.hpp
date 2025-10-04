@@ -156,6 +156,6 @@ extern const nullopt_t nullopt;
 
 } // namespace ft
 
-#endif // LIBFTPP_OPTIONAL_HPP
-
 #	include "libftpp/optional/optional.tpp" // IWYU pragma: export
+
+#endif // LIBFTPP_OPTIONAL_HPP
