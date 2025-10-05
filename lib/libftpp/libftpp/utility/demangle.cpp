@@ -1,4 +1,5 @@
 #include "libftpp/utility.hpp"
+#include <exception>
 #include <string>
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -17,7 +18,13 @@ std::string demangle(const char* mangled_name)
 	char* const demangled =
 	    abi::__cxa_demangle(mangled_name, NULL, NULL, &status);
 
-	result = status == 0 ? demangled : mangled_name;
+	try {
+		result = status == 0 ? demangled : mangled_name;
+	}
+	catch (const std::exception& e) {
+		std::free(demangled); // NOLINT(cppcoreguidelines-no-malloc)
+		throw;
+	}
 	std::free(demangled); // NOLINT(cppcoreguidelines-no-malloc)
 	return result;
 #else  // LIBFTPP_HAVE_CXXABI_H
