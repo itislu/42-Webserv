@@ -50,6 +50,8 @@ CheckOptions:
   - key: readability-magic-numbers.IgnoredFloatingPointValues
     value: '1.0;100.0;0.1' # 1.0 and 100.0 are default, 0.1 for decimal base operations.
 
+ExcludeHeaderFilterRegex: 'libftpp/.*' # libftpp has its own clang-tidy config.
+
 ExtraArgsBefore:
   - -Wall
   - -Wextra
