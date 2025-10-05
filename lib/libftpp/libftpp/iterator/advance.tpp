@@ -5,6 +5,7 @@
 
 #	include "libftpp/iterator.hpp"
 #	include "libftpp/type_traits.hpp"
+#	include <cassert>
 #	include <cstdlib>
 #	include <iterator>
 
