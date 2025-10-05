@@ -33,7 +33,7 @@ jobs:
           style: 'file' # Use .clang-format config file.
           extensions: 'c,cpp,h,hpp,ipp,tpp'
           tidy-checks: '' # Use .clang-tidy config file.
-          version: '21'
+          version: '20'
           files-changed-only: false # Changes in header files can affect other files.
           ignore: 'build'
           step-summary: true
