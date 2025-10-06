@@ -1,6 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <bits/types.h>
 #include <cstddef>
 #include <sys/poll.h> //poll(), struct pollfd
 #include <vector>
@@ -25,6 +26,7 @@ public:
   void receiveFromClient(Client& client, std::size_t& idx);
   void disconnectClient(Client& client, std::size_t& idx);
 
+  static void stopServer();
   static void sendToClient(Client& client, pollfd& pfd);
 
 private:
@@ -32,6 +34,7 @@ private:
   int _serverFd;
   std::vector<Client> _clients;
   std::vector<pollfd> _pfds;
+  static volatile __sig_atomic_t _running;
 };
 
 #endif

@@ -1,6 +1,8 @@
 #include "Server.hpp"
 #include "client/Client.hpp"
 #include <algorithm>
+#include <bits/types.h>
+#include <csignal>
 #include <cstddef>
 #include <cstdlib> //exit()
 #include <cstring> //std::memset()
@@ -16,6 +18,8 @@
 #include <unistd.h> //close()
 #include <vector>
 
+volatile __sig_atomic_t Server::_running = 0;
+
 // TODO REMOVE THIS AND THROW EXCEPTION
 static void error(const std::string& msg)
 {
@@ -23,10 +27,22 @@ static void error(const std::string& msg)
   exit(1);
 }
 
+static void sigHandler(int /*sigNum*/)
+{
+  std::cout << "Shutting down server...";
+  Server::stopServer();
+}
+
+void Server::stopServer()
+{
+  _running = 0;
+}
+
 Server::Server(int port)
   : _port(port)
   , _serverFd(0)
 {
+  signal(SIGINT, sigHandler);
   initSocket();
 
   struct pollfd pfd = {};
@@ -50,6 +66,7 @@ void Server::initSocket()
   }
 
   int opt = 1;
+  // NOLINTNEXTLINE(missing-includes)
   if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
     error("setting options for server socket failed");
   }
@@ -157,7 +174,8 @@ void Server::sendToClient(Client& client, pollfd& pfd)
 
 void Server::run()
 {
-  while (true) {
+  _running = 1;
+  while (_running != 0) {
     const int ready = poll((&_pfds[0]), _pfds.size(), -1);
     //-1 = no timeout
     if (ready < 0) {
