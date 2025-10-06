@@ -9,6 +9,7 @@
 #include <fcntl.h> //fcntl()
 #include <iostream>
 #include <netinet/in.h> //struct sockaddr
+#include <new>
 #include <signal.h>
 #include <string.h> // strerror()
 #include <string>
@@ -20,16 +21,13 @@
 
 volatile sig_atomic_t Server::_running = 0;
 
-// TODO REMOVE THIS AND THROW EXCEPTION
 static void error(const std::string& msg)
 {
   std::cerr << "Error: " << msg << " (" << strerror(errno) << ")\n";
-  exit(1);
 }
 
 static void sigIntHandler(int /*sigNum*/)
 {
-  std::cout << "Shutting down server...\n";
   Server::stopServer();
 }
 
@@ -49,7 +47,7 @@ void Server::initServer()
 {
   // NOLINTBEGIN
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
-    std::cerr << "Error: Failed to set SIGINT handler\n";
+    error("Failed to set SIGINT handler");
     return;
   }
   // NOLINTEND
@@ -70,6 +68,7 @@ Server::~Server()
     close(_pfds[i].fd);
   }
   _pfds.clear();
+  _clients.clear();
 }
 
 void Server::initSocket()
@@ -115,11 +114,13 @@ void Server::acceptClient()
   const int clientFd = accept(_serverFd, NULL, NULL);
   if (clientFd < 0) {
     error("failed to accept new client");
+    return;
   }
 
   if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
     close(clientFd);
-    error("failed to set client non-blocking");
+    error("failed to accept new client");
+    return;
   }
 
   struct pollfd pfd = {};
@@ -147,7 +148,13 @@ void Server::receiveFromClient(Client& client, std::size_t& idx)
   Buffer buffer(MAX_CHUNK);
   const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
   if (bytes > 0) {
-    client.addToInBuff(buffer);
+    try {
+      client.addToInBuff(buffer);
+    } catch (std::bad_alloc& e) {
+      error("Allocation for inbuffer failed");
+      disconnectClient(client, idx);
+    }
+
     // This is just for debugging atm
     std::cout << "Client " << idx << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -185,33 +192,53 @@ void Server::sendToClient(Client& client, pollfd& pfd)
   }
 }
 
+void Server::checkActivity()
+{
+  for (std::size_t i = 0; i < _pfds.size(); i++) {
+    const unsigned events = static_cast<unsigned>(_pfds[i].revents);
+    if (_pfds[i].fd == _serverFd) {
+      if ((events & POLLIN) != 0) {
+        acceptClient();
+      }
+    } else {
+      Client& client = _clients[i - 1];
+      if ((events & POLLIN) != 0) { // Receive Data
+        receiveFromClient(client, i);
+      }
+      if ((events & POLLOUT) != 0) { // Send Data
+        Server::sendToClient(client, _pfds[i]);
+      }
+      if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0) { // Error
+        disconnectClient(client, i);
+      }
+    }
+  }
+}
+
 void Server::run()
 {
   _running = 1;
   while (_running != 0) {
-    const int ready = poll((&_pfds[0]), _pfds.size(), -1);
-    //-1 = no timeout
-    if (ready < 0) {
-      // error("poll failed");
-    }
-    for (std::size_t i = 0; i < _pfds.size(); i++) {
-      const unsigned events = static_cast<unsigned>(_pfds[i].revents);
-      if (_pfds[i].fd == _serverFd) {
-        if ((events & POLLIN) != 0) {
-          acceptClient();
+    try {
+      const int ready = poll((&_pfds[0]), _pfds.size(), -1);
+      //-1 = no timeout
+      if (ready < 0) {
+        if (errno == EINTR) {
+          continue;
         }
-      } else {
-        Client& client = _clients[i - 1];
-        if ((events & POLLIN) != 0) { // Receive Data
-          receiveFromClient(client, i);
-        }
-        if ((events & POLLOUT) != 0) { // Send Data
-          Server::sendToClient(client, _pfds[i]);
-        }
-        if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0) { // Error
-          disconnectClient(client, i);
-        }
+        std::cerr << "Error: poll failed\n";
+        break;
       }
+      if (ready == 0) {
+        std::cerr << "Error: poll timeout\n";
+        break;
+      }
+
+      checkActivity();
+
+    } catch (const std::bad_alloc& e) {
+      std::cerr << "Error: " << e.what() << "\n";
     }
   }
+  std::cout << "Shutting down server...\n";
 }

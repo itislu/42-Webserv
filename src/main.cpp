@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     Server server(port);
     server.initServer();
     server.run();
-  } catch (std::exception& e) {
+  } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";
     return 1;
   }
