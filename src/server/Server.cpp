@@ -158,7 +158,8 @@ void Server::sendToClient(Client& client, pollfd& pfd)
 void Server::run()
 {
   while (true) {
-    const int ready = poll((&_pfds[0]), _pfds.size(), -1); //-1 = no timeout
+    const int ready = poll((&_pfds[0]), _pfds.size(), -1);
+    //-1 = no timeout
     if (ready < 0) {
       error("poll failed");
     }
