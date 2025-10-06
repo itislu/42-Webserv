@@ -2,7 +2,6 @@
 #define SERVER_HPP
 
 #include <cstddef>
-#include <exception>
 #include <string>
 #include <sys/poll.h> //poll(), struct pollfd
 #include <vector>

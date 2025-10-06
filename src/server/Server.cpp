@@ -37,7 +37,7 @@ Server::Server(int port)
   , _serverFd(0)
 {
   _pfds.reserve(MAX_CLIENTS + 1); // should come from config for now 1024
-  _clients.reserve(MAX_CLIENTS);
+  _clients.reserve(MAX_CLIENTS);  // not sure if we wanna add a Client limit
 }
 
 Server::Server(const Server& other)
@@ -208,7 +208,7 @@ void Server::sendToClient(Client& client, std::size_t& idx)
   }
 }
 
-// TODO add check if still same client
+// TODO: add check if still same client
 void Server::checkActivity()
 {
   for (std::size_t i = 0; i < _pfds.size(); i++) {
