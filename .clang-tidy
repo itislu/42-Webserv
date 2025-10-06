@@ -41,6 +41,8 @@ Checks:
 CheckOptions:
   - key: bugprone-empty-catch.IgnoreCatchWithKeywords
     value: 'EMPTY: '
+  - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
+    value: true
   - key: misc-header-include-cycle.IgnoredFilesList
     value: '.tpp' # pragma once does not seem to be recognized by clang-tidy.
   - key: misc-include-cleaner.IgnoreHeaders

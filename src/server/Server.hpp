@@ -41,7 +41,6 @@ private:
   int _serverFd;
   std::vector<Client> _clients;
   std::vector<pollfd> _pfds;
-  static volatile __sig_atomic_t _running;
 };
 
 #endif

@@ -19,21 +19,16 @@
 #include <unistd.h> //close()
 #include <vector>
 
-volatile sig_atomic_t Server::_running = 0;
+static volatile sig_atomic_t g_running = 0;
 
 static void error(const std::string& msg)
 {
   std::cerr << "Error: " << msg << " (" << strerror(errno) << ")\n";
 }
 
-static void sigIntHandler(int /*sigNum*/)
+extern "C" void sigIntHandler(int /*sigNum*/)
 {
-  Server::stopServer();
-}
-
-void Server::stopServer()
-{
-  _running = 0;
+  g_running = 0;
 }
 
 Server::Server(int port)
@@ -45,12 +40,10 @@ Server::Server(int port)
 
 void Server::initServer()
 {
-  // NOLINTBEGIN
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
     error("Failed to set SIGINT handler");
     return;
   }
-  // NOLINTEND
 
   initSocket();
 
@@ -217,8 +210,8 @@ void Server::checkActivity()
 
 void Server::run()
 {
-  _running = 1;
-  while (_running != 0) {
+  g_running = 1;
+  while (g_running != 0) {
     try {
       const int ready = poll((&_pfds[0]), _pfds.size(), -1);
       //-1 = no timeout
