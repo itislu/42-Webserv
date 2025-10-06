@@ -7,7 +7,7 @@
 #include <errno.h> //errno
 #include <fcntl.h> //fcntl()
 #include <iostream>
-#include <netinet/in.h> //struct sockadrr
+#include <netinet/in.h> //struct sockaddr
 #include <string.h>     // strerror()
 #include <string>
 #include <sys/poll.h>
@@ -165,8 +165,10 @@ void Server::run()
     }
     for (std::size_t i = 0; i < _pfds.size(); i++) {
       const unsigned events = static_cast<unsigned>(_pfds[i].revents);
-      if (_pfds[i].fd == _serverFd && ((events & POLLIN) != 0)) {
-        acceptClient();
+      if (_pfds[i].fd == _serverFd) {
+        if ((events & POLLIN) != 0) {
+          acceptClient();
+        }
       } else {
         Client& client = _clients[i - 1];
         if ((events & POLLIN) != 0) { // Receive Data
