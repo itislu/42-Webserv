@@ -5,13 +5,13 @@
 
 Client::Client()
   : _fd(-1)
-  , _state(0)
+//, _state(0)
 {
 }
 
 Client::Client(int sockFd)
   : _fd(sockFd)
-  , _state(0)
+//, _state(0)
 {
 }
 

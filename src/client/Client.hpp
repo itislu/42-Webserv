@@ -28,7 +28,7 @@ public:
 
 private:
   int _fd;
-  int _state;
+  // int _state;
   Buffer _inBuff;
   Buffer _outBuff;
 };
