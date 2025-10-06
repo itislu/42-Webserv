@@ -11,9 +11,6 @@ public:
   typedef std::vector<unsigned char> Buffer;
   Client();
   explicit Client(int sockFd);
-  Client(const Client& other);
-  Client& operator=(const Client& other);
-  ~Client();
 
   int getFd() const;
   Buffer getInBuff() const;
