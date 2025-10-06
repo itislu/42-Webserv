@@ -1,7 +1,6 @@
 #include "Server.hpp"
 #include "client/Client.hpp"
 #include <algorithm>
-#include <bits/types.h>
 #include <csignal>
 #include <cstddef>
 #include <cstdlib> //exit()
@@ -19,7 +18,7 @@
 #include <unistd.h> //close()
 #include <vector>
 
-volatile __sig_atomic_t Server::_running = 0;
+volatile sig_atomic_t Server::_running = 0;
 
 // TODO REMOVE THIS AND THROW EXCEPTION
 static void error(const std::string& msg)
