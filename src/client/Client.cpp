@@ -55,7 +55,7 @@ void Client::addToInBuff(std::string str)
   _inBuff.insert(_inBuff.end(), str.begin(), str.end());
 }
 
-void Client::addToInBuff(std::vector<char>& buffer)
+void Client::addToInBuff(const Buffer& buffer)
 {
   _inBuff.insert(_inBuff.end(), buffer.begin(), buffer.end());
 }
@@ -65,7 +65,7 @@ void Client::addToOutBuff(std::string str)
   _outBuff.insert(_outBuff.end(), str.begin(), str.end());
 }
 
-void Client::addToOutBuff(std::vector<char>& buffer)
+void Client::addToOutBuff(const Buffer& buffer)
 {
   _outBuff.insert(_outBuff.end(), buffer.begin(), buffer.end());
 }
