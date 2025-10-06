@@ -1,7 +1,6 @@
 #include "Server.hpp"
 #include "client/Client.hpp"
 #include <algorithm>
-#include <asm-generic/socket.h>
 #include <cstddef>
 #include <cstdlib> //exit()
 #include <cstring> //std::memset()
@@ -114,12 +113,15 @@ void Server::disconnectClient(Client& client, size_t& idx)
 
 void Server::receiveFromClient(Client& client, size_t& idx)
 {
-  std::vector<char> buffer(MAX_CHUNK);
+  Buffer buffer(MAX_CHUNK);
   const size_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
   if (bytes > 0) {
     client.addToInBuff(buffer);
     std::cout << "Client " << idx << ": ";
-    std::cout.write(&buffer[0], static_cast<std::streamsize>(bytes));
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
+    std::cout.write(reinterpret_cast<const char*>(&buffer[0]),
+                    static_cast<std::streamsize>(bytes));
+    // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
 
     // TODO: STATEMACHINE/PARSING
 
