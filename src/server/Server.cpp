@@ -10,7 +10,8 @@
 #include <fcntl.h> //fcntl()
 #include <iostream>
 #include <netinet/in.h> //struct sockaddr
-#include <string.h>     // strerror()
+#include <signal.h>
+#include <string.h> // strerror()
 #include <string>
 #include <sys/poll.h>
 #include <sys/socket.h> //socket(), setsockopt(),
@@ -27,9 +28,9 @@ static void error(const std::string& msg)
   exit(1);
 }
 
-static void sigHandler(int /*sigNum*/)
+static void sigIntHandler(int /*sigNum*/)
 {
-  std::cout << "Shutting down server...";
+  std::cout << "Shutting down server...\n";
   Server::stopServer();
 }
 
@@ -42,7 +43,18 @@ Server::Server(int port)
   : _port(port)
   , _serverFd(0)
 {
-  signal(SIGINT, sigHandler);
+  _pfds.reserve(MAX_CLIENTS); // should come from config for now 1024
+}
+
+void Server::initServer()
+{
+  // NOLINTBEGIN
+  if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
+    std::cerr << "Error: Failed to set SIGINT handler\n";
+    return;
+  }
+  // NOLINTEND
+
   initSocket();
 
   struct pollfd pfd = {};

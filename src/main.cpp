@@ -9,8 +9,9 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  const int port = 8080;
+  const int port = 8080; // should come from config
   Server server(port);
+  server.initServer();
   server.run();
 
   return 0;

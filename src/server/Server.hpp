@@ -11,6 +11,11 @@
 #ifndef MAX_CHUNK
 #define MAX_CHUNK 1024
 #endif
+
+#ifndef MAX_CLIENTS
+#define MAX_CLIENTS 1024
+#endif
+
 class Server
 {
 public:
@@ -21,6 +26,7 @@ public:
   ~Server();
 
   void run();
+  void initServer();
   void initSocket();
   void acceptClient();
   void receiveFromClient(Client& client, std::size_t& idx);
