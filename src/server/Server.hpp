@@ -2,6 +2,8 @@
 #define SERVER_HPP
 
 #include <cstddef>
+#include <exception>
+#include <string>
 #include <sys/poll.h> //poll(), struct pollfd
 #include <vector>
 
@@ -32,6 +34,8 @@ public:
   void disconnectClient(Client& client, std::size_t& idx);
   void sendToClient(Client& client, std::size_t& idx);
   void checkActivity();
+
+  void throwSocketException(const std::string& msg);
 
 private:
   int _port;

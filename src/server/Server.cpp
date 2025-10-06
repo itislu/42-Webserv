@@ -11,6 +11,7 @@
 #include <netinet/in.h> //struct sockaddr
 #include <new>
 #include <signal.h>
+#include <stdexcept>
 #include <string.h> // strerror()
 #include <string>
 #include <sys/poll.h>
@@ -35,7 +36,35 @@ Server::Server(int port)
   : _port(port)
   , _serverFd(0)
 {
-  _pfds.reserve(MAX_CLIENTS); // should come from config for now 1024
+  _pfds.reserve(MAX_CLIENTS + 1); // should come from config for now 1024
+  _clients.reserve(MAX_CLIENTS);
+}
+
+Server::Server(const Server& other)
+  : _port(-1)
+  , _serverFd(-1)
+{
+  *this = other;
+}
+
+Server& Server::operator=(const Server& other)
+{
+  if (this != &other) {
+    _port = other._port;
+    _serverFd = other._serverFd;
+    _pfds = other._pfds;
+    _clients = other._clients;
+  }
+  return *this;
+}
+
+Server::~Server()
+{
+  for (std::size_t i = 0; i < _pfds.size(); i++) {
+    close(_pfds[i].fd);
+  }
+  _pfds.clear();
+  _clients.clear();
 }
 
 void Server::initServer()
@@ -55,25 +84,16 @@ void Server::initServer()
   _pfds.push_back(pfd);
 }
 
-Server::~Server()
-{
-  for (std::size_t i = 0; i < _pfds.size(); i++) {
-    close(_pfds[i].fd);
-  }
-  _pfds.clear();
-  _clients.clear();
-}
-
 void Server::initSocket()
 {
   _serverFd = socket(AF_INET, SOCK_STREAM, 0);
   if (_serverFd < 0) {
-    error("server socket creation failed");
+    throwSocketException("server socket creation failed");
   }
 
   int opt = 1;
   if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-    error("setting options for server socket failed");
+    throwSocketException("setting options for server socket failed");
   }
 
   struct sockaddr_in servAddr = {};
@@ -88,20 +108,21 @@ void Server::initSocket()
            sizeof(servAddr)) < 0)
   // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
   {
-    error("failed to bind server socket");
+    throwSocketException("failed to bind server socket");
   }
 
   if (listen(_serverFd, SOMAXCONN) < 0) {
-    error("failed to set server socket to listen");
+    throwSocketException("failed to set server socket to listen");
   }
 
   if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) < 0) {
-    error("failed to set server socket to non blocking");
+    throwSocketException("failed to set server socket to non-blocking");
   }
 
   std::cout << "[SERVER] listening on port " << _port << "\n";
 }
 
+// if we wanna add a MAX_CLIENT limit -> TODO add limit check
 void Server::acceptClient()
 {
   const int clientFd = accept(_serverFd, NULL, NULL);
@@ -171,20 +192,23 @@ void Server::sendToClient(Client& client, std::size_t& idx)
   const std::size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
   const ssize_t bytes =
     send(client.getFd(), client.getOutBuff().data(), toSend, 0);
-  if (bytes >= 0) {
+  if (bytes > 0) {
     client.removeFromOutBuff(bytes);
     if (!client.hasDataToSend()) {
       _pfds[idx].events =
         static_cast<short>(static_cast<unsigned>(_pfds[idx].events) &
                            ~static_cast<unsigned>(POLLOUT));
     }
+  } else if (bytes == 0) {
+    std::cout << "[SERVER] no data sent to client " << idx << "\n";
   } else {
-    std::cerr << "[SERVER] send error for client " << client.getFd() << ": "
+    std::cerr << "[SERVER] send error for client " << idx << ": "
               << strerror(errno) << "\n";
     disconnectClient(client, idx);
   }
 }
 
+// TODO add check if still same client
 void Server::checkActivity()
 {
   for (std::size_t i = 0; i < _pfds.size(); i++) {
@@ -219,7 +243,7 @@ void Server::run()
         if (errno == EINTR) {
           continue;
         }
-        std::cerr << "Error: poll failed\n";
+        error("poll failed");
         break;
       }
       if (ready == 0) {
@@ -234,4 +258,13 @@ void Server::run()
     }
   }
   std::cout << "Shutting down server...\n";
+}
+
+void Server::throwSocketException(const std::string& msg)
+{
+  if (_serverFd >= 0) {
+    close(_serverFd);
+    _serverFd = -1;
+  }
+  throw std::runtime_error(msg);
 }
