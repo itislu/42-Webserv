@@ -31,10 +31,8 @@ public:
   void acceptClient();
   void receiveFromClient(Client& client, std::size_t& idx);
   void disconnectClient(Client& client, std::size_t& idx);
+  void sendToClient(Client& client, std::size_t& idx);
   void checkActivity();
-
-  static void stopServer();
-  static void sendToClient(Client& client, pollfd& pfd);
 
 private:
   int _port;

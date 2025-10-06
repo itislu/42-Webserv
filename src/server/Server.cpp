@@ -141,13 +141,7 @@ void Server::receiveFromClient(Client& client, std::size_t& idx)
   Buffer buffer(MAX_CHUNK);
   const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
   if (bytes > 0) {
-    try {
-      client.addToInBuff(buffer);
-    } catch (std::bad_alloc& e) {
-      error("Allocation for inbuffer failed");
-      disconnectClient(client, idx);
-    }
-
+    client.addToInBuff(buffer);
     // This is just for debugging atm
     std::cout << "Client " << idx << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -166,22 +160,28 @@ void Server::receiveFromClient(Client& client, std::size_t& idx)
     disconnectClient(client, idx);
   } else // bytes < 0
   {
-    std::cout << "[SERVER] No data from Client " << idx << '\n';
+    error("recv failed, removing client");
+    disconnectClient(client, idx);
   }
 }
 
-void Server::sendToClient(Client& client, pollfd& pfd)
+void Server::sendToClient(Client& client, std::size_t& idx)
 {
   const std::size_t maxChunk = MAX_CHUNK;
   const std::size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
   const ssize_t bytes =
     send(client.getFd(), client.getOutBuff().data(), toSend, 0);
-  if (bytes > 0) {
+  if (bytes >= 0) {
     client.removeFromOutBuff(bytes);
     if (!client.hasDataToSend()) {
-      pfd.events = static_cast<short>(static_cast<unsigned>(pfd.events) &
-                                      ~static_cast<unsigned>(POLLOUT));
+      _pfds[idx].events =
+        static_cast<short>(static_cast<unsigned>(_pfds[idx].events) &
+                           ~static_cast<unsigned>(POLLOUT));
     }
+  } else {
+    std::cerr << "[SERVER] send error for client " << client.getFd() << ": "
+              << strerror(errno) << "\n";
+    disconnectClient(client, idx);
   }
 }
 
@@ -199,7 +199,7 @@ void Server::checkActivity()
         receiveFromClient(client, i);
       }
       if ((events & POLLOUT) != 0) { // Send Data
-        Server::sendToClient(client, _pfds[i]);
+        sendToClient(client, i);
       }
       if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0) { // Error
         disconnectClient(client, i);
