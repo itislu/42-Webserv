@@ -67,7 +67,10 @@ void Server::initServer()
 
 Server::~Server()
 {
-  close(_serverFd);
+  for (std::size_t i = 0; i < _pfds.size(); i++) {
+    close(_pfds[i].fd);
+  }
+  _pfds.clear();
 }
 
 void Server::initSocket()
@@ -78,7 +81,6 @@ void Server::initSocket()
   }
 
   int opt = 1;
-  // NOLINTNEXTLINE(missing-includes)
   if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
     error("setting options for server socket failed");
   }
@@ -191,7 +193,7 @@ void Server::run()
     const int ready = poll((&_pfds[0]), _pfds.size(), -1);
     //-1 = no timeout
     if (ready < 0) {
-      error("poll failed");
+      // error("poll failed");
     }
     for (std::size_t i = 0; i < _pfds.size(); i++) {
       const unsigned events = static_cast<unsigned>(_pfds[i].revents);
