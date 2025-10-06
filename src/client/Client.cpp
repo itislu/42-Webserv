@@ -30,7 +30,7 @@ Client::Buffer Client::getOutBuff() const
   return _outBuff;
 }
 
-void Client::addToInBuff(std::string str)
+void Client::addToInBuff(const std::string& str)
 {
   _inBuff.insert(_inBuff.end(), str.begin(), str.end());
 }
@@ -40,7 +40,7 @@ void Client::addToInBuff(const Buffer& buffer)
   _inBuff.insert(_inBuff.end(), buffer.begin(), buffer.end());
 }
 
-void Client::addToOutBuff(std::string str)
+void Client::addToOutBuff(const std::string& str)
 {
   _outBuff.insert(_outBuff.end(), str.begin(), str.end());
 }

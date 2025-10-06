@@ -16,10 +16,10 @@ public:
   Buffer getInBuff() const;
   Buffer getOutBuff() const;
 
-  void addToInBuff(std::string str);
+  void addToInBuff(const std::string& str);
   void addToInBuff(const Buffer& buffer);
 
-  void addToOutBuff(std::string str);
+  void addToOutBuff(const std::string& str);
   void addToOutBuff(const Buffer& buffer);
 
   void removeFromOutBuff(ssize_t bytes);
