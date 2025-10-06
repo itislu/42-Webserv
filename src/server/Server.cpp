@@ -16,6 +16,7 @@
 #include <unistd.h> //close()
 #include <vector>
 
+// TODO REMOVE THIS AND THROW EXCEPTION
 static void error(const std::string& msg)
 {
   std::cerr << "Error: " << msg << " (" << strerror(errno) << ")\n";
@@ -114,9 +115,10 @@ void Server::disconnectClient(Client& client, size_t& idx)
 void Server::receiveFromClient(Client& client, size_t& idx)
 {
   Buffer buffer(MAX_CHUNK);
-  const size_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
+  const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
   if (bytes > 0) {
     client.addToInBuff(buffer);
+    // This is just for debugging atm
     std::cout << "Client " << idx << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     std::cout.write(reinterpret_cast<const char*>(&buffer[0]),
