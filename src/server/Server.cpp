@@ -103,7 +103,7 @@ void Server::acceptClient()
   std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
 }
 
-void Server::disconnectClient(Client& client, size_t& idx)
+void Server::disconnectClient(Client& client, std::size_t& idx)
 {
   std::cout << "[SERVER] Client " << idx << " disconnected\n";
   close(client.getFd());
@@ -112,7 +112,7 @@ void Server::disconnectClient(Client& client, size_t& idx)
   idx--;
 }
 
-void Server::receiveFromClient(Client& client, size_t& idx)
+void Server::receiveFromClient(Client& client, std::size_t& idx)
 {
   Buffer buffer(MAX_CHUNK);
   const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
@@ -142,8 +142,8 @@ void Server::receiveFromClient(Client& client, size_t& idx)
 
 void Server::sendToClient(Client& client, pollfd& pfd)
 {
-  const size_t maxChunk = MAX_CHUNK;
-  const size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
+  const std::size_t maxChunk = MAX_CHUNK;
+  const std::size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
   const ssize_t bytes =
     send(client.getFd(), client.getOutBuff().data(), toSend, 0);
   if (bytes > 0) {
@@ -163,7 +163,7 @@ void Server::run()
     if (ready < 0) {
       error("poll failed");
     }
-    for (size_t i = 0; i < _pfds.size(); i++) {
+    for (std::size_t i = 0; i < _pfds.size(); i++) {
       const unsigned events = static_cast<unsigned>(_pfds[i].revents);
       if (_pfds[i].fd == _serverFd && ((events & POLLIN) != 0)) {
         acceptClient();

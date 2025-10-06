@@ -22,8 +22,8 @@ public:
   void run();
   void initSocket();
   void acceptClient();
-  void receiveFromClient(Client& client, size_t& idx);
-  void disconnectClient(Client& client, size_t& idx);
+  void receiveFromClient(Client& client, std::size_t& idx);
+  void disconnectClient(Client& client, std::size_t& idx);
 
   static void sendToClient(Client& client, pollfd& pfd);
 
