@@ -115,6 +115,7 @@ void Server::initSocket()
     throwSocketException("failed to set server socket to listen");
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
   if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) < 0) {
     throwSocketException("failed to set server socket to non-blocking");
   }
@@ -131,6 +132,7 @@ void Server::acceptClient()
     return;
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
   if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
     close(clientFd);
     error("failed to accept new client");
