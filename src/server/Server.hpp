@@ -1,7 +1,6 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <bits/types.h>
 #include <cstddef>
 #include <sys/poll.h> //poll(), struct pollfd
 #include <vector>
