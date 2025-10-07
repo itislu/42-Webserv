@@ -3,6 +3,7 @@
 #include <vector>
 
 Config::Config(const std::string& file)
+  : _maxClients(MAX_CLIENTS)
 {
   // parse file
   (void)file;

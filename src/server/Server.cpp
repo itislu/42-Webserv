@@ -10,7 +10,6 @@
 #include <errno.h> //errno
 #include <fcntl.h> //fcntl()
 #include <iostream>
-#include <netinet/in.h> //struct sockaddr
 #include <new>
 #include <signal.h>
 #include <stdexcept>
@@ -35,8 +34,6 @@ extern "C" void sigIntHandler(int /*sigNum*/)
 }
 
 Server::Server(const Config& config)
-  : _port(-1)
-  , _serverFd(-1)
 {
   _listeners.reserve(config.getPorts().size());
   for (std::vector<int>::const_iterator it = config.getPorts().begin();
@@ -45,13 +42,11 @@ Server::Server(const Config& config)
     _listeners.push_back(Socket(*it));
   }
 
-  _pfds.reserve(MAX_CLIENTS + 1); // should come from config for now 1024
-  _clients.reserve(MAX_CLIENTS);  // not sure if we wanna add a Client limit
+  _pfds.reserve(config.getMaxClients());
+  _clients.reserve(config.getMaxClients());
 }
 
 Server::Server(const Server& other)
-  : _port(-1)
-  , _serverFd(-1)
 {
   *this = other;
 }

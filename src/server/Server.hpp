@@ -13,11 +13,6 @@
 #ifndef MAX_CHUNK
 #define MAX_CHUNK 1024
 #endif
-
-#ifndef MAX_CLIENTS
-#define MAX_CLIENTS 1024
-#endif
-
 class Server
 {
 public:
@@ -41,8 +36,6 @@ public:
   void throwSocketException(const std::string& msg);
 
 private:
-  int _port;
-  int _serverFd;
   std::vector<Socket> _listeners;
   std::vector<Client> _clients;
   std::vector<pollfd> _pfds;
