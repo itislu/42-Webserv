@@ -150,16 +150,17 @@ void Server::acceptClient()
   std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
 }
 
-void Server::disconnectClient(Client& client, std::size_t& idx)
+bool Server::disconnectClient(Client& client, std::size_t& idx)
 {
   std::cout << "[SERVER] Client " << idx << " disconnected\n";
   close(client.getFd());
   _pfds.erase(_pfds.begin() + static_cast<long>(idx));
   _clients.erase(_clients.begin() + static_cast<long>(idx - 1));
   idx--;
+  return false;
 }
 
-void Server::receiveFromClient(Client& client, std::size_t& idx)
+bool Server::receiveFromClient(Client& client, std::size_t& idx)
 {
   Buffer buffer(MAX_CHUNK);
   const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
@@ -180,15 +181,16 @@ void Server::receiveFromClient(Client& client, std::size_t& idx)
         static_cast<unsigned>(POLLOUT)); // enable POLLOUT safely
     }
   } else if (bytes == 0) {
-    disconnectClient(client, idx);
+    return disconnectClient(client, idx);
   } else // bytes < 0
   {
     error("recv failed, removing client");
-    disconnectClient(client, idx);
+    return disconnectClient(client, idx);
   }
+  return true;
 }
 
-void Server::sendToClient(Client& client, std::size_t& idx)
+bool Server::sendToClient(Client& client, std::size_t& idx)
 {
   const std::size_t maxChunk = MAX_CHUNK;
   const std::size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
@@ -206,14 +208,15 @@ void Server::sendToClient(Client& client, std::size_t& idx)
   } else {
     std::cerr << "[SERVER] send error for client " << idx << ": "
               << strerror(errno) << "\n";
-    disconnectClient(client, idx);
+    return disconnectClient(client, idx);
   }
+  return true;
 }
 
-// TODO: add check if still same client
 void Server::checkActivity()
 {
   for (std::size_t i = 0; i < _pfds.size(); i++) {
+    bool same = true;
     const unsigned events = static_cast<unsigned>(_pfds[i].revents);
     if (_pfds[i].fd == _serverFd) {
       if ((events & POLLIN) != 0) {
@@ -221,14 +224,15 @@ void Server::checkActivity()
       }
     } else {
       Client& client = _clients[i - 1];
-      if ((events & POLLIN) != 0) { // Receive Data
-        receiveFromClient(client, i);
+      if ((events & POLLIN) != 0 && same) { // Receive Data
+        same = receiveFromClient(client, i);
       }
-      if ((events & POLLOUT) != 0) { // Send Data
-        sendToClient(client, i);
+      if ((events & POLLOUT) != 0 && same) { // Send Data
+        same = sendToClient(client, i);
       }
-      if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0) { // Error
-        disconnectClient(client, i);
+      if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 &&
+          same) { // Error
+        same = disconnectClient(client, i);
       }
     }
   }
