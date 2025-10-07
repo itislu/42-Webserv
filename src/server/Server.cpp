@@ -187,11 +187,16 @@ void Server::checkActivity()
       }
     } else {
       Client& client = _clients[i - _listeners.size()];
-      if ((events & POLLIN) != 0 && same) { // Receive Data
-        same = receiveFromClient(client, i);
-      }
-      if ((events & POLLOUT) != 0 && same) { // Send Data
-        same = sendToClient(client, i);
+      try {
+        if ((events & POLLIN) != 0 && same) { // Receive Data
+          same = receiveFromClient(client, i);
+        }
+        if ((events & POLLOUT) != 0 && same) { // Send Data
+          same = sendToClient(client, i);
+        }
+      } catch (const std::bad_alloc& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        disconnectClient(client, i);
       }
       if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 &&
           same) { // Error
@@ -208,26 +213,20 @@ void Server::run()
 {
   g_running = 1;
   while (g_running != 0) {
-    try {
-      const int ready = poll((&_pfds[0]), _pfds.size(), -1);
-      //-1 = no timeout
-      if (ready < 0) {
-        if (errno == EINTR) {
-          continue;
-        }
-        error("poll failed");
-        break;
+    const int ready = poll((&_pfds[0]), _pfds.size(), -1);
+    //-1 = no timeout
+    if (ready < 0) {
+      if (errno == EINTR) {
+        continue;
       }
-      if (ready == 0) {
-        std::cerr << "Error: poll timeout\n";
-        break;
-      }
-
-      checkActivity();
-
-    } catch (const std::bad_alloc& e) {
-      std::cerr << "Error: " << e.what() << "\n";
+      error("poll failed");
+      break;
     }
+    if (ready == 0) {
+      std::cerr << "Error: poll timeout\n";
+      break;
+    }
+    checkActivity();
   }
   std::cout << "Shutting down server...\n";
 }
