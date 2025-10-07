@@ -45,29 +45,11 @@ Server::Server(const Config& config)
   _clients.reserve(config.getMaxClients());
 }
 
-Server::Server(const Server& other)
-{
-  *this = other;
-}
-
-Server& Server::operator=(const Server& other)
-{
-  if (this != &other) {
-    _pfds = other._pfds;
-    _clients = other._clients;
-    _listeners = other._listeners;
-  }
-  return *this;
-}
-
 Server::~Server()
 {
   for (std::size_t i = 0; i < _pfds.size(); i++) {
     close(_pfds[i].fd);
   }
-  _pfds.clear();
-  _clients.clear();
-  _listeners.clear();
 }
 
 void Server::addToPfd(int sockFd)
@@ -125,7 +107,7 @@ bool Server::disconnectClient(Client& client, std::size_t& idx)
   std::cout << "[SERVER] Client " << idx << " disconnected\n";
   close(client.getFd());
   _pfds.erase(_pfds.begin() + static_cast<long>(idx));
-  _clients.erase(_clients.begin() + static_cast<long>(idx - 1));
+  _clients.erase(_clients.begin() + static_cast<long>(idx - _listeners.size()));
   return false;
 }
 
@@ -204,8 +186,7 @@ void Server::checkActivity()
         acceptClient(_pfds[i].fd);
       }
     } else {
-      // NOT CORRECT ANYMORE depends on listening ports
-      Client& client = _clients[i - 1];
+      Client& client = _clients[i - _listeners.size()];
       if ((events & POLLIN) != 0 && same) { // Receive Data
         same = receiveFromClient(client, i);
       }

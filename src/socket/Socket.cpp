@@ -26,7 +26,10 @@ int Socket::getPort() const
 
 void Socket::throwSocketException(const std::string& msg)
 {
-  close(_fd);
+  if (_fd < 0) {
+    close(_fd);
+  }
+
   _fd = -1;
   throw std::runtime_error(msg);
 }
@@ -34,7 +37,6 @@ void Socket::throwSocketException(const std::string& msg)
 struct sockaddr_in Socket::getIpv4SockAddr() const
 {
   struct sockaddr_in sockAddr = {};
-  std::memset(&sockAddr, 0, sizeof(sockAddr));
   sockAddr.sin_family = AF_INET;
   sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
   sockAddr.sin_port = htons(_port);

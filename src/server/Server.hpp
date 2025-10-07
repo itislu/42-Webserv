@@ -18,8 +18,6 @@ class Server
 public:
   typedef std::vector<unsigned char> Buffer;
   explicit Server(const Config& config);
-  Server(const Server& other);
-  Server& operator=(const Server& other);
   ~Server();
 
   void run();
@@ -37,6 +35,8 @@ public:
   void throwSocketException(const std::string& msg);
 
 private:
+  Server(const Server& other);
+  Server& operator=(const Server& other);
   std::vector<Socket> _listeners;
   std::vector<Client> _clients;
   std::vector<pollfd> _pfds;
