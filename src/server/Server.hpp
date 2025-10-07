@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "client/Client.hpp"
+#include "socket/Socket.hpp"
 
 #ifndef MAX_CHUNK
 #define MAX_CHUNK 1024
@@ -28,6 +29,7 @@ public:
   void run();
   void initServer();
   void initSocket();
+  void addListeners();
   void acceptClient();
   bool receiveFromClient(Client& client, std::size_t& idx);
   bool disconnectClient(Client& client, std::size_t& idx);
@@ -39,6 +41,7 @@ public:
 private:
   int _port;
   int _serverFd;
+  std::vector<Socket> _listeners;
   std::vector<Client> _clients;
   std::vector<pollfd> _pfds;
 };

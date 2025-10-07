@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "client/Client.hpp"
+#include "socket/Socket.hpp"
 #include <algorithm>
 #include <csignal>
 #include <cstddef>
@@ -67,6 +68,19 @@ Server::~Server()
   _clients.clear();
 }
 
+void Server::addListeners()
+{
+  for (std::vector<Socket>::iterator it = _listeners.begin();
+       it != _listeners.end();
+       ++it) {
+    struct pollfd pfd = {};
+    pfd.fd = it->getFd();
+    pfd.events = POLLIN;
+    pfd.revents = 0;
+    _pfds.push_back(pfd);
+  }
+}
+
 void Server::initServer()
 {
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
@@ -75,13 +89,7 @@ void Server::initServer()
   }
 
   initSocket();
-
-  struct pollfd pfd = {};
-  pfd.fd = _serverFd;
-  pfd.events = POLLIN;
-  pfd.revents = 0;
-
-  _pfds.push_back(pfd);
+  addListeners();
 }
 
 void Server::initSocket()
