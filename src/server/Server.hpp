@@ -27,7 +27,8 @@ public:
   void initListeners();
   void addToPfd(int sockFd);
   void addListeners();
-  void acceptClient();
+  bool isListener(int sockFd);
+  void acceptClient(int serverFd);
   bool receiveFromClient(Client& client, std::size_t& idx);
   bool disconnectClient(Client& client, std::size_t& idx);
   bool sendToClient(Client& client, std::size_t& idx);

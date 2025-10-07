@@ -101,10 +101,10 @@ void Server::initServer()
   initListeners();
 }
 
-// if we wanna add a MAX_CLIENT limit -> TODO add limit check
-void Server::acceptClient()
+// TODO refactor so its the correct fd accepting
+void Server::acceptClient(int serverFd)
 {
-  const int clientFd = accept(_serverFd, NULL, NULL);
+  const int clientFd = accept(serverFd, NULL, NULL);
   if (clientFd < 0) {
     error("failed to accept new client");
     return;
@@ -162,6 +162,18 @@ bool Server::receiveFromClient(Client& client, std::size_t& idx)
   return true;
 }
 
+bool Server::isListener(int sockFd)
+{
+  for (std::vector<Socket>::iterator it = _listeners.begin();
+       it != _listeners.end();
+       ++it) {
+    if (sockFd == it->getFd()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool Server::sendToClient(Client& client, std::size_t& idx)
 {
   const std::size_t maxChunk = MAX_CHUNK;
@@ -190,9 +202,9 @@ void Server::checkActivity()
   for (std::size_t i = 0; i < _pfds.size();) {
     bool same = true;
     const unsigned events = static_cast<unsigned>(_pfds[i].revents);
-    if (_pfds[i].fd == _serverFd) {
+    if (isListener(_pfds[i].fd)) {
       if ((events & POLLIN) != 0) {
-        acceptClient();
+        acceptClient(_pfds[i].fd);
       }
     } else {
       Client& client = _clients[i - 1];
