@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "client/Client.hpp"
+#include "config/Config.hpp"
 #include "socket/Socket.hpp"
 #include <algorithm>
 #include <csignal>
@@ -33,10 +34,17 @@ extern "C" void sigIntHandler(int /*sigNum*/)
   g_running = 0;
 }
 
-Server::Server(int port)
-  : _port(port)
-  , _serverFd(0)
+Server::Server(const Config& config)
+  : _port(-1)
+  , _serverFd(-1)
 {
+  _listeners.reserve(config.getPorts().size());
+  for (std::vector<int>::const_iterator it = config.getPorts().begin();
+       it != config.getPorts().end();
+       ++it) {
+    _listeners.push_back(Socket(*it));
+  }
+
   _pfds.reserve(MAX_CLIENTS + 1); // should come from config for now 1024
   _clients.reserve(MAX_CLIENTS);  // not sure if we wanna add a Client limit
 }
@@ -55,6 +63,7 @@ Server& Server::operator=(const Server& other)
     _serverFd = other._serverFd;
     _pfds = other._pfds;
     _clients = other._clients;
+    _listeners = other._listeners;
   }
   return *this;
 }
@@ -66,18 +75,26 @@ Server::~Server()
   }
   _pfds.clear();
   _clients.clear();
+  _listeners.clear();
 }
 
-void Server::addListeners()
+void Server::addToPfd(int sockFd)
+{
+  struct pollfd pfd = {};
+  pfd.fd = sockFd;
+  pfd.events = POLLIN;
+  pfd.revents = 0;
+  _pfds.push_back(pfd);
+}
+
+void Server::initListeners()
 {
   for (std::vector<Socket>::iterator it = _listeners.begin();
        it != _listeners.end();
        ++it) {
-    struct pollfd pfd = {};
-    pfd.fd = it->getFd();
-    pfd.events = POLLIN;
-    pfd.revents = 0;
-    _pfds.push_back(pfd);
+    // init Socket here
+    addToPfd(it->getFd());
+    std::cout << "[SERVER] listening on port " << it->getPort() << "\n";
   }
 }
 
@@ -87,48 +104,7 @@ void Server::initServer()
     error("Failed to set SIGINT handler");
     return;
   }
-
-  initSocket();
-  addListeners();
-}
-
-void Server::initSocket()
-{
-  _serverFd = socket(AF_INET, SOCK_STREAM, 0);
-  if (_serverFd < 0) {
-    throwSocketException("server socket creation failed");
-  }
-
-  int opt = 1;
-  if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-    throwSocketException("setting options for server socket failed");
-  }
-
-  struct sockaddr_in servAddr = {};
-  std::memset(&servAddr, 0, sizeof(servAddr));
-  servAddr.sin_family = AF_INET;
-  servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  servAddr.sin_port = htons(_port);
-
-  // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (bind(_serverFd,
-           reinterpret_cast<const struct sockaddr*>(&servAddr),
-           sizeof(servAddr)) < 0)
-  // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
-  {
-    throwSocketException("failed to bind server socket");
-  }
-
-  if (listen(_serverFd, SOMAXCONN) < 0) {
-    throwSocketException("failed to set server socket to listen");
-  }
-
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
-  if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) < 0) {
-    throwSocketException("failed to set server socket to non-blocking");
-  }
-
-  std::cout << "[SERVER] listening on port " << _port << "\n";
+  initListeners();
 }
 
 // if we wanna add a MAX_CLIENT limit -> TODO add limit check
@@ -147,12 +123,7 @@ void Server::acceptClient()
     return;
   }
 
-  struct pollfd pfd = {};
-  pfd.fd = clientFd;
-  pfd.events = POLLIN;
-  pfd.revents = 0;
-  _pfds.push_back(pfd);
-
+  addToPfd(clientFd);
   _clients.push_back(Client(clientFd));
 
   std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
@@ -284,3 +255,42 @@ void Server::throwSocketException(const std::string& msg)
   }
   throw std::runtime_error(msg);
 }
+
+/* void Server::initSocket()
+{
+  _serverFd = socket(AF_INET, SOCK_STREAM, 0);
+  if (_serverFd < 0) {
+    throwSocketException("server socket creation failed");
+  }
+
+  int opt = 1;
+  if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+    throwSocketException("setting options for server socket failed");
+  }
+
+  struct sockaddr_in servAddr = {};
+  std::memset(&servAddr, 0, sizeof(servAddr));
+  servAddr.sin_family = AF_INET;
+  servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  servAddr.sin_port = htons(_port);
+
+  // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
+  if (bind(_serverFd,
+           reinterpret_cast<const struct sockaddr*>(&servAddr),
+           sizeof(servAddr)) < 0)
+  // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+  {
+    throwSocketException("failed to bind server socket");
+  }
+
+  if (listen(_serverFd, SOMAXCONN) < 0) {
+    throwSocketException("failed to set server socket to listen");
+  }
+
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
+  if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) < 0) {
+    throwSocketException("failed to set server socket to non-blocking");
+  }
+
+  std::cout << "[SERVER] listening on port " << _port << "\n";
+} */

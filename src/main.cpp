@@ -1,3 +1,4 @@
+#include "config/Config.hpp"
 #include "server/Server.hpp"
 #include <exception>
 #include <iostream>
@@ -11,8 +12,9 @@ int main(int argc, char* argv[])
   }
 
   try {
-    const int port = 8080; // should come from config
-    Server server(port);
+
+    const Config config(argv[1]);
+    Server server(config);
     server.initServer();
     server.run();
   } catch (const std::exception& e) {

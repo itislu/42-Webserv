@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "client/Client.hpp"
+#include "config/Config.hpp"
 #include "socket/Socket.hpp"
 
 #ifndef MAX_CHUNK
@@ -21,14 +22,15 @@ class Server
 {
 public:
   typedef std::vector<unsigned char> Buffer;
-  explicit Server(int port);
+  explicit Server(const Config& config);
   Server(const Server& other);
   Server& operator=(const Server& other);
   ~Server();
 
   void run();
   void initServer();
-  void initSocket();
+  void initListeners();
+  void addToPfd(int sockFd);
   void addListeners();
   void acceptClient();
   bool receiveFromClient(Client& client, std::size_t& idx);
