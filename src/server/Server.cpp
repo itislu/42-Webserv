@@ -12,7 +12,6 @@
 #include <iostream>
 #include <new>
 #include <signal.h>
-#include <stdexcept>
 #include <string.h> // strerror()
 #include <string>
 #include <sys/poll.h>
@@ -240,15 +239,6 @@ void Server::run()
     }
   }
   std::cout << "Shutting down server...\n";
-}
-
-void Server::throwSocketException(const std::string& msg)
-{
-  if (_serverFd >= 0) {
-    close(_serverFd);
-    _serverFd = -1;
-  }
-  throw std::runtime_error(msg);
 }
 
 /* void Server::initSocket()
