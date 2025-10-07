@@ -16,6 +16,9 @@ public:
   void throwSocketException(const std::string& msg);
   void makeNonBlocking(int sockFd);
 
+  struct sockaddr_in getIpv4SockAddr() const;
+  void setFlags();
+
 private:
   int _port;
   int _fd;

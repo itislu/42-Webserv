@@ -29,6 +29,8 @@ target_link_libraries(${PROJECT_NAME}
   utils
   server
   client
+  socket
+  config
 )
 
 

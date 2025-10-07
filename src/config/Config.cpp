@@ -18,3 +18,8 @@ const std::vector<int>& Config::getPorts() const
 {
   return _ports;
 }
+
+int Config::getMaxClients() const
+{
+  return _maxClients;
+}

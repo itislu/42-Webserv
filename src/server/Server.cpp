@@ -53,8 +53,6 @@ Server::Server(const Server& other)
 Server& Server::operator=(const Server& other)
 {
   if (this != &other) {
-    _port = other._port;
-    _serverFd = other._serverFd;
     _pfds = other._pfds;
     _clients = other._clients;
     _listeners = other._listeners;
@@ -86,7 +84,7 @@ void Server::initListeners()
   for (std::vector<Socket>::iterator it = _listeners.begin();
        it != _listeners.end();
        ++it) {
-    // init Socket here
+    it->initSocket();
     addToPfd(it->getFd());
     std::cout << "[SERVER] listening on port " << it->getPort() << "\n";
   }
@@ -101,7 +99,6 @@ void Server::initServer()
   initListeners();
 }
 
-// TODO refactor so its the correct fd accepting
 void Server::acceptClient(int serverFd)
 {
   const int clientFd = accept(serverFd, NULL, NULL);
@@ -207,6 +204,7 @@ void Server::checkActivity()
         acceptClient(_pfds[i].fd);
       }
     } else {
+      // NOT CORRECT ANYMORE depends on listening ports
       Client& client = _clients[i - 1];
       if ((events & POLLIN) != 0 && same) { // Receive Data
         same = receiveFromClient(client, i);
@@ -252,42 +250,3 @@ void Server::run()
   }
   std::cout << "Shutting down server...\n";
 }
-
-/* void Server::initSocket()
-{
-  _serverFd = socket(AF_INET, SOCK_STREAM, 0);
-  if (_serverFd < 0) {
-    throwSocketException("server socket creation failed");
-  }
-
-  int opt = 1;
-  if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-    throwSocketException("setting options for server socket failed");
-  }
-
-  struct sockaddr_in servAddr = {};
-  std::memset(&servAddr, 0, sizeof(servAddr));
-  servAddr.sin_family = AF_INET;
-  servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  servAddr.sin_port = htons(_port);
-
-  // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (bind(_serverFd,
-           reinterpret_cast<const struct sockaddr*>(&servAddr),
-           sizeof(servAddr)) < 0)
-  // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
-  {
-    throwSocketException("failed to bind server socket");
-  }
-
-  if (listen(_serverFd, SOMAXCONN) < 0) {
-    throwSocketException("failed to set server socket to listen");
-  }
-
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
-  if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) < 0) {
-    throwSocketException("failed to set server socket to non-blocking");
-  }
-
-  std::cout << "[SERVER] listening on port " << _port << "\n";
-} */

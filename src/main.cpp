@@ -2,6 +2,7 @@
 #include "server/Server.hpp"
 #include <exception>
 #include <iostream>
+#include <string>
 
 int main(int argc, char* argv[])
 {
@@ -12,11 +13,14 @@ int main(int argc, char* argv[])
   }
 
   try {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    const std::string configPath = argv[1]; //
+    const Config config(configPath);
 
-    const Config config(argv[1]);
     Server server(config);
     server.initServer();
     server.run();
+
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";
     return 1;

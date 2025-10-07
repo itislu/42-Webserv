@@ -2,10 +2,10 @@
 # CONFIG MODULE
 # **************************************************************************** #
 
-set(LIB_NAME utils)
+set(LIB_NAME config)
 
 add_library(${LIB_NAME} STATIC
-  .cpp
+  Config.cpp
 )
 
 target_link_libraries(${LIB_NAME} 
