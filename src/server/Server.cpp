@@ -156,7 +156,6 @@ bool Server::disconnectClient(Client& client, std::size_t& idx)
   close(client.getFd());
   _pfds.erase(_pfds.begin() + static_cast<long>(idx));
   _clients.erase(_clients.begin() + static_cast<long>(idx - 1));
-  idx--;
   return false;
 }
 
@@ -215,7 +214,7 @@ bool Server::sendToClient(Client& client, std::size_t& idx)
 
 void Server::checkActivity()
 {
-  for (std::size_t i = 0; i < _pfds.size(); i++) {
+  for (std::size_t i = 0; i < _pfds.size();) {
     bool same = true;
     const unsigned events = static_cast<unsigned>(_pfds[i].revents);
     if (_pfds[i].fd == _serverFd) {
@@ -234,6 +233,9 @@ void Server::checkActivity()
           same) { // Error
         same = disconnectClient(client, i);
       }
+    }
+    if (same) {
+      i++;
     }
   }
 }
