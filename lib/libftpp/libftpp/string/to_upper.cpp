@@ -17,7 +17,7 @@ std::string &to_upper(std::string &str) {
 std::string to_upper(const std::string &str) {
   std::string newStr = str;
   std::transform(str.begin(), str.end(), newStr.begin(), to_uppercase);
-  return str;
+  return newStr;
 }
 
 } // namespace ft

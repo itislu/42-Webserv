@@ -17,7 +17,7 @@ std::string &to_lower(std::string &str) {
 std::string to_lower(const std::string &str) {
   std::string newStr = str;
   std::transform(str.begin(), str.end(), newStr.begin(), to_lowercase);
-  return str;
+  return newStr;
 }
 
 } // namespace ft
