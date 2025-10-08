@@ -12,7 +12,6 @@ Checks:
   # Remove
   - -bugprone-easily-swappable-parameters # C++98 is too limited to deal with this (no designated initializers, no compound literals, no scoped enums).
   - -misc-use-anonymous-namespace # static for functions is more visible.
-  - -cppcoreguidelines-c-copy-assignment-signature # to allow fcntl(), C-Style function
   # Aliases
   - -cert-dcl37-c,
     -cert-dcl51-cpp,
@@ -22,7 +21,7 @@ Checks:
     -cert-exp42-c,
     -cert-oop54-cpp,
     -cppcoreguidelines-avoid-magic-numbers,
-    -cppcoreguidelines-pro-type-vararg,
+    -cppcoreguidelines-c-copy-assignment-signature,
     -cppcoreguidelines-non-private-member-variables-in-classes,
     -hicpp-avoid-goto,
     -hicpp-braces-around-statements,
@@ -41,6 +40,8 @@ Checks:
 CheckOptions:
   - key: bugprone-empty-catch.IgnoreCatchWithKeywords
     value: 'EMPTY: '
+  - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
+    value: true
   - key: misc-const-correctness.WarnPointersAsValues
     value: true
   - key: misc-const-correctness.TransformPointersAsValues
@@ -49,12 +50,16 @@ CheckOptions:
     value: true
   - key: misc-header-include-cycle.IgnoredFilesList
     value: '.tpp' # pragma once does not seem to be recognized by clang-tidy.
+  - key: misc-include-cleaner.IgnoreHeaders
+    value: 'asm-generic/socket.h' # Use sys/socket.h for SOL_SOCKET, SO_REUSEADDR.
   - key: modernize-deprecated-headers.CheckHeaderFile
     value: true
   - key: readability-magic-numbers.IgnoredIntegerValues
     value: '1;2;3;4;10' # 1-4 are default, 10 for decimal base operations.
   - key: readability-magic-numbers.IgnoredFloatingPointValues
     value: '1.0;100.0;0.1' # 1.0 and 100.0 are default, 0.1 for decimal base operations.
+
+ExcludeHeaderFilterRegex: 'libftpp/.*' # libftpp has its own clang-tidy config.
 
 ExtraArgsBefore:
   - -Wall

@@ -5,35 +5,15 @@
 
 Client::Client()
   : _fd(-1)
-  , _state(0)
+//, _state(0)
 {
 }
 
 Client::Client(int sockFd)
   : _fd(sockFd)
-  , _state(0)
+//, _state(0)
 {
 }
-
-Client::Client(const Client& other)
-  : _fd()
-  , _state()
-{
-  *this = other;
-}
-
-Client& Client::operator=(const Client& other)
-{
-  if (this != &other) {
-    _fd = other._fd;
-    _state = other._state;
-    _inBuff = other._inBuff;
-    _outBuff = other._outBuff;
-  }
-  return *this;
-}
-
-Client::~Client() {}
 
 int Client::getFd() const
 {
@@ -50,22 +30,22 @@ Client::Buffer Client::getOutBuff() const
   return _outBuff;
 }
 
-void Client::addToInBuff(std::string str)
+void Client::addToInBuff(const std::string& str)
 {
   _inBuff.insert(_inBuff.end(), str.begin(), str.end());
 }
 
-void Client::addToInBuff(std::vector<char>& buffer)
+void Client::addToInBuff(const Buffer& buffer)
 {
   _inBuff.insert(_inBuff.end(), buffer.begin(), buffer.end());
 }
 
-void Client::addToOutBuff(std::string str)
+void Client::addToOutBuff(const std::string& str)
 {
   _outBuff.insert(_outBuff.end(), str.begin(), str.end());
 }
 
-void Client::addToOutBuff(std::vector<char>& buffer)
+void Client::addToOutBuff(const Buffer& buffer)
 {
   _outBuff.insert(_outBuff.end(), buffer.begin(), buffer.end());
 }
