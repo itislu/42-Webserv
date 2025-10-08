@@ -19,6 +19,8 @@ add_library(${LIB_NAME} STATIC
   libftpp/string/from_string_exception.cpp
   libftpp/string/to_string.cpp
   libftpp/string/trim.cpp
+  libftpp/string/to_lower.cpp
+  libftpp/string/to_upper.cpp
   libftpp/utility/demangle.cpp
 )
 
