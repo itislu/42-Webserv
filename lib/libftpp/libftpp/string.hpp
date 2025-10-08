@@ -200,6 +200,16 @@ std::string to_string(bool v, std::ios::fmtflags fmt = std::ios::boolalpha);
 std::string& trim(std::string& str);
 std::string trim(const std::string& str);
 
+/* to_upper */
+
+std::string& to_upper(std::string& str);
+std::string to_upper(const std::string& str);
+
+/* to_lower */
+
+std::string& to_lower(std::string& str);
+std::string to_lower(const std::string& str);
+
 } // namespace ft
 
 #	include "libftpp/string/ends_with.tpp"      // IWYU pragma: export
