@@ -12,7 +12,6 @@ Checks:
   # Remove
   - -bugprone-easily-swappable-parameters # C++98 is too limited to deal with this (no designated initializers, no compound literals, no scoped enums).
   - -misc-use-anonymous-namespace # static for functions is more visible.
-  - -cppcoreguidelines-c-copy-assignment-signature # to allow fcntl(), C-Style function
   # Aliases
   - -cert-dcl37-c,
     -cert-dcl51-cpp,
@@ -22,7 +21,7 @@ Checks:
     -cert-exp42-c,
     -cert-oop54-cpp,
     -cppcoreguidelines-avoid-magic-numbers,
-    -cppcoreguidelines-pro-type-vararg,
+    -cppcoreguidelines-c-copy-assignment-signature,
     -cppcoreguidelines-non-private-member-variables-in-classes,
     -hicpp-avoid-goto,
     -hicpp-braces-around-statements,
@@ -41,8 +40,12 @@ Checks:
 CheckOptions:
   - key: bugprone-empty-catch.IgnoreCatchWithKeywords
     value: 'EMPTY: '
+  - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
+    value: true
   - key: misc-header-include-cycle.IgnoredFilesList
     value: '.tpp' # pragma once does not seem to be recognized by clang-tidy.
+  - key: misc-include-cleaner.IgnoreHeaders
+    value: 'asm-generic/socket.h' # Use sys/socket.h for SOL_SOCKET, SO_REUSEADDR.
   - key: modernize-deprecated-headers.CheckHeaderFile
     value: 'true'
   - key: readability-magic-numbers.IgnoredIntegerValues

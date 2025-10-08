@@ -11,19 +11,16 @@ public:
   typedef std::vector<unsigned char> Buffer;
   Client();
   explicit Client(int sockFd);
-  Client(const Client& other);
-  Client& operator=(const Client& other);
-  ~Client();
 
   int getFd() const;
   Buffer getInBuff() const;
   Buffer getOutBuff() const;
 
-  void addToInBuff(std::string str);
-  void addToInBuff(std::vector<char>& buffer);
+  void addToInBuff(const std::string& str);
+  void addToInBuff(const Buffer& buffer);
 
-  void addToOutBuff(std::string str);
-  void addToOutBuff(std::vector<char>& buffer);
+  void addToOutBuff(const std::string& str);
+  void addToOutBuff(const Buffer& buffer);
 
   void removeFromOutBuff(ssize_t bytes);
 
@@ -31,7 +28,7 @@ public:
 
 private:
   int _fd;
-  int _state;
+  // int _state;
   Buffer _inBuff;
   Buffer _outBuff;
 };

@@ -17,6 +17,7 @@ Diagnostics:
     FastCheckFilter: None
   Includes:
     AnalyzeAngledIncludes: true
+    IgnoreHeader: 'asm-generic/socket.h' # Use sys/socket.h for SOL_SOCKET, SO_REUSEADDR.
   MissingIncludes: Strict
 
 InlayHints:
