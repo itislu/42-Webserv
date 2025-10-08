@@ -1,0 +1,28 @@
+CompileFlags:
+  Add:
+    [
+      -Wall,
+      -Wextra,
+      -Werror,
+      -Wpedantic,
+      -Wshadow,
+      -Wdocumentation,
+      -std=c++98,
+      --language=c++,
+      -ftemplate-depth=100, # Prevent crash when infinite template recursion.
+    ]
+  Compiler: c++
+
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: None
+  Includes:
+    AnalyzeAngledIncludes: true
+  MissingIncludes: Strict
+
+InlayHints:
+  BlockEnd: true
+  DefaultArguments: true
+
+Documentation:
+  CommentFormat: Doxygen

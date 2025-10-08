@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include <cstddef>
+#include <string>
 #include <sys/poll.h> //poll(), struct pollfd
 #include <vector>
 
@@ -10,21 +11,30 @@
 #ifndef MAX_CHUNK
 #define MAX_CHUNK 1024
 #endif
+
+#ifndef MAX_CLIENTS
+#define MAX_CLIENTS 1024
+#endif
+
 class Server
 {
 public:
+  typedef std::vector<unsigned char> Buffer;
   explicit Server(int port);
   Server(const Server& other);
   Server& operator=(const Server& other);
   ~Server();
 
   void run();
+  void initServer();
   void initSocket();
   void acceptClient();
-  void receiveFromClient(Client& client, size_t& idx);
-  void disconnectClient(Client& client, size_t& idx);
+  bool receiveFromClient(Client& client, std::size_t& idx);
+  bool disconnectClient(Client& client, std::size_t& idx);
+  bool sendToClient(Client& client, std::size_t& idx);
+  void checkActivity();
 
-  static void sendToClient(Client& client, pollfd& pfd);
+  void throwSocketException(const std::string& msg);
 
 private:
   int _port;
