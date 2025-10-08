@@ -2,6 +2,7 @@
 #include "client/Client.hpp"
 #include "config/Config.hpp"
 #include "socket/Socket.hpp"
+#include "utils/Buffer.hpp"
 #include <algorithm>
 #include <csignal>
 #include <cstddef>
@@ -92,7 +93,7 @@ void Server::acceptClient(int serverFd)
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
   if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
     close(clientFd);
-    error("failed to accept new client");
+    error("failed to set client socket to non-blocking");
     return;
   }
 
@@ -116,7 +117,7 @@ bool Server::receiveFromClient(Client& client, std::size_t& idx)
   Buffer buffer(MAX_CHUNK);
   const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
   if (bytes > 0) {
-    client.addToInBuff(buffer);
+    client.getInBuff().add(buffer);
     // This is just for debugging atm
     std::cout << "Client " << idx << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -156,11 +157,11 @@ bool Server::isListener(int sockFd)
 bool Server::sendToClient(Client& client, std::size_t& idx)
 {
   const std::size_t maxChunk = MAX_CHUNK;
-  const std::size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
+  const std::size_t toSend = std::min(client.getOutBuff().getSize(), maxChunk);
   const ssize_t bytes =
     send(client.getFd(), client.getOutBuff().data(), toSend, 0);
   if (bytes > 0) {
-    client.removeFromOutBuff(bytes);
+    client.getOutBuff().remove(bytes);
     if (!client.hasDataToSend()) {
       _pfds[idx].events =
         static_cast<short>(static_cast<unsigned>(_pfds[idx].events) &
