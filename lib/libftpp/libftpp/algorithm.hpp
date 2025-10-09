@@ -12,6 +12,21 @@
 namespace ft {
 
 /**
+ * https://en.cppreference.com/w/cpp/algorithm/ranges/contains
+ */
+template <typename InputIt, typename T>
+bool contains(InputIt first, InputIt last, const T& value);
+
+/**
+ * https://en.cppreference.com/w/cpp/algorithm/ranges/contains
+ */
+template <typename InputIt1, typename InputIt2>
+bool contains_subrange(InputIt1 first1,
+                       InputIt1 last1,
+                       InputIt2 first2,
+                       InputIt2 last2);
+
+/**
  * https://en.cppreference.com/w/cpp/algorithm/copy
  */
 template <typename InputIt, typename OutputIt, typename UnaryPred>
@@ -212,10 +227,6 @@ shift_right(ForwardIt first,
  */
 template <typename T>
 void member_swap(T& a, T& b);
-
-/**
- * https://en.cppreference.com/w/cpp/algorithm/swap
- */
 template <typename T2, std::size_t N>
 void member_swap(T2 (&a)[N], T2 (&b)[N]);
 
@@ -238,6 +249,7 @@ ForwardIt2 swap_ranges(ForwardIt1 first1, ForwardIt1 last1, ForwardIt2 first2);
 } // namespace ft
 
 #	include "libftpp/algorithm/binary_search.tpp" // IWYU pragma: export
+#	include "libftpp/algorithm/contains.tpp"      // IWYU pragma: export
 #	include "libftpp/algorithm/copy.tpp"          // IWYU pragma: export
 #	include "libftpp/algorithm/equal.tpp"         // IWYU pragma: export
 #	include "libftpp/algorithm/is_sorted.tpp"     // IWYU pragma: export
