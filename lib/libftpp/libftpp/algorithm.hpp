@@ -6,6 +6,22 @@
 #	include <iterator>
 #	include <utility>
 
+/**
+ * About Ranges
+ *
+ * Some functions support "ranges" as arguments.
+ * Ranges are not implemented specially like in C++20.
+ * A range for libftpp is any type that has public `begin()` and `end()` member
+ * functions and `iterator` and `const_iterator` typedefs, or a bounded array.
+ *
+ * Limitations:
+ * - No concepts are used to constrain template parameters.
+ * - Projections are not supported.
+ * - Functions are not implemented as algorithm function objects (AFOs).
+ *
+ * https://en.cppreference.com/w/cpp/algorithm/ranges
+ */
+
 #	define FT_MIN(a, b) ((b) < (a) ? (b) : (a))
 #	define FT_MAX(a, b) ((b) > (a) ? (b) : (a))
 
@@ -16,6 +32,8 @@ namespace ft {
  */
 template <typename InputIt, typename T>
 bool contains(InputIt first, InputIt last, const T& value);
+template <typename R, typename T>
+bool contains(const R& r, const T& value);
 
 /**
  * https://en.cppreference.com/w/cpp/algorithm/ranges/contains
@@ -25,6 +43,8 @@ bool contains_subrange(InputIt1 first1,
                        InputIt1 last1,
                        InputIt2 first2,
                        InputIt2 last2);
+template <typename R1, typename R2>
+bool contains_subrange(const R1& r1, const R2& r2);
 
 /**
  * https://en.cppreference.com/w/cpp/algorithm/copy
