@@ -114,7 +114,7 @@ bool Server::disconnectClient(Client& client, std::size_t& idx)
 
 bool Server::receiveFromClient(Client& client, std::size_t& idx)
 {
-  Buffer buffer(MAX_CHUNK);
+  Buffer::Container buffer(MAX_CHUNK);
   const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
   if (bytes > 0) {
     client.getInBuff().add(buffer);

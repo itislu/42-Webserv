@@ -16,7 +16,6 @@
 class Server
 {
 public:
-  typedef std::vector<unsigned char> Buffer;
   explicit Server(const Config& config);
   ~Server();
 
