@@ -5,6 +5,7 @@
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
 #include <cstddef>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -27,6 +28,7 @@ public:
   size_t getDefaultTimeout() const;
   const std::string& getErrorLogPath() const;
   const std::string& getAccessLogPath() const;
+  const std::map<int, std::string>& getErrorPages() const;
 
   // Setters
   void addServer(const ServerConfig& server);
@@ -42,9 +44,11 @@ public:
 
 private:
   std::string _configFile;
-  std::vector<ServerConfig> _servers;
+  std::string _root;
   std::size_t _defaultMaxBodySize;
   std::size_t _defaultTimeOut;
+  std::map<int, std::string> _errorPages;
+  std::vector<ServerConfig> _servers;
 
   // Maybe for Logging
   std::string _errorLogPath;

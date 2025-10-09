@@ -35,6 +35,7 @@ public:
   void setMaxBodySize(std::size_t size);
   void addAllowedMethod(const std::string& method);
   void setTimeOut(std::size_t time);
+  void addLocation(const LocationConfig& location);
 
   const LocationConfig& getLocationForPath(const std::string& uri) const;
 

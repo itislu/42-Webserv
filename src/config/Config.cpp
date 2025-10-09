@@ -1,6 +1,7 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include <cstddef>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,11 @@ size_t Config::getDefaultBodySize() const
 std::size_t Config::getDefaultTimeout() const
 {
   return _defaultTimeOut;
+}
+
+const std::map<int, std::string>& Config::getErrorPages() const
+{
+  return _errorPages;
 }
 
 const std::string& Config::getErrorLogPath() const

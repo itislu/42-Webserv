@@ -7,7 +7,8 @@
 #include <vector>
 
 ServerConfig::ServerConfig(const Config& global)
-  : _maxBodySize(global.getDefaultBodySize())
+  : _errorPages(global.getErrorPages())
+  , _maxBodySize(global.getDefaultBodySize())
   , _timeOut(global.getDefaultTimeout())
 {
 }
@@ -98,6 +99,11 @@ void ServerConfig::addAllowedMethod(const std::string& method)
 void ServerConfig::setTimeOut(std::size_t time)
 {
   _timeOut = time;
+}
+
+void ServerConfig::addLocation(const LocationConfig& location)
+{
+  _locations.push_back(location);
 }
 
 /* const LocationConfig& ServerConfig::getLocationForPath(const std::string&

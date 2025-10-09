@@ -5,10 +5,12 @@
 #include <string>
 #include <vector>
 
+class ServerConfig;
+
 class LocationConfig
 {
 public:
-  LocationConfig();
+  explicit LocationConfig(const ServerConfig& serverConfig);
 
   // GETTERS
   const std::string& getPath() const;
@@ -31,6 +33,7 @@ public:
   void setPath(const std::string& path);
   void setRoot(const std::string& root);
   void setAutoindex(bool autoindex);
+  void setAllowedMethods(const std::string& method);
   void addAllowedMethods(const std::string& method);
   void setIndex(const std::string& index);
   void setMaxSize(std::size_t size);

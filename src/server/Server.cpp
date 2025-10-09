@@ -35,15 +35,16 @@ extern "C" void sigIntHandler(int /*sigNum*/)
 
 Server::Server(const Config& config)
 {
-  _listeners.reserve(config.getPorts().size());
-  for (std::vector<int>::const_iterator it = config.getPorts().begin();
-       it != config.getPorts().end();
-       ++it) {
-    _listeners.push_back(Socket(*it));
-  }
+  (void)config;
+  // _listeners.reserve(config.getPorts().size());
+  // for (std::vector<int>::const_iterator it = config.getPorts().begin();
+  //      it != config.getPorts().end();
+  //      ++it) {
+  //   _listeners.push_back(Socket(*it));
+  // }
 
-  _pfds.reserve(config.getMaxClients());
-  _clients.reserve(config.getMaxClients());
+  _pfds.reserve(MAX_CLIENTS);
+  _clients.reserve(MAX_CLIENTS);
 }
 
 Server::~Server()

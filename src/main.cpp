@@ -1,8 +1,9 @@
 #include "config/Config.hpp"
-#include "server/Server.hpp"
+#include "config/ConfigTestSetup.hpp"
+#include "config/ServerConfig.hpp"
+#include "server/ServerHandler.hpp"
 #include <exception>
 #include <iostream>
-#include <string>
 
 int main(int argc, char* argv[])
 {
@@ -14,12 +15,14 @@ int main(int argc, char* argv[])
 
   try {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    const std::string configPath = argv[1]; //
-    const Config config(configPath);
+    // const std::string configPath = argv[1]; //
+    // const Config config(configPath);
 
-    Server server(config);
-    server.initServer();
-    server.run();
+    const Config config = TestConfigSetup::testConfig();
+
+    const ServerHandler serverHandler(config);
+    // server.initServer();
+    // server.run();
 
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";

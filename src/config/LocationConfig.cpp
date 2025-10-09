@@ -1,11 +1,15 @@
 #include "LocationConfig.hpp"
+#include "config/ServerConfig.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>
 
-LocationConfig::LocationConfig()
-  : _autoindex(false)
-  , _maxBodysize()
+LocationConfig::LocationConfig(const ServerConfig& serverConfig)
+  : _root(serverConfig.getRoot())
+  , _autoindex(false)
+  , _allowedMethods(serverConfig.getAllowedMethods())
+  , _index(serverConfig.getIndex())
+  , _maxBodysize(serverConfig.getMaxBodySize())
   , _cgiEnabled(false)
   , _redirect(false)
   , _redirectCode()
@@ -87,6 +91,12 @@ void LocationConfig::setRoot(const std::string& root)
 void LocationConfig::setAutoindex(bool autoindex)
 {
   _autoindex = autoindex;
+}
+
+void LocationConfig::setAllowedMethods(const std::string& method)
+{
+  _allowedMethods.clear();
+  _allowedMethods.push_back(method);
 }
 
 void LocationConfig::addAllowedMethods(const std::string& method)
