@@ -306,6 +306,12 @@ template <typename T>
 struct remove_pointer;
 
 /**
+ * https://en.cppreference.com/w/cpp/types/remove_cvref
+ */
+template <typename T>
+struct remove_cvref;
+
+/**
  * https://en.cppreference.com/w/cpp/types/enable_if
  */
 template <bool B, typename T = void>

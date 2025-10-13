@@ -708,6 +708,10 @@ struct remove_pointer : conditional<is_pointer<T>::value,
 template <typename T>
 struct remove_pointer<T*> : type_identity<T> {};
 
+/* remove_cvref */
+template <typename T>
+struct remove_cvref : remove_cv<typename remove_reference<T>::type> {};
+
 /* enable_if */
 template <bool, typename T /*= void*/>
 struct enable_if : type_identity<T> {};
