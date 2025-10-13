@@ -641,8 +641,20 @@ struct negation : bool_constant<!bool(B::value)> {};
 
 /* Custom type traits */
 
+/* is_const_lvalue_reference */
 /**
  * If `T` is a reference type then `is_const<T>::value` is always `false`. The
+ * proper way to check a potentially-reference type for constness is to remove
+ * the reference first.
+ */
+template <typename T>
+struct is_const_lvalue_reference
+    : bool_constant<is_lvalue_reference<T>::value
+                    && is_const<typename remove_reference<T>::type>::value> {};
+
+/* is_nonconst_lvalue_reference */
+/**
+ * If `T` is a reference type then `!is_const<T>::value` is always `true`. The
  * proper way to check a potentially-reference type for constness is to remove
  * the reference first.
  */
