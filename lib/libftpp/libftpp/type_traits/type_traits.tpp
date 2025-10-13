@@ -402,9 +402,7 @@ struct is_impossible_source;
 template <typename To>
 struct is_impossible_target;
 template <typename From, typename To>
-struct is_impossible_abstract_to_ref;
-template <typename From, typename To>
-struct is_impossible_array_to_ref;
+struct is_impossible_reference;
 
 /**
  * Uses SFINAE with function overload resolution to determine if a value of type
@@ -418,10 +416,7 @@ private:
 	 * to ensure the expression is well-formed. Conversions where this would
 	 * affect the result are handled in a separate specialization.
 	 */
-	static typename conditional<!is_returnable<From>::value,
-	                            typename add_lvalue_reference<From>::type,
-	                            From>::type
-	make_from();
+	static typename add_lvalue_reference<From>::type make_from();
 	static yes_type can_convert(To);
 	static no_type can_convert(...);
 
@@ -442,8 +437,7 @@ struct impl<
     To,
     typename enable_if<is_impossible_source<From>::value
                        || is_impossible_target<To>::value
-                       || is_impossible_abstract_to_ref<From, To>::value
-                       || is_impossible_array_to_ref<From, To>::value>::type>
+                       || is_impossible_reference<From, To>::value>::type>
     : false_type {};
 
 // Example: `is_convertible<int() const, int (*)()>`
@@ -460,16 +454,10 @@ struct is_impossible_target
     : bool_constant<is_array<To>::value || is_function<To>::value
                     || is_abstract<To>::value> {};
 
-// Example: `is_convertible<Abstract, Abstract&>`
+// Example: `is_convertible<Foo, Foo&>`
 template <typename From, typename To>
-struct is_impossible_abstract_to_ref
-    : bool_constant<is_abstract<From>::value
-                    && is_nonconst_lvalue_reference<To>::value> {};
-
-// Example: `is_convertible<int[2], int (&)[2]>`
-template <typename From, typename To>
-struct is_impossible_array_to_ref
-    : bool_constant<is_array<From>::value
+struct is_impossible_reference
+    : bool_constant<is_object<From>::value
                     && is_nonconst_lvalue_reference<To>::value> {};
 
 } // namespace _is_convertible
