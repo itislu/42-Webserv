@@ -160,8 +160,8 @@ private:
 	                               && ft::is_lvalue_reference<Deleter>::value,
 	                           _enabler>::type = _enabler()) throw();
 
-	pointer _p;
-	Deleter _d;
+	pointer _ptr;
+	Deleter _deleter;
 };
 
 template <typename T>
@@ -412,8 +412,8 @@ private:
 	                   && _is_compatible_raw_pointer<Pointer>::value,
 	               _enabler>::type = _enabler()) throw();
 
-	pointer _p;
-	Deleter _d;
+	pointer _ptr;
+	Deleter _deleter;
 };
 
 template <typename T>

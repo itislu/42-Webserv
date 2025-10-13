@@ -36,8 +36,8 @@ struct unique_ptr<T[], Deleter>::_is_compatible_unique_ptr
 // 1)
 template <typename T, typename Deleter /*= default_delete<T> */>
 unique_ptr<T[], Deleter>::unique_ptr() throw()
-    : _p(),
-      _d()
+    : _ptr(),
+      _deleter()
 {
 	FT_STATIC_ASSERT(!ft::is_pointer<Deleter>::value);
 }
@@ -50,8 +50,8 @@ unique_ptr<T[], Deleter>::unique_ptr(
     typename ft::enable_if<!ft::is_pointer<Deleter>::value
                                && _is_compatible_raw_pointer<U>::value,
                            _enabler>::type /*unused = _enabler()*/) throw()
-    : _p(p),
-      _d()
+    : _ptr(p),
+      _deleter()
 {}
 
 // 3) a,b,c) (1)
@@ -65,8 +65,8 @@ unique_ptr<T[], Deleter>::unique_ptr(
         Deleter>::type d,
     typename ft::enable_if<_is_compatible_raw_pointer<U>::value,
                            _enabler>::type /*unused = _enabler()*/) throw()
-    : _p(p),
-      _d(d)
+    : _ptr(p),
+      _deleter(d)
 {}
 
 // 4) a) (2)
@@ -78,15 +78,15 @@ unique_ptr<T[], Deleter>::unique_ptr(
     typename ft::enable_if<!ft::is_reference<Deleter>::value
                                && _is_compatible_raw_pointer<U>::value,
                            _enabler>::type /*unused = _enabler()*/) throw()
-    : _p(p),
-      _d(ft::move(d))
+    : _ptr(p),
+      _deleter(ft::move(d))
 {}
 
 // 5)
 template <typename T, typename Deleter /*= default_delete<T> */>
 unique_ptr<T[], Deleter>::unique_ptr(ft::rvalue<unique_ptr>& u) throw()
-    : _p(u.release()),
-      _d(ft::move(u._d))
+    : _ptr(u.release()),
+      _deleter(ft::move(u._deleter))
 {}
 
 // 6)
@@ -98,9 +98,9 @@ unique_ptr<T[], Deleter>::unique_ptr(
         _is_compatible_unique_ptr<U, E>::value
             && _unique_ptr::is_compatible_deleter<E, Deleter>::value,
         _enabler>::type /*unused = _enabler()*/) throw()
-    : _p(u.release()),
-      _d(ft::is_reference<E>::value ? u.get_deleter()
-                                    : ft::move(u.get_deleter()))
+    : _ptr(u.release()),
+      _deleter(ft::is_reference<E>::value ? u.get_deleter()
+                                          : ft::move(u.get_deleter()))
 {}
 
 template <typename T, typename Deleter /*= default_delete<T> */>
@@ -114,7 +114,7 @@ unique_ptr<T[], Deleter>&
 unique_ptr<T[], Deleter>::operator=(ft::rvalue<unique_ptr>& r) throw()
 {
 	reset(r.release());
-	_d = ft::move(r._d);
+	_deleter = ft::move(r._deleter);
 	return *this;
 }
 
@@ -126,7 +126,7 @@ unique_ptr<T[], Deleter>::operator=(ft::rvalue<unique_ptr<U, E> >& r) throw()
 	FT_STATIC_ASSERT((_is_compatible_unique_ptr<U, E>::value));
 
 	reset(r.release());
-	_d = ft::move(r.get_deleter());
+	_deleter = ft::move(r.get_deleter());
 	return *this;
 }
 
@@ -134,8 +134,8 @@ template <typename T, typename Deleter /*= default_delete<T> */>
 typename unique_ptr<T[], Deleter>::pointer
 unique_ptr<T[], Deleter>::release() throw()
 {
-	pointer p = _p;
-	_p = pointer();
+	pointer p = _ptr;
+	_ptr = pointer();
 	return p;
 }
 
@@ -146,12 +146,12 @@ void unique_ptr<T[], Deleter>::reset(
     typename ft::enable_if<_is_compatible_raw_pointer<U>::value,
                            _enabler>::type /*unused = _enabler()*/) throw()
 {
-	assert(ptr == pointer() || ptr != _p);
+	assert(ptr == pointer() || ptr != _ptr);
 
-	pointer old_ptr = _p;
-	_p = ptr;
+	pointer old_ptr = _ptr;
+	_ptr = ptr;
 	if (old_ptr != pointer()) {
-		_d(old_ptr);
+		_deleter(old_ptr);
 	}
 }
 
@@ -165,42 +165,42 @@ template <typename T, typename Deleter /*= default_delete<T> */>
 void unique_ptr<T[], Deleter>::swap(unique_ptr& other) throw()
 {
 	using std::swap;
-	swap(_p, other._p);
-	swap(_d, other._d);
+	swap(_ptr, other._ptr);
+	swap(_deleter, other._deleter);
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 typename unique_ptr<T[], Deleter>::pointer unique_ptr<T[], Deleter>::get() const
     throw()
 {
-	return _p;
+	return _ptr;
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 typename ft::add_lvalue_reference<Deleter>::type
 unique_ptr<T[], Deleter>::get_deleter() throw()
 {
-	return _d;
+	return _deleter;
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 typename ft::add_lvalue_reference<const Deleter>::type
 unique_ptr<T[], Deleter>::get_deleter() const throw()
 {
-	return _d;
+	return _deleter;
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 bool unique_ptr<T[], Deleter>::boolean_test() const throw()
 {
-	return _p != pointer();
+	return _ptr != pointer();
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 T& unique_ptr<T[], Deleter>::operator[](std::size_t i) const
 {
-	assert(_p != pointer());
-	return _p[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+	assert(_ptr != pointer());
+	return _ptr[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 template <typename T>
