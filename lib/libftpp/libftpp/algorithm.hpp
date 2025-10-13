@@ -6,10 +6,45 @@
 #	include <iterator>
 #	include <utility>
 
+/**
+ * About Ranges
+ *
+ * Some functions support "ranges" as arguments.
+ * Ranges are not implemented specially like in C++20.
+ * A range for libftpp is any type that has public `begin()` and `end()` member
+ * functions and `iterator` and `const_iterator` typedefs, or a bounded array.
+ *
+ * Limitations:
+ * - No concepts are used to constrain template parameters.
+ * - Projections are not supported.
+ * - Functions are not implemented as algorithm function objects (AFOs).
+ *
+ * https://en.cppreference.com/w/cpp/algorithm/ranges
+ */
+
 #	define FT_MIN(a, b) ((b) < (a) ? (b) : (a))
 #	define FT_MAX(a, b) ((b) > (a) ? (b) : (a))
 
 namespace ft {
+
+/**
+ * https://en.cppreference.com/w/cpp/algorithm/ranges/contains
+ */
+template <typename InputIt, typename T>
+bool contains(InputIt first, InputIt last, const T& value);
+template <typename R, typename T>
+bool contains(const R& r, const T& value);
+
+/**
+ * https://en.cppreference.com/w/cpp/algorithm/ranges/contains
+ */
+template <typename InputIt1, typename InputIt2>
+bool contains_subrange(InputIt1 first1,
+                       InputIt1 last1,
+                       InputIt2 first2,
+                       InputIt2 last2);
+template <typename R1, typename R2>
+bool contains_subrange(const R1& r1, const R2& r2);
 
 /**
  * https://en.cppreference.com/w/cpp/algorithm/copy
@@ -212,10 +247,6 @@ shift_right(ForwardIt first,
  */
 template <typename T>
 void member_swap(T& a, T& b);
-
-/**
- * https://en.cppreference.com/w/cpp/algorithm/swap
- */
 template <typename T2, std::size_t N>
 void member_swap(T2 (&a)[N], T2 (&b)[N]);
 
@@ -238,6 +269,7 @@ ForwardIt2 swap_ranges(ForwardIt1 first1, ForwardIt1 last1, ForwardIt2 first2);
 } // namespace ft
 
 #	include "libftpp/algorithm/binary_search.tpp" // IWYU pragma: export
+#	include "libftpp/algorithm/contains.tpp"      // IWYU pragma: export
 #	include "libftpp/algorithm/copy.tpp"          // IWYU pragma: export
 #	include "libftpp/algorithm/equal.tpp"         // IWYU pragma: export
 #	include "libftpp/algorithm/is_sorted.tpp"     // IWYU pragma: export
