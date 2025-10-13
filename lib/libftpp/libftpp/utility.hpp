@@ -3,6 +3,7 @@
 #	define LIBFTPP_UTILITY_HPP
 
 #	include "libftpp/utility/countof.ipp"
+#	include "libftpp/movable.hpp"
 #	include <string>
 
 /**
@@ -28,8 +29,24 @@
 
 namespace ft {
 
+/* demangle */
+
 std::string demangle(const char* mangled_name);
 
+/**
+ * @brief Casts an lvalue to an rvalue reference emulation to indicate an object
+ * may be moved from
+ *
+ * Needed for functions taking `ft::rvalue<T>&` parameters to be chosen by
+ * overload resolution.
+ *
+ * https://en.cppreference.com/w/cpp/utility/move
+ */
+template <typename T>
+ft::rvalue<T>& move(T& t) throw();
+
 } // namespace ft
+
+#	include "libftpp/utility/move.tpp" // IWYU pragma: export
 
 #endif // LIBFTPP_UTILITY_HPP
