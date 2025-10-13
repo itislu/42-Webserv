@@ -138,6 +138,12 @@ template <typename T>
 struct is_lvalue_reference;
 
 /**
+ * https://en.cppreference.com/w/cpp/types/is_rvalue_reference
+ */
+template <typename T>
+struct is_rvalue_reference;
+
+/**
  * https://en.cppreference.com/w/cpp/types/is_arithmetic
  */
 template <typename T>
@@ -274,6 +280,12 @@ struct remove_reference;
  */
 template <typename T>
 struct add_lvalue_reference;
+
+/**
+ * https://en.cppreference.com/w/cpp/types/add_reference
+ */
+template <typename T>
+struct add_rvalue_reference;
 
 /**
  * https://en.cppreference.com/w/cpp/types/remove_extent

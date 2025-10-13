@@ -6,6 +6,7 @@
 #	include "libftpp/type_traits.hpp"
 #	include "type_traits_detail.hpp"
 #	include "libftpp/assert.hpp" // IWYU pragma: keep: Conditionally needed.
+#	include "libftpp/movable.hpp"
 #	include <cstddef>
 #	include <limits>
 
@@ -136,7 +137,24 @@ template <typename>
 struct is_lvalue_reference : false_type {};
 
 template <typename T>
-struct is_lvalue_reference<T&> : true_type {};
+struct is_lvalue_reference<T&>
+    : bool_constant<!is_rvalue_reference<T&>::value> {};
+
+/* is_rvalue_reference */
+template <typename>
+struct is_rvalue_reference : false_type {};
+
+template <typename T>
+struct is_rvalue_reference<ft::rvalue<T>&> : true_type {};
+
+template <typename T>
+struct is_rvalue_reference<const ft::rvalue<T>&> : true_type {};
+
+template <typename T>
+struct is_rvalue_reference<volatile ft::rvalue<T>&> : true_type {};
+
+template <typename T>
+struct is_rvalue_reference<const volatile ft::rvalue<T>&> : true_type {};
 
 /* is_arithmetic */
 template <typename T>
@@ -151,7 +169,8 @@ struct is_object
 
 /* is_reference */
 template <typename T>
-struct is_reference : is_lvalue_reference<T> {};
+struct is_reference : bool_constant<is_lvalue_reference<T>::value
+                                    || is_rvalue_reference<T>::value> {};
 
 /* is_const */
 template <typename>
@@ -500,6 +519,34 @@ struct remove_reference : type_identity<T> {};
 template <typename T>
 struct remove_reference<T&> : type_identity<T> {};
 
+template <typename T>
+struct remove_reference<ft::rvalue<T>&> : remove_reference<T> {};
+
+template <typename T>
+struct remove_reference<ft::rvalue<T&>&> : remove_reference<T&> {};
+
+template <typename T>
+struct remove_reference<const ft::rvalue<T>&> : remove_reference<const T> {};
+
+template <typename T>
+struct remove_reference<const ft::rvalue<T&>&> : remove_reference<const T&> {};
+
+template <typename T>
+struct remove_reference<volatile ft::rvalue<T>&>
+    : remove_reference<volatile T> {};
+
+template <typename T>
+struct remove_reference<volatile ft::rvalue<T&>&>
+    : remove_reference<volatile T&> {};
+
+template <typename T>
+struct remove_reference<const volatile ft::rvalue<T>&>
+    : remove_reference<const volatile T> {};
+
+template <typename T>
+struct remove_reference<const volatile ft::rvalue<T&>&>
+    : remove_reference<const volatile T&> {};
+
 /* add_lvalue_reference */
 namespace _add_lvalue_reference {
 template <typename T, typename = void>
@@ -511,13 +558,126 @@ struct add_lvalue_reference : _add_lvalue_reference::impl<T> {};
 
 namespace _add_lvalue_reference {
 
+/**
+ * void -> void
+ * T& -> T&
+ */
 template <typename T, typename /*= void*/>
 struct impl : type_identity<T> {};
 
+/**
+ * T -> T&
+ * const T -> const T&
+ */
 template <typename T>
-struct impl<T, typename voider<T&>::type> : type_identity<T&> {};
+struct impl<T,
+            typename voider<T&,
+                            typename enable_if<
+                                !_type_traits::is_rvalue<T>::value
+                                && !is_rvalue_reference<T>::value>::type>::type>
+    : type_identity<T&> {};
+
+/**
+ * rvalue<T> -> T&
+ * rvalue<T>& -> T&
+ * rvalue<T&>& -> T&
+ * rvalue<rvalue<T> >& -> T&
+ * const rvalue<T> -> const T&
+ * const rvalue<volatile T> -> const volatile T&
+ */
+template <typename T>
+struct impl<T, typename enable_if<_type_traits::is_rvalue<T>::value>::type>
+    : impl<T&> {};
+
+template <typename T>
+struct impl<ft::rvalue<T>&, typename voider<T&>::type> : impl<T&> {};
+
+template <typename T>
+struct impl<ft::rvalue<T&>&, typename voider<T&>::type> : impl<T&> {};
+
+template <typename T>
+struct impl<const ft::rvalue<T>&, typename voider<T&>::type> : impl<const T&> {
+};
+
+template <typename T>
+struct impl<const ft::rvalue<T&>&, typename voider<T&>::type> : impl<const T&> {
+};
+
+template <typename T>
+struct impl<volatile ft::rvalue<T>&, typename voider<T&>::type>
+    : impl<volatile T&> {};
+
+template <typename T>
+struct impl<volatile ft::rvalue<T&>&, typename voider<T&>::type>
+    : impl<volatile T&> {};
+
+template <typename T>
+struct impl<const volatile ft::rvalue<T>&, typename voider<T&>::type>
+    : impl<const volatile T&> {};
+
+template <typename T>
+struct impl<const volatile ft::rvalue<T&>&, typename voider<T&>::type>
+    : impl<const volatile T&> {};
 
 } // namespace _add_lvalue_reference
+
+/* add_rvalue_reference */
+namespace _add_rvalue_reference {
+template <typename T,
+          typename RemoveCv = typename remove_cv<T>::type,
+          bool IsReference = is_reference<T>::value,
+          bool IsRvalue = _type_traits::is_rvalue<T>::value,
+          typename = void>
+struct impl;
+} // namespace _add_rvalue_reference
+
+template <typename T>
+struct add_rvalue_reference : _add_rvalue_reference::impl<T> {};
+
+namespace _add_rvalue_reference {
+
+/**
+ * T& -> T&
+ * rvalue<T>& -> rvalue<T>&
+ */
+template <typename T,
+          typename RemoveCv /*= typename remove_cv<T>::type*/,
+          bool IsReference /*= is_reference<T>::value*/,
+          bool IsRvalue /*= _type_traits::is_rvalue<T>::value*/,
+          typename /*= void*/>
+struct impl : type_identity<T> {};
+
+/**
+ * rvalue<T> -> rvalue<T>&
+ */
+template <typename T, typename RemoveCv /*= typename remove_cv<T>::type*/>
+struct impl<T,
+            RemoveCv,
+            false, // IsReference
+            true,  // IsRvalue
+            typename voider<T&>::type> : type_identity<T&> {};
+
+/**
+ * T -> rvalue<T>&
+ * const T -> const rvalue<T>&
+ */
+template <typename T, typename RemoveCv /*= typename remove_cv<T>::type*/>
+struct impl<T,
+            RemoveCv,
+            false, // IsReference
+            false, // IsRvalue
+            typename voider<T&, ft::rvalue<RemoveCv>&>::type>
+    : conditional<
+          is_const<T>::value && is_volatile<T>::value,
+          const volatile ft::rvalue<RemoveCv>&,
+          typename conditional<
+              is_const<T>::value,
+              const ft::rvalue<RemoveCv>&,
+              typename conditional<is_volatile<T>::value,
+                                   volatile ft::rvalue<RemoveCv>&,
+                                   ft::rvalue<RemoveCv>&>::type>::type> {};
+
+} // namespace _add_rvalue_reference
 
 /* remove_extent */
 template <typename T>
