@@ -2,6 +2,7 @@
 #ifndef LIBFTPP_MEMORY_HPP
 #	define LIBFTPP_MEMORY_HPP
 
+#	include "libftpp/assert.hpp"
 #	include "libftpp/memory/unique_ptr_detail.hpp"
 #	include "libftpp/movable.hpp"
 #	include "libftpp/safe_bool.hpp"
@@ -71,6 +72,8 @@ public:
 template <typename T, typename Deleter = default_delete<T> >
 class unique_ptr : public ft::safe_bool<unique_ptr<T, Deleter> > {
 private:
+	FT_STATIC_ASSERT(ft::is_pointer<T*>::value); // T* must form a valid type.
+
 	template <typename U, typename E>
 	struct _is_compatible_unique_ptr;
 	struct _enabler {};
@@ -311,6 +314,8 @@ template <typename T, typename Deleter /*= default_delete<T> */>
 class unique_ptr<T[], Deleter>
     : public ft::safe_bool<unique_ptr<T[], Deleter> > {
 private:
+	FT_STATIC_ASSERT(ft::is_pointer<T*>::value); // T* must form a valid type.
+
 	template <typename U>
 	struct _is_compatible_raw_pointer;
 	template <typename U, typename E>
