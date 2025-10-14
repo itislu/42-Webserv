@@ -1,44 +1,41 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include "config/LocationConfig.hpp"
+#include "config/ServerConfig.hpp"
+#include "socket/Socket.hpp"
 #include <cstddef>
+#include <map>
 #include <string>
-#include <sys/poll.h> //poll(), struct pollfd
 #include <vector>
 
-#include "client/Client.hpp"
-#include "config/Config.hpp"
-#include "socket/Socket.hpp"
-
-#ifndef MAX_CHUNK
-#define MAX_CHUNK 1024
-#endif
+// maybe just store a pointer to the ServerConfig here?
 class Server
 {
 public:
-  explicit Server(const Config& config);
-  ~Server();
+  Server(const ServerConfig& servConfig,
+         const std::vector<const Socket*>& listeners);
 
-  void run();
-  void initServer();
-  void initListeners();
-  void addToPfd(int sockFd);
-  void addListeners();
-  bool isListener(int sockFd);
-  void acceptClient(int serverFd);
-  bool receiveFromClient(Client& client, std::size_t& idx);
-  bool disconnectClient(Client& client, std::size_t& idx);
-  bool sendToClient(Client& client, std::size_t& idx);
-  void checkActivity();
-
-  void throwSocketException(const std::string& msg);
+  const std::vector<const Socket*>& getListeners() const;
+  const std::vector<std::string>& getHostnames() const;
 
 private:
-  Server(const Server& other);
-  Server& operator=(const Server& other);
-  std::vector<Socket> _listeners;
-  std::vector<Client> _clients;
-  std::vector<pollfd> _pfds;
+  // server specific
+  std::vector<const Socket*> _listeners; // listeners (ports)
+  std::vector<std::string> _hostnames;   // names for virtual hosting
+
+  // can be defaulted
+  std::string _root;
+  std::string _index; // index.html
+  std::map<int, std::string> _errorPages;
+  std::size_t _maxBodySize;
+  std::vector<std::string> _allowedMethods; // usually per location
+  std::size_t _timeOut;
+  std::vector<LocationConfig> _locations;
+
+  // Maybe for Logging
+  // std::string _errorLogPath;
+  // std::string _accesLogPath;
 };
 
 #endif

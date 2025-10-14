@@ -41,6 +41,7 @@ static LocationConfig createTestLocation(
 // --- Create a test ServerConfig ---
 static ServerConfig createTestServer(const Config& config,
                                      const std::vector<int>& ports,
+                                     const std::vector<std::string>& hosts,
                                      const std::string& root = "./www")
 {
   ServerConfig server(config);
@@ -48,6 +49,10 @@ static ServerConfig createTestServer(const Config& config,
   // Add ports
   for (std::size_t i = 0; i < ports.size(); ++i) {
     server.addPort(ports[i]);
+  }
+  // Add hosts
+  for (std::size_t i = 0; i < hosts.size(); ++i) {
+    server.addHostName(hosts[i]);
   }
 
   server.setRoot(root);
@@ -79,46 +84,22 @@ Config createTestConfig()
   std::vector<int> ports1;
   ports1.push_back(8080);
   ports1.push_back(8081);
-  ServerConfig server1 = createTestServer(config, ports1, "./www/server1");
+  std::vector<std::string> hosts1;
+  hosts1.push_back("test.com");
+  ServerConfig server1 =
+    createTestServer(config, ports1, hosts1, "./www/server1");
   config.addServer(server1);
 
   // Server 2: single port
   std::vector<int> ports2;
+  ports2.push_back(8080);
   ports2.push_back(9090);
-  ServerConfig server2 = createTestServer(config, ports2, "./www/server2");
+  std::vector<std::string> hosts2;
+  hosts2.push_back("example.com");
+  hosts2.push_back("localhost");
+  ServerConfig server2 =
+    createTestServer(config, ports2, hosts2, "./www/server2");
   config.addServer(server2);
-
-  return config;
-}
-
-Config testConfig()
-{
-  const Config config = TestConfigSetup::createTestConfig();
-
-  const std::vector<ServerConfig>& servers = config.getServers();
-  for (std::vector<ServerConfig>::const_iterator serverIt = servers.begin();
-       serverIt != servers.end();
-       ++serverIt) {
-    std::cout << "Server should listen on ports: ";
-
-    const std::vector<int>& ports = serverIt->getPorts();
-    for (std::vector<int>::const_iterator portIt = ports.begin();
-         portIt != ports.end();
-         ++portIt) {
-      std::cout << *portIt << " ";
-    }
-    std::cout << "\n";
-
-    const std::vector<LocationConfig>& locations = serverIt->getLocations();
-    for (std::vector<LocationConfig>::const_iterator locIt = locations.begin();
-         locIt != locations.end();
-         ++locIt) {
-      std::cout << "  Location: " << locIt->getPath()
-                << ", root: " << locIt->getRoot()
-                << ", autoindex: " << (locIt->isAutoindex() ? "on" : "off")
-                << "\n";
-    }
-  }
 
   return config;
 }

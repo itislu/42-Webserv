@@ -6,6 +6,7 @@
 #include "ServerConfig.hpp"
 #include <cstddef>
 #include <map>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -54,5 +55,7 @@ private:
   std::string _errorLogPath;
   std::string _accesLogPath;
 };
+
+std::ostream& operator<<(std::ostream& out, const Config& config);
 
 #endif

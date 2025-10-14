@@ -2,6 +2,7 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
+#include "AutoFd.hpp"
 #include <string>
 
 class Socket
@@ -9,7 +10,8 @@ class Socket
 public:
   explicit Socket(int port);
 
-  int getFd() const;
+  const AutoFd& getFd() const;
+  int getRawFd() const;
   int getPort() const;
 
   void initSocket();
@@ -21,7 +23,7 @@ public:
 
 private:
   int _port;
-  int _fd;
+  AutoFd _fd;
 };
 
 #endif

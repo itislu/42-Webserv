@@ -1,6 +1,7 @@
 #include "config/Config.hpp"
 #include "config/ConfigTestSetup.hpp"
 #include "config/ServerConfig.hpp"
+#include "server/Server.hpp"
 #include "server/ServerHandler.hpp"
 #include <exception>
 #include <iostream>
@@ -18,11 +19,12 @@ int main(int argc, char* argv[])
     // const std::string configPath = argv[1]; //
     // const Config config(configPath);
 
-    const Config config = TestConfigSetup::testConfig();
-
-    const ServerHandler serverHandler(config);
-    // server.initServer();
-    // server.run();
+    const Config config = TestConfigSetup::createTestConfig();
+    std::cout << config;
+    ServerHandler serverHandler(config);
+    serverHandler.debugPrintMaps();
+    serverHandler.init();
+    // serverHandler.run();
 
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";

@@ -78,3 +78,40 @@ const LocationConfig* Config::getLocationForPath(const ServerConfig& server,
   // TODO: Implement
 }
  */
+
+std::ostream& operator<<(std::ostream& out, const Config& config)
+{
+  const std::vector<ServerConfig>& servers = config.getServers();
+  for (std::vector<ServerConfig>::const_iterator serverIt = servers.begin();
+       serverIt != servers.end();
+       ++serverIt) {
+    out << "Server ports: ";
+
+    const std::vector<int>& ports = serverIt->getPorts();
+    for (std::vector<int>::const_iterator portIt = ports.begin();
+         portIt != ports.end();
+         ++portIt) {
+      out << *portIt << " ";
+    }
+    out << "\n";
+
+    out << "Hosts: ";
+    const std::vector<std::string>& hostnames = serverIt->getHostnames();
+    for (std::vector<std::string>::const_iterator hostIt = hostnames.begin();
+         hostIt != hostnames.end();
+         ++hostIt) {
+      out << *hostIt << " ";
+    }
+    out << "\n";
+
+    const std::vector<LocationConfig>& locations = serverIt->getLocations();
+    for (std::vector<LocationConfig>::const_iterator locIt = locations.begin();
+         locIt != locations.end();
+         ++locIt) {
+      out << "  Location: " << locIt->getPath()
+          << ", root: " << locIt->getRoot()
+          << ", autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n";
+    }
+  }
+  return out;
+}
