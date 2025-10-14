@@ -10,8 +10,7 @@ class Socket
 public:
   explicit Socket(int port);
 
-  const AutoFd& getFd() const;
-  int getRawFd() const;
+  int getFd() const;
   int getPort() const;
 
   void initSocket();
@@ -19,7 +18,7 @@ public:
   void makeNonBlocking(int sockFd);
 
   struct sockaddr_in getIpv4SockAddr() const;
-  void setFlags();
+  static void setFlags(int sockFd);
 
 private:
   int _port;

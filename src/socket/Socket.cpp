@@ -16,14 +16,9 @@ Socket::Socket(int port)
   initSocket();
 }
 
-int Socket::getRawFd() const
+int Socket::getFd() const
 {
   return _fd.get();
-}
-
-const AutoFd& Socket::getFd() const
-{
-  return _fd;
 }
 
 int Socket::getPort() const
@@ -49,11 +44,12 @@ struct sockaddr_in Socket::getIpv4SockAddr() const
   return sockAddr;
 }
 
-void Socket::setFlags()
+void Socket::setFlags(int sockFd)
 {
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
-  if (fcntl(_fd.get(), F_SETFL, O_NONBLOCK) < 0) {
-    throwSocketException("failed to set server socket to non-blocking");
+  if (fcntl(sockFd, F_SETFL, O_NONBLOCK) < 0) {
+    close(sockFd);
+    throw std::runtime_error("failed to set socket to non-blocking");
   }
 }
 
@@ -83,5 +79,5 @@ void Socket::initSocket()
   if (listen(_fd.get(), SOMAXCONN) < 0) {
     throwSocketException("failed to set server socket to listen");
   }
-  setFlags();
+  setFlags(_fd.get());
 }

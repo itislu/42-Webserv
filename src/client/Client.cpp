@@ -1,8 +1,10 @@
 #include "Client.hpp"
 #include "utils/Buffer.hpp"
+#include <string>
 
 Client::Client()
   : _fd(-1)
+  , _socket()
 //, _state(0)
 {
 }
@@ -15,7 +17,12 @@ Client::Client(int sockFd)
 
 int Client::getFd() const
 {
-  return _fd;
+  return _fd.get();
+}
+
+const std::string& Client::getHost() const
+{
+  return _host;
 }
 
 Buffer Client::getInBuff() const
