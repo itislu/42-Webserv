@@ -1,7 +1,3 @@
-#pragma once
-#ifndef LIBFTPP_MOVABLE_HPP
-#	define LIBFTPP_MOVABLE_HPP
-
 /**
  * Move semantics in C++98
  *
@@ -9,6 +5,10 @@
  * Limitations:
  * https://www.boost.org/doc/libs/1_84_0/doc/html/move/emulation_limitations.html
  */
+
+#pragma once
+#ifndef LIBFTPP_MOVABLE_HPP
+#	define LIBFTPP_MOVABLE_HPP
 
 #	include "libftpp/movable/movable.ipp"
 
