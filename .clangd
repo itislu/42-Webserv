@@ -6,7 +6,6 @@ CompileFlags:
       -Werror,
       -Wpedantic,
       -Wdocumentation,
-      -std=c++98,
       --language=c++,
       -ftemplate-depth=100, # Prevent crash when infinite template recursion.
     ]
@@ -26,3 +25,14 @@ InlayHints:
 
 Documentation:
   CommentFormat: Doxygen
+
+---
+
+If:
+  PathExclude: tests/.*
+
+CompileFlags:
+  Add:
+    [
+      -std=c++98,
+    ]
