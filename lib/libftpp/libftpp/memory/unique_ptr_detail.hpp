@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LIBFTPP_MEMORY_MEMORY_UNIQUE_PTR_DETAIL_HPP
-#	define LIBFTPP_MEMORY_MEMORY_UNIQUE_PTR_DETAIL_HPP
+#ifndef LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_HPP
+#	define LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_HPP
 
 namespace ft {
 namespace _unique_ptr {
@@ -20,4 +20,4 @@ struct is_compatible_deleter;
 
 #	include "unique_ptr_detail.tpp" // IWYU pragma: export
 
-#endif // LIBFTPP_MEMORY_MEMORY_UNIQUE_PTR_DETAIL_HPP
+#endif // LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_HPP

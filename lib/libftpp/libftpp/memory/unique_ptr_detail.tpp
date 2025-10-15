@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LIBFTPP_MEMORY_MEMORY_UNIQUE_PTR_DETAIL_TPP
-#	define LIBFTPP_MEMORY_MEMORY_UNIQUE_PTR_DETAIL_TPP
+#ifndef LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_TPP
+#	define LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_TPP
 
 #	include "unique_ptr_detail.hpp"
 #	include "libftpp/type_traits.hpp"
@@ -32,4 +32,4 @@ struct is_compatible_deleter
 } // namespace _unique_ptr
 } // namespace ft
 
-#endif // LIBFTPP_MEMORY_MEMORY_UNIQUE_PTR_DETAIL_TPP
+#endif // LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_TPP
