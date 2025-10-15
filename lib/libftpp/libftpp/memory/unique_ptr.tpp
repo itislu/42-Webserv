@@ -5,6 +5,7 @@
 #	include "libftpp/memory.hpp"
 #	include "unique_ptr_detail.hpp"
 #	include "libftpp/assert.hpp"
+#	include "libftpp/functional.hpp"
 #	include "libftpp/movable.hpp"
 #	include "libftpp/type_traits.hpp"
 #	include "libftpp/utility.hpp"
@@ -30,6 +31,17 @@ unique_ptr<T, Deleter>::unique_ptr() throw()
 {
 	FT_STATIC_ASSERT(!ft::is_pointer<Deleter>::value);
 }
+
+template <typename T, typename Deleter /*= default_delete<T> */>
+template <typename Nullptr_t>
+unique_ptr<T, Deleter>::unique_ptr(
+    Nullptr_t /*unused*/,
+    typename ft::enable_if<ft::is_convertible<Nullptr_t, nullptr_t>::value
+                               && !ft::is_pointer<Deleter>::value,
+                           _enabler>::type /*unused = _enabler()*/) throw()
+    : _ptr(),
+      _deleter()
+{}
 
 // 2)
 template <typename T, typename Deleter /*= default_delete<T> */>
@@ -113,6 +125,14 @@ unique_ptr<T, Deleter>::operator=(ft::rvalue<unique_ptr<U, E> >& r) throw()
 
 	reset(r.release());
 	_deleter = ft::move(r.get_deleter());
+	return *this;
+}
+
+template <typename T, typename Deleter /*= default_delete<T> */>
+unique_ptr<T, Deleter>&
+unique_ptr<T, Deleter>::operator=(nullptr_t /*unused*/) throw()
+{
+	reset();
 	return *this;
 }
 
@@ -387,6 +407,78 @@ template <typename T1, typename D1, typename T2, typename D2>
 bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 {
 	return !(x < y);
+}
+
+template <typename T, typename D>
+bool operator==(const unique_ptr<T, D>& x, nullptr_t /*unused*/) throw()
+{
+	return !x;
+}
+
+template <typename T, typename D>
+bool operator==(nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw()
+{
+	return !x;
+}
+
+template <typename T, typename D>
+bool operator!=(const unique_ptr<T, D>& x, nullptr_t /*unused*/) throw()
+{
+	return static_cast<bool>(x);
+}
+
+template <typename T, typename D>
+bool operator!=(nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw()
+{
+	return static_cast<bool>(x);
+}
+
+template <typename T, typename D>
+bool operator<(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+{
+	return ft::less<typename unique_ptr<T, D>::pointer>()(x.get(), FT_NULLPTR);
+}
+
+template <typename T, typename D>
+bool operator<(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+{
+	return ft::less<typename unique_ptr<T, D>::pointer>()(FT_NULLPTR, y.get());
+}
+
+template <typename T, typename D>
+bool operator<=(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+{
+	return !(FT_NULLPTR < x);
+}
+
+template <typename T, typename D>
+bool operator<=(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+{
+	return !(y < FT_NULLPTR);
+}
+
+template <typename T, typename D>
+bool operator>(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+{
+	return FT_NULLPTR < x;
+}
+
+template <typename T, typename D>
+bool operator>(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+{
+	return y < FT_NULLPTR;
+}
+
+template <typename T, typename D>
+bool operator>=(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+{
+	return !(x < FT_NULLPTR);
+}
+
+template <typename T, typename D>
+bool operator>=(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+{
+	return !(FT_NULLPTR < y);
 }
 
 template <typename CharT, typename Traits, typename Y, typename D>

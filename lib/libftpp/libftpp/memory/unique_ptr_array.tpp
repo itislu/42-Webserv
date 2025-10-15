@@ -18,7 +18,7 @@ template <typename T, typename Deleter /*= default_delete<T> */>
 template <typename U>
 struct unique_ptr<T[], Deleter>::_is_compatible_raw_pointer
     : ft::bool_constant<
-          ft::is_same<U, pointer>::value
+          ft::is_same<U, pointer>::value || ft::is_same<U, nullptr_t>::value
           || (ft::is_same<pointer, element_type*>::value
               && ft::is_convertible<typename ft::remove_pointer<U>::type (*)[],
                                     element_type (*)[]>::value)> {};
@@ -41,6 +41,17 @@ unique_ptr<T[], Deleter>::unique_ptr() throw()
 {
 	FT_STATIC_ASSERT(!ft::is_pointer<Deleter>::value);
 }
+
+template <typename T, typename Deleter /*= default_delete<T> */>
+template <typename Nullptr_t>
+unique_ptr<T[], Deleter>::unique_ptr(
+    Nullptr_t /*unused*/,
+    typename ft::enable_if<ft::is_convertible<Nullptr_t, nullptr_t>::value
+                               && !ft::is_pointer<Deleter>::value,
+                           _enabler>::type /*unused = _enabler()*/) throw()
+    : _ptr(),
+      _deleter()
+{}
 
 // 2)
 template <typename T, typename Deleter /*= default_delete<T> */>
@@ -131,6 +142,14 @@ unique_ptr<T[], Deleter>::operator=(ft::rvalue<unique_ptr<U, E> >& r) throw()
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
+unique_ptr<T[], Deleter>&
+unique_ptr<T[], Deleter>::operator=(nullptr_t /*unused*/) throw()
+{
+	reset();
+	return *this;
+}
+
+template <typename T, typename Deleter /*= default_delete<T> */>
 typename unique_ptr<T[], Deleter>::pointer
 unique_ptr<T[], Deleter>::release() throw()
 {
@@ -156,7 +175,7 @@ void unique_ptr<T[], Deleter>::reset(
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
-void unique_ptr<T[], Deleter>::reset() throw()
+void unique_ptr<T[], Deleter>::reset(nullptr_t /*unused = FT_NULLPTR*/) throw()
 {
 	reset(pointer());
 }
