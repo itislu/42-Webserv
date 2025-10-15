@@ -40,6 +40,8 @@ Checks:
 CheckOptions:
   - key: bugprone-empty-catch.IgnoreCatchWithKeywords
     value: 'EMPTY: '
+  - key: cppcoreguidelines-pro-type-static-cast-downcast.StrictMode
+    value: false
   - key: misc-const-correctness.WarnPointersAsValues
     value: true
   - key: misc-const-correctness.TransformPointersAsValues

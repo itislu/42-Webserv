@@ -138,6 +138,12 @@ template <typename T>
 struct is_lvalue_reference;
 
 /**
+ * https://en.cppreference.com/w/cpp/types/is_rvalue_reference
+ */
+template <typename T>
+struct is_rvalue_reference;
+
+/**
  * https://en.cppreference.com/w/cpp/types/is_arithmetic
  */
 template <typename T>
@@ -276,6 +282,12 @@ template <typename T>
 struct add_lvalue_reference;
 
 /**
+ * https://en.cppreference.com/w/cpp/types/add_reference
+ */
+template <typename T>
+struct add_rvalue_reference;
+
+/**
  * https://en.cppreference.com/w/cpp/types/remove_extent
  */
 template <typename T>
@@ -292,6 +304,12 @@ struct remove_all_extents;
  */
 template <typename T>
 struct remove_pointer;
+
+/**
+ * https://en.cppreference.com/w/cpp/types/remove_cvref
+ */
+template <typename T>
+struct remove_cvref;
 
 /**
  * https://en.cppreference.com/w/cpp/types/enable_if
@@ -378,13 +396,27 @@ struct negation;
 FT_HAS_MEMBER_FUNCTION(void, swap, (T&))
 
 /**
- * @brief Checks wether `T` is a non-const lvalue reference type
+ * @brief Checks wether `T` is an lvalue reference to a const-qualified type
  *
- * Provides the member constant `value` which is equal to `true`, if `T` is a
- * non-const lvalue reference type. Otherwise, `value` is equal to `false`.
+ * Provides the member constant `value` which is equal to `true`, if `T` is an
+ * lvalue reference to a const-qualified type. Otherwise, `value` is equal to
+ * `false`.
  *
  * This is useful because if `T` is a reference type then `is_const<T>::value`
  * is always `false`.
+ */
+template <typename T>
+struct is_const_lvalue_reference;
+
+/**
+ * @brief Checks wether `T` is an lvalue reference to a non-const-qualified type
+ *
+ * Provides the member constant `value` which is equal to `true`, if `T` is an
+ * lvalue reference to a non-const-qualified type. Otherwise, `value` is equal
+ * to `false`.
+ *
+ * This is useful because if `T` is a reference type then `!is_const<T>::value`
+ * is always `true`.
  */
 template <typename T>
 struct is_nonconst_lvalue_reference;
