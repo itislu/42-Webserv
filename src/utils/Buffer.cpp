@@ -39,7 +39,7 @@ std::size_t Buffer::getSize() const
   return _buff.size();
 }
 
-const unsigned char* Buffer::data() const
+unsigned char* Buffer::data()
 {
   return _buff.data();
 }

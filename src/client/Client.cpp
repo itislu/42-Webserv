@@ -1,16 +1,22 @@
 #include "Client.hpp"
+#include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
+#include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
 #include <string>
 
 Client::Client()
   : _fd(-1)
+  , _socket()
+  , _server()
 //, _state(0)
 {
 }
 
-Client::Client(int sockFd)
+Client::Client(int sockFd, const Socket* socket, const Server* server)
   : _fd(sockFd)
+  , _socket(socket)
+  , _server(server)
 //, _state(0)
 {
 }
@@ -33,6 +39,21 @@ Buffer Client::getInBuff() const
 Buffer Client::getOutBuff() const
 {
   return _outBuff;
+}
+
+const Socket* Client::getSocket() const
+{
+  return _socket;
+}
+
+const Server* Client::getServer() const
+{
+  return _server;
+}
+
+void Client::setServer(const Server* server)
+{
+  _server = server;
 }
 
 bool Client::hasDataToSend() const

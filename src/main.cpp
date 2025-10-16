@@ -23,8 +23,7 @@ int main(int argc, char* argv[])
     std::cout << config;
     ServerHandler serverHandler(config);
     serverHandler.debugPrintMaps();
-    serverHandler.init();
-    // serverHandler.run();
+    serverHandler.run();
 
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";

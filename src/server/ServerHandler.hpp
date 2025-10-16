@@ -38,11 +38,14 @@ public:
 
   Client* getClientFromFd(int clientFd);
   pollfd* getPollFdForClient(Client* client);
+  const Socket* getSocketFromFd(int sockFd);
+  const Server* getServerFromSocket(const Socket* socket);
 
   // INIT - Server Setup
   void createServers(const Config& config);
   void initListeners();
   void addToPfd(int sockFd);
+  void addToClients(int sockFd);
   std::vector<const Socket*> createListeners(const std::vector<int>& ports);
   void mapServerToListeners(const std::vector<int>& ports, Server* server);
   const Socket* getListener(int port);

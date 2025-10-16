@@ -107,6 +107,12 @@ void ServerHandler::addToPfd(int sockFd)
   _pfds.push_back(pfd);
 }
 
+void ServerHandler::addToClients(int sockFd)
+{
+  const Socket* const sock = getSocketFromFd(sockFd);
+  _clients.push_back(new Client(sockFd, sock, getServerFromSocket(sock)));
+}
+
 void ServerHandler::mapServerToListeners(const std::vector<int>& ports,
                                          Server* server)
 {
@@ -116,6 +122,38 @@ void ServerHandler::mapServerToListeners(const std::vector<int>& ports,
     const Socket* const keySocket = getListener(port);
     _socketToServers[keySocket].push_back(server);
   }
+}
+
+bool ServerHandler::isListener(int sockFd)
+{
+  for (portToSocketIter it = _portToSocket.begin(); it != _portToSocket.end();
+       ++it) {
+    if (sockFd == it->second->getFd()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+const Socket* ServerHandler::getSocketFromFd(int sockFd)
+{
+  for (socketToServersIter it = _socketToServers.begin();
+       it != _socketToServers.end();
+       ++it) {
+    if (it->first->getFd() == sockFd) {
+      return it->first;
+    }
+  }
+  return NULL;
+}
+
+const Server* ServerHandler::getServerFromSocket(const Socket* socket)
+{
+  const std::vector<Server*> servers = _socketToServers[socket];
+  if (servers.size() != 1) {
+    return NULL;
+  }
+  return servers[0];
 }
 
 void ServerHandler::debugPrintMaps() const
@@ -173,7 +211,7 @@ void ServerHandler::acceptClient(int sockFd)
   }
 
   addToPfd(clientFd.get());
-  _clients.push_back(new Client(clientFd.get()));
+  addToClients(clientFd.get());
 
   std::cout << "[SERVER] new client connected, fd=" << clientFd.get() << '\n';
 }
@@ -212,9 +250,8 @@ pollfd* ServerHandler::getPollFdForClient(Client* client)
 
 bool ServerHandler::receiveFromClient(Client* client)
 {
-  const Buffer buffer(MAX_CHUNK);
-  const ssize_t bytes =
-    recv(client->getFd(), buffer.data(), buffer.getSize(), 0);
+  std::vector<unsigned char> buffer(MAX_CHUNK);
+  const ssize_t bytes = recv(client->getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
     client->getInBuff().add(buffer);
     // This is just for debugging atm
@@ -342,74 +379,3 @@ void ServerHandler::run()
   }
   std::cout << "Shutting down servers...\n";
 }
-
-/* bool ServerHandler::disconnectClient(std::size_t& idx)
-
-
-bool ServerHandler::receiveFromClient(Client* client)
-{
-  Buffer buffer(MAX_CHUNK);
-  const ssize_t bytes =
-    recv(client.getFd(), buffer.data(), buffer.getSize(), 0);
-  if (bytes > 0) {
-    client.addToInBuff(buffer);
-    // This is just for debugging atm
-    std::cout << "Client " << client.getFd() << ": ";
-    // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
-    std::cout.write(reinterpret_cast<const char*>(&buffer[0]),
-                    static_cast<std::streamsize>(bytes));
-    // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
-
-    // TODO: STATEMACHINE/PARSING
-
-    if (client.hasDataToSend()) {
-      _pfds[idx].events = static_cast<short>(
-        static_cast<unsigned>(_pfds[idx].events) |
-        static_cast<unsigned>(POLLOUT)); // enable POLLOUT safely
-    }
-  } else if (bytes == 0) {
-    return false;
-  } else // bytes < 0
-  {
-    error("recv failed, removing client");
-    return false;
-  }
-  return true;
-}
-
-bool ServerHandler::sendToClient(Client* client)
-{
-  // const std::size_t maxChunk = MAX_CHUNK;
-  const std::size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
-  const ssize_t bytes =
-    send(client.getFd(), client.getOutBuff().data(), toSend, 0);
-  if (bytes > 0) {
-    client.removeFromOutBuff(bytes);
-    if (!client.hasDataToSend()) {
-      _pfds[idx].events =
-        static_cast<short>(static_cast<unsigned>(_pfds[idx].events) &
-                           ~static_cast<unsigned>(POLLOUT));
-    }
-  } else if (bytes == 0) {
-    std::cout << "[SERVER] no data sent to client " << idx << "\n";
-  } else {
-    std::cerr << "[SERVER] send error for client " << idx << ": "
-              << strerror(errno) << "\n";
-    return disconnectClient(client, idx);
-  }
-  return true;
-}
-
-bool ServerHandler::isListener(int sockFd)
-{
-  for (portToSocketIter it = _portToSocket.begin(); it != _portToSocket.end();
-       ++it) {
-    if (sockFd == it->second->getFd()) {
-      return true;
-    }
-  }
-  return false;
-}
-
-
-} */

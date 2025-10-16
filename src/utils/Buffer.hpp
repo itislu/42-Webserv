@@ -23,7 +23,7 @@ public:
   void remove(size_t bytes);
   std::size_t getSize() const;
   bool isEmpty() const;
-  const unsigned char* data() const;
+  unsigned char* data();
 
   iterator begin();
   iterator end();

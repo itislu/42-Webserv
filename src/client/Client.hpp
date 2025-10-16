@@ -11,19 +11,23 @@ class Client
 {
 public:
   Client();
-  explicit Client(int sockFd);
+  explicit Client(int sockFd, const Socket* socket, const Server* server);
 
   int getFd() const;
   const std::string& getHost() const;
   Buffer getInBuff() const;
   Buffer getOutBuff() const;
+  const Socket* getSocket() const;
+  const Server* getServer() const;
+
+  void setServer(const Server* server);
 
   bool hasDataToSend() const;
 
 private:
   AutoFd _fd;
-  // Socket* _socket; // set pointer to the socket it belongs to
-  // Server* _server; // point to Null in the begining
+  const Socket* _socket; // points to Socket it connected
+  const Server* _server; // point to Null in the begining
   std::string _host;
   // int _state;
   Buffer _inBuff;
