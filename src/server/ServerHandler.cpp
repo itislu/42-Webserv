@@ -156,64 +156,27 @@ const Server* ServerHandler::getServerFromSocket(const Socket* socket)
   return servers[0];
 }
 
-void ServerHandler::debugPrintMaps() const
-{
-  std::cout << "\n============ Ports/Sockets ============\n";
-  for (portToSocketIter it = _portToSocket.begin(); it != _portToSocket.end();
-       ++it) {
-    std::cout << "Port: " << it->first << "\n"
-              << "Socket: " << it->second->getPort()
-              << " | Fd: " << it->second->getFd() << " | Ptr:" << it->second
-              << "\n\n";
-  }
-  std::cout << "=========== Sockets/Servers ===========\n";
-  for (socketToServersIter it = _socketToServers.begin();
-       it != _socketToServers.end();
-       ++it) {
-    std::cout << "Socket: " << it->first << "\n";
-    for (std::vector<Server*>::const_iterator servIt = it->second.begin();
-         servIt != it->second.end();
-         ++servIt) {
-      std::cout << "└── Server: " << *servIt << "\n";
-      std::cout << "    " << (*servIt)->getHostnames().size() << ".Hosts: ";
-      for (std::vector<std::string>::const_iterator hostIt =
-             (*servIt)->getHostnames().begin();
-           hostIt != (*servIt)->getHostnames().end();
-           ++hostIt) {
-        std::cout << *hostIt;
-        std::vector<std::string>::const_iterator next = hostIt;
-        if (++next != (*servIt)->getHostnames().end()) {
-          std::cout << " | ";
-        }
-      }
-      std::cout << "\n";
-    }
-    std::cout << "\n";
-  }
-  std::cout << "=======================================\n\n";
-}
-
 // TODO: add client to correct server
 // can only be done after parsing Host header in HTTP
 void ServerHandler::acceptClient(int sockFd)
 {
-  const AutoFd clientFd(accept(sockFd, NULL, NULL));
-  if (clientFd.get() < 0) {
+  const int clientFd = accept(sockFd, NULL, NULL);
+  if (clientFd < 0) {
     error("failed to accept new client");
     return;
   }
 
   try {
-    Socket::setFlags(clientFd.get());
+    Socket::setFlags(clientFd);
   } catch (std::exception& e) {
     error("failed to accept new client");
     return;
   }
 
-  addToPfd(clientFd.get());
-  addToClients(clientFd.get());
+  addToPfd(clientFd);
+  addToClients(clientFd);
 
-  std::cout << "[SERVER] new client connected, fd=" << clientFd.get() << '\n';
+  std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
 }
 
 void ServerHandler::disconnectClient(Client* client, const std::size_t idx)
@@ -253,13 +216,13 @@ bool ServerHandler::receiveFromClient(Client* client)
   std::vector<unsigned char> buffer(MAX_CHUNK);
   const ssize_t bytes = recv(client->getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
-    client->getInBuff().add(buffer);
     // This is just for debugging atm
     std::cout << "Client " << client->getFd() << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     std::cout.write(reinterpret_cast<const char*>(buffer.data()),
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+    client->getInBuff().add(buffer);
 
     // TODO: STATEMACHINE/PARSING
 
@@ -341,6 +304,7 @@ void ServerHandler::checkActivity()
 {
   for (std::size_t i = 0; i < _pfds.size();) {
     const unsigned events = static_cast<unsigned>(_pfds[i].revents);
+    std::cout << i << "(" << events << ")\n";
     if (isListener(_pfds[i].fd)) {
       if ((events & POLLIN) != 0) {
         acceptClient(_pfds[i].fd);
@@ -378,4 +342,41 @@ void ServerHandler::run()
     checkActivity();
   }
   std::cout << "Shutting down servers...\n";
+}
+
+void ServerHandler::debugPrintMaps() const
+{
+  std::cout << "\n============ Ports/Sockets ============\n";
+  for (portToSocketIter it = _portToSocket.begin(); it != _portToSocket.end();
+       ++it) {
+    std::cout << "Port: " << it->first << "\n"
+              << "Socket: " << it->second->getPort()
+              << " | Fd: " << it->second->getFd() << " | Ptr:" << it->second
+              << "\n\n";
+  }
+  std::cout << "=========== Sockets/Servers ===========\n";
+  for (socketToServersIter it = _socketToServers.begin();
+       it != _socketToServers.end();
+       ++it) {
+    std::cout << "Socket: " << it->first << "\n";
+    for (std::vector<Server*>::const_iterator servIt = it->second.begin();
+         servIt != it->second.end();
+         ++servIt) {
+      std::cout << "└── Server: " << *servIt << "\n";
+      std::cout << "    " << (*servIt)->getHostnames().size() << ".Hosts: ";
+      for (std::vector<std::string>::const_iterator hostIt =
+             (*servIt)->getHostnames().begin();
+           hostIt != (*servIt)->getHostnames().end();
+           ++hostIt) {
+        std::cout << *hostIt;
+        std::vector<std::string>::const_iterator next = hostIt;
+        if (++next != (*servIt)->getHostnames().end()) {
+          std::cout << " | ";
+        }
+      }
+      std::cout << "\n";
+    }
+    std::cout << "\n";
+  }
+  std::cout << "=======================================\n\n";
 }
