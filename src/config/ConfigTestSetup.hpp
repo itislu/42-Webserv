@@ -5,7 +5,6 @@
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
 #include <cstddef>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -42,6 +41,7 @@ static LocationConfig createTestLocation(
 static ServerConfig createTestServer(const Config& config,
                                      const std::vector<int>& ports,
                                      const std::vector<std::string>& hosts,
+                                     const std::size_t timeout,
                                      const std::string& root = "./www")
 {
   ServerConfig server(config);
@@ -56,6 +56,8 @@ static ServerConfig createTestServer(const Config& config,
   }
 
   server.setRoot(root);
+
+  server.setTimeOut(timeout);
 
   std::vector<std::string> methods;
   methods.push_back("GET");
@@ -87,7 +89,7 @@ Config createTestConfig()
   std::vector<std::string> hosts1;
   hosts1.push_back("test.com");
   ServerConfig server1 =
-    createTestServer(config, ports1, hosts1, "./www/server1");
+    createTestServer(config, ports1, hosts1, 20, "./www/server1");
   config.addServer(server1);
 
   // Server 2: single port
@@ -98,7 +100,7 @@ Config createTestConfig()
   hosts2.push_back("example.com");
   hosts2.push_back("localhost");
   ServerConfig server2 =
-    createTestServer(config, ports2, hosts2, "./www/server2");
+    createTestServer(config, ports2, hosts2, 10, "./www/server2");
   config.addServer(server2);
 
   return config;

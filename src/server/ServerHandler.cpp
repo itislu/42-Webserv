@@ -304,13 +304,16 @@ void ServerHandler::checkActivity()
 {
   for (std::size_t i = 0; i < _pfds.size();) {
     const unsigned events = static_cast<unsigned>(_pfds[i].revents);
-    std::cout << i << "(" << events << ")\n";
     if (isListener(_pfds[i].fd)) {
+      std::cout << "Listener\n";
+      std::cout << i << "(" << events << ")\n";
       if ((events & POLLIN) != 0) {
         acceptClient(_pfds[i].fd);
-        i++;
       }
+      i++;
     } else {
+      std::cout << "Client\n";
+      std::cout << i << "(" << events << ")\n";
       Client* const client = getClientFromFd(_pfds[i].fd);
       if (!handleClient(client, events)) {
         disconnectClient(client, i);
@@ -324,9 +327,10 @@ void ServerHandler::checkActivity()
 void ServerHandler::run()
 {
   g_running = 1;
+  const int TIMEOUT_MS = 10000;
   while (g_running != 0) {
     // TODO: calculate timeout
-    const int ready = poll((&_pfds[0]), _pfds.size(), -1);
+    const int ready = poll((&_pfds[0]), _pfds.size(), TIMEOUT_MS);
     if (ready < 0) {
       if (errno == EINTR) {
         continue;

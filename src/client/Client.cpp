@@ -3,6 +3,7 @@
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
+#include "utils/TimeStamp.hpp"
 #include <string>
 
 Client::Client()
@@ -54,6 +55,16 @@ const Server* Client::getServer() const
 void Client::setServer(const Server* server)
 {
   _server = server;
+}
+
+TimeStamp Client::getLastActivity() const
+{
+  return _lastActivity;
+}
+
+void Client::updateLastActivity()
+{
+  _lastActivity.setTime(TimeStamp::now());
 }
 
 bool Client::hasDataToSend() const

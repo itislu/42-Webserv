@@ -96,7 +96,7 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
       out << *portIt << " ";
     }
     out << "\n";
-
+    out << "Timeout: " << serverIt->getTimeOut() << "s\n";
     out << "Hosts: ";
     const std::vector<std::string>& hostnames = serverIt->getHostnames();
     for (std::vector<std::string>::const_iterator hostIt = hostnames.begin();

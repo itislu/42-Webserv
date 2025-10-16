@@ -5,6 +5,7 @@
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
+#include "utils/TimeStamp.hpp"
 #include <string>
 
 class Client
@@ -22,6 +23,9 @@ public:
 
   void setServer(const Server* server);
 
+  TimeStamp getLastActivity() const;
+  void updateLastActivity();
+
   bool hasDataToSend() const;
 
 private:
@@ -29,6 +33,7 @@ private:
   const Socket* _socket; // points to Socket it connected
   const Server* _server; // point to Null in the begining
   std::string _host;
+  TimeStamp _lastActivity;
   // int _state;
   Buffer _inBuff;
   Buffer _outBuff;
