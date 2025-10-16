@@ -4,8 +4,8 @@
 #	define LIBFTPP_STRING_STARTS_WITH_TPP
 
 #	include "libftpp/string.hpp"
+#	include "libftpp/utility.hpp"
 #	include <cassert>
-#	include <cstddef>
 #	include <string>
 
 namespace ft {
@@ -31,7 +31,7 @@ template <typename CharT, typename Traits, typename Allocator>
 bool starts_with(const std::basic_string<CharT, Traits, Allocator>& str,
                  const CharT* prefix)
 {
-	assert(prefix != NULL);
+	assert(prefix != FT_NULLPTR);
 
 	typename std::basic_string<CharT, Traits, Allocator>::size_type prefix_len =
 	    Traits::length(prefix);

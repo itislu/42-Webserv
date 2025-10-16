@@ -4,8 +4,8 @@
 #	define LIBFTPP_SAFE_BOOL_SAFE_BOOL_TPP
 
 #	include "libftpp/safe_bool.hpp"
+#	include "libftpp/utility.hpp"
 #	include "safe_bool_base.hpp"
-#	include <cstddef>
 
 namespace ft {
 
@@ -14,7 +14,7 @@ safe_bool<Derived>::operator safe_bool_t() const
 {
 	return (static_cast<const Derived*>(this))->boolean_test()
 	           ? &safe_bool_base::this_type_does_not_support_comparisons
-	           : NULL;
+	           : FT_NULLPTR;
 }
 
 template <typename Derived>

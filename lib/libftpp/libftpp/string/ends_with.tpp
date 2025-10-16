@@ -4,8 +4,8 @@
 #	define LIBFTPP_STRING_ENDS_WITH_TPP
 
 #	include "libftpp/string.hpp"
+#	include "libftpp/utility.hpp"
 #	include <cassert>
-#	include <cstddef>
 #	include <string>
 
 namespace ft {
@@ -31,7 +31,7 @@ template <typename CharT, typename Traits, typename Allocator>
 bool ends_with(const std::basic_string<CharT, Traits, Allocator>& str,
                const CharT* suffix)
 {
-	assert(suffix != NULL);
+	assert(suffix != FT_NULLPTR);
 
 	typename std::basic_string<CharT, Traits, Allocator>::size_type suffix_len =
 	    Traits::length(suffix);

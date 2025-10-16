@@ -4,7 +4,7 @@
 #	define LIBFTPP_STRING_TO_STRING_TPP
 
 #	include "libftpp/string.hpp"
-#	include <cstddef>
+#	include "libftpp/utility.hpp"
 #	include <ios>
 #	include <sstream>
 #	include <string>
@@ -40,7 +40,7 @@ std::string to_string(T* v, std::ios::fmtflags fmt)
 {
 	std::ostringstream oss;
 	oss.flags(fmt);
-	if (v == NULL) {
+	if (v == FT_NULLPTR) {
 		oss << "(null)";
 	}
 	else {
