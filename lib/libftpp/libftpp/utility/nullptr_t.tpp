@@ -1,10 +1,9 @@
 #pragma once
-#ifndef LIBFTPP_MEMORY_NULLPTR_T_TPP
-#	define LIBFTPP_MEMORY_NULLPTR_T_TPP
+#ifndef LIBFTPP_UTILITY_NULLPTR_T_TPP
+#	define LIBFTPP_UTILITY_NULLPTR_T_TPP
 
-#	include "libftpp/memory.hpp"
-#	include "libftpp/assert.hpp"
 #	include "libftpp/utility.hpp"
+#	include "libftpp/assert.hpp"
 #	include <cstddef>
 
 namespace ft {
@@ -89,4 +88,4 @@ bool operator>=(nullptr_t /*unused*/, T* /*unused*/)
 
 } // namespace ft
 
-#endif // LIBFTPP_MEMORY_NULLPTR_T_TPP
+#endif // LIBFTPP_UTILITY_NULLPTR_T_TPP

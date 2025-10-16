@@ -7,58 +7,11 @@
 #	include "libftpp/movable.hpp"
 #	include "libftpp/safe_bool.hpp"
 #	include "libftpp/type_traits.hpp"
+#	include "libftpp/utility.hpp"
 #	include <cstddef>
 #	include <ostream>
 
-/**
- * @brief `nullptr` emulation
- *
- * Implemented as a macro because `nullptr` is a prvalue.
- *
- * https://en.cppreference.com/w/cpp/language/nullptr
- */
-#	define FT_NULLPTR ft::nullptr_t()
-
 namespace ft {
-
-/* nullptr_t */
-
-/**
- * https://en.cppreference.com/w/cpp/types/nullptr_t
- */
-class nullptr_t {
-public:
-	// NOLINTBEGIN(google-explicit-constructor): `std::nullptr_t` may be
-	// implicitly converted to any pointer and pointer to member type.
-	template <typename T>
-	operator T*() const throw();
-
-	template <typename C, typename T>
-	operator T C::*() const throw();
-	// NOLINTEND(google-explicit-constructor)
-
-private:
-	// `sizeof(std::nullptr_t)` is equal to `sizeof(void *)`.
-	void* _;
-};
-
-// Disabled ordered comparison operators.
-template <typename T>
-bool operator<(T* /*unused*/, nullptr_t /*unused*/);
-template <typename T>
-bool operator<(nullptr_t /*unused*/, T* /*unused*/);
-template <typename T>
-bool operator<=(T* /*unused*/, nullptr_t /*unused*/);
-template <typename T>
-bool operator<=(nullptr_t /*unused*/, T* /*unused*/);
-template <typename T>
-bool operator>(T* /*unused*/, nullptr_t /*unused*/);
-template <typename T>
-bool operator>(nullptr_t /*unused*/, T* /*unused*/);
-template <typename T>
-bool operator>=(T* /*unused*/, nullptr_t /*unused*/);
-template <typename T>
-bool operator>=(nullptr_t /*unused*/, T* /*unused*/);
 
 /* default_delete */
 
@@ -140,12 +93,12 @@ public:
 	// NOLINTBEGIN(google-explicit-constructor): Original in `std::unique_ptr`
 	// is not `explicit`.
 	template <typename Nullptr_t>
-	unique_ptr(
-	    Nullptr_t /*unused*/,
-	    typename ft::enable_if<ft::is_convertible<Nullptr_t, nullptr_t>::value
-	                               && !ft::is_pointer<Deleter>::value,
-	                           _enabler>::type /*unused*/
-	    = _enabler()) throw();
+	unique_ptr(Nullptr_t /*unused*/,
+	           typename ft::enable_if<
+	               ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
+	                   && !ft::is_pointer<Deleter>::value,
+	               _enabler>::type /*unused*/
+	           = _enabler()) throw();
 	// NOLINTEND(google-explicit-constructor)
 	// 2)
 	template <typename Pointer>
@@ -186,7 +139,7 @@ public:
 	unique_ptr& operator=(ft::rvalue<unique_ptr>& r) throw();
 	template <typename U, typename E>
 	unique_ptr& operator=(ft::rvalue<unique_ptr<U, E> >& r) throw();
-	unique_ptr& operator=(nullptr_t /*unused*/) throw();
+	unique_ptr& operator=(ft::nullptr_t /*unused*/) throw();
 
 	pointer release() throw();
 	void reset(pointer ptr = pointer()) throw();
@@ -359,29 +312,29 @@ bool operator>(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);
 template <typename T1, typename D1, typename T2, typename D2>
 bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);
 template <typename T, typename D>
-bool operator==(const unique_ptr<T, D>& x, nullptr_t /*unused*/) throw();
+bool operator==(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/) throw();
 template <typename T, typename D>
-bool operator==(nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw();
+bool operator==(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw();
 template <typename T, typename D>
-bool operator!=(const unique_ptr<T, D>& x, nullptr_t /*unused*/) throw();
+bool operator!=(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/) throw();
 template <typename T, typename D>
-bool operator!=(nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw();
+bool operator!=(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw();
 template <typename T, typename D>
-bool operator<(const unique_ptr<T, D>& x, nullptr_t /*unused*/);
+bool operator<(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/);
 template <typename T, typename D>
-bool operator<(nullptr_t /*unused*/, const unique_ptr<T, D>& y);
+bool operator<(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y);
 template <typename T, typename D>
-bool operator<=(const unique_ptr<T, D>& x, nullptr_t /*unused*/);
+bool operator<=(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/);
 template <typename T, typename D>
-bool operator<=(nullptr_t /*unused*/, const unique_ptr<T, D>& y);
+bool operator<=(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y);
 template <typename T, typename D>
-bool operator>(const unique_ptr<T, D>& x, nullptr_t /*unused*/);
+bool operator>(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/);
 template <typename T, typename D>
-bool operator>(nullptr_t /*unused*/, const unique_ptr<T, D>& y);
+bool operator>(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y);
 template <typename T, typename D>
-bool operator>=(const unique_ptr<T, D>& x, nullptr_t /*unused*/);
+bool operator>=(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/);
 template <typename T, typename D>
-bool operator>=(nullptr_t /*unused*/, const unique_ptr<T, D>& y);
+bool operator>=(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y);
 
 template <typename CharT, typename Traits, typename Y, typename D>
 std::basic_ostream<CharT, Traits>&
@@ -419,12 +372,12 @@ public:
 	// NOLINTBEGIN(google-explicit-constructor): Original in `std::unique_ptr`
 	// is not `explicit`.
 	template <typename Nullptr_t>
-	unique_ptr(
-	    Nullptr_t /*unused*/,
-	    typename ft::enable_if<ft::is_convertible<Nullptr_t, nullptr_t>::value
-	                               && !ft::is_pointer<Deleter>::value,
-	                           _enabler>::type /*unused*/
-	    = _enabler()) throw();
+	unique_ptr(Nullptr_t /*unused*/,
+	           typename ft::enable_if<
+	               ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
+	                   && !ft::is_pointer<Deleter>::value,
+	               _enabler>::type /*unused*/
+	           = _enabler()) throw();
 	// NOLINTEND(google-explicit-constructor)
 	// 2)
 	template <typename U>
@@ -469,7 +422,7 @@ public:
 	unique_ptr& operator=(ft::rvalue<unique_ptr>& r) throw();
 	template <typename U, typename E>
 	unique_ptr& operator=(ft::rvalue<unique_ptr<U, E> >& r) throw();
-	unique_ptr& operator=(nullptr_t /*unused*/) throw();
+	unique_ptr& operator=(ft::nullptr_t /*unused*/) throw();
 
 	pointer release() throw();
 	template <typename U>
@@ -477,7 +430,7 @@ public:
 	           typename ft::enable_if<_is_compatible_raw_pointer<U>::value,
 	                                  _enabler>::type /*unused*/
 	           = _enabler()) throw();
-	void reset(nullptr_t /*unused*/ = FT_NULLPTR) throw();
+	void reset(ft::nullptr_t /*unused*/ = FT_NULLPTR) throw();
 	void swap(unique_ptr& other) throw();
 
 	/**
@@ -523,6 +476,5 @@ FT_REQUIRES(ft::is_unbounded_array<T>::value)
 #	include "libftpp/memory/default_delete.tpp"   // IWYU pragma: export
 #	include "libftpp/memory/unique_ptr.tpp"       // IWYU pragma: export
 #	include "libftpp/memory/unique_ptr_array.tpp" // IWYU pragma: export
-#	include "libftpp/memory/nullptr_t.tpp"        // IWYU pragma: export
 
 #endif // LIBFTPP_MEMORY_HPP

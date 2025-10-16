@@ -36,7 +36,7 @@ template <typename T, typename Deleter /*= default_delete<T> */>
 template <typename Nullptr_t>
 unique_ptr<T, Deleter>::unique_ptr(
     Nullptr_t /*unused*/,
-    typename ft::enable_if<ft::is_convertible<Nullptr_t, nullptr_t>::value
+    typename ft::enable_if<ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
                                && !ft::is_pointer<Deleter>::value,
                            _enabler>::type /*unused = _enabler()*/) throw()
     : _ptr(),
@@ -130,7 +130,7 @@ unique_ptr<T, Deleter>::operator=(ft::rvalue<unique_ptr<U, E> >& r) throw()
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 unique_ptr<T, Deleter>&
-unique_ptr<T, Deleter>::operator=(nullptr_t /*unused*/) throw()
+unique_ptr<T, Deleter>::operator=(ft::nullptr_t /*unused*/) throw()
 {
 	reset();
 	return *this;
@@ -410,73 +410,73 @@ bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 }
 
 template <typename T, typename D>
-bool operator==(const unique_ptr<T, D>& x, nullptr_t /*unused*/) throw()
+bool operator==(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/) throw()
 {
 	return !x;
 }
 
 template <typename T, typename D>
-bool operator==(nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw()
+bool operator==(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw()
 {
 	return !x;
 }
 
 template <typename T, typename D>
-bool operator!=(const unique_ptr<T, D>& x, nullptr_t /*unused*/) throw()
+bool operator!=(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/) throw()
 {
 	return static_cast<bool>(x);
 }
 
 template <typename T, typename D>
-bool operator!=(nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw()
+bool operator!=(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& x) throw()
 {
 	return static_cast<bool>(x);
 }
 
 template <typename T, typename D>
-bool operator<(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+bool operator<(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/)
 {
 	return ft::less<typename unique_ptr<T, D>::pointer>()(x.get(), FT_NULLPTR);
 }
 
 template <typename T, typename D>
-bool operator<(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+bool operator<(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y)
 {
 	return ft::less<typename unique_ptr<T, D>::pointer>()(FT_NULLPTR, y.get());
 }
 
 template <typename T, typename D>
-bool operator<=(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+bool operator<=(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/)
 {
 	return !(FT_NULLPTR < x);
 }
 
 template <typename T, typename D>
-bool operator<=(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+bool operator<=(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y)
 {
 	return !(y < FT_NULLPTR);
 }
 
 template <typename T, typename D>
-bool operator>(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+bool operator>(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/)
 {
 	return FT_NULLPTR < x;
 }
 
 template <typename T, typename D>
-bool operator>(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+bool operator>(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y)
 {
 	return y < FT_NULLPTR;
 }
 
 template <typename T, typename D>
-bool operator>=(const unique_ptr<T, D>& x, nullptr_t /*unused*/)
+bool operator>=(const unique_ptr<T, D>& x, ft::nullptr_t /*unused*/)
 {
 	return !(x < FT_NULLPTR);
 }
 
 template <typename T, typename D>
-bool operator>=(nullptr_t /*unused*/, const unique_ptr<T, D>& y)
+bool operator>=(ft::nullptr_t /*unused*/, const unique_ptr<T, D>& y)
 {
 	return !(FT_NULLPTR < y);
 }
