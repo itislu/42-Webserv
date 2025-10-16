@@ -2,12 +2,18 @@
 #define SERVERHANDLER_HPP
 
 #include "Server.hpp"
+#include "client/Client.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
 #include "socket/Socket.hpp"
+#include <cstddef>
 #include <map>
 #include <sys/poll.h>
 #include <vector>
+
+#ifndef MAX_CHUNK
+#define MAX_CHUNK 1024
+#endif
 
 class ServerHandler
 {
@@ -25,6 +31,13 @@ public:
   void checkActivity();
   bool isListener(int sockFd);
   void acceptClient(int sockFd);
+  bool handleClient(Client* client, unsigned events);
+  bool receiveFromClient(Client* client);
+  bool sendToClient(Client* client);
+  void disconnectClient(Client* client, std::size_t idx);
+
+  Client* getClientFromFd(int clientFd);
+  pollfd* getPollFdForClient(Client* client);
 
   // INIT - Server Setup
   void createServers(const Config& config);
@@ -47,6 +60,7 @@ private:
   std::vector<pollfd> _pfds; // listeners + clients
   std::map<const Socket*, std::vector<Server*> > _socketToServers;
   std::map<int, const Socket*> _portToSocket;
+  std::vector<Client*> _clients;
 };
 
 #endif

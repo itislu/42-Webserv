@@ -1,7 +1,9 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
+#include "config/LocationConfig.hpp"
 #include <cstddef>
 #include <map>
+#include <ostream>
 #include <string>
 #include <vector>
 

@@ -14,6 +14,9 @@ public:
   typedef std::vector<unsigned char> Container;
   typedef Container::iterator iterator;
 
+  Buffer();
+  explicit Buffer(std::size_t size);
+
   void add(const std::string& str);
   void add(const Container& buffer);
   void remove(ssize_t bytes);

@@ -7,6 +7,13 @@
 /* ************************************************************************** */
 // PUBLIC
 
+Buffer::Buffer() {}
+
+Buffer::Buffer(std::size_t size)
+{
+  _buff.reserve(size);
+}
+
 void Buffer::add(const std::string& str)
 {
   _buff.insert(_buff.end(), str.begin(), str.end());

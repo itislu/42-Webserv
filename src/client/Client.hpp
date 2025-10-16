@@ -1,6 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
@@ -21,7 +22,8 @@ public:
 
 private:
   AutoFd _fd;
-  Socket* _socket; // set pointer to the socket it belongs to
+  // Socket* _socket; // set pointer to the socket it belongs to
+  // Server* _server; // point to Null in the begining
   std::string _host;
   // int _state;
   Buffer _inBuff;

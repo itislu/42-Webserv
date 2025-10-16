@@ -1,20 +1,23 @@
 #include "ServerHandler.hpp"
+#include "client/Client.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
+#include "utils/Buffer.hpp"
+#include <algorithm>
 #include <cerrno>
 #include <csignal>
+#include <cstddef>
 #include <cstring>
 #include <exception>
-#include <fcntl.h>
 #include <iostream>
 #include <map>
 #include <string>
 #include <sys/poll.h>
 #include <sys/socket.h>
-#include <unistd.h>
+#include <sys/types.h>
 #include <utility>
 #include <vector>
 
@@ -153,6 +156,7 @@ void ServerHandler::debugPrintMaps() const
 }
 
 // TODO: add client to correct server
+// can only be done after parsing Host header in HTTP
 void ServerHandler::acceptClient(int sockFd)
 {
   const AutoFd clientFd(accept(sockFd, NULL, NULL));
@@ -169,26 +173,188 @@ void ServerHandler::acceptClient(int sockFd)
   }
 
   addToPfd(clientFd.get());
+  _clients.push_back(new Client(clientFd.get()));
+
   std::cout << "[SERVER] new client connected, fd=" << clientFd.get() << '\n';
 }
 
-bool ServerHandler::disconnectClient(Client& client, std::size_t& idx)
+void ServerHandler::disconnectClient(Client* client, const std::size_t idx)
 {
-  std::cout << "[SERVER] Client " << idx << " disconnected\n";
-  close(client.getFd());
+  std::cout << "[SERVER] Client fd=" << client->getFd() << " disconnected\n";
+
+  // remove pfd for client
   _pfds.erase(_pfds.begin() + static_cast<long>(idx));
-  _clients.erase(_clients.begin() + static_cast<long>(idx - 1));
-  return false;
+
+  // remove from client vector
+  if (client != 0) {
+    for (std::vector<Client*>::iterator it = _clients.begin();
+         it != _clients.end();
+         ++it) {
+      if (*it == client) {
+        delete *it;
+        _clients.erase(it);
+        break;
+      }
+    }
+  }
 }
 
-bool ServerHandler::receiveFromClient(Client& client, std::size_t& idx)
+pollfd* ServerHandler::getPollFdForClient(Client* client)
+{
+  for (std::vector<pollfd>::iterator it = _pfds.begin(); it != _pfds.end();
+       ++it) {
+    if (it->fd == client->getFd()) {
+      return &(*it);
+    }
+  }
+  return NULL;
+}
+
+bool ServerHandler::receiveFromClient(Client* client)
+{
+  const Buffer buffer(MAX_CHUNK);
+  const ssize_t bytes =
+    recv(client->getFd(), buffer.data(), buffer.getSize(), 0);
+  if (bytes > 0) {
+    client->getInBuff().add(buffer);
+    // This is just for debugging atm
+    std::cout << "Client " << client->getFd() << ": ";
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
+    std::cout.write(reinterpret_cast<const char*>(buffer.data()),
+                    static_cast<std::streamsize>(bytes));
+    // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+
+    // TODO: STATEMACHINE/PARSING
+
+    if (client->hasDataToSend()) {
+      pollfd* const pfd = getPollFdForClient(client);
+      pfd->events = static_cast<short>(
+        static_cast<unsigned>(pfd->events) |
+        static_cast<unsigned>(POLLOUT)); // enable POLLOUT safely
+    }
+  } else if (bytes == 0) {
+    return false;
+  } else // bytes < 0
+  {
+    error("recv failed, removing client");
+    return false;
+  }
+  return true;
+}
+
+bool ServerHandler::sendToClient(Client* client)
+{
+  const std::size_t toSend = std::min(client->getOutBuff().getSize(),
+                                      static_cast<std::size_t>(MAX_CHUNK));
+  const ssize_t bytes =
+    send(client->getFd(), client->getOutBuff().data(), toSend, 0);
+
+  if (bytes > 0) {
+    client->getOutBuff().remove(bytes);
+    if (!client->hasDataToSend()) {
+      if (pollfd* const pfd = getPollFdForClient(client)) {
+        pfd->events =
+          static_cast<short>(static_cast<unsigned>(pfd->events) &
+                             ~static_cast<unsigned>(
+                               POLLOUT)); // disable write when buffer is empty
+      }
+    }
+  } else if (bytes == 0) {
+    std::cout << "[SERVER] no data sent to client fd=" << client->getFd()
+              << "\n";
+  } else {
+    std::cerr << "[SERVER] send error for client fd=" << client->getFd() << ": "
+              << strerror(errno) << "\n";
+    return false;
+  }
+  return true;
+}
+
+bool ServerHandler::handleClient(Client* client, const unsigned events)
+{
+  if (client == 0) {
+    return false;
+  }
+  bool alive = true;
+  if ((events & POLLIN) != 0 && alive) { // Receive Data
+    alive = receiveFromClient(client);
+  }
+  if ((events & POLLOUT) != 0 && alive) { // Send Data
+    alive = sendToClient(client);
+  }
+  if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 && alive) {
+    return false; // disconnect client
+  }
+  return alive;
+}
+
+Client* ServerHandler::getClientFromFd(int clientFd)
+{
+  for (std::vector<Client*>::iterator it = _clients.begin();
+       it != _clients.end();
+       ++it) {
+    if ((*it)->getFd() == clientFd) {
+      return *it;
+    }
+  }
+  return NULL;
+}
+
+void ServerHandler::checkActivity()
+{
+  for (std::size_t i = 0; i < _pfds.size();) {
+    const unsigned events = static_cast<unsigned>(_pfds[i].revents);
+    if (isListener(_pfds[i].fd)) {
+      if ((events & POLLIN) != 0) {
+        acceptClient(_pfds[i].fd);
+        i++;
+      }
+    } else {
+      Client* const client = getClientFromFd(_pfds[i].fd);
+      if (!handleClient(client, events)) {
+        disconnectClient(client, i);
+      } else {
+        i++;
+      }
+    }
+  }
+}
+
+void ServerHandler::run()
+{
+  g_running = 1;
+  while (g_running != 0) {
+    // TODO: calculate timeout
+    const int ready = poll((&_pfds[0]), _pfds.size(), -1);
+    if (ready < 0) {
+      if (errno == EINTR) {
+        continue;
+      }
+      error("poll failed");
+      break;
+    }
+    if (ready == 0) {
+      std::cerr << "Error: poll timeout\n";
+      // TODO: add cleanup and reset timeout, only break when no servers left
+      break;
+    }
+    checkActivity();
+  }
+  std::cout << "Shutting down servers...\n";
+}
+
+/* bool ServerHandler::disconnectClient(std::size_t& idx)
+
+
+bool ServerHandler::receiveFromClient(Client* client)
 {
   Buffer buffer(MAX_CHUNK);
-  const ssize_t bytes = recv(client.getFd(), &buffer[0], buffer.size(), 0);
+  const ssize_t bytes =
+    recv(client.getFd(), buffer.data(), buffer.getSize(), 0);
   if (bytes > 0) {
     client.addToInBuff(buffer);
     // This is just for debugging atm
-    std::cout << "Client " << idx << ": ";
+    std::cout << "Client " << client.getFd() << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     std::cout.write(reinterpret_cast<const char*>(&buffer[0]),
                     static_cast<std::streamsize>(bytes));
@@ -202,18 +368,18 @@ bool ServerHandler::receiveFromClient(Client& client, std::size_t& idx)
         static_cast<unsigned>(POLLOUT)); // enable POLLOUT safely
     }
   } else if (bytes == 0) {
-    return disconnectClient(client, idx);
+    return false;
   } else // bytes < 0
   {
     error("recv failed, removing client");
-    return disconnectClient(client, idx);
+    return false;
   }
   return true;
 }
 
-bool ServerHandler::sendToClient(Client& client, std::size_t& idx)
+bool ServerHandler::sendToClient(Client* client)
 {
-  const std::size_t maxChunk = MAX_CHUNK;
+  // const std::size_t maxChunk = MAX_CHUNK;
   const std::size_t toSend = std::min(client.getOutBuff().size(), maxChunk);
   const ssize_t bytes =
     send(client.getFd(), client.getOutBuff().data(), toSend, 0);
@@ -245,53 +411,5 @@ bool ServerHandler::isListener(int sockFd)
   return false;
 }
 
-void ServerHandler::checkActivity()
-{
-  for (std::size_t i = 0; i < _pfds.size();) {
-    bool same = true;
-    const unsigned events = static_cast<unsigned>(_pfds[i].revents);
-    if (isListener(_pfds[i].fd)) {
-      if ((events & POLLIN) != 0) {
-        acceptClient();
-      }
-    } else {
-      Client& client = _clients[i - 1];
-      if ((events & POLLIN) != 0 && same) { // Receive Data
-        same = receiveFromClient(client, i);
-      }
-      if ((events & POLLOUT) != 0 && same) { // Send Data
-        same = sendToClient(client, i);
-      }
-      if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 &&
-          same) { // Error
-        same = disconnectClient(client, i);
-      }
-    }
-    if (same) {
-      i++;
-    }
-  }
-}
 
-void ServerHandler::run()
-{
-  g_running = 1;
-  while (g_running != 0) {
-    // TODO: calculate timeout
-    const int ready = poll((&_pfds[0]), _pfds.size(), -1);
-    if (ready < 0) {
-      if (errno == EINTR) {
-        continue;
-      }
-      error("poll failed");
-      break;
-    }
-    if (ready == 0) {
-      std::cerr << "Error: poll timeout\n";
-      // TODO: add cleanup and reset timeout, only break when no servers left
-      break;
-    }
-    checkActivity();
-  }
-  std::cout << "Shutting down servers...\n";
-}
+} */

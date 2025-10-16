@@ -1,10 +1,10 @@
 #include "Client.hpp"
+#include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
 #include <string>
 
 Client::Client()
   : _fd(-1)
-  , _socket()
 //, _state(0)
 {
 }
