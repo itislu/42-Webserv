@@ -6,8 +6,10 @@
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
+#include "utils/TimeStamp.hpp"
 #include <algorithm>
 #include <cerrno>
+#include <climits>
 #include <csignal>
 #include <cstddef>
 #include <cstring>
@@ -39,6 +41,7 @@ ServerHandler::ServerHandler(const Config& config)
     error("Failed to set SIGINT handler");
     return;
   }
+  _lowestTimeOut = config.getDefaultTimeout();
   createServers(config);
 }
 
@@ -324,13 +327,29 @@ void ServerHandler::checkActivity()
   }
 }
 
+int ServerHandler::calculateTimeOut() const
+{
+  const TimeStamp now;
+  long currTimeOut = _lowestTimeOut;
+
+  for (clientIter it = _clients.begin(); it != _clients.end(); ++it) {
+    const long clientTimeOut = now - (*it)->getLastActivity();
+    currTimeOut = std::min(clientTimeOut, currTimeOut);
+  }
+
+  long timeoutMs = currTimeOut * MS_MULTIPLIER;
+  timeoutMs = std::min<long>(timeoutMs, INT_MAX);
+  timeoutMs = std::max<long>(timeoutMs, 0);
+
+  return static_cast<int>(timeoutMs);
+}
+
 void ServerHandler::run()
 {
   g_running = 1;
-  const int TIMEOUT_MS = 10000;
   while (g_running != 0) {
-    // TODO: calculate timeout
-    const int ready = poll((&_pfds[0]), _pfds.size(), TIMEOUT_MS);
+    const int timeOut = calculateTimeOut();
+    const int ready = poll((&_pfds[0]), _pfds.size(), timeOut);
     if (ready < 0) {
       if (errno == EINTR) {
         continue;
@@ -341,7 +360,6 @@ void ServerHandler::run()
     if (ready == 0) {
       std::cerr << "Error: poll timeout\n";
       // TODO: add cleanup and reset timeout, only break when no servers left
-      break;
     }
     checkActivity();
   }

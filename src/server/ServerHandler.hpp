@@ -21,6 +21,8 @@ public:
   typedef std::map<int, const Socket*>::const_iterator portToSocketIter;
   typedef std::map<const Socket*, std::vector<Server*> >::const_iterator
     socketToServersIter;
+  typedef std::vector<Server*>::const_iterator serverIter;
+  typedef std::vector<Client*>::const_iterator clientIter;
 
   // CONSTRUCTORS
   explicit ServerHandler(const Config& config);
@@ -41,6 +43,8 @@ public:
   const Socket* getSocketFromFd(int sockFd);
   const Server* getServerFromSocket(const Socket* socket);
 
+  int calculateTimeOut() const;
+
   // INIT - Server Setup
   void createServers(const Config& config);
   void initListeners();
@@ -59,6 +63,7 @@ private:
   ServerHandler(const ServerHandler& other);
   ServerHandler& operator=(const ServerHandler& other);
 
+  long _lowestTimeOut;
   std::vector<Server*> _servers;
   std::vector<pollfd> _pfds; // listeners + clients
   std::map<const Socket*, std::vector<Server*> > _socketToServers;

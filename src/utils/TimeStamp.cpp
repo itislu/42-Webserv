@@ -20,3 +20,8 @@ long TimeStamp::now()
 {
   return std::time(NULL);
 }
+
+long TimeStamp::operator-(const TimeStamp& other) const
+{
+  return getTime() - other.getTime();
+}

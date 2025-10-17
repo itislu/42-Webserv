@@ -17,7 +17,6 @@
 typedef std::vector<ServerConfig>::iterator servConfIt;
 typedef const std::vector<ServerConfig>::iterator const_servConfIt;
 
-// It stores server blocks and defaults, not request-specific state.
 class Config
 {
 public:
