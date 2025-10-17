@@ -1,7 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "event/TimeStamp.hpp"
+#include "client/TimeStamp.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
