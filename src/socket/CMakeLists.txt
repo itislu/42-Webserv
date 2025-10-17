@@ -5,6 +5,7 @@
 set(LIB_NAME socket)
 
 add_library(${LIB_NAME} STATIC
+  SocketManager.cpp
   Socket.cpp
   AutoFd.cpp
 )

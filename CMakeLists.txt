@@ -31,6 +31,7 @@ target_link_libraries(${PROJECT_NAME}
   client
   socket
   config
+  event
 )
 
 
@@ -44,9 +45,10 @@ add_subdirectory(lib/libftpp)
 # MODULES
 add_subdirectory(src/client)
 add_subdirectory(src/config)
-add_subdirectory(src/utils)
+add_subdirectory(src/event)
 add_subdirectory(src/server)
 add_subdirectory(src/socket)
+add_subdirectory(src/utils)
 
 
 # **************************************************************************** #

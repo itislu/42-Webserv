@@ -6,7 +6,6 @@
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
 #include "socket/Socket.hpp"
-#include <cstddef>
 #include <map>
 #include <sys/poll.h>
 #include <vector>
