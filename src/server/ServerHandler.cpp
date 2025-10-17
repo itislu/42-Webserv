@@ -3,7 +3,6 @@
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
 #include "server/Server.hpp"
-#include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
 #include "utils/TimeStamp.hpp"
