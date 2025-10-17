@@ -1,6 +1,8 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "config/LocationConfig.hpp"
+#include <algorithm>
+#include <climits>
 #include <cstddef>
 #include <map>
 #include <ostream>
@@ -69,6 +71,15 @@ void Config::setAccessLogPath(const std::string& path)
   _accesLogPath = path;
 }
 
+void Config::setLowestDefaultTimeout()
+{
+  long timeOut = LONG_MAX;
+  for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
+    timeOut = std::min(timeOut, (*it).getTimeOut());
+  }
+  _defaultTimeOut = timeOut;
+}
+
 std::ostream& operator<<(std::ostream& out, const Config& config)
 {
   const std::vector<ServerConfig>& servers = config.getServers();
@@ -103,5 +114,6 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
           << ", autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n";
     }
   }
+  out << "Lowest Timeout: " << config.getDefaultTimeout() << "s\n";
   return out;
 }

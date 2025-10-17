@@ -15,11 +15,13 @@
 #endif
 
 typedef std::vector<ServerConfig>::iterator servConfIt;
-typedef const std::vector<ServerConfig>::iterator const_servConfIt;
+typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
 
 class Config
 {
 public:
+
+
   explicit Config(const std::string& configFile);
 
   // Getters
@@ -36,6 +38,7 @@ public:
   void setDefaultTimeout(long seconds);
   void setErrorLogPath(const std::string& path);
   void setAccessLogPath(const std::string& path);
+  void setLowestDefaultTimeout();
 
   const ServerConfig* getServerForRequest(const std::string& host,
                                           int port) const;

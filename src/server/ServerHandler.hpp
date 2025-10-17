@@ -45,6 +45,7 @@ public:
   const Server* getServerFromSocket(const Socket* socket);
 
   int calculateTimeOut() const;
+  long getClientTimeOut(const Client* client) const;
 
   // INIT - Server Setup
   void createServers(const Config& config);

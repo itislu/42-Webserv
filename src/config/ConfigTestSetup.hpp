@@ -100,8 +100,9 @@ Config createTestConfig()
   hosts2.push_back("example.com");
   hosts2.push_back("localhost");
   ServerConfig server2 =
-    createTestServer(config, ports2, hosts2, 10, "./www/server2");
+    createTestServer(config, ports2, hosts2, 3, "./www/server2");
   config.addServer(server2);
+  config.setLowestDefaultTimeout();
 
   return config;
 }

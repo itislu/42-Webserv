@@ -1,9 +1,12 @@
 #include "Client.hpp"
+#include "config/ServerConfig.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
 #include "utils/TimeStamp.hpp"
+#include <asm-generic/errno.h>
+#include <iostream>
 #include <string>
 
 Client::Client()
@@ -20,6 +23,7 @@ Client::Client(int sockFd, const Socket* socket, const Server* server)
   , _server(server)
 //, _state(0)
 {
+  std::cout << "[CLIENT] connected " << _lastActivity.getTime() << "\n";
 }
 
 int Client::getFd() const

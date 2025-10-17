@@ -262,6 +262,7 @@ bool ServerHandler::receiveFromClient(Client* client)
     error("recv failed, removing client");
     return false;
   }
+  client->updateLastActivity();
   return true;
 }
 
@@ -290,6 +291,7 @@ bool ServerHandler::sendToClient(Client* client)
               << strerror(errno) << "\n";
     return false;
   }
+  client->updateLastActivity();
   return true;
 }
 
@@ -328,15 +330,11 @@ void ServerHandler::checkActivity()
   for (std::size_t i = 0; i < _pfds.size();) {
     const unsigned events = static_cast<unsigned>(_pfds[i].revents);
     if (isListener(_pfds[i].fd)) {
-      std::cout << "Listener\n";
-      std::cout << i << "(" << events << ")\n";
       if ((events & POLLIN) != 0) {
         acceptClient(_pfds[i].fd);
       }
       i++;
     } else {
-      std::cout << "Client\n";
-      std::cout << i << "(" << events << ")\n";
       Client* const client = getClientFromFd(_pfds[i].fd);
       if (!handleClient(client, events)) {
         disconnectClient(client);
@@ -347,19 +345,38 @@ void ServerHandler::checkActivity()
   }
 }
 
+long ServerHandler::getClientTimeOut(const Client* const client) const
+{
+  if (client->getServer() != 0) {
+    return client->getServer()->getTimeout();
+  }
+  return _config->getDefaultTimeout();
+}
+
 int ServerHandler::calculateTimeOut() const
 {
-  const TimeStamp now;
-  long currTimeOut = _lowestTimeOut;
-
-  for (clientIter it = _clients.begin(); it != _clients.end(); ++it) {
-    const long clientTimeOut = now - (*it)->getLastActivity();
-    currTimeOut = std::min(clientTimeOut, currTimeOut);
+  if (_clients.empty()) {
+    long timeoutMs = _lowestTimeOut * MS_MULTIPLIER;
+    timeoutMs = std::min(timeoutMs, static_cast<long>(INT_MAX));
+    timeoutMs = std::max(timeoutMs, 0L);
+    std::cout << "No clients, default timeout: " << timeoutMs << "ms\n";
+    return static_cast<int>(timeoutMs);
   }
 
-  long timeoutMs = currTimeOut * MS_MULTIPLIER;
-  timeoutMs = std::min<long>(timeoutMs, INT_MAX);
-  timeoutMs = std::max<long>(timeoutMs, 0);
+  const TimeStamp now;
+  long minRemaining = LONG_MAX;
+
+  for (clientIter it = _clients.begin(); it != _clients.end(); ++it) {
+    const long clientTimeout = getClientTimeOut(*it);
+    const long remaining = clientTimeout - (now - (*it)->getLastActivity());
+    minRemaining = std::min(remaining, minRemaining);
+  }
+
+  long timeoutMs = minRemaining * MS_MULTIPLIER;
+  timeoutMs = std::min(timeoutMs, static_cast<long>(INT_MAX));
+  timeoutMs = std::max(timeoutMs, 0L);
+
+  std::cout << "current timeout time: " << timeoutMs << "ms\n";
 
   return static_cast<int>(timeoutMs);
 }
@@ -367,13 +384,13 @@ int ServerHandler::calculateTimeOut() const
 void ServerHandler::checkClientTimeouts()
 {
   const TimeStamp now;
-  for (clientIter it = _clients.begin(); it != _clients.end(); ++it) {
-    const long timeOut = (*it)->getServer() != 0
-                           ? (*it)->getServer()->getTimeout()
-                           : _config->getDefaultTimeout();
-
+  for (clientIter it = _clients.begin(); it != _clients.end();) {
+    const long timeOut = getClientTimeOut(*it);
     if (now - (*it)->getLastActivity() >= timeOut) {
+      std::cout << "[SERVER] Client fd=" << (*it)->getFd() << " timed out.\n";
       disconnectClient(*it);
+    } else {
+      ++it;
     }
   }
 }
@@ -392,7 +409,7 @@ void ServerHandler::run()
       break;
     }
     if (ready == 0) {
-      // std::cout << "Error: poll timeout\n";
+      // std::cout << "poll timeout: " << TimeStamp::now() << "\n";
     }
     if (ready > 0) {
       checkActivity();
