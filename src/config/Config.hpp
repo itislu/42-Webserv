@@ -24,8 +24,8 @@ public:
 
   // Getters
   const std::vector<ServerConfig>& getServers() const;
-  size_t getDefaultBodySize() const;
-  size_t getDefaultTimeout() const;
+  std::size_t getDefaultBodySize() const;
+  long getDefaultTimeout() const;
   const std::string& getErrorLogPath() const;
   const std::string& getAccessLogPath() const;
   const std::map<int, std::string>& getErrorPages() const;
@@ -33,7 +33,7 @@ public:
   // Setters
   void addServer(const ServerConfig& server);
   void setDefaultMaxBodySize(std::size_t bytes);
-  void setDefaultTimeout(std::size_t seconds);
+  void setDefaultTimeout(long seconds);
   void setErrorLogPath(const std::string& path);
   void setAccessLogPath(const std::string& path);
 
@@ -46,7 +46,7 @@ private:
   std::string _configFile;
   std::string _root;
   std::size_t _defaultMaxBodySize;
-  std::size_t _defaultTimeOut;
+  long _defaultTimeOut;
   std::map<int, std::string> _errorPages;
   std::vector<ServerConfig> _servers;
 

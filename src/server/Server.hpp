@@ -18,6 +18,7 @@ public:
 
   const std::vector<const Socket*>& getListeners() const;
   const std::vector<std::string>& getHostnames() const;
+  long getTimeout() const;
 
 private:
   // server specific
@@ -30,7 +31,7 @@ private:
   std::map<int, std::string> _errorPages;
   std::size_t _maxBodySize;
   std::vector<std::string> _allowedMethods; // usually per location
-  std::size_t _timeOut;
+  long _timeOut;
   std::vector<LocationConfig> _locations;
 
   // Maybe for Logging

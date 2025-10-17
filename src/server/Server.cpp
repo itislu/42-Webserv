@@ -27,3 +27,8 @@ const std::vector<std::string>& Server::getHostnames() const
 {
   return _hostnames;
 }
+
+long Server::getTimeout() const
+{
+  return _timeOut;
+}

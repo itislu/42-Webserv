@@ -23,6 +23,7 @@ public:
     socketToServersIter;
   typedef std::vector<Server*>::const_iterator serverIter;
   typedef std::vector<Client*>::const_iterator clientIter;
+  typedef std::vector<pollfd>::iterator pfdIter;
 
   // CONSTRUCTORS
   explicit ServerHandler(const Config& config);
@@ -36,7 +37,7 @@ public:
   bool handleClient(Client* client, unsigned events);
   bool receiveFromClient(Client* client);
   bool sendToClient(Client* client);
-  void disconnectClient(Client* client, std::size_t idx);
+  void disconnectClient(Client* client);
 
   Client* getClientFromFd(int clientFd);
   pollfd* getPollFdForClient(Client* client);
@@ -48,13 +49,14 @@ public:
   // INIT - Server Setup
   void createServers(const Config& config);
   void initListeners();
-  void addToPfd(int sockFd);
-  void addToClients(int sockFd);
+  void addToPfd(int fdes);
+  void addToClients(int sockFd, int clientFd);
   std::vector<const Socket*> createListeners(const std::vector<int>& ports);
   void mapServerToListeners(const std::vector<int>& ports, Server* server);
   const Socket* getListener(int port);
   void mapListeners();
   void addServerToListener();
+  void checkClientTimeouts();
 
   // DEBUG
   void debugPrintMaps() const;
@@ -64,11 +66,14 @@ private:
   ServerHandler& operator=(const ServerHandler& other);
 
   long _lowestTimeOut;
+  const Config* _config;
+
+  std::vector<Client*> _clients;
   std::vector<Server*> _servers;
-  std::vector<pollfd> _pfds; // listeners + clients
+  std::vector<pollfd> _pfds;
+
   std::map<const Socket*, std::vector<Server*> > _socketToServers;
   std::map<int, const Socket*> _portToSocket;
-  std::vector<Client*> _clients;
 };
 
 #endif

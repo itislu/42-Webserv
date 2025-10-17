@@ -19,12 +19,12 @@ const std::vector<ServerConfig>& Config::getServers() const
   return _servers;
 }
 
-size_t Config::getDefaultBodySize() const
+std::size_t Config::getDefaultBodySize() const
 {
   return _defaultMaxBodySize;
 }
 
-std::size_t Config::getDefaultTimeout() const
+long Config::getDefaultTimeout() const
 {
   return _defaultTimeOut;
 }
@@ -54,7 +54,7 @@ void Config::setDefaultMaxBodySize(std::size_t bytes)
   _defaultMaxBodySize = bytes;
 }
 
-void Config::setDefaultTimeout(std::size_t seconds)
+void Config::setDefaultTimeout(long seconds)
 {
   _defaultTimeOut = seconds;
 }
@@ -68,18 +68,6 @@ void Config::setAccessLogPath(const std::string& path)
 {
   _accesLogPath = path;
 }
-
-/* const ServerConfig* Config::getServerForRequest(const std::string& host,
-                                                int port) const
-{
-  // TODO: Implement
-}
-const LocationConfig* Config::getLocationForPath(const ServerConfig& server,
-                                                 const std::string& path) const
-{
-  // TODO: Implement
-}
- */
 
 std::ostream& operator<<(std::ostream& out, const Config& config)
 {

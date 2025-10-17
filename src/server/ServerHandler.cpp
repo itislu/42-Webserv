@@ -36,6 +36,7 @@ extern "C" void sigIntHandler(int /*sigNum*/)
 }
 
 ServerHandler::ServerHandler(const Config& config)
+  : _config(&config)
 {
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
     error("Failed to set SIGINT handler");
@@ -101,19 +102,19 @@ const Socket* ServerHandler::getListener(int port)
   return sock;
 }
 
-void ServerHandler::addToPfd(int sockFd)
+void ServerHandler::addToPfd(int fdes)
 {
   struct pollfd pfd = {};
-  pfd.fd = sockFd;
+  pfd.fd = fdes;
   pfd.events = POLLIN;
   pfd.revents = 0;
   _pfds.push_back(pfd);
 }
 
-void ServerHandler::addToClients(int sockFd)
+void ServerHandler::addToClients(int sockFd, int clientFd)
 {
   const Socket* const sock = getSocketFromFd(sockFd);
-  _clients.push_back(new Client(sockFd, sock, getServerFromSocket(sock)));
+  _clients.push_back(new Client(clientFd, sock, getServerFromSocket(sock)));
 }
 
 void ServerHandler::mapServerToListeners(const std::vector<int>& ports,
@@ -152,15 +153,24 @@ const Socket* ServerHandler::getSocketFromFd(int sockFd)
 
 const Server* ServerHandler::getServerFromSocket(const Socket* socket)
 {
-  const std::vector<Server*> servers = _socketToServers[socket];
-  if (servers.size() != 1) {
+  const std::map<const Socket*, std::vector<Server*> >::const_iterator iter =
+    _socketToServers.find(socket);
+  if (iter == _socketToServers.end()) {
+    std::cout << "No server found for this socket\n";
     return NULL;
   }
+
+  const std::vector<Server*>& servers = iter->second;
+  if (servers.size() != 1) {
+    std::cout << "Found multiple servers, don't assign any: " << servers.size()
+              << "\n";
+    return NULL;
+  }
+
+  std::cout << "Found only one server, assign it instantly to client\n";
   return servers[0];
 }
 
-// TODO: add client to correct server
-// can only be done after parsing Host header in HTTP
 void ServerHandler::acceptClient(int sockFd)
 {
   const int clientFd = accept(sockFd, NULL, NULL);
@@ -177,17 +187,26 @@ void ServerHandler::acceptClient(int sockFd)
   }
 
   addToPfd(clientFd);
-  addToClients(clientFd);
+  addToClients(sockFd, clientFd);
 
   std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
 }
 
-void ServerHandler::disconnectClient(Client* client, const std::size_t idx)
+void ServerHandler::disconnectClient(Client* client)
 {
-  std::cout << "[SERVER] Client fd=" << client->getFd() << " disconnected\n";
+  if (client == 0) {
+    return;
+  }
 
-  // remove pfd for client
-  _pfds.erase(_pfds.begin() + static_cast<long>(idx));
+  const int clientFd = client->getFd();
+
+  // Remove corresponding pollfd
+  for (pfdIter pfdIt = _pfds.begin(); pfdIt != _pfds.end(); ++pfdIt) {
+    if (pfdIt->fd == clientFd) {
+      _pfds.erase(pfdIt);
+      break;
+    }
+  }
 
   // remove from client vector
   if (client != 0) {
@@ -201,6 +220,7 @@ void ServerHandler::disconnectClient(Client* client, const std::size_t idx)
       }
     }
   }
+  std::cout << "[SERVER] Client fd=" << clientFd << " disconnected\n";
 }
 
 pollfd* ServerHandler::getPollFdForClient(Client* client)
@@ -319,7 +339,7 @@ void ServerHandler::checkActivity()
       std::cout << i << "(" << events << ")\n";
       Client* const client = getClientFromFd(_pfds[i].fd);
       if (!handleClient(client, events)) {
-        disconnectClient(client, i);
+        disconnectClient(client);
       } else {
         i++;
       }
@@ -344,6 +364,20 @@ int ServerHandler::calculateTimeOut() const
   return static_cast<int>(timeoutMs);
 }
 
+void ServerHandler::checkClientTimeouts()
+{
+  const TimeStamp now;
+  for (clientIter it = _clients.begin(); it != _clients.end(); ++it) {
+    const long timeOut = (*it)->getServer() != 0
+                           ? (*it)->getServer()->getTimeout()
+                           : _config->getDefaultTimeout();
+
+    if (now - (*it)->getLastActivity() >= timeOut) {
+      disconnectClient(*it);
+    }
+  }
+}
+
 void ServerHandler::run()
 {
   g_running = 1;
@@ -358,10 +392,12 @@ void ServerHandler::run()
       break;
     }
     if (ready == 0) {
-      std::cerr << "Error: poll timeout\n";
-      // TODO: add cleanup and reset timeout, only break when no servers left
+      // std::cout << "Error: poll timeout\n";
     }
-    checkActivity();
+    if (ready > 0) {
+      checkActivity();
+    }
+    checkClientTimeouts();
   }
   std::cout << "Shutting down servers...\n";
 }
