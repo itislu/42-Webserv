@@ -3,10 +3,23 @@
 #include "config/ServerConfig.hpp"
 #include "server/Server.hpp"
 #include "server/ServerHandler.hpp"
+#include "server/ServerManager.hpp"
+#include "socket/SocketManager.hpp"
+#include "client/ClientManager.hpp"
+#include "event/EventManager.hpp"
 #include <exception>
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main() {
+  Config config = TestConfigSetup::createTestConfig();
+  ServerManager serverManager(config);
+
+  serverManager.run();
+
+  return 0;
+}
+
+/* int main(int argc, char* argv[])
 {
   (void)argv;
   if (argc != 2) {
@@ -31,3 +44,4 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
+ */

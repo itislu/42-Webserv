@@ -9,6 +9,8 @@
 
 class Config;
 
+typedef std::vector<ServerConfig>::const_iterator c_srvConfIter;
+
 class ServerConfig
 {
 public:

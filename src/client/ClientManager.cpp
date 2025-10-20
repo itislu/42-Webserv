@@ -8,3 +8,9 @@
 // Updating last activity
 
 // Could integrate timeout logic too, or have a separate TimeoutManager.
+
+ClientManager::ClientManager()
+{
+
+}
+

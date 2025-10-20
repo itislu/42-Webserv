@@ -9,9 +9,9 @@
 class ClientManager
 {
 public:
+  ClientManager();
+
 private:
   std::vector<Client*> _clients;
-  SocketManager& _sockets;
-  ServerManager& _servers;
 };
 #endif
