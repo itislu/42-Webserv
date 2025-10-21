@@ -6,7 +6,6 @@
 #	include "libftpp/type_traits.hpp"
 #	include "type_traits_detail.hpp"
 #	include "libftpp/assert.hpp" // IWYU pragma: keep: Conditionally needed.
-#	include "libftpp/movable.hpp"
 #	include <cstddef>
 #	include <limits>
 

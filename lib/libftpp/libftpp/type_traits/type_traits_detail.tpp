@@ -4,7 +4,6 @@
 #	define LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_DETAIL_TPP
 
 #	include "type_traits_detail.hpp"
-#	include "libftpp/movable.hpp"
 #	include "libftpp/type_traits.hpp"
 
 namespace ft {

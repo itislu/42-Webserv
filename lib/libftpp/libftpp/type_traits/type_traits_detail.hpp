@@ -3,6 +3,11 @@
 #	define LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_DETAIL_HPP
 
 namespace ft {
+
+// Forward declaration to prevent circular include with libftpp/movable.hpp.
+template <typename T>
+struct rvalue;
+
 namespace _type_traits {
 
 /**
@@ -24,6 +29,7 @@ template <typename T>
 struct type_or_null;
 
 } // namespace _type_traits
+
 } // namespace ft
 
 #	include "type_traits_detail.tpp" // IWYU pragma: export
