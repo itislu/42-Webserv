@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "unique_ptr_detail.hpp"
 #pragma once
 #ifndef LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_TPP
 #	define LIBFTPP_MEMORY_UNIQUE_PTR_DETAIL_TPP

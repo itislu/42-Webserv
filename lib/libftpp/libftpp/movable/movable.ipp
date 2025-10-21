@@ -1,7 +1,7 @@
-// IWYU pragma: private; include "libftpp/utility.hpp"
+// IWYU pragma: private; include "libftpp/movable.hpp"
 #pragma once
-#ifndef LIBFTPP_UTILITY_MOVE_IPP
-#	define LIBFTPP_UTILITY_MOVE_IPP
+#ifndef LIBFTPP_MOVABLE_MOVABLE_IPP
+#	define LIBFTPP_MOVABLE_MOVABLE_IPP
 
 #	define LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)            \
 		operator ft::rvalue<TYPE>&() throw()                    \
@@ -51,4 +51,4 @@
 	private:
 // NOLINTEND(bugprone-macro-parentheses)
 
-#endif // LIBFTPP_UTILITY_MOVE_IPP
+#endif // LIBFTPP_MOVABLE_MOVABLE_IPP

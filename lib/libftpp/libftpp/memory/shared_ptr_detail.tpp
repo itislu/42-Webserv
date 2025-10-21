@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "shared_ptr_detail.hpp"
 #pragma once
 #ifndef LIBFTPP_MEMORY_SHARED_PTR_DETAIL_TPP
 #	define LIBFTPP_MEMORY_SHARED_PTR_DETAIL_TPP

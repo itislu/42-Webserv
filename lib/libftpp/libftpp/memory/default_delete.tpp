@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "libftpp/memory.hpp"
 #pragma once
 #ifndef LIBFTPP_MEMORY_DEFAULT_DELETE_TPP
 #	define LIBFTPP_MEMORY_DEFAULT_DELETE_TPP

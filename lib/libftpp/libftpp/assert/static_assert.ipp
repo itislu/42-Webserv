@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "libftpp/assert.hpp"
 #pragma once
 #ifndef LIBFTPP_ASSERT_STATIC_ASSERT_IPP
 #	define LIBFTPP_ASSERT_STATIC_ASSERT_IPP

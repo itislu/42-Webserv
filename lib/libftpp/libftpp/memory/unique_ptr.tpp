@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "libftpp/memory.hpp"
 #pragma once
 #ifndef LIBFTPP_MEMORY_UNIQUE_PTR_TPP
 #	define LIBFTPP_MEMORY_UNIQUE_PTR_TPP

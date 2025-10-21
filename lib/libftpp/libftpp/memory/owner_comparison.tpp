@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "libftpp/memory.hpp"
 #pragma once
 #ifndef LIBFTPP_MEMORY_OWNER_COMPARISON_TPP
 #	define LIBFTPP_MEMORY_OWNER_COMPARISON_TPP

@@ -1,4 +1,4 @@
-// IWYU pragma: private; include "_type_traits.hpp"
+// IWYU pragma: private; include "type_traits_detail.hpp"
 #pragma once
 #ifndef LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_DETAIL_TPP
 #	define LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_DETAIL_TPP
