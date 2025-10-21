@@ -2,9 +2,16 @@
 #ifndef LIBFTPP_MEMORY_SHARED_PTR_DETAIL_HPP
 #	define LIBFTPP_MEMORY_SHARED_PTR_DETAIL_HPP
 
+#	include "libftpp/type_traits.hpp"
+#	include <cstddef>
 #	include <typeinfo>
 
 namespace ft {
+
+// Forward declaration.
+template <typename T>
+class shared_ptr;
+
 namespace _shared_ptr {
 
 /**
@@ -29,6 +36,51 @@ struct is_compatible_smart_pointer;
  */
 template <typename T, typename Yp>
 void delete_ptr(Yp ptr) throw();
+
+/* Conditionally inherited access operators */
+
+/**
+ * Helper class to get stored pointer from `shared_ptr`.
+ */
+template <typename T>
+class shared_ptr_get {
+public:
+	typedef typename ft::remove_extent<T>::type element_type;
+
+protected:
+	element_type* get() const throw();
+};
+
+/**
+ * Non-array, non-void.
+ */
+template <typename T, typename = void>
+class shared_ptr_access : public shared_ptr_get<T> {
+public:
+	T& operator*() const throw();
+	T* operator->() const throw();
+};
+
+/**
+ * Array specialization.
+ */
+template <typename T>
+class shared_ptr_access<T, typename ft::enable_if<ft::is_array<T>::value>::type>
+    : public shared_ptr_get<T> {
+public:
+	typename shared_ptr_get<T>::element_type&
+	operator[](std::ptrdiff_t idx) const;
+};
+
+/**
+ * Cv void specialization.
+ */
+template <typename T>
+class shared_ptr_access<T, typename ft::enable_if<ft::is_void<T>::value>::type>
+    : public shared_ptr_get<T> {
+public:
+	T* operator->() const throw();
+};
 
 /* Control blocks */
 
@@ -78,8 +130,10 @@ private:
 };
 
 } // namespace _shared_ptr
+
 } // namespace ft
 
+#	include "shared_ptr_access.tpp"          // IWYU pragma: export
 #	include "shared_ptr_control_derived.tpp" // IWYU pragma: export
 #	include "shared_ptr_detail.tpp"          // IWYU pragma: export
 

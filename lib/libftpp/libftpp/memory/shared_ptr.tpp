@@ -231,43 +231,6 @@ typename shared_ptr<T>::element_type* shared_ptr<T>::get() const throw()
 }
 
 template <typename T>
-typename ft::add_lvalue_reference<T>::type shared_ptr<T>::operator*() const
-    throw()
-{
-	FT_STATIC_ASSERT( // operator* is not valid when T is void.
-	    !ft::is_void<T>::value);
-	FT_STATIC_ASSERT( // operator* is not valid when T is an array type.
-	    !ft::is_array<T>::value);
-
-	assert(_ptr != FT_NULLPTR);
-	return *_ptr;
-}
-
-template <typename T>
-typename ft::add_pointer<T>::type shared_ptr<T>::operator->() const throw()
-{
-	FT_STATIC_ASSERT( // operator-> is not valid when T is an array type.
-	    !ft::is_array<T>::value);
-
-	assert(_ptr != FT_NULLPTR);
-	return _ptr;
-}
-
-template <typename T>
-typename ft::add_lvalue_reference<typename shared_ptr<T>::element_type>::type
-shared_ptr<T>::operator[](std::ptrdiff_t idx) const
-{
-	FT_STATIC_ASSERT( // operator[] is not valid when T is not an array type.
-	    ft::is_array<T>::value);
-
-	assert(_ptr != FT_NULLPTR && idx >= 0);
-	if (ft::is_bounded_array<T>::value) {
-		assert(static_cast<std::size_t>(idx) < ft::extent<T>::value);
-	}
-	return _ptr[idx]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-}
-
-template <typename T>
 long shared_ptr<T>::use_count() const throw()
 {
 	return _control != FT_NULLPTR ? _control->use_count() : 0;

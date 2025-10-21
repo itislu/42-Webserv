@@ -503,7 +503,8 @@ FT_REQUIRES(ft::is_unbounded_array<T>::value)
  * deletions.
  */
 template <typename T>
-class shared_ptr : public ft::safe_bool<shared_ptr<T> > {
+class shared_ptr : public ft::safe_bool<shared_ptr<T> >,
+                   public _shared_ptr::shared_ptr_access<T> {
 private:
 	struct _enabler {};
 
@@ -584,10 +585,6 @@ public:
 	void swap(shared_ptr& r) throw();
 
 	element_type* get() const throw();
-	typename ft::add_lvalue_reference<T>::type operator*() const throw();
-	typename ft::add_pointer<T>::type operator->() const throw();
-	typename ft::add_lvalue_reference<element_type>::type
-	operator[](std::ptrdiff_t idx) const;
 	long use_count() const throw();
 	bool boolean_test() const throw();
 	template <typename Y>
