@@ -244,7 +244,7 @@ private:
 	 * T must be a complete type. Further, if T is a template then this also
 	 * ensures to instantiate it, which is required to get the correct answer.
 	 */
-	FT_STATIC_ASSERT(sizeof(T) != 0); // T must be a complete type.
+	FT_STATIC_ASSERT(ft::is_complete<T>::value); // T must be a complete type.
 
 	template <typename U, typename = void>
 	struct is_arrayable : false_type {};
@@ -792,6 +792,25 @@ template <typename B>
 struct negation : bool_constant<!bool(B::value)> {};
 
 /* Custom type traits */
+
+/* is_complete */
+namespace _is_complete {
+template <typename T, typename = void>
+struct impl;
+} // namespace _is_complete
+
+template <typename T>
+struct is_complete : _is_complete::impl<T> {};
+
+namespace _is_complete {
+
+template <typename T, typename /*= void*/>
+struct impl : false_type {};
+
+template <typename T>
+struct impl<T, typename enable_if<sizeof(T) != 0>::type> : true_type {};
+
+} // namespace _is_complete
 
 /* is_const_lvalue_reference */
 /**

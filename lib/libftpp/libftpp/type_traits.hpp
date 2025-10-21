@@ -396,6 +396,26 @@ struct negation;
 FT_HAS_MEMBER_FUNCTION(void, swap, (T&))
 
 /**
+ * @brief Checks wether `T` is a complete type
+ *
+ * Provides the member constant `value` which is equal to `true`, if `T` is a
+ * complete type at the point of instantiation of this trait. Otherwise, `value`
+ * is equal to `false`.
+ *
+ * The following types are incomplete types:
+ * - the type void (possibly cv-qualified);
+ * - incompletely-defined object types:
+ *   - class type that has been declared (e.g. by forward declaration) but not
+ *     defined;
+ *   - array of unknown bound;
+ *   - array of elements of incomplete type;
+ *   - enumeration type from the point of declaration until its underlying type
+ *     is determined.
+ */
+template <typename T>
+struct is_complete;
+
+/**
  * @brief Checks wether `T` is an lvalue reference to a const-qualified type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is an

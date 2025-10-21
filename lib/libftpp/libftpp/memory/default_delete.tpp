@@ -25,7 +25,8 @@ default_delete<T>::default_delete(
 template <typename T>
 void default_delete<T>::operator()(T* ptr) const
 {
-	FT_STATIC_ASSERT(sizeof(T) != 0); // Cannot delete an incomplete type.
+	FT_STATIC_ASSERT( // Cannot delete an incomplete type.
+	    ft::is_complete<T>::value);
 
 	delete ptr;
 }
@@ -49,7 +50,8 @@ template <typename U>
 FT_REQUIRES((ft::is_convertible<U (*)[], T (*)[]>::value))
 (void)default_delete<T[]>::operator()(U* ptr) const
 {
-	FT_STATIC_ASSERT(sizeof(U) != 0); // Cannot delete an incomplete type.
+	FT_STATIC_ASSERT( // Cannot delete an incomplete type.
+	    ft::is_complete<U>::value);
 
 	delete[] ptr;
 }
