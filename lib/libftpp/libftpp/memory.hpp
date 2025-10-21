@@ -491,7 +491,6 @@ FT_REQUIRES(ft::is_unbounded_array<T>::value)
  *
  * Limitations:
  * - No `weak_ptr`.
- * - No `pointer_cast` functions.
  * - No `enable_shared_from_this`.
  * - Limited `make_shared` implementation.
  * - No support for custom allocators.
@@ -749,6 +748,26 @@ FT_REQUIRES(!ft::is_unbounded_array<T>::value)
 template <typename T>
 FT_REQUIRES(ft::is_unbounded_array<T>::value)
 (shared_ptr<T>)make_shared_for_overwrite(std::size_t N);
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/shared_ptr/pointer_cast
+ */
+template <typename T, typename U>
+shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> static_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
+template <typename T, typename U>
+shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> dynamic_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
+template <typename T, typename U>
+shared_ptr<T> const_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> const_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
+template <typename T, typename U>
+shared_ptr<T> reinterpret_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> reinterpret_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
 
 /**
  * https://en.cppreference.com/w/cpp/memory/shared_ptr/get_deleter

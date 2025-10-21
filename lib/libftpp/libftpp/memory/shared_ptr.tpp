@@ -477,6 +477,76 @@ FT_REQUIRES(ft::is_unbounded_array<T>::value)
 	return shared_ptr<T>(::new typename ft::remove_extent<T>::type[N]);
 }
 
+template <typename T, typename U>
+shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	Y* const p = static_cast<Y*>(r.get());
+	return shared_ptr<T>(r, p);
+}
+
+template <typename T, typename U>
+shared_ptr<T> static_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	Y* const p = static_cast<Y*>(r.get());
+	return shared_ptr<T>(ft::move(r), p);
+}
+
+template <typename T, typename U>
+shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	if (Y* const p = dynamic_cast<Y*>(r.get())) {
+		return shared_ptr<T>(r, p);
+	}
+	return shared_ptr<T>();
+}
+
+template <typename T, typename U>
+shared_ptr<T> dynamic_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	if (Y* const p = dynamic_cast<Y*>(r.get())) {
+		return shared_ptr<T>(ft::move(r), p);
+	}
+	return shared_ptr<T>();
+}
+
+template <typename T, typename U>
+shared_ptr<T> const_pointer_cast(const shared_ptr<U>& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	Y* const p = const_cast<Y*>(r.get());
+	return shared_ptr<T>(r, p);
+}
+
+template <typename T, typename U>
+shared_ptr<T> const_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	Y* const p = const_cast<Y*>(r.get());
+	return shared_ptr<T>(ft::move(r), p);
+}
+
+template <typename T, typename U>
+shared_ptr<T> reinterpret_pointer_cast(const shared_ptr<U>& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+	Y* const p = reinterpret_cast<Y*>(r.get());
+	return shared_ptr<T>(r, p);
+}
+
+template <typename T, typename U>
+shared_ptr<T> reinterpret_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw()
+{
+	typedef typename shared_ptr<T>::element_type Y;
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+	Y* const p = reinterpret_cast<Y*>(r.get());
+	return shared_ptr<T>(ft::move(r), p);
+}
+
 template <typename Deleter, typename T>
 Deleter* get_deleter(const shared_ptr<T>& p) throw()
 {
