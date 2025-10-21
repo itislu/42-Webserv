@@ -32,10 +32,11 @@
  * @brief `nullptr` emulation
  *
  * Implemented as a macro because `nullptr` is a prvalue.
+ * The `static_cast` is necessary to prevent the "most vexing parse".
  *
  * https://en.cppreference.com/w/cpp/language/nullptr
  */
-#	define FT_NULLPTR ft::nullptr_t()
+#	define FT_NULLPTR static_cast<ft::nullptr_t>(ft::nullptr_t())
 
 namespace ft {
 
