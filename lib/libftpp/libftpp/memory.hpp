@@ -2,9 +2,9 @@
 #ifndef LIBFTPP_MEMORY_HPP
 #	define LIBFTPP_MEMORY_HPP
 
-#	include "libftpp/assert.hpp"
 #	include "libftpp/memory/shared_ptr_detail.hpp"
 #	include "libftpp/memory/unique_ptr_detail.hpp"
+#	include "libftpp/assert.hpp"
 #	include "libftpp/movable.hpp"
 #	include "libftpp/safe_bool.hpp"
 #	include "libftpp/type_traits.hpp"
@@ -487,16 +487,14 @@ FT_REQUIRES(ft::is_unbounded_array<T>::value)
 /* shared_ptr */
 
 /**
- * @brief Basic implementation of shared_ptr
+ * @brief Basic implementation of `shared_ptr`
  *
  * Limitations:
- * - No aliasing constructor.
- * - No support for custom deleters or allocators.
- * - No support for `shared_ptr<void>`.
  * - No `weak_ptr`.
- * - Limited `make_shared` implementation.
  * - No `pointer_cast` functions.
  * - No `enable_shared_from_this`.
+ * - Limited `make_shared` implementation.
+ * - No support for custom allocators.
  * - Not thread-safe and no atomic operations.
  *
  * https://en.cppreference.com/w/cpp/memory/shared_ptr
@@ -508,11 +506,6 @@ FT_REQUIRES(ft::is_unbounded_array<T>::value)
 template <typename T>
 class shared_ptr : public ft::safe_bool<shared_ptr<T> > {
 private:
-	// Would require to store a deleter which remembers the type of the owned
-	// pointer.
-	FT_STATIC_ASSERT( // ft::shared_ptr<void> is not supported.
-	    !ft::is_void<T>::value);
-
 	struct _enabler {};
 
 public:
@@ -531,6 +524,26 @@ public:
 	                        _shared_ptr::is_compatible_raw_pointee<Y, T>::value,
 	                        _enabler>::type /*unused*/
 	                    = _enabler());
+	// 4)
+	template <typename Y, typename Deleter>
+	shared_ptr(Y* ptr,
+	           Deleter d,
+	           typename ft::enable_if<
+	               _shared_ptr::is_compatible_raw_pointee<Y, T>::value,
+	               _enabler>::type /*unused*/
+	           = _enabler());
+	// 5)
+	template <typename Deleter>
+	shared_ptr(ft::nullptr_t ptr, Deleter d);
+	// 8)
+	/**
+	 * @note Use of this constructor leads to a dangling pointer unless `ptr`
+	 * remains valid at least until the ownership group of `r` is destroyed.
+	 */
+	template <typename Y>
+	shared_ptr(const shared_ptr<Y>& r, element_type* ptr) throw();
+	template <typename Y>
+	shared_ptr(ft::rvalue<shared_ptr<Y> >& r, element_type* ptr) throw();
 	// 9)
 	shared_ptr(const shared_ptr& r) throw();
 	// NOLINTBEGIN(google-explicit-constructor): Originals in `std::shared_ptr`
@@ -550,14 +563,15 @@ public:
 	               _enabler>::type /*unused*/
 	           = _enabler()) throw();
 	// 13)
-	template <typename Y>
-	shared_ptr(ft::rvalue<unique_ptr<Y> >& r,
-	           typename ft::enable_if<
-	               _shared_ptr::is_compatible_smart_pointer<Y, T>::value
-	                   && ft::is_convertible<typename unique_ptr<Y>::pointer,
-	                                         element_type*>::value,
-	               _enabler>::type /*unused*/
-	           = _enabler());
+	template <typename Y, typename Deleter>
+	shared_ptr(
+	    ft::rvalue<unique_ptr<Y, Deleter> >& r,
+	    typename ft::enable_if<
+	        _shared_ptr::is_compatible_smart_pointer<Y, T>::value
+	            && ft::is_convertible<typename unique_ptr<Y, Deleter>::pointer,
+	                                  element_type*>::value,
+	        _enabler>::type /*unused*/
+	    = _enabler());
 	// NOLINTEND(google-explicit-constructor)
 	~shared_ptr();
 	// Take by value to allow for more copy-elision.
@@ -566,6 +580,8 @@ public:
 	void reset() throw();
 	template <typename Y>
 	void reset(Y* ptr);
+	template <typename Y, typename Deleter>
+	void reset(Y* ptr, Deleter d);
 	void swap(shared_ptr& r) throw();
 
 	element_type* get() const throw();
@@ -585,12 +601,11 @@ private:
 
 	template <typename>
 	friend class shared_ptr;
-
-	template <typename Y>
-	static void _delete_ptr(Y* ptr);
+	template <typename Deleter, typename U>
+	friend Deleter* get_deleter(const shared_ptr<U>& p) throw();
 
 	element_type* _ptr;
-	long* _use_count;
+	_shared_ptr::control_block_base* _control;
 };
 
 /**
@@ -734,6 +749,12 @@ FT_REQUIRES(!ft::is_unbounded_array<T>::value)
 template <typename T>
 FT_REQUIRES(ft::is_unbounded_array<T>::value)
 (shared_ptr<T>)make_shared_for_overwrite(std::size_t N);
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/shared_ptr/get_deleter
+ */
+template <typename Deleter, typename T>
+Deleter* get_deleter(const shared_ptr<T>& p) throw();
 
 template <typename T, typename U>
 bool operator==(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw();

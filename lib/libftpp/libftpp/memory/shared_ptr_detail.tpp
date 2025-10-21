@@ -53,6 +53,19 @@ template <typename U, std::size_t N, typename T>
 struct _is_compatible_array<U[N], T>
     : ft::is_same<typename ft::remove_cv<T>::type, U[]> {};
 
+/* delete_ptr */
+
+template <typename T, typename Yp>
+void delete_ptr(Yp ptr) throw()
+{
+	if (ft::is_array<T>::value) {
+		delete[] ptr;
+	}
+	else {
+		delete ptr;
+	}
+}
+
 } // namespace _shared_ptr
 } // namespace ft
 

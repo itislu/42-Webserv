@@ -22,14 +22,14 @@ namespace ft {
 template <typename T>
 shared_ptr<T>::shared_ptr() throw()
     : _ptr(FT_NULLPTR),
-      _use_count(FT_NULLPTR)
+      _control(FT_NULLPTR)
 {}
 
 // 2)
 template <typename T>
 shared_ptr<T>::shared_ptr(ft::nullptr_t /*unused*/) throw()
     : _ptr(FT_NULLPTR),
-      _use_count(FT_NULLPTR)
+      _control(FT_NULLPTR)
 {}
 
 // 3)
@@ -41,12 +41,70 @@ shared_ptr<T>::shared_ptr(
                            _enabler>::type /*unused = _enabler()*/)
 try
     : _ptr(ptr),
-      _use_count(new long(1)) {
+      _control(new _shared_ptr::control_block_pointer<Y*, T>(ptr)) {
 	FT_STATIC_ASSERT(ft::is_complete<Y>::value); // Y must be a complete type.
 }
 catch (...) {
-	_delete_ptr(ptr);
+	_shared_ptr::delete_ptr<T>(ptr);
 	throw;
+}
+
+// 4)
+template <typename T>
+template <typename Y, typename Deleter>
+shared_ptr<T>::shared_ptr(
+    Y* ptr,
+    Deleter d,
+    typename ft::enable_if<_shared_ptr::is_compatible_raw_pointee<Y, T>::value,
+                           _enabler>::type /*unused = _enabler()*/)
+try
+    : _ptr(ptr),
+      _control(new _shared_ptr::control_block_pointer_deleter<Y*, Deleter>(
+          ptr,
+          ft::move(d))) {
+}
+catch (...) {
+	d(ptr);
+	throw;
+}
+
+// 5
+template <typename T>
+template <typename Deleter>
+shared_ptr<T>::shared_ptr(ft::nullptr_t ptr, Deleter d)
+try
+    : _ptr(ptr),
+      _control(new _shared_ptr::control_block_pointer_deleter<ft::nullptr_t,
+                                                              Deleter>(
+          ptr,
+          ft::move(d))) {
+}
+catch (...) {
+	d(ptr);
+	throw;
+}
+
+// 8)
+template <typename T>
+template <typename Y>
+shared_ptr<T>::shared_ptr(const shared_ptr<Y>& r, element_type* ptr) throw()
+    : _ptr(ptr),
+      _control(r._control)
+{
+	if (_control != FT_NULLPTR) {
+		_control->add_shared();
+	}
+}
+
+template <typename T>
+template <typename Y>
+shared_ptr<T>::shared_ptr(ft::rvalue<shared_ptr<Y> >& r,
+                          element_type* ptr) throw()
+    : _ptr(ptr),
+      _control(r._control)
+{
+	r._ptr = FT_NULLPTR;
+	r._control = FT_NULLPTR;
 }
 
 // 9)
@@ -54,10 +112,10 @@ template <typename T>
 shared_ptr<T>::shared_ptr(const shared_ptr& r) throw()
     : ft::safe_bool<shared_ptr>(),
       _ptr(r._ptr),
-      _use_count(r._use_count)
+      _control(r._control)
 {
-	if (_use_count != FT_NULLPTR) {
-		++(*_use_count);
+	if (_control != FT_NULLPTR) {
+		_control->add_shared();
 	}
 }
 
@@ -69,10 +127,10 @@ shared_ptr<T>::shared_ptr(
         _shared_ptr::is_compatible_smart_pointer<Y, T>::value,
         _enabler>::type /*unused = _enabler()*/) throw()
     : _ptr(r._ptr),
-      _use_count(r._use_count)
+      _control(r._control)
 {
-	if (_use_count != FT_NULLPTR) {
-		++(*_use_count);
+	if (_control != FT_NULLPTR) {
+		_control->add_shared();
 	}
 }
 
@@ -80,10 +138,10 @@ shared_ptr<T>::shared_ptr(
 template <typename T>
 shared_ptr<T>::shared_ptr(ft::rvalue<shared_ptr>& r) throw()
     : _ptr(r._ptr),
-      _use_count(r._use_count)
+      _control(r._control)
 {
 	r._ptr = FT_NULLPTR;
-	r._use_count = FT_NULLPTR;
+	r._control = FT_NULLPTR;
 }
 
 template <typename T>
@@ -94,24 +152,28 @@ shared_ptr<T>::shared_ptr(
         _shared_ptr::is_compatible_smart_pointer<Y, T>::value,
         _enabler>::type /*unused = _enabler()*/) throw()
     : _ptr(r._ptr),
-      _use_count(r._use_count)
+      _control(r._control)
 {
 	r._ptr = FT_NULLPTR;
-	r._use_count = FT_NULLPTR;
+	r._control = FT_NULLPTR;
 }
 
 // 13)
 template <typename T>
-template <typename Y>
+template <typename Y, typename Deleter>
 shared_ptr<T>::shared_ptr(
-    ft::rvalue<unique_ptr<Y> >& r,
+    ft::rvalue<unique_ptr<Y, Deleter> >& r,
     typename ft::enable_if<
         _shared_ptr::is_compatible_smart_pointer<Y, T>::value
-            && ft::is_convertible<typename unique_ptr<Y>::pointer,
+            && ft::is_convertible<typename unique_ptr<Y, Deleter>::pointer,
                                   element_type*>::value,
         _enabler>::type /*unused = _enabler()*/)
     : _ptr(r.get()),
-      _use_count(r.get() != FT_NULLPTR ? new long(1) : FT_NULLPTR)
+      _control(r.get() != FT_NULLPTR
+                   ? new _shared_ptr::control_block_pointer_deleter<
+                         typename unique_ptr<Y, Deleter>::pointer,
+                         Deleter>(r.get(), ft::move(r.get_deleter()))
+                   : FT_NULLPTR)
 {
 	r.release();
 }
@@ -119,15 +181,11 @@ shared_ptr<T>::shared_ptr(
 template <typename T>
 shared_ptr<T>::~shared_ptr()
 {
-	if (_use_count == FT_NULLPTR) {
-		return;
+	if (_control != FT_NULLPTR) {
+		if (_control->release()) {
+			delete _control;
+		}
 	}
-	if (--(*_use_count) > 0) {
-		return;
-	}
-	delete _use_count;
-
-	_delete_ptr(_ptr);
 }
 
 template <typename T>
@@ -152,10 +210,18 @@ void shared_ptr<T>::reset(Y* ptr)
 }
 
 template <typename T>
+template <typename Y, typename Deleter>
+void shared_ptr<T>::reset(Y* ptr, Deleter d)
+{
+	assert(ptr == FT_NULLPTR || ptr != _ptr);
+	shared_ptr(ptr, d).swap(*this);
+}
+
+template <typename T>
 void shared_ptr<T>::swap(shared_ptr& r) throw()
 {
 	std::swap(_ptr, r._ptr);
-	std::swap(_use_count, r._use_count);
+	std::swap(_control, r._control);
 }
 
 template <typename T>
@@ -204,7 +270,7 @@ shared_ptr<T>::operator[](std::ptrdiff_t idx) const
 template <typename T>
 long shared_ptr<T>::use_count() const throw()
 {
-	return _use_count != FT_NULLPTR ? *_use_count : 0;
+	return _control != FT_NULLPTR ? _control->use_count() : 0;
 }
 
 template <typename T>
@@ -217,26 +283,14 @@ template <typename T>
 template <typename Y>
 bool shared_ptr<T>::owner_before(const shared_ptr<Y>& other) const throw()
 {
-	return _use_count < other._use_count;
+	return _control < other._control;
 }
 
 template <typename T>
 template <typename Y>
 bool shared_ptr<T>::owner_equal(const shared_ptr<Y>& other) const throw()
 {
-	return _use_count == other._use_count;
-}
-
-template <typename T>
-template <typename Y>
-void shared_ptr<T>::_delete_ptr(Y* ptr)
-{
-	if (ft::is_array<T>::value) {
-		delete[] ptr;
-	}
-	else {
-		delete ptr;
-	}
+	return _control == other._control;
 }
 
 template <typename T>
@@ -421,6 +475,15 @@ FT_REQUIRES(ft::is_unbounded_array<T>::value)
 (shared_ptr<T>)make_shared_for_overwrite(std::size_t N)
 {
 	return shared_ptr<T>(::new typename ft::remove_extent<T>::type[N]);
+}
+
+template <typename Deleter, typename T>
+Deleter* get_deleter(const shared_ptr<T>& p) throw()
+{
+	if (p._control == FT_NULLPTR) {
+		return FT_NULLPTR;
+	}
+	return static_cast<Deleter*>(p._control->get_deleter(typeid(Deleter)));
 }
 
 template <typename T, typename U>
