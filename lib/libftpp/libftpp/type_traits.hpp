@@ -402,6 +402,18 @@ struct negation;
 FT_HAS_MEMBER_FUNCTION(void, swap, (T&))
 
 /**
+ * @brief Checks wether `T` is a class or union type
+ *
+ * Provides the member constant `value` which is equal to `true`, if `T` is a
+ * class or union type. Otherwise, `value` is equal to `false`.
+ *
+ * Classes and unions cannot be differentiated without compiler builtins, so
+ * this is a portable compromise.
+ */
+template <typename T>
+struct is_class_or_union;
+
+/**
  * @brief Checks wether `T` is a complete type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is a

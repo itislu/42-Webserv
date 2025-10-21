@@ -813,6 +813,25 @@ struct negation : bool_constant<!bool(B::value)> {};
 
 /* Custom type traits */
 
+/* is_class_or_union */
+namespace _is_class_or_union {
+template <typename T, typename = void>
+struct impl;
+} // namespace _is_class_or_union
+
+template <typename T>
+struct is_class_or_union : _is_class_or_union::impl<T> {};
+
+namespace _is_class_or_union {
+
+template <typename T, typename /*= void*/>
+struct impl : false_type {};
+
+template <typename T>
+struct impl<T, typename voider<int T::*>::type> : true_type {};
+
+} // namespace _is_class_or_union
+
 /* is_complete */
 namespace _is_complete {
 template <typename T, typename = void>
