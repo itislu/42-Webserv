@@ -1,16 +1,73 @@
 #include "ClientManager.hpp"
+#include "client/Client.hpp"
+#include "client/TimeStamp.hpp"
+#include <algorithm>
+#include <climits>
+#include <cstddef>
+#include <map>
+#include <utility>
+#include <vector>
 
-// Owns _clients.
-// Responsible for:
-// Adding/removing clients
-// Disconnecting
-// Sending/receiving
-// Updating last activity
+ClientManager::ClientManager() {}
 
-// Could integrate timeout logic too, or have a separate TimeoutManager.
-
-ClientManager::ClientManager()
+Client* ClientManager::getClient(int fdes) const
 {
-
+  const const_clientIter iter = _clients.find(fdes);
+  if (iter == _clients.end()) {
+    return NULL;
+  }
+  return iter->second;
 }
 
+std::size_t ClientManager::getClientCount() const
+{
+  return _clients.size();
+}
+
+void ClientManager::addClient(int fdes)
+{
+  _clients.insert(std::make_pair(fdes, new Client(fdes)));
+}
+
+void ClientManager::removeClient(int fdes)
+{
+  const clientIter iter = _clients.find(fdes);
+  if (iter != _clients.end()) {
+    // delete iter->second;
+    _clients.erase(iter);
+  }
+}
+
+const std::map<int, Client*>& ClientManager::getClients() const
+{
+  return _clients;
+}
+
+bool ClientManager::hasClients() const
+{
+  return !_clients.empty();
+}
+
+long ClientManager::getMinTimeout() const
+{
+  const TimeStamp now;
+  long minRemaining = LONG_MAX;
+  for (const_clientIter it = _clients.begin(); it != _clients.end(); ++it) {
+    const long clientTimeout = it->second->getTimeout();
+    const long remaining =
+      clientTimeout - (now - it->second->getLastActivity());
+    minRemaining = std::min(remaining, minRemaining);
+  }
+  return minRemaining;
+}
+
+void ClientManager::getTimedOutClients(std::vector<Client*>& timedOut) const
+{
+  const TimeStamp now;
+  for (const_clientIter it = _clients.begin(); it != _clients.end(); ++it) {
+    const long timeout = it->second->getTimeout();
+    if (now - it->second->getLastActivity() >= timeout) {
+      timedOut.push_back(it->second);
+    }
+  }
+}

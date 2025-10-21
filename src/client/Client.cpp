@@ -1,27 +1,33 @@
 #include "Client.hpp"
-#include "event/TimeStamp.hpp"
+#include "client/TimeStamp.hpp"
+#include "config/Config.hpp"
 #include "server/Server.hpp"
+#include "server/ServerHandler.hpp"
 #include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
+#include <algorithm>
+#include <cerrno>
+#include <climits>
+#include <cstddef>
+#include <cstring>
 #include <iostream>
 #include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <vector>
 
 Client::Client()
   : _fd(-1)
-  , _socket()
+  //, _state(0)
   , _server()
-//, _state(0)
 {
 }
 
-Client::Client(int sockFd, const Socket* socket, const Server* server)
-  : _fd(sockFd)
-  , _socket(socket)
-  , _server(server)
-//, _state(0)
+Client::Client(int fdes)
+  : _fd(fdes)
+  , _server()
 {
-  std::cout << "[CLIENT] connected " << _lastActivity.getTime() << "\n";
 }
 
 int Client::getFd() const
@@ -44,10 +50,18 @@ Buffer Client::getOutBuff() const
   return _outBuff;
 }
 
-const Socket* Client::getSocket() const
+long Client::getTimeout() const
 {
-  return _socket;
+  if (_server != 0) {
+    return _server->getTimeout();
+  }
+  return Config::getDefaultTimeout();
 }
+
+// const Socket* Client::getSocket() const
+// {
+//   return _socket;
+// }
 
 const Server* Client::getServer() const
 {
@@ -57,6 +71,49 @@ const Server* Client::getServer() const
 void Client::setServer(const Server* server)
 {
   _server = server;
+}
+
+bool Client::receive()
+{
+  std::vector<unsigned char> buffer(MAX_CHUNK);
+  const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
+  if (bytes > 0) {
+    std::cout << "Client " << getFd() << ": ";
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
+    std::cout.write(reinterpret_cast<const char*>(buffer.data()),
+                    static_cast<std::streamsize>(bytes));
+    // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+    _inBuff.add(buffer);
+
+    // TODO: STATEMACHINE/PARSING
+  } else if (bytes == 0) {
+    return false;
+  } else // bytes < 0
+  {
+    std::cerr << ("[SERVER] recv failed, removing client");
+    return false;
+  }
+  updateLastActivity();
+  return true;
+}
+
+bool Client::sendTo()
+{
+  const std::size_t toSend =
+    std::min(_outBuff.getSize(), static_cast<std::size_t>(MAX_CHUNK));
+  const ssize_t bytes = send(getFd(), _outBuff.data(), toSend, 0);
+
+  if (bytes > 0) {
+    _outBuff.remove(bytes);
+  } else if (bytes == 0) {
+    std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
+  } else {
+    std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
+              << strerror(errno) << "\n";
+    return false;
+  }
+  updateLastActivity();
+  return true;
 }
 
 TimeStamp Client::getLastActivity() const

@@ -8,8 +8,8 @@
 
 ServerConfig::ServerConfig(const Config& global)
   : _errorPages(global.getErrorPages())
-  , _maxBodySize(global.getDefaultBodySize())
-  , _timeOut(global.getDefaultTimeout())
+  , _maxBodySize(global.getBodySize())
+  , _timeOut(global.getTimeout())
 {
 }
 

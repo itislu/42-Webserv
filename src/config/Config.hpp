@@ -20,25 +20,25 @@ typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
 class Config
 {
 public:
-
-
   explicit Config(const std::string& configFile);
 
   // Getters
   const std::vector<ServerConfig>& getServers() const;
-  std::size_t getDefaultBodySize() const;
-  long getDefaultTimeout() const;
+  std::size_t getBodySize() const;
+  long getTimeout() const;
   const std::string& getErrorLogPath() const;
   const std::string& getAccessLogPath() const;
   const std::map<int, std::string>& getErrorPages() const;
 
   // Setters
   void addServer(const ServerConfig& server);
-  void setDefaultMaxBodySize(std::size_t bytes);
-  void setDefaultTimeout(long seconds);
+  void setMaxBodySize(std::size_t bytes);
+  void setTimeout(long seconds);
   void setErrorLogPath(const std::string& path);
   void setAccessLogPath(const std::string& path);
-  void setLowestDefaultTimeout();
+  void setDefaultTimeout();
+
+  static int getDefaultTimeout();
 
   const ServerConfig* getServerForRequest(const std::string& host,
                                           int port) const;
@@ -48,10 +48,12 @@ public:
 private:
   std::string _configFile;
   std::string _root;
-  std::size_t _defaultMaxBodySize;
-  long _defaultTimeOut;
+  std::size_t _maxBodySize;
+  // long _defaultTimeOut;
   std::map<int, std::string> _errorPages;
   std::vector<ServerConfig> _servers;
+  static int _defaultTimeOut;
+  long _timeout;
 
   // Maybe for Logging
   std::string _errorLogPath;

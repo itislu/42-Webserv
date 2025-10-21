@@ -1,10 +1,6 @@
 #ifndef TIMESTAMP_HPP
 #define TIMESTAMP_HPP
 
-#ifndef MS_MULTIPLIER
-#define MS_MULTIPLIER 1000L
-#endif
-
 class TimeStamp
 {
 public:

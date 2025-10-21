@@ -48,7 +48,6 @@ void Socket::setFlags(int sockFd)
 {
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
   if (fcntl(sockFd, F_SETFL, O_NONBLOCK) < 0) {
-    close(sockFd);
     throw std::runtime_error("failed to set socket to non-blocking");
   }
 }
@@ -79,5 +78,9 @@ void Socket::initSocket()
   if (listen(_fd.get(), SOMAXCONN) < 0) {
     throwSocketException("failed to set server socket to listen");
   }
-  setFlags(_fd.get());
+
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
+  if (fcntl(_fd.get(), F_SETFL, O_NONBLOCK) < 0) {
+    throwSocketException("failed to set socket to non-blocking");
+  }
 }

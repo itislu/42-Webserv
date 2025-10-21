@@ -1,6 +1,7 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "config/LocationConfig.hpp"
+#include "event/EventManager.hpp"
 #include <algorithm>
 #include <climits>
 #include <cstddef>
@@ -9,10 +10,12 @@
 #include <string>
 #include <vector>
 
+int Config::_defaultTimeOut = 0;
+
 Config::Config(const std::string& configFile)
   : _configFile(configFile)
-  , _defaultMaxBodySize()
-  , _defaultTimeOut()
+  , _maxBodySize()
+  , _timeout()
 {
 }
 
@@ -21,14 +24,14 @@ const std::vector<ServerConfig>& Config::getServers() const
   return _servers;
 }
 
-std::size_t Config::getDefaultBodySize() const
+std::size_t Config::getBodySize() const
 {
-  return _defaultMaxBodySize;
+  return _maxBodySize;
 }
 
-long Config::getDefaultTimeout() const
+long Config::getTimeout() const
 {
-  return _defaultTimeOut;
+  return _timeout;
 }
 
 const std::map<int, std::string>& Config::getErrorPages() const
@@ -51,14 +54,14 @@ void Config::addServer(const ServerConfig& server)
   _servers.push_back(server);
 }
 
-void Config::setDefaultMaxBodySize(std::size_t bytes)
+void Config::setMaxBodySize(std::size_t bytes)
 {
-  _defaultMaxBodySize = bytes;
+  _maxBodySize = bytes;
 }
 
-void Config::setDefaultTimeout(long seconds)
+void Config::setTimeout(long seconds)
 {
-  _defaultTimeOut = seconds;
+  _timeout = seconds;
 }
 
 void Config::setErrorLogPath(const std::string& path)
@@ -71,13 +74,24 @@ void Config::setAccessLogPath(const std::string& path)
   _accesLogPath = path;
 }
 
-void Config::setLowestDefaultTimeout()
+void Config::setDefaultTimeout()
 {
-  long timeOut = LONG_MAX;
-  for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
-    timeOut = std::min(timeOut, (*it).getTimeOut());
+  long timeout = LONG_MAX;
+  if (_servers.empty()) {
+    timeout = _timeout;
   }
-  _defaultTimeOut = timeOut;
+  for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
+    timeout = std::min(timeout, (*it).getTimeOut());
+  }
+  timeout = std::min(timeout, static_cast<long>(INT_MAX));
+  timeout = std::max(timeout, 0L);
+
+  Config::_defaultTimeOut = static_cast<int>(timeout);
+}
+
+int Config::getDefaultTimeout()
+{
+  return Config::_defaultTimeOut;
 }
 
 std::ostream& operator<<(std::ostream& out, const Config& config)
@@ -114,6 +128,6 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
           << ", autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n";
     }
   }
-  out << "Lowest Timeout: " << config.getDefaultTimeout() << "s\n";
+  out << "Lowest Timeout: " << config.getTimeout() << "s\n";
   return out;
 }

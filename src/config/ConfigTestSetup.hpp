@@ -79,8 +79,8 @@ Config createTestConfig()
 {
   Config config("file");
 
-  config.setDefaultMaxBodySize(MAXBODYSIZE);
-  config.setDefaultTimeout(TIMEOUT); // 60 seconds
+  config.setMaxBodySize(MAXBODYSIZE);
+  config.setTimeout(TIMEOUT); // 60 seconds
 
   // Server 1: ports
   std::vector<int> ports1;
@@ -102,7 +102,7 @@ Config createTestConfig()
   ServerConfig server2 =
     createTestServer(config, ports2, hosts2, 3, "./www/server2");
   config.addServer(server2);
-  config.setLowestDefaultTimeout();
+  config.setDefaultTimeout();
 
   return config;
 }

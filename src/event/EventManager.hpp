@@ -1,20 +1,37 @@
 #ifndef EVENTMANAGER_HPP
 #define EVENTMANAGER_HPP
 
+#include "client/Client.hpp"
 #include "client/ClientManager.hpp"
 #include "socket/SocketManager.hpp"
+
+#ifndef MS_MULTIPLIER
+#define MS_MULTIPLIER 1000L
+#endif
 
 class EventManager
 {
 public:
-EventManager(const ClientManager& clients, const SocketManager& sockets);
+  EventManager(ClientManager* clients, SocketManager* sockets);
 
-int check();
+  int check();
+
+  /* EVENTS */
+  void checkActivity();
+  bool handleClient(Client* client, unsigned events);
+  bool sendToClient(Client* client);
+  bool receiveFromClient(Client* client);
+  void disconnectClient(Client* client);
+  void acceptClient(int fdes, unsigned events);
+
+  /* TIMEOUT */
+  void checkTimeouts();
+  int calculateTimeout() const;
+  long getClientTimeout(const Client* client) const;
 
 private:
-const ClientManager& _clientsManager;
-const SocketManager& _socketsManager;
-
+  ClientManager* _clientsManager;
+  SocketManager* _socketsManager;
 };
 
 #endif
