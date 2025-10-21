@@ -306,6 +306,12 @@ template <typename T>
 struct remove_pointer;
 
 /**
+ * https://en.cppreference.com/w/cpp/types/add_pointer
+ */
+template <typename T>
+struct add_pointer;
+
+/**
  * https://en.cppreference.com/w/cpp/types/remove_cvref
  */
 template <typename T>

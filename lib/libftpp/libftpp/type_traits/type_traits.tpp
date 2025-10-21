@@ -696,6 +696,26 @@ struct remove_pointer : conditional<is_pointer<T>::value,
 template <typename T>
 struct remove_pointer<T*> : type_identity<T> {};
 
+/* add_pointer */
+namespace _add_pointer {
+template <typename T, typename = void>
+struct impl;
+} // namespace _add_pointer
+
+template <typename T>
+struct add_pointer : _add_pointer::impl<T> {};
+
+namespace _add_pointer {
+
+template <typename T, typename /*= void*/>
+struct impl : type_identity<T> {};
+
+template <typename T>
+struct impl<T, typename voider<typename remove_reference<T>::type*>::type>
+    : type_identity<typename remove_reference<T>::type*> {};
+
+} // namespace _add_pointer
+
 /* remove_cvref */
 template <typename T>
 struct remove_cvref : remove_cv<typename remove_reference<T>::type> {};
