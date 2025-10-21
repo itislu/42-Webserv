@@ -6,6 +6,7 @@
 #	include "libftpp/movable.hpp"
 #	include "libftpp/type_traits.hpp"
 #	include <string>
+#	include <typeinfo>
 
 /**
  * https://en.cppreference.com/w/cpp/utility/unreachable
@@ -41,6 +42,7 @@ namespace ft {
 
 /* demangle */
 
+std::string demangle(const std::type_info& type_id);
 std::string demangle(const char* mangled_name);
 
 /* move */

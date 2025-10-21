@@ -1,6 +1,7 @@
 #include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 #include <string>
+#include <typeinfo>
 
 #if defined(__GNUC__) || defined(__clang__)
 #	include <cstdlib>
@@ -9,6 +10,11 @@
 #endif // defined(__GNUC__) || defined(__clang__)
 
 namespace ft {
+
+std::string demangle(const std::type_info& type_id)
+{
+	return ft::demangle(type_id.name());
+}
 
 std::string demangle(const char* mangled_name)
 {
