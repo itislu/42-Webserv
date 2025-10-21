@@ -20,7 +20,7 @@ expected<T, E>::expected()
 
 template <typename T, typename E>
 expected<T, E>::expected(const expected& other)
-    : ft::safe_bool<expected<T, E> >(),
+    : ft::safe_bool<expected>(),
       _has_value(false)
 {
 	if (other._has_value) {

@@ -19,7 +19,7 @@ expected<void, E>::expected() throw()
 
 template <typename E>
 expected<void, E>::expected(const expected& other)
-    : ft::safe_bool<expected<void, E> >(),
+    : ft::safe_bool<expected>(),
       _error(other._has_value ? FT_NULLPTR : new E(*other._error)),
       _has_value(other._has_value)
 {}
