@@ -12,6 +12,9 @@ namespace ft {
 
 std::string demangle(const char* mangled_name)
 {
+	if (mangled_name == FT_NULLPTR) {
+		return "";
+	}
 #ifdef LIBFTPP_HAVE_CXXABI_H
 	int status = 0;
 	const ft::unique_ptr<char, void (*)(void*)> demangled(
