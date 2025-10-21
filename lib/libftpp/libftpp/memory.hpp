@@ -816,8 +816,21 @@ struct owner_equal {
 	    throw();
 };
 
+/* addressof */
+
+// NOLINTBEGIN(readability-redundant-declaration): Included from
+// shared_ptr_detail.hpp.
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/addressof
+ */
+template <typename T>
+T* addressof(T& arg) throw();
+// NOLINTEND(readability-redundant-declaration)
+
 } // namespace ft
 
+#	include "libftpp/memory/addressof.tpp"        // IWYU pragma: export
 #	include "libftpp/memory/default_delete.tpp"   // IWYU pragma: export
 #	include "libftpp/memory/owner_comparison.tpp" // IWYU pragma: export
 #	include "libftpp/memory/shared_ptr.tpp"       // IWYU pragma: export
