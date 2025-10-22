@@ -1,7 +1,6 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "config/LocationConfig.hpp"
-#include "event/EventManager.hpp"
 #include <algorithm>
 #include <climits>
 #include <cstddef>
@@ -128,6 +127,6 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
           << ", autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n";
     }
   }
-  out << "Lowest Timeout: " << config.getTimeout() << "s\n";
+  out << "Lowest Timeout(Default): " << Config::getDefaultTimeout() << "s\n";
   return out;
 }

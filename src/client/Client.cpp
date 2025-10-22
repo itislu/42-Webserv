@@ -2,7 +2,6 @@
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
 #include "server/Server.hpp"
-#include "server/ServerHandler.hpp"
 #include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
 #include <algorithm>

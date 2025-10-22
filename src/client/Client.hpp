@@ -8,6 +8,10 @@
 #include "utils/Buffer.hpp"
 #include <string>
 
+#ifndef MAX_CHUNK
+#define MAX_CHUNK 1024
+#endif
+
 class Client
 {
 public:
