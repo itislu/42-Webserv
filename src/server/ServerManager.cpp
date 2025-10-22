@@ -49,7 +49,7 @@ void ServerManager::createServers(const std::vector<ServerConfig>& configs)
        ++it) {
     const std::vector<const Socket*> listeners =
       createListeners((*it).getPorts());
-    addServer(*it, listeners);
+    addServer(&(*it), listeners);
   }
 }
 
@@ -67,7 +67,7 @@ std::vector<const Socket*> ServerManager::createListeners(
   return listeners;
 }
 
-void ServerManager::addServer(const ServerConfig& config,
+void ServerManager::addServer(const ServerConfig* config,
                               const std::vector<const Socket*>& listeners)
 {
   const Server* const server = new Server(config, listeners);

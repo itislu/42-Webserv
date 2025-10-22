@@ -86,10 +86,11 @@ bool Client::receive()
 
     // TODO: STATEMACHINE/PARSING
   } else if (bytes == 0) {
+    std::cout << "[CLIENT] wants to disconnect\n";
     return false;
   } else // bytes < 0
   {
-    std::cerr << ("[SERVER] recv failed, removing client");
+    std::cerr << ("[SERVER] recv failed, removing client\n");
     return false;
   }
   updateLastActivity();

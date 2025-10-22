@@ -49,13 +49,12 @@ private:
   std::string _configFile;
   std::string _root;
   std::size_t _maxBodySize;
-  // long _defaultTimeOut;
   std::map<int, std::string> _errorPages;
   std::vector<ServerConfig> _servers;
   static int _defaultTimeOut;
   long _timeout;
 
-  // Maybe for Logging
+  // for Logging
   std::string _errorLogPath;
   std::string _accesLogPath;
 };

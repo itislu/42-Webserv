@@ -23,7 +23,6 @@ public:
   const std::string& getHost() const;
   Buffer getInBuff() const;
   Buffer getOutBuff() const;
-  const Socket* getSocket() const;
   const Server* getServer() const;
 
   void setServer(const Server* server);
@@ -37,11 +36,11 @@ public:
   bool sendTo();
 
 private:
+  // int _state;
   AutoFd _fd;
   const Server* _server;
   std::string _host;
   TimeStamp _lastActivity;
-  // int _state;
   Buffer _inBuff;
   Buffer _outBuff;
 };

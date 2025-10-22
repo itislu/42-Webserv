@@ -18,15 +18,14 @@ public:
 
   Client* getClient(int fdes) const;
   std::size_t getClientCount() const;
-
-  bool hasClients() const;
-  long getMinTimeout() const;
-  void getTimedOutClients(std::vector<Client*>& timedOut) const;
-
   const std::map<int, Client*>& getClients() const;
+  bool hasClients() const;
 
   void addClient(int fdes, const Server* server);
   void removeClient(int fdes);
+
+  long getMinTimeout() const;
+  void getTimedOutClients(std::vector<Client*>& timedOut) const;
 
 private:
   ClientManager(const ClientManager& other);

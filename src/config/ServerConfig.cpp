@@ -109,6 +109,6 @@ void ServerConfig::addLocation(const LocationConfig& location)
 /* const LocationConfig& ServerConfig::getLocationForPath(const std::string&
 uri) const
 {
-  //TODO: implement lookup
+
 }
  */

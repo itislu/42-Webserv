@@ -4,8 +4,6 @@
 #include "config/LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
 #include "socket/Socket.hpp"
-#include <cstddef>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -13,26 +11,21 @@
 class Server
 {
 public:
-  Server(const ServerConfig& servConfig,
+  Server(const ServerConfig* servConfig,
          const std::vector<const Socket*>& listeners);
 
+  const ServerConfig* getConfig() const;
   const std::vector<const Socket*>& getListeners() const;
   const std::vector<std::string>& getHostnames() const;
   long getTimeout() const;
 
 private:
+  const ServerConfig* _config;
+
   // server specific
   std::vector<const Socket*> _listeners; // listeners (ports)
   std::vector<std::string> _hostnames;   // names for virtual hosting
-
-  // can be defaulted
-  std::string _root;
-  std::string _index; // index.html
-  std::map<int, std::string> _errorPages;
-  std::size_t _maxBodySize;
-  std::vector<std::string> _allowedMethods; // usually per location
   long _timeOut;
-  std::vector<LocationConfig> _locations;
 
   // Maybe for Logging
   // std::string _errorLogPath;

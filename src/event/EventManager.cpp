@@ -90,7 +90,7 @@ void EventManager::acceptClient(int fdes, const unsigned events)
     _clientsManager->addClient(clientFd, server);
     std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
-    std::cerr << "[SERVER] accepting new client failed\n";
+    // std::cerr << "[SERVER] accepting new client failed\n";
   }
 }
 
@@ -119,8 +119,7 @@ int EventManager::calculateTimeout() const
   if (!_clientsManager->hasClients()) {
     const long timeout = Config::getDefaultTimeout();
     const int timeoutMs = convertToMs(timeout);
-    // std::cout << "No clients - using default timeout: " << timeoutMs <<
-    // "ms\n";
+    std::cout << "No clients - use default timeout: " << timeoutMs << "ms\n";
     return timeoutMs;
   }
 
