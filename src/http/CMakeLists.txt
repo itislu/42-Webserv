@@ -5,7 +5,6 @@
 set(LIB_NAME http)
 
 add_library(${LIB_NAME} STATIC
-  abnfRules/requestLineRules.cpp
   abnfRules/uriRules.cpp
   http.cpp
 )
