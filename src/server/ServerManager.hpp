@@ -13,7 +13,6 @@
 
 class ServerManager
 {
-
   typedef std::map<const Socket*, std::vector<const Server*> >::iterator
     sockToServIter;
   typedef std::map<const Socket*, std::vector<const Server*> >::const_iterator

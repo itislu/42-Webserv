@@ -38,8 +38,7 @@ public:
 
 private:
   AutoFd _fd;
-  // const Socket* _socket; // points to Socket it connected
-  const Server* _server; // point to Null in the begining
+  const Server* _server;
   std::string _host;
   TimeStamp _lastActivity;
   // int _state;

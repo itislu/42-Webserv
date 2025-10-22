@@ -5,8 +5,6 @@
 #include "client/ClientManager.hpp"
 #include "socket/SocketManager.hpp"
 
-
-
 class ServerManager;
 
 class EventManager
