@@ -26,7 +26,7 @@ public:
 
   void setServer(const Server* server);
 
-  TimeStamp getLastActivity() const;
+  const TimeStamp& getLastActivity();
   void updateLastActivity();
   long getTimeout() const;
 

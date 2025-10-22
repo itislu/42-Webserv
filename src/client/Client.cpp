@@ -116,7 +116,7 @@ bool Client::sendTo()
   return true;
 }
 
-TimeStamp Client::getLastActivity() const
+const TimeStamp& Client::getLastActivity()
 {
   return _lastActivity;
 }
