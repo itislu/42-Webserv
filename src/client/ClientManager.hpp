@@ -14,6 +14,7 @@ public:
   typedef std::map<int, Client*>::const_iterator const_clientIter;
 
   ClientManager();
+  ~ClientManager();
 
   Client* getClient(int fdes) const;
   std::size_t getClientCount() const;
@@ -28,6 +29,8 @@ public:
   void removeClient(int fdes);
 
 private:
+  ClientManager(const ClientManager& other);
+  ClientManager& operator=(const ClientManager& other);
   std::map<int /* fd */, Client*> _clients;
 };
 

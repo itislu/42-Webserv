@@ -11,7 +11,14 @@
 
 ClientManager::ClientManager() {}
 
-// ADD destructor for freeing clients
+ClientManager::~ClientManager()
+{
+  for (std::map<int, Client*>::iterator it = _clients.begin();
+       it != _clients.end();
+       ++it) {
+    delete it->second;
+  }
+}
 
 Client* ClientManager::getClient(int fdes) const
 {
@@ -27,7 +34,6 @@ std::size_t ClientManager::getClientCount() const
   return _clients.size();
 }
 
-// TODO: protection - allocation could fail
 void ClientManager::addClient(int fdes, const Server* server)
 {
   _clients.insert(std::make_pair(fdes, new Client(fdes, server)));

@@ -12,6 +12,7 @@
 class SocketManager
 {
 public:
+  typedef std::vector<const Socket*>::iterator sockIter;
   typedef std::map<int, const Socket*>::iterator fdToSockIter;
   typedef std::map<int, const Socket*>::const_iterator const_fdToSockIter;
 
@@ -47,6 +48,7 @@ private:
   SocketManager(const SocketManager& other);
   SocketManager& operator=(const SocketManager& other);
 
+  std::vector<const Socket*> _sockets;
   std::map<int /* fd */, const Socket*> _fdToSocket;
   std::vector<pollfd> _pfds;
 };

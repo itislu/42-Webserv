@@ -103,7 +103,6 @@ void EventManager::checkActivity()
     const unsigned events = static_cast<unsigned>(pfds[i].revents);
     if (_socketsManager->isListener(pfds[i].fd)) {
       acceptClient(pfds[i].fd, events);
-      // pfds[i].revents = 0;
       i++;
     } else {
       Client* const client = _clientsManager->getClient(pfds[i].fd);

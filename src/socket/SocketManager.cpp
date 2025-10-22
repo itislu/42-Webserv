@@ -4,7 +4,6 @@
 #include "config/ServerConfig.hpp"
 #include <cstddef>
 #include <exception>
-#include <iostream>
 #include <map>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -22,8 +21,8 @@ SocketManager::SocketManager(const Config* config)
 
 SocketManager::~SocketManager()
 {
-  for (fdToSockIter it = _fdToSocket.begin(); it != _fdToSocket.end(); ++it) {
-    delete (it->second);
+  for (sockIter it = _sockets.begin(); it != _sockets.end(); ++it) {
+    delete (*it);
   }
 }
 
@@ -45,6 +44,7 @@ void SocketManager::createListener(const std::vector<int>& ports)
       continue;
     }
     const Socket* const socket = new Socket(*it);
+    _sockets.push_back(socket);
     addToFdSocketMap(socket->getFd(), socket);
     addToPfd(socket->getFd());
   }
