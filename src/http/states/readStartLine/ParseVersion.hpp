@@ -2,8 +2,9 @@
 #ifndef PARSE_VERSION_HPP
 #define PARSE_VERSION_HPP
 
-#include "http/TokenFinder.hpp"
-#include <utils/IState.hpp>
+#include "utils/abnfRules/SequenceRule.hpp"
+#include "utils/BufferReader.hpp"
+#include <utils/state/IState.hpp>
 
 class Client;
 class ReadStartLine;
@@ -22,8 +23,12 @@ private:
   ParseVersion(const ParseVersion& other);
   ParseVersion& operator=(const ParseVersion& other);
 
+  void _extractVersion();
+
   Client* _client;
-  TokenFinder _finder;
+  BufferReader _buffReader;
+  SequenceRule _sequenze;
+  bool _init;
 };
 
 #endif // PARSE_URI_HPP

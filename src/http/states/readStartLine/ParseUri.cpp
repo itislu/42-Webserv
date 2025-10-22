@@ -1,14 +1,21 @@
 #include "ParseUri.hpp"
-#include "utils/Buffer.hpp"
 
-#include <cctype>
+#include "http/abnfRules/requestLineRules.hpp"
+#include "http/abnfRules/ruleIds.hpp"
+#include "utils/abnfRules/Rule.hpp"
+#include "utils/abnfRules/RuleResult.hpp"
+#include "utils/abnfRules/SequenceRule.hpp"
 #include <client/Client.hpp>
-#include <http/http.hpp>
+#include <http/Uri.hpp>
 #include <http/states/readStartLine/ParseVersion.hpp>
 #include <http/states/readStartLine/ReadStartLine.hpp>
-#include <utils/IState.hpp>
-#include <utils/StateHandler.hpp>
+#include <libftpp/string.hpp>
+#include <stdexcept>
+#include <utils/Buffer.hpp>
+#include <utils/BufferReader.hpp>
+#include <utils/state/IState.hpp>
 
+#include <cctype>
 #include <cstddef>
 #include <string>
 
@@ -18,8 +25,12 @@
 ParseUri::ParseUri(ReadStartLine* context)
   : IState<ReadStartLine>(context)
   , _client(context->getContext())
+  , _parseState(ParseScheme)
+  , _buffReader()
+  , _sequence()
+  , _initParser(true)
 {
-  _finder.initTokenFinder(&_client->getInBuff(), http::SP);
+  _buffReader.init(&_client->getInBuff());
 }
 
 ParseUri::~ParseUri() {}
@@ -30,12 +41,20 @@ ParseUri::~ParseUri() {}
 ParseUri::ParseUri()
   : IState<ReadStartLine>(NULL)
   , _client(NULL)
+  , _parseState(ParseScheme)
+  , _buffReader()
+  , _sequence()
+  , _initParser(true)
 {
 }
 
 ParseUri::ParseUri(const ParseUri& other)
   : IState<ReadStartLine>(other.getContext())
-  , _client(other._client)
+  , _client(NULL)
+  , _parseState(ParseScheme)
+  , _buffReader()
+  , _sequence()
+  , _initParser(true)
 {
   *this = other;
 }
@@ -50,92 +69,150 @@ ParseUri& ParseUri::operator=(const ParseUri& other)
 
 void ParseUri::run()
 {
-  if (!_finder.buffContainsToken()) {
+  if (_parseState == ParseScheme) {
+    _parseScheme();
+  }
+  if (_parseState == ParseAuthority) {
+    _parseAuthority();
+  }
+  if (_parseState == ParsePath) {
+    _parsePath();
+  }
+  if (_parseState == ParseQuery) {
+    _parseQuery();
+  }
+  if (_parseState == ParseFragment) {
+    _parseFragment();
+  }
+  if (_parseState == ParseDone) {
+    _client->getRequest().setUri(_tmpUri);
+    getContext()->getStateHandler().setState<ParseVersion>();
     return;
   }
-  std::string rawUri = _finder.getStrUntilToken();
-  _tmpUri.setRaw(rawUri);
-
-  _parseRawUri(); // TODO validate URI --> OK/ALARM
-
-  Buffer& buff = _client->getInBuff();
-  buff.remove(rawUri.size() + _finder.getTokenSize());
-
-  _client->getRequest().setUri(_tmpUri);
-  getContext()->getStateHandler().setState<ParseVersion>();
 }
 
-// bool ParseUri::_isValidChr(unsigned char chr)
-// {
-//   // Unreserved: ALPHA / DIGIT / "-" / "." / "_" / "~"
-//   if (_isUnreservedChr(chr)) {
-//     return true;
-//   }
-
-//   // Reserved: gen-delims / sub-delims
-//   if (_isReservedChr(chr)) {
-//     return true;
-//   }
-
-//   // '%' starts percent-encoding
-//   if (chr == '%') {
-//     return true;
-//   }
-
-//   // ' ' end of line
-//   if (chr == ' ') {
-//     return true;
-//   }
-
-//   return false;
-// }
-
-// bool ParseUri::_isReservedChr(unsigned char chr)
-// {
-//   // Reserved: gen-delims / sub-delims
-//   const std::string reserved = ":/?#[]@!$&'()*+,;=";
-//   return reserved.find(static_cast<char>(chr)) != std::string::npos;
-// }
-
-// bool ParseUri::_isUnreservedChr(unsigned char chr)
-// {
-//   // Unreserved: ALPHA / DIGIT / "-" / "." / "_" / "~"
-//   return (std::isalnum(chr) != 0 || chr == '-' || chr == '.' || chr == '_' ||
-//           chr == '~');
-// }
-
-void ParseUri::_parseRawUri()
+void ParseUri::_updateState(ParseUriState nextState)
 {
-  //TODO
-  _parseScheme();
-  _parseAuthority();
-  _parsePath();
-  _parseQuery();
-  _parseFragment();
+  if (_sequence != NULL) {
+    delete _sequence;
+    _sequence = NULL;
+  }
+  _results.clear();
+  _initParser = true;
+  _parseState = nextState;
+  _buffReader.resetPosInBuff();
 }
 
+/**
+ * @brief Parse the scheme part of the uri
+ */
 void ParseUri::_parseScheme()
 {
-  const Buffer& buff = _client->getInBuff();
-  (void)buff;
+  if (_initParser) {
+    _initParser = false;
+
+    _sequence = schemePartRule();
+
+    _sequence->setBufferReader(&_buffReader);
+    _sequence->setResultMap(&_results);
+    _buffReader.resetPosInBuff();
+  }
+
+  if (!_sequence->matches()) {
+    _updateState(ParseAuthority);
+    return;
+  }
+  if (_sequence->end()) {
+    std::string scheme = _extractPartIfAvailable(SchemePart);
+    scheme = scheme.substr(0, scheme.size() - 1); // remove "http:" -> "http"
+    _tmpUri.setScheme(scheme);
+    _updateState(ParseAuthority);
+  }
 }
 
+/**
+ * @brief Parse the authority part of the uri
+ */
 void ParseUri::_parseAuthority()
 {
+  if (_initParser) {
+    _initParser = false;
+    _sequence = authorityPartRule();
+    _sequence->setBufferReader(&_buffReader);
+  }
 
+  if (!_sequence->matches()) {
+    // TODO alarm
+    _updateState(ParsePath);
+    return;
+  }
+  if (_sequence->end()) {
+    _tmpUri.setAuthority(_extractPartWithoutCurrChar());
+    _updateState(ParsePath);
+  }
 }
 
 void ParseUri::_parsePath()
 {
+  if (_initParser) {
+    _initParser = false;
+    _sequence = pathPartRule();
+    _sequence->setBufferReader(&_buffReader);
+  }
 
+  if (!_sequence->matches()) {
+    _updateState(ParseDone);
+    return;
+  }
+  if (_sequence->end()) {
+    std::string path = _extractPartWithoutCurrChar();
+    ft::trim(path);
+    _tmpUri.setPath(path);
+    _updateState(ParseQuery);
+  }
 }
 
 void ParseUri::_parseQuery()
 {
-
+  _updateState(ParseFragment);
 }
 
 void ParseUri::_parseFragment()
 {
+  _updateState(ParseDone);
+}
 
+std::string ParseUri::_extractPartIfAvailable(Rule::RuleId ruleId)
+{
+  try {
+    const RuleResult& result = _results.at(ruleId);
+    const long index = result.getEnd();
+    if (index < 0) {
+      return std::string("");
+    }
+    _buffReader.resetPosInBuff();
+    return _client->getInBuff().consume(index + 1);
+  } catch (const std::out_of_range& oor) {
+    return std::string("");
+  }
+}
+
+std::string ParseUri::_extractPart()
+{
+  const long index = _buffReader.getPosInBuff();
+  if (index < 0) {
+    return std::string("");
+  }
+  _buffReader.resetPosInBuff();
+  return _client->getInBuff().consume(index + 1);
+}
+
+std::string ParseUri::_extractPartWithoutCurrChar()
+{
+  long index = _buffReader.getPosInBuff();
+  index--;
+  if (index < 0) {
+    return std::string("");
+  }
+  return _client->getInBuff().consume(index + 1);
 }

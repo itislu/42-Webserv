@@ -1,6 +1,8 @@
 #include "Request.hpp"
 #include "http/Uri.hpp"
+#include <algorithm>
 #include <cstddef>
+#include <cstring>
 #include <string>
 
 /* ************************************************************************** */
@@ -12,31 +14,10 @@ const Request::MethodMap Request::_methodMap[_methods] = {
   { "DELETE", Request::DELETE },
 };
 
+const std::size_t Request::MAX_METHOD_LEN = Request::_getMaxMethodLen();
+
 /* ************************************************************************** */
 // PUBLIC
-
-Request::Request()
-  : _method(UNDEFINED)
-{
-}
-
-Request::~Request() {}
-
-Request::Request(const Request& other)
-  : _method(other._method)
-  , _uri(other._uri)
-  , _version(other._version)
-{
-  *this = other;
-}
-
-Request& Request::operator=(const Request& other)
-{
-  if (this != &other) {
-    // todo copy logic
-  }
-  return *this;
-}
 
 Request::Method Request::getMethod() const
 {
@@ -48,22 +29,27 @@ void Request::setMethod(Request::Method method)
   _method = method;
 }
 
-Uri& Request::getUri()
+const Uri& Request::getUri() const
 {
   return _uri;
 }
 
-std::string Request::getVersion() const
+void Request::setUri(const Uri& uri)
+{
+  _uri = uri;
+}
+
+const std::string& Request::getVersion() const
 {
   return _version;
 }
 
-void Request::setVersion(std::string& version)
+void Request::setVersion(const std::string& version)
 {
   _version = version;
 }
 
-// NOLINTBEGIN (clang-tidy cppcoreguidelines-pro-bounds-constant-array-index)
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 Request::Method Request::strToMethod(std::string& strMethod)
 {
   for (std::size_t i = 0; i < _methods; i++) {
@@ -73,7 +59,18 @@ Request::Method Request::strToMethod(std::string& strMethod)
   }
   return Request::UNDEFINED;
 }
-// NOLINTEND
+// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
 /* ************************************************************************** */
 // PRIVATE
+
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
+std::size_t Request::_getMaxMethodLen() throw()
+{
+  std::size_t maxLen = 0;
+  for (std::size_t i = 0; i < _methods; i++) {
+    maxLen = std::max(maxLen, strlen(_methodMap[i].methodStr));
+  }
+  return maxLen;
+}
+// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)

@@ -1,9 +1,9 @@
 #pragma once
 #ifndef DONE_HPP
-#include "utils/Done.hpp"
+#include "utils/state/Done.hpp"
 #endif
 
-#include <utils/IState.hpp>
+#include <utils/state/IState.hpp>
 
 
 template<typename Context>

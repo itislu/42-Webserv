@@ -2,7 +2,7 @@
 #ifndef STATE_HANDLER_HPP
 #define STATE_HANDLER_HPP
 
-#include "utils/IState.hpp"
+#include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
 template<typename Context>

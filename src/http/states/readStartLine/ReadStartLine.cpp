@@ -1,19 +1,18 @@
 #include "ReadStartLine.hpp"
 #include "ParseMethod.hpp"
-#include "utils/StateHandler.hpp"
+#include <utils/state/StateHandler.hpp>
 
 #include <client/Client.hpp>
-#include <utils/IState.hpp>
+#include <utils/state/IState.hpp>
 
 #include <cstddef>
 
 /* ************************************************************************** */
 // PUBLIC
 
-ReadStartLine::ReadStartLine(Client* client)
-  : IState(client)
+ReadStartLine::ReadStartLine(Client* context)
+  : IState(context)
   , _stateHandler(this)
-  , _sizeStartLine(0)
 {
   _stateHandler.setState<ParseMethod>();
 }
@@ -27,8 +26,6 @@ ReadStartLine::~ReadStartLine() {}
  */
 void ReadStartLine::run()
 {
-  (void)_sizeStartLine; // todo: use
-
   _stateHandler.setStateHasChanged(true);
   while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
     _stateHandler.setStateHasChanged(false);
@@ -52,14 +49,12 @@ StateHandler<ReadStartLine>& ReadStartLine::getStateHandler()
 ReadStartLine::ReadStartLine()
   : IState(NULL)
   , _stateHandler(this)
-  , _sizeStartLine(0)
 {
 }
 
 ReadStartLine::ReadStartLine(const ReadStartLine& other)
   : IState(NULL)
   , _stateHandler(this)
-  , _sizeStartLine(0)
 {
   *this = other;
 }

@@ -2,8 +2,9 @@
 #ifndef PARSE_METHOD_HPP
 #define PARSE_METHOD_HPP
 
-#include "http/TokenFinder.hpp"
-#include "utils/IState.hpp"
+#include "utils/abnfRules/SequenceRule.hpp"
+#include <utils/state/IState.hpp>
+#include "utils/BufferReader.hpp"
 
 class Client;
 class ReadStartLine;
@@ -22,8 +23,13 @@ private:
   ParseMethod(const ParseMethod& other);
   ParseMethod& operator=(const ParseMethod& other);
 
+  void _extractMethod();
+  static bool _isValid(char chr);
+
   Client* _client;
-  TokenFinder _finder;
+  BufferReader _buffReader;
+  SequenceRule _sequenze;
+  bool _init;
 };
 
 #endif // PARSE_METHOD_HPP

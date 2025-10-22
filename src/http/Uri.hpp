@@ -8,18 +8,28 @@
 class Uri
 {
 public:
-  Uri();
-  ~Uri();
-  Uri(const Uri& other);
-  Uri& operator=(const Uri& other);
-
   std::string getRaw() const;
-  void setRaw(std::string& rawUri);
+  void setRaw(const std::string& rawUri);
+
+  const std::string& getScheme() const;
+  std::string& getScheme();
+  void setScheme(const std::string& str);
+  const std::string& getAuthority() const;
+  void setAuthority(const std::string& str);
+  const std::string& getPath() const;
+  void setPath(const std::string& str);
+  const std::string& getQuery() const;
+  void setQuery(const std::string& str);
+  const std::string& getFragment() const;
+  void setFragment(const std::string& str);
 
 private:
   std::string _raw;
-  // querry
-  // host
+  std::string _scheme;
+  std::string _authority;
+  std::string _path;
+  std::string _query;
+  std::string _fragment;
 };
 
 #endif // URI_HPP

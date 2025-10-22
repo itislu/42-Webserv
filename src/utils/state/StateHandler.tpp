@@ -3,8 +3,8 @@
 #include "StateHandler.hpp"
 #endif
 
-#include "utils/Done.hpp"
-#include "utils/IState.hpp"
+#include "utils/state/Done.hpp"
+#include <utils/state/IState.hpp>
 #include <cstddef>
 
 /* ************************************************************************** */

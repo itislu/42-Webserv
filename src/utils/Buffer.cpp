@@ -1,5 +1,6 @@
 #include "Buffer.hpp"
 #include <cstddef>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <sys/types.h>
@@ -32,6 +33,11 @@ std::size_t Buffer::getSize() const
   return _buff.size();
 }
 
+unsigned char Buffer::at(size_t pos)
+{
+  return _buff.at(pos);
+}
+
 Buffer::iterator Buffer::begin()
 {
   return _buff.begin();
@@ -59,4 +65,11 @@ std::string Buffer::getString(long fromIndex, long toIndex) const
     throw std::invalid_argument("index must be > 0");
   }
   return std::string(_buff.begin() + fromIndex, _buff.begin() + toIndex);
+}
+
+std::string Buffer::consume(long bytes)
+{
+  const std::string newStr = getString(0, bytes);
+  remove(bytes);
+  return newStr;
 }
