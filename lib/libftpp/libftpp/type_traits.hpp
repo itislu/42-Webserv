@@ -402,7 +402,7 @@ struct negation;
 FT_HAS_MEMBER_FUNCTION(void, swap, (T&))
 
 /**
- * @brief Checks wether `T` is a class or union type
+ * @brief Checks whether `T` is a class or union type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is a
  * class or union type. Otherwise, `value` is equal to `false`.
@@ -414,7 +414,7 @@ template <typename T>
 struct is_class_or_union;
 
 /**
- * @brief Checks wether `T` is a complete type
+ * @brief Checks whether `T` is a complete type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is a
  * complete type at the point of instantiation of this trait. Otherwise, `value`
@@ -434,7 +434,7 @@ template <typename T>
 struct is_complete;
 
 /**
- * @brief Checks wether `T` is an lvalue reference to a const-qualified type
+ * @brief Checks whether `T` is an lvalue reference to a const-qualified type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is an
  * lvalue reference to a const-qualified type. Otherwise, `value` is equal to
@@ -447,7 +447,8 @@ template <typename T>
 struct is_const_lvalue_reference;
 
 /**
- * @brief Checks wether `T` is an lvalue reference to a non-const-qualified type
+ * @brief Checks whether `T` is an lvalue reference to a non-const-qualified
+ * type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is an
  * lvalue reference to a non-const-qualified type. Otherwise, `value` is equal
@@ -460,7 +461,7 @@ template <typename T>
 struct is_nonconst_lvalue_reference;
 
 /**
- * @brief Checks wether `T` can be a return type of a function
+ * @brief Checks whether `T` can be a return type of a function
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is not
  * an abstract class, an array, or a function. Otherwise, `value` is equal to
