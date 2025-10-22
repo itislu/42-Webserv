@@ -5,32 +5,32 @@
 
 #	include "libftpp/optional.hpp"
 #	include "libftpp/safe_bool.hpp"
+#	include "libftpp/utility.hpp"
 #	include <algorithm>
 #	include <cassert>
-#	include <cstddef>
 
 namespace ft {
 
 template <typename T>
 optional<T>::optional() throw()
-    : _value(NULL)
+    : _value(FT_NULLPTR)
 {}
 
 template <typename T>
 optional<T>::optional(nullopt_t /*unused*/) throw()
-    : _value(NULL)
+    : _value(FT_NULLPTR)
 {}
 
 template <typename T>
 optional<T>::optional(const optional& other)
     : ft::safe_bool<optional<T> >(),
-      _value(other.has_value() ? new T(*other._value) : NULL)
+      _value(other.has_value() ? new T(*other._value) : FT_NULLPTR)
 {}
 
 template <typename T>
 template <typename U>
 optional<T>::optional(const optional<U>& other)
-    : _value(other.has_value() ? new T(*other) : NULL)
+    : _value(other.has_value() ? new T(*other) : FT_NULLPTR)
 {}
 
 template <typename T>
@@ -96,7 +96,7 @@ bool optional<T>::boolean_test() const throw()
 template <typename T>
 bool optional<T>::has_value() const throw()
 {
-	return _value != NULL;
+	return _value != FT_NULLPTR;
 }
 
 template <typename T>
@@ -186,7 +186,7 @@ void optional<T>::reset() throw()
 {
 	if (has_value()) {
 		delete _value;
-		_value = NULL;
+		_value = FT_NULLPTR;
 	}
 }
 

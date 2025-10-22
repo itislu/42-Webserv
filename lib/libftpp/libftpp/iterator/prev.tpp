@@ -5,7 +5,6 @@
 
 #	include "libftpp/assert.hpp"
 #	include "libftpp/iterator.hpp"
-#	include "libftpp/type_traits.hpp"
 #	include <iterator>
 
 namespace ft {
@@ -16,8 +15,7 @@ BidirIt prev(BidirIt it)
 	typedef typename std::iterator_traits<BidirIt>::difference_type
 	    BidirIt_must_be_an_iterator_type;
 	// Use to avoid unused typedef warnings.
-	FT_STATIC_ASSERT((ft::is_same<BidirIt_must_be_an_iterator_type,
-	                              BidirIt_must_be_an_iterator_type>::value));
+	FT_STATIC_ASSERT(ft::make_true<BidirIt_must_be_an_iterator_type>::value);
 
 	--it;
 	return it;
