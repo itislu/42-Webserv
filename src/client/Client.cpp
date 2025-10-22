@@ -1,4 +1,6 @@
 #include "Client.hpp"
+#include "http/Request.hpp"
+#include "utils/Buffer.hpp"
 #include <string>
 #include <sys/types.h>
 #include <vector>
@@ -20,42 +22,47 @@ int Client::getFd() const
   return _fd;
 }
 
-Client::Buffer Client::getInBuff() const
+Buffer& Client::getInBuff()
 {
   return _inBuff;
 }
 
-Client::Buffer Client::getOutBuff() const
+Buffer& Client::getOutBuff()
 {
   return _outBuff;
 }
 
-void Client::addToInBuff(const std::string& str)
+Request& Client::getRequest()
 {
-  _inBuff.insert(_inBuff.end(), str.begin(), str.end());
+  return _request;
 }
 
-void Client::addToInBuff(const Buffer& buffer)
-{
-  _inBuff.insert(_inBuff.end(), buffer.begin(), buffer.end());
-}
+// void Client::addToInBuff(std::string str)
+// {
+//   _inBuff.insert(_inBuff.end(), str.begin(), str.end());
+// }
 
-void Client::addToOutBuff(const std::string& str)
-{
-  _outBuff.insert(_outBuff.end(), str.begin(), str.end());
-}
+// void Client::addToInBuff(std::vector<char>& buffer)
+// {
+//   _inBuff.insert(_inBuff.end(), buffer.begin(), buffer.end());
+// }
 
-void Client::addToOutBuff(const Buffer& buffer)
-{
-  _outBuff.insert(_outBuff.end(), buffer.begin(), buffer.end());
-}
+// void Client::addToOutBuff(std::string str)
+// {
+//   _outBuff.insert(_outBuff.end(), str.begin(), str.end());
+// }
 
-void Client::removeFromOutBuff(ssize_t bytes)
-{
-  _outBuff.erase(_outBuff.begin(), _outBuff.begin() + bytes);
-}
+// void Client::addToOutBuff(std::vector<char>& buffer)
+// {
+//   _outBuff.insert(_outBuff.end(), buffer.begin(), buffer.end());
+// }
 
-bool Client::hasDataToSend() const
-{
-  return !_outBuff.empty();
-}
+// void Client::removeFromOutBuff(ssize_t bytes)
+// {
+//   _outBuff.erase(_outBuff.begin(), _outBuff.begin() + bytes);
+// }
+
+// bool Client::hasDataToSend() const
+// {
+//   return !_outBuff.empty();
+// }

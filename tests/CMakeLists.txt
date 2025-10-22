@@ -48,8 +48,11 @@ function(add_my_test test_name)
     PRIVATE
     GTest::gtest
     pthread
-    utils
     ftpp
+    client
+    http
+    # server
+    utils
   )
 
   add_test(NAME ${PROJECT_NAME}_${test_name} COMMAND ${test_name})
@@ -59,6 +62,19 @@ endfunction()
 # **************************************************************************** #
 # Tester
 
+# utils
 add_my_test(utilsTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
+)
+
+# http
+
+# http/parser
+add_my_test(uriRulesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/uriRulesTester.cpp
+)
+
+# http/states
+add_my_test(readStartLineTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readStartLineTester.cpp
 )
