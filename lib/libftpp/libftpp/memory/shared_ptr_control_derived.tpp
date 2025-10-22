@@ -4,7 +4,8 @@
 #	define LIBFTPP_MEMORY_SHARED_PTR_CONTROL_DERIVED_TPP
 
 #	include "shared_ptr_detail.hpp"
-#	include "addressof.tpp" // Avoid circular include of libftpp/memory.hpp.
+#	include "addressof.tpp" // NOLINT(misc-include-cleaner): Avoid circular
+// include of libftpp/memory.hpp.
 #	include "libftpp/utility.hpp"
 #	include <typeinfo>
 
