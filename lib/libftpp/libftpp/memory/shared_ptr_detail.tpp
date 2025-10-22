@@ -12,7 +12,7 @@ namespace _shared_ptr {
 
 /* is_compatible_raw_pointee */
 
-template <typename Y, typename T, typename /*= void*/>
+template <typename, typename, typename /*= void*/>
 struct is_compatible_raw_pointee : ft::false_type {};
 
 template <typename Y, typename U, std::size_t N>
@@ -46,7 +46,7 @@ struct is_compatible_smart_pointer
     : ft::bool_constant<ft::is_convertible<Y*, T*>::value
                         || _is_compatible_array<Y, T>::value> {};
 
-template <typename Y, typename T>
+template <typename, typename>
 struct _is_compatible_array : ft::false_type {};
 
 template <typename U, std::size_t N, typename T>

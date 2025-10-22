@@ -10,7 +10,7 @@ namespace ft {
 namespace _type_traits {
 
 /* is_rvalue */
-template <typename T>
+template <typename>
 struct is_rvalue : false_type {};
 
 template <typename T>
@@ -36,7 +36,7 @@ struct type_or_null : _type_or_null::impl<T> {};
 
 namespace _type_or_null {
 
-template <typename T, typename /*= void*/>
+template <typename, typename /*= void*/>
 struct impl : type_identity<null_type> {};
 
 template <typename T>

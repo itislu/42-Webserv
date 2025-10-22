@@ -13,7 +13,7 @@
 			template <typename T, RETURN_TYPE(T::*) ARGS_IN_PARENS>           \
 			struct sfinae {};                                                 \
                                                                               \
-			template <typename T, typename = void>                            \
+			template <typename, typename = void>                              \
 			struct impl : ft::false_type {};                                  \
                                                                               \
 			template <typename T>                                             \

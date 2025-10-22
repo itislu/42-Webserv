@@ -9,7 +9,7 @@
 namespace ft {
 namespace _movable {
 
-template <typename T, typename /*= void*/>
+template <typename, typename /*= void*/>
 struct inherit_if_class_or_union {};
 
 template <typename T>

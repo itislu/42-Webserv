@@ -108,7 +108,7 @@ struct impl : bool_constant<std::numeric_limits<T>::is_specialized
 } // namespace _is_floating_point
 
 /* is_array */
-template <typename T>
+template <typename>
 struct is_array : false_type {};
 
 template <typename T>
@@ -245,7 +245,7 @@ private:
 	 */
 	FT_STATIC_ASSERT(ft::is_complete<T>::value); // T must be a complete type.
 
-	template <typename U, typename = void>
+	template <typename, typename = void>
 	struct is_arrayable : false_type {};
 
 	template <typename U>
@@ -328,7 +328,7 @@ template <typename T, std::size_t N>
 struct rank<T[N]> : integral_constant<std::size_t, 1 + rank<T>::value> {};
 
 /* extent */
-template <typename T, unsigned N /*= 0*/>
+template <typename, unsigned /*= 0*/>
 struct extent : integral_constant<std::size_t, 0> {};
 
 template <typename T, unsigned N>
@@ -342,7 +342,7 @@ struct extent<T[I], N>
 /* Type relationships */
 
 /* is_same */
-template <typename T, typename U>
+template <typename, typename>
 struct is_same : false_type {};
 
 template <typename T>
@@ -628,16 +628,16 @@ namespace _add_rvalue_reference {
  * rvalue<T>& -> rvalue<T>&
  */
 template <typename T,
-          typename RemoveCv /*= typename remove_cv<T>::type*/,
-          bool IsReference /*= is_reference<T>::value*/,
-          bool IsRvalue /*= _type_traits::is_rvalue<T>::value*/,
+          typename /*= typename remove_cv<T>::type*/,
+          bool /*= is_reference<T>::value*/,
+          bool /*= _type_traits::is_rvalue<T>::value*/,
           typename /*= void*/>
 struct impl : type_identity<T> {};
 
 /**
  * rvalue<T> -> rvalue<T>&
  */
-template <typename T, typename RemoveCv /*= typename remove_cv<T>::type*/>
+template <typename T, typename RemoveCv>
 struct impl<T,
             RemoveCv,
             false, // IsReference
@@ -648,7 +648,7 @@ struct impl<T,
  * T -> rvalue<T>&
  * const T -> const rvalue<T>&
  */
-template <typename T, typename RemoveCv /*= typename remove_cv<T>::type*/>
+template <typename T, typename RemoveCv>
 struct impl<T,
             RemoveCv,
             false, // IsReference
@@ -823,7 +823,7 @@ struct is_class_or_union : _is_class_or_union::impl<T> {};
 
 namespace _is_class_or_union {
 
-template <typename T, typename /*= void*/>
+template <typename, typename /*= void*/>
 struct impl : false_type {};
 
 template <typename T>
@@ -842,7 +842,7 @@ struct is_complete : _is_complete::impl<T> {};
 
 namespace _is_complete {
 
-template <typename T, typename /*= void*/>
+template <typename, typename /*= void*/>
 struct impl : false_type {};
 
 template <typename T>

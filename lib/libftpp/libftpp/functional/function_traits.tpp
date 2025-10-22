@@ -49,8 +49,8 @@ namespace _function_traits {
 /* Recurse until Nth arg is last. */
 template <
     typename ReducedFunc,
-    unsigned Arity,
-    typename LastArg,
+    unsigned,
+    typename,
     unsigned N,
     bool IsLast /*= (Arity > 0 && N == Arity - 1) || (Arity == 0 && N == 0)*/>
 struct argument_type : function_traits<ReducedFunc>::template argument_type<N> {
