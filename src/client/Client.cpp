@@ -4,7 +4,6 @@
 #include "server/Server.hpp"
 #include "server/ServerHandler.hpp"
 #include "socket/AutoFd.hpp"
-#include "socket/Socket.hpp"
 #include "utils/Buffer.hpp"
 #include <algorithm>
 #include <cerrno>
@@ -27,6 +26,12 @@ Client::Client()
 Client::Client(int fdes)
   : _fd(fdes)
   , _server()
+{
+}
+
+Client::Client(int fdes, const Server* server)
+  : _fd(fdes)
+  , _server(server)
 {
 }
 
@@ -57,11 +62,6 @@ long Client::getTimeout() const
   }
   return Config::getDefaultTimeout();
 }
-
-// const Socket* Client::getSocket() const
-// {
-//   return _socket;
-// }
 
 const Server* Client::getServer() const
 {

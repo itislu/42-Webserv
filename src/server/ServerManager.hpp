@@ -31,6 +31,7 @@ public:
 
   const Server* getServerFromSocket(const Socket* socket) const;
   const std::vector<const Server*>& getServers();
+  const Server* getInitServer(int fdes) const;
 
   void mapServerToSocket(const Server* server,
                          const std::vector<const Socket*>& listeners);

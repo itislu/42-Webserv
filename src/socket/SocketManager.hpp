@@ -16,6 +16,8 @@ public:
   typedef std::map<int, const Socket*>::const_iterator const_fdToSockIter;
 
   explicit SocketManager(const Config* config);
+  ~SocketManager();
+
   void createListeningSockets(const std::vector<ServerConfig>& configs);
   void createListener(const std::vector<int>& ports);
   bool listenerExists(int port) const;
@@ -29,7 +31,7 @@ public:
   pollfd* getPfdStart();
   pollfd* getPollFd(int fdes);
 
-  bool acceptClient(int fdes);
+  int acceptClient(int fdes);
 
   void enablePollout(int fdes);
   void disablePollout(int fdes);
@@ -42,6 +44,9 @@ public:
   void removeFdFromMap(int fdes);
 
 private:
+  SocketManager(const SocketManager& other);
+  SocketManager& operator=(const SocketManager& other);
+
   std::map<int /* fd */, const Socket*> _fdToSocket;
   std::vector<pollfd> _pfds;
 };

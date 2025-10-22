@@ -1,6 +1,7 @@
 #include "ClientManager.hpp"
 #include "client/Client.hpp"
 #include "client/TimeStamp.hpp"
+#include "server/Server.hpp"
 #include <algorithm>
 #include <climits>
 #include <cstddef>
@@ -9,6 +10,8 @@
 #include <vector>
 
 ClientManager::ClientManager() {}
+
+// ADD destructor for freeing clients
 
 Client* ClientManager::getClient(int fdes) const
 {
@@ -24,16 +27,17 @@ std::size_t ClientManager::getClientCount() const
   return _clients.size();
 }
 
-void ClientManager::addClient(int fdes)
+// TODO: protection - allocation could fail
+void ClientManager::addClient(int fdes, const Server* server)
 {
-  _clients.insert(std::make_pair(fdes, new Client(fdes)));
+  _clients.insert(std::make_pair(fdes, new Client(fdes, server)));
 }
 
 void ClientManager::removeClient(int fdes)
 {
   const clientIter iter = _clients.find(fdes);
   if (iter != _clients.end()) {
-    // delete iter->second;
+    delete iter->second;
     _clients.erase(iter);
   }
 }

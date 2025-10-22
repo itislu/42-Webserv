@@ -5,14 +5,16 @@
 #include "client/ClientManager.hpp"
 #include "socket/SocketManager.hpp"
 
-#ifndef MS_MULTIPLIER
-#define MS_MULTIPLIER 1000L
-#endif
+
+
+class ServerManager;
 
 class EventManager
 {
 public:
-  EventManager(ClientManager* clients, SocketManager* sockets);
+  EventManager(ClientManager* clients,
+               SocketManager* sockets,
+               ServerManager* servers);
 
   int check();
 
@@ -32,6 +34,7 @@ public:
 private:
   ClientManager* _clientsManager;
   SocketManager* _socketsManager;
+  ServerManager* _serverManager;
 };
 
 #endif

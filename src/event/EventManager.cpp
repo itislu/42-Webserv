@@ -1,7 +1,11 @@
 #include "EventManager.hpp"
 #include "client/Client.hpp"
 #include "client/ClientManager.hpp"
+#include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
+#include "server/Server.hpp"
+#include "server/ServerManager.hpp"
+#include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
 #include <algorithm>
 #include <climits>
@@ -16,9 +20,12 @@
 // Calls checkActivity() (or delegate to ClientManager/SocketManager)
 // Checks timeouts
 
-EventManager::EventManager(ClientManager* clients, SocketManager* sockets)
+EventManager::EventManager(ClientManager* clients,
+                           SocketManager* sockets,
+                           ServerManager* servers)
   : _clientsManager(clients)
   , _socketsManager(sockets)
+  , _serverManager(servers)
 {
 }
 
@@ -63,7 +70,6 @@ void EventManager::disconnectClient(Client* client)
   if (client == 0) {
     return;
   }
-
   const int clientFd = client->getFd();
   // Remove corresponding pollfd
   _socketsManager->removeFd(clientFd);
@@ -76,10 +82,17 @@ void EventManager::disconnectClient(Client* client)
 
 void EventManager::acceptClient(int fdes, const unsigned events)
 {
-  if ((events & POLLIN) != 0) {
-    if (_socketsManager->acceptClient(fdes)) {
-      _clientsManager->addClient(fdes);
-    }
+  if ((events & POLLIN) == 0) {
+    return;
+  }
+
+  const int clientFd = _socketsManager->acceptClient(fdes);
+  if (clientFd > 0) {
+    const Server* const server = _serverManager->getInitServer(fdes);
+    _clientsManager->addClient(clientFd, server);
+    std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
+  } else {
+    std::cerr << "[SERVER] accepting new client failed\n";
   }
 }
 
@@ -90,6 +103,7 @@ void EventManager::checkActivity()
     const unsigned events = static_cast<unsigned>(pfds[i].revents);
     if (_socketsManager->isListener(pfds[i].fd)) {
       acceptClient(pfds[i].fd, events);
+      // pfds[i].revents = 0;
       i++;
     } else {
       Client* const client = _clientsManager->getClient(pfds[i].fd);
@@ -106,20 +120,18 @@ int EventManager::calculateTimeout() const
 {
   // No clients yet, get default
   if (!_clientsManager->hasClients()) {
-    long timeout = Config::getDefaultTimeout() * MS_MULTIPLIER;
-    timeout = std::min(timeout, static_cast<long>(INT_MAX));
-    timeout = std::max(timeout, 0L);
-    return static_cast<int>(timeout);
+    const long timeout = Config::getDefaultTimeout();
+    const int timeoutMs = convertToMs(timeout);
+    // std::cout << "No clients - using default timeout: " << timeoutMs <<
+    // "ms\n";
+    return timeoutMs;
   }
 
   const long minRemaining = _clientsManager->getMinTimeout();
-  long timeoutMs = minRemaining * MS_MULTIPLIER;
-  timeoutMs = std::min(timeoutMs, static_cast<long>(INT_MAX));
-  timeoutMs = std::max(timeoutMs, 0L);
+  const int timeoutMs = convertToMs(minRemaining);
+  // std::cout << "using client min remaining timeout: " << timeoutMs << "ms\n";
 
-  std::cout << "current timeout time: " << timeoutMs << "ms\n";
-
-  return static_cast<int>(timeoutMs);
+  return timeoutMs;
 }
 
 void EventManager::checkTimeouts()
@@ -142,6 +154,5 @@ int EventManager::check()
     return ready;
   }
   checkActivity();
-  checkTimeouts();
   return ready;
 }

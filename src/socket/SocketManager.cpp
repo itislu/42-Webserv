@@ -20,6 +20,13 @@ SocketManager::SocketManager(const Config* config)
   createListeningSockets(config->getServers());
 }
 
+SocketManager::~SocketManager()
+{
+  for (fdToSockIter it = _fdToSocket.begin(); it != _fdToSocket.end(); ++it) {
+    delete (it->second);
+  }
+}
+
 void SocketManager::createListeningSockets(
   const std::vector<ServerConfig>& configs)
 {
@@ -91,25 +98,27 @@ pollfd* SocketManager::getPfdStart()
   return _pfds.data();
 }
 
-bool SocketManager::acceptClient(int fdes)
+int SocketManager::acceptClient(int fdes)
 {
   const int clientFd = accept(fdes, NULL, NULL);
   if (clientFd < 0) {
-    // error("failed to accept new client");
-    return false;
+
+    return -1;
   }
 
   try {
     Socket::setFlags(clientFd);
     addToPfd(clientFd);
+    const Socket* const listener = getSocket(fdes);
+    if (listener != NULL) {
+      _fdToSocket[clientFd] = listener;
+    }
   } catch (std::exception& e) {
     close(clientFd);
-    // error("failed to accept new client");
-    return false;
+    return -1;
   }
 
-  return true;
-  std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
+  return clientFd;
 }
 
 pollfd* SocketManager::getPollFd(int fdes)

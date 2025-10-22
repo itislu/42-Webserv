@@ -1,6 +1,10 @@
 #ifndef TIMESTAMP_HPP
 #define TIMESTAMP_HPP
 
+#ifndef MS_MULTIPLIER
+#define MS_MULTIPLIER 1000L
+#endif
+
 class TimeStamp
 {
 public:
@@ -17,5 +21,6 @@ private:
 };
 
 // TODO: add print overload so it prints a formated time
+int convertToMs(long timeout);
 
 #endif

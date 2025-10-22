@@ -25,7 +25,7 @@ extern "C" void sigIntHandler(int /*sigNum*/)
 ServerManager::ServerManager(const Config* const config)
   : _config(config)
   , _socketManager(config)
-  , _eventManager(&_clientManager, &_socketManager)
+  , _eventManager(&_clientManager, &_socketManager, this)
 {
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
     error("Failed to set SIGINT handler");
@@ -102,6 +102,18 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
   return servers[0];
 }
 
+const Server* ServerManager::getInitServer(int fdes) const
+{
+  const Socket* const socket = _socketManager.getSocket(fdes);
+  if (socket != 0) {
+    const c_sockToServIter iter = _socketToServers.find(socket);
+    if (iter->second.size() == 1) {
+      return iter->second[0];
+    }
+  }
+  return NULL;
+}
+
 std::size_t ServerManager::serverCount() const
 {
   return _servers.size();
@@ -126,6 +138,7 @@ void ServerManager::run()
       }
       break;
     }
+    _eventManager.checkTimeouts();
   }
   std::cout << "Shutting down servers...\n";
 }

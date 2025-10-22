@@ -13,7 +13,7 @@ class Client
 public:
   Client();
   explicit Client(int fdes);
-  explicit Client(int sockFd, const Socket* socket, const Server* server);
+  explicit Client(int fdes, const Server* server);
 
   int getFd() const;
   const std::string& getHost() const;
