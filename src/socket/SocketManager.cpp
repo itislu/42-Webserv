@@ -45,15 +45,15 @@ void SocketManager::createListener(const std::vector<int>& ports)
     }
     const Socket* const socket = new Socket(*it);
     _sockets.push_back(socket);
-    addToFdSocketMap(socket->getFd(), socket);
+    addToListenerMap(socket->getFd(), socket);
     addToPfd(socket->getFd());
   }
 }
 
 bool SocketManager::listenerExists(int port) const
 {
-  for (std::map<int, const Socket*>::const_iterator it = _fdToSocket.begin();
-       it != _fdToSocket.end();
+  for (std::map<int, const Socket*>::const_iterator it = _listeners.begin();
+       it != _listeners.end();
        ++it) {
     if ((*it).second->getPort() == port) {
       return true;
@@ -65,13 +65,14 @@ bool SocketManager::listenerExists(int port) const
 bool SocketManager::isListener(int fdes) const
 {
   const std::map<int, const Socket*>::const_iterator iter =
-    _fdToSocket.find(fdes);
-  return iter != _fdToSocket.end();
+    _listeners.find(fdes);
+  return iter != _listeners.end();
 }
 
-void SocketManager::addToFdSocketMap(int fdes, const Socket* socket)
+void SocketManager::addToListenerMap(int fdes, const Socket* socket)
 {
-  _fdToSocket.insert(std::make_pair(fdes, socket));
+
+  _listeners.insert(std::make_pair(fdes, socket));
 }
 
 void SocketManager::addToPfd(int fdes)
@@ -88,7 +89,7 @@ std::size_t SocketManager::getPfdsSize() const
   return _pfds.size();
 }
 
-std::vector<pollfd> SocketManager::getPfds() const
+std::vector<pollfd>& SocketManager::getPfds()
 {
   return _pfds;
 }
@@ -153,8 +154,8 @@ void SocketManager::disablePollout(int fdes)
 const Socket* SocketManager::getSocket(int fdes) const
 {
   const std::map<int, const Socket*>::const_iterator iter =
-    _fdToSocket.find(fdes);
-  if (iter != _fdToSocket.end()) {
+    _listeners.find(fdes);
+  if (iter != _listeners.end()) {
     return iter->second;
   }
   return NULL;
@@ -162,7 +163,7 @@ const Socket* SocketManager::getSocket(int fdes) const
 
 const Socket* SocketManager::getListener(int port) const
 {
-  for (const_fdToSockIter it = _fdToSocket.begin(); it != _fdToSocket.end();
+  for (const_fdToSockIter it = _listeners.begin(); it != _listeners.end();
        ++it) {
     if ((*it).second->getPort() == port) {
       return it->second;

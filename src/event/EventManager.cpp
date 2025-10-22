@@ -10,6 +10,7 @@
 #include <csignal>
 #include <cstring>
 #include <iostream>
+#include <new>
 #include <sys/poll.h>
 #include <vector>
 
@@ -66,6 +67,7 @@ bool EventManager::handleClient(Client* client, unsigned events)
 void EventManager::disconnectClient(Client* client)
 {
   if (client == 0) {
+    std::cout << "NO CLIENT TO REMOVE!\n";
     return;
   }
   const int clientFd = client->getFd();
@@ -90,13 +92,13 @@ void EventManager::acceptClient(int fdes, const unsigned events)
     _clientsManager->addClient(clientFd, server);
     std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
-    // std::cerr << "[SERVER] accepting new client failed\n";
+    std::cerr << "[SERVER] accepting new client failed\n";
   }
 }
 
 void EventManager::checkActivity()
 {
-  std::vector<pollfd> pfds = _socketsManager->getPfds();
+  std::vector<pollfd>& pfds = _socketsManager->getPfds();
   for (std::size_t i = 0; i < pfds.size();) {
     const unsigned events = static_cast<unsigned>(pfds[i].revents);
     if (_socketsManager->isListener(pfds[i].fd)) {
@@ -115,6 +117,7 @@ void EventManager::checkActivity()
 
 int EventManager::calculateTimeout() const
 {
+  std::cout << "CALCULATE TIMEOUT\n";
   // No clients yet, get default
   if (!_clientsManager->hasClients()) {
     const long timeout = Config::getDefaultTimeout();
@@ -125,7 +128,7 @@ int EventManager::calculateTimeout() const
 
   const long minRemaining = _clientsManager->getMinTimeout();
   const int timeoutMs = convertToMs(minRemaining);
-  // std::cout << "using client min remaining timeout: " << timeoutMs << "ms\n";
+  std::cout << "using client min remaining timeout: " << timeoutMs << "ms\n";
 
   return timeoutMs;
 }
@@ -149,6 +152,10 @@ int EventManager::check()
   if (ready <= 0) {
     return ready;
   }
-  checkActivity();
+  try {
+    checkActivity();
+  } catch (std::bad_alloc& e) {
+    std::cerr << "Error: " << e.what() << "\n";
+  }
   return ready;
 }

@@ -24,11 +24,11 @@ public:
   bool listenerExists(int port) const;
   bool isListener(int fdes) const;
 
-  void addToFdSocketMap(int fdes, const Socket* socket);
+  void addToListenerMap(int fdes, const Socket* socket);
   void addToPfd(int fdes);
 
   std::size_t getPfdsSize() const;
-  std::vector<pollfd> getPfds() const;
+  std::vector<pollfd>& getPfds();
   pollfd* getPfdStart();
   pollfd* getPollFd(int fdes);
 
@@ -48,9 +48,10 @@ private:
   SocketManager(const SocketManager& other);
   SocketManager& operator=(const SocketManager& other);
 
-  std::vector<const Socket*> _sockets;
-  std::map<int /* fd */, const Socket*> _fdToSocket;
   std::vector<pollfd> _pfds;
+  std::vector<const Socket*> _sockets;
+  std::map<int /* fd */, const Socket*> _listeners;
+  std::map<int /* fd */, const Socket*> _fdToSocket; // clientfds to socket
 };
 
 #endif
