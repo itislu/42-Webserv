@@ -67,7 +67,6 @@ bool EventManager::handleClient(Client* client, unsigned events)
 void EventManager::disconnectClient(Client* client)
 {
   if (client == 0) {
-    std::cout << "NO CLIENT TO REMOVE!\n";
     return;
   }
   const int clientFd = client->getFd();
@@ -117,7 +116,6 @@ void EventManager::checkActivity()
 
 int EventManager::calculateTimeout() const
 {
-  std::cout << "CALCULATE TIMEOUT\n";
   // No clients yet, get default
   if (!_clientsManager->hasClients()) {
     const long timeout = Config::getDefaultTimeout();
