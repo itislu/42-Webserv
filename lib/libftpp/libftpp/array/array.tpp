@@ -8,6 +8,7 @@
 #	include "libftpp/assert.hpp"
 #	include "libftpp/string.hpp"
 #	include "libftpp/type_traits.hpp"
+#	include "libftpp/utility.hpp"
 #	include <algorithm>
 #	include <cassert>
 #	include <cstddef>
@@ -34,7 +35,7 @@ template <typename T, std::size_t N>
 T* impl<T, N>::ptr(const Type& t) throw()
 {
 	if (N == 0) {
-		return NULL;
+		return FT_NULLPTR;
 	}
 	/*
 	The const_cast only removes const-ness temporarily added by the parameter

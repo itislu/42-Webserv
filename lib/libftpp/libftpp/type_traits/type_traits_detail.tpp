@@ -4,11 +4,29 @@
 #	define LIBFTPP_TYPE_TRAITS_TYPE_TRAITS_DETAIL_TPP
 
 #	include "type_traits_detail.hpp"
+#	include "libftpp/movable.hpp"
 #	include "libftpp/type_traits.hpp"
 
 namespace ft {
 namespace _type_traits {
 
+/* is_rvalue */
+template <typename T>
+struct is_rvalue : false_type {};
+
+template <typename T>
+struct is_rvalue<ft::rvalue<T> > : true_type {};
+
+template <typename T>
+struct is_rvalue<const ft::rvalue<T> > : true_type {};
+
+template <typename T>
+struct is_rvalue<volatile ft::rvalue<T> > : true_type {};
+
+template <typename T>
+struct is_rvalue<const volatile ft::rvalue<T> > : true_type {};
+
+/* type_or_null */
 namespace _type_or_null {
 template <typename T, typename = void>
 struct impl;

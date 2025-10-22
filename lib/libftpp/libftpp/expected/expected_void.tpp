@@ -5,29 +5,29 @@
 
 #	include "libftpp/expected.hpp"
 #	include "libftpp/safe_bool.hpp"
+#	include "libftpp/utility.hpp"
 #	include <algorithm>
 #	include <cassert>
-#	include <cstddef>
 
 namespace ft {
 
 template <typename E>
 expected<void, E>::expected() throw()
-    : _error(NULL),
+    : _error(FT_NULLPTR),
       _has_value(true)
 {}
 
 template <typename E>
 expected<void, E>::expected(const expected& other)
     : ft::safe_bool<expected<void, E> >(),
-      _error(other._has_value ? NULL : new E(*other._error)),
+      _error(other._has_value ? FT_NULLPTR : new E(*other._error)),
       _has_value(other._has_value)
 {}
 
 template <typename E>
 template <typename U, typename G>
 expected<void, E>::expected(const expected<U, G>& other)
-    : _error(other.has_value() ? NULL : new E(other.error())),
+    : _error(other.has_value() ? FT_NULLPTR : new E(other.error())),
       _has_value(other._has_value())
 {}
 

@@ -4,7 +4,7 @@
 
 #	include "libftpp/exception.hpp"
 #	include "libftpp/expected.hpp"
-#	include <cstddef>
+#	include "libftpp/utility.hpp"
 #	include <ios>
 #	include <new>
 #	include <string>
@@ -97,7 +97,7 @@ class from_string_invalid_exception;
  */
 template <typename To>
 To from_string(const std::string& str,
-               std::string::size_type* endpos_out = NULL);
+               std::string::size_type* endpos_out = FT_NULLPTR);
 /**
  * @copydoc from_string(const std::string&, std::string::size_type*)
  *
@@ -107,7 +107,7 @@ To from_string(const std::string& str,
 template <typename To>
 To from_string(const std::string& str,
                std::ios::fmtflags fmt,
-               std::string::size_type* endpos_out = NULL);
+               std::string::size_type* endpos_out = FT_NULLPTR);
 /**
  * @copydoc from_string(const std::string&, std::string::size_type*)
  *
@@ -118,7 +118,7 @@ template <typename To>
 ft::expected<To, ft::from_string_exception>
 from_string(const std::string& str,
             std::nothrow_t nothrow,
-            std::string::size_type* endpos_out = NULL);
+            std::string::size_type* endpos_out = FT_NULLPTR);
 /**
  * @copydoc from_string(const std::string&, std::string::size_type*)
  *
@@ -132,7 +132,7 @@ ft::expected<To, ft::from_string_exception>
 from_string(const std::string& str,
             std::ios::fmtflags fmt,
             std::nothrow_t nothrow,
-            std::string::size_type* endpos_out = NULL);
+            std::string::size_type* endpos_out = FT_NULLPTR);
 
 class from_string_exception : public ft::exception {
 public:

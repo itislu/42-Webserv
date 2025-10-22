@@ -22,4 +22,51 @@
  */
 #	define FT_STATIC_ASSERT(EXPR) LIBFTPP_STATIC_ASSERT_IMPL(EXPR)
 
+#	include "libftpp/type_traits.hpp"
+
+namespace ft {
+
+/**
+ * @brief Provides a dependent `false` value
+ *
+ * Useful to cause a compilation error if a template gets instantiated.
+ * By making a static assertion that always fails, a free-standing function can
+ * essentially be disabled.
+ * One template argument must be a template type itself, otherwise the compiler
+ * detects the assertion failure in the first phase of two-phase name lookup.
+ * More template arguments can be passed to prevent unused typedef warnings, for
+ * example.
+ */
+template <typename,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void>
+struct make_false : ft::false_type {};
+
+/**
+ * @brief Provides a dependent `true` value
+ *
+ * Useful to prevent unused typedef warnings by using the type in a static
+ * assertion that always passes.
+ */
+template <typename,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void,
+          typename = void>
+struct make_true : ft::true_type {};
+
+} // namespace ft
+
 #endif // LIBFTPP_ASSERT_HPP

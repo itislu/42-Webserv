@@ -16,8 +16,7 @@ InputIt next(InputIt it)
 	typedef typename std::iterator_traits<InputIt>::difference_type
 	    InputIt_must_be_an_iterator_type;
 	// Use to avoid unused typedef warnings.
-	FT_STATIC_ASSERT((ft::is_same<InputIt_must_be_an_iterator_type,
-	                              InputIt_must_be_an_iterator_type>::value));
+	FT_STATIC_ASSERT(ft::make_true<InputIt_must_be_an_iterator_type>::value);
 
 	++it;
 	return it;

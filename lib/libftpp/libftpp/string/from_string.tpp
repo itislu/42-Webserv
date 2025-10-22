@@ -7,11 +7,11 @@
 #	include "libftpp/iterator.hpp"
 #	include "libftpp/string.hpp"
 #	include "libftpp/type_traits.hpp"
+#	include "libftpp/utility.hpp"
 #	include <algorithm>
 #	include <cctype>
 #	include <cerrno>
 #	include <cmath>
-#	include <cstddef>
 #	include <cstdlib>
 #	include <iostream>
 #	include <limits>
@@ -37,14 +37,15 @@ struct impl {
 
 template <typename To>
 To from_string(const std::string& str,
-               std::string::size_type* endpos_out /*= NULL*/)
+               std::string::size_type* endpos_out /*= FT_NULLPTR*/)
 {
 	return ft::from_string<To>(str, std::ios::fmtflags(), endpos_out);
 }
 
 template <>
-inline bool from_string<bool>(const std::string& str,
-                              std::string::size_type* endpos_out /*= NULL*/)
+inline bool
+from_string<bool>(const std::string& str,
+                  std::string::size_type* endpos_out /*= FT_NULLPTR*/)
 {
 	try {
 		return ft::from_string<bool>(str, std::ios::boolalpha, endpos_out);
@@ -57,7 +58,7 @@ inline bool from_string<bool>(const std::string& str,
 template <typename To>
 To from_string(const std::string& str,
                std::ios::fmtflags fmt,
-               std::string::size_type* endpos_out /*= NULL*/)
+               std::string::size_type* endpos_out /*= FT_NULLPTR*/)
 {
 	// NOLINTNEXTLINE: Let endpos always be a valid reference
 	std::string::size_type _, &endpos = (endpos_out ? *endpos_out : _) = 0;
@@ -85,7 +86,7 @@ template <typename To>
 ft::expected<To, ft::from_string_exception>
 from_string(const std::string& str,
             std::nothrow_t /*nothrow*/,
-            std::string::size_type* endpos_out /*= NULL*/)
+            std::string::size_type* endpos_out /*= FT_NULLPTR*/)
 {
 	try {
 		return ft::from_string<To>(str, endpos_out);
@@ -100,7 +101,7 @@ ft::expected<To, ft::from_string_exception>
 from_string(const std::string& str,
             std::ios::fmtflags fmt,
             std::nothrow_t /*nothrow*/,
-            std::string::size_type* endpos_out /*= NULL*/)
+            std::string::size_type* endpos_out /*= FT_NULLPTR*/)
 {
 	try {
 		return ft::from_string<To>(str, fmt, endpos_out);
@@ -150,7 +151,7 @@ struct impl<To, typename ft::enable_if<ft::is_integral<To>::value>::type> {
 	{
 		const char* const start = str.c_str();
 		// False positive: Check does not run on C code (`strto*` signature).
-		char* end = NULL; // NOLINT(misc-const-correctness)
+		char* end = FT_NULLPTR; // NOLINT(misc-const-correctness)
 
 		// strtol works even for unsigned long since valid numbers between
 		// LONG_MAX and ULONG_MAX would not get here
@@ -162,7 +163,7 @@ struct impl<To, typename ft::enable_if<ft::is_integral<To>::value>::type> {
 		    || test < static_cast<long>(std::numeric_limits<To>::min())
 		    || static_cast<unsigned long>(test) > static_cast<unsigned long>(
 		           std::numeric_limits<To>::max())) {
-			if (end != NULL) {
+			if (end != FT_NULLPTR) {
 				endpos_out = end - start;
 			}
 			throw from_string_range_exception(str, typeid(To));
@@ -219,7 +220,7 @@ struct impl<To,
 	{
 		const char* const start = str.c_str();
 		// False positive: Check does not run on C code (`strto*` signature).
-		char* end = NULL; // NOLINT(misc-const-correctness)
+		char* end = FT_NULLPTR; // NOLINT(misc-const-correctness)
 
 		int errno_local = errno;
 		errno = 0;
@@ -233,7 +234,7 @@ struct impl<To,
 			res = std::strtold(start, &end);
 		}
 		std::swap(errno, errno_local);
-		if (end != NULL) {
+		if (end != FT_NULLPTR) {
 			endpos_out = end - start;
 		}
 

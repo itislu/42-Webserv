@@ -6,12 +6,19 @@ namespace ft {
 namespace _type_traits {
 
 /**
- * Incomplete type used to represent a NULL type internally in type traits.
+ * @brief Returns `true` if `T` is an `ft::rvalue`
+ */
+template <typename T>
+struct is_rvalue;
+
+/**
+ * @brief Incomplete type used to represent a NULL type internally in type
+ * traits
  */
 struct null_type;
 
 /**
- * Returns `T::type` if that is well-formed, otherwise `null_type`.
+ * @brief Returns `T::type` if that is well-formed, otherwise `null_type`
  */
 template <typename T>
 struct type_or_null;

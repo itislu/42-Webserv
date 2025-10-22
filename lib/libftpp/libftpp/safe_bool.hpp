@@ -7,8 +7,11 @@
 namespace ft {
 
 /**
- * @brief Class to provide boolean tests for the deriving class but restricting
- * it from taking participation in unwanted expressions (safe bool problem)
+ * @brief Mixin providing safe boolean test that does not participate in
+ * unwanted expressions (safe bool problem)
+ *
+ * Needed since C++98 does not support the `explicit` keyword with conversion
+ * operators yet (introduced in C++11).
  *
  * Implements the Safe Bool idiom using CRTP (Curiously Recurring Template
  * Pattern).
@@ -17,7 +20,7 @@ namespace ft {
  * Usage:
  * 1. Publicly inherit from this class using CRTP idiom:
  *    `class YourClass : public safe_bool<YourClass>`.
- * 2. Implement `bool boolean_test() const`.
+ * 2. Implement `bool boolean_test() const` instead of `operator bool() const`.
  */
 template <typename Derived = void>
 class safe_bool : private _safe_bool::safe_bool_base {
@@ -36,8 +39,11 @@ private:
 };
 
 /**
- * @brief Class to provide boolean tests for the deriving class but restricting
- * it from taking participation in unwanted expressions (safe bool problem)
+ * @brief Mixin providing safe boolean test that does not participate in
+ * unwanted expressions (safe bool problem)
+ *
+ * Needed since C++98 does not support the `explicit` keyword with conversion
+ * operators yet (introduced in C++11).
  *
  * Implements the Safe Bool idiom using dynamic dispatch.
  * https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Safe_bool
@@ -45,7 +51,7 @@ private:
  * Usage:
  * 1. Publicly inherit from this class with no template parameter:
  *    `class YourClass : public safe_bool<>`.
- * 2. Implement `bool boolean_test() const`.
+ * 2. Implement `bool boolean_test() const` instead of `operator bool() const`.
  *
  * @note If your class is not virtual yet, prefer to pass your class as template
  * parameter (CRTP idiom) to avoid it becoming virtual.

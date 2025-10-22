@@ -16,7 +16,7 @@ std::string demangle(const char* mangled_name)
 	std::string result;
 	int status = 0;
 	char* const demangled =
-	    abi::__cxa_demangle(mangled_name, NULL, NULL, &status);
+	    abi::__cxa_demangle(mangled_name, FT_NULLPTR, FT_NULLPTR, &status);
 
 	try {
 		result = status == 0 ? demangled : mangled_name;
