@@ -15,6 +15,7 @@
 #	include <cassert>
 #	include <cstddef>
 #	include <ostream>
+#	include <typeinfo> // IWYU pragma: keep: typeid
 
 namespace ft {
 
