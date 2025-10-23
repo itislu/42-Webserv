@@ -1,13 +1,13 @@
-#include "http/abnfRules/uriRules.hpp"
-#include "utils/Buffer.hpp"
-#include "utils/BufferReader.hpp"
-#include "utils/abnfRules/AlternativeRule.hpp"
-#include "utils/abnfRules/LiteralRule.hpp"
-#include "utils/abnfRules/RangeRule.hpp"
-#include "utils/abnfRules/RepetitionRule.hpp"
-#include "utils/abnfRules/SequenceRule.hpp"
+#include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
+#include <utils/Buffer.hpp>
+#include <utils/BufferReader.hpp>
+#include <utils/abnfRules/AlternativeRule.hpp>
+#include <utils/abnfRules/LiteralRule.hpp>
+#include <utils/abnfRules/RangeRule.hpp>
+#include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/abnfRules/SequenceRule.hpp>
 
 #include <cctype>
 #include <gtest/gtest.h>
@@ -132,15 +132,15 @@ TEST(UriAbnfTest, RelativePart)
  */
 TEST(UriAbnfTest, Scheme)
 {
-  SequenceRule* sequenze = schemeRule();
-  EXPECT_TRUE(runParser("a1234", *sequenze));
-  EXPECT_TRUE(runParser("a", *sequenze));
-  EXPECT_TRUE(runParser("a+", *sequenze));
-  EXPECT_TRUE(runParser("a-", *sequenze));
-  EXPECT_TRUE(runParser("a.", *sequenze));
+  SequenceRule* sequence = schemeRule();
+  EXPECT_TRUE(runParser("a1234", *sequence));
+  EXPECT_TRUE(runParser("a", *sequence));
+  EXPECT_TRUE(runParser("a+", *sequence));
+  EXPECT_TRUE(runParser("a-", *sequence));
+  EXPECT_TRUE(runParser("a.", *sequence));
 
   // Invalid
-  EXPECT_FALSE(runParser("1a1234", *sequenze));
+  EXPECT_FALSE(runParser("1a1234", *sequence));
 }
 
 /**
@@ -361,28 +361,28 @@ TEST(UriAbnfTest, IPv4address_Valid)
  */
 TEST(UriAbnfTest, DecOctet)
 {
-  SequenceRule sequenze;
-  sequenze.addRule(decOctetRule());
+  SequenceRule sequence;
+  sequence.addRule(decOctetRule());
 
   // 0-9
-  EXPECT_TRUE(runParser("1", sequenze));
-  EXPECT_TRUE(runParser("9", sequenze));
+  EXPECT_TRUE(runParser("1", sequence));
+  EXPECT_TRUE(runParser("9", sequence));
 
   // 10-99
-  EXPECT_TRUE(runParser("10", sequenze));
-  EXPECT_TRUE(runParser("99", sequenze));
+  EXPECT_TRUE(runParser("10", sequence));
+  EXPECT_TRUE(runParser("99", sequence));
 
   // 100-199
-  EXPECT_TRUE(runParser("100", sequenze));
-  EXPECT_TRUE(runParser("199", sequenze));
+  EXPECT_TRUE(runParser("100", sequence));
+  EXPECT_TRUE(runParser("199", sequence));
 
   // 200-249
-  EXPECT_TRUE(runParser("200", sequenze));
-  EXPECT_TRUE(runParser("249", sequenze));
+  EXPECT_TRUE(runParser("200", sequence));
+  EXPECT_TRUE(runParser("249", sequence));
 
   // 250-255
-  EXPECT_TRUE(runParser("250", sequenze));
-  EXPECT_TRUE(runParser("255", sequenze));
+  EXPECT_TRUE(runParser("250", sequence));
+  EXPECT_TRUE(runParser("255", sequence));
 }
 
 /**
@@ -390,12 +390,12 @@ TEST(UriAbnfTest, DecOctet)
  */
 TEST(UriAbnfTest, RegName)
 {
-  SequenceRule sequenze;
-  sequenze.addRule(regNameRule());
-  EXPECT_TRUE(runParser("a", sequenze));
-  EXPECT_TRUE(runParser("a%20", sequenze));
-  EXPECT_TRUE(runParser("a%20b", sequenze));
-  EXPECT_TRUE(runParser("a%20b!!!=", sequenze));
+  SequenceRule sequence;
+  sequence.addRule(regNameRule());
+  EXPECT_TRUE(runParser("a", sequence));
+  EXPECT_TRUE(runParser("a%20", sequence));
+  EXPECT_TRUE(runParser("a%20b", sequence));
+  EXPECT_TRUE(runParser("a%20b!!!=", sequence));
 }
 
 /**
@@ -446,12 +446,12 @@ TEST(UriAbnfTest, Path)
  */
 TEST(UriAbnfTest, PathAbEmpty)
 {
-  SequenceRule sequenze;
+  SequenceRule sequence;
   RepetitionRule* rep = pathAbEmptyRule();
-  sequenze.addRule(rep);
-  EXPECT_TRUE(runParser("/abc/def", sequenze));
-  EXPECT_TRUE(runParser("/abc/def//", sequenze));
-  EXPECT_TRUE(runParser("///", sequenze));
+  sequence.addRule(rep);
+  EXPECT_TRUE(runParser("/abc/def", sequence));
+  EXPECT_TRUE(runParser("/abc/def//", sequence));
+  EXPECT_TRUE(runParser("///", sequence));
 }
 
 /**
@@ -459,14 +459,14 @@ TEST(UriAbnfTest, PathAbEmpty)
  */
 TEST(UriAbnfTest, PathAbsolute)
 {
-  SequenceRule* sequenze = pathAbsoluteRule();
-  EXPECT_TRUE(runParser("/abc/def", *sequenze));
-  EXPECT_TRUE(runParser("/abc/def//", *sequenze));
-  EXPECT_TRUE(runParser("/", *sequenze));
+  SequenceRule* sequence = pathAbsoluteRule();
+  EXPECT_TRUE(runParser("/abc/def", *sequence));
+  EXPECT_TRUE(runParser("/abc/def//", *sequence));
+  EXPECT_TRUE(runParser("/", *sequence));
 
   // Invalid
-  EXPECT_FALSE(runParser("///", *sequenze));
-  EXPECT_FALSE(runParser("//abc/", *sequenze));
+  EXPECT_FALSE(runParser("///", *sequence));
+  EXPECT_FALSE(runParser("//abc/", *sequence));
 }
 
 /**
@@ -474,26 +474,26 @@ TEST(UriAbnfTest, PathAbsolute)
  */
 TEST(UriAbnfTest, PathNoScheme)
 {
-  SequenceRule* sequenze = pathNoScheme();
-  EXPECT_TRUE(runParser("abc", *sequenze));
-  EXPECT_TRUE(runParser("abc/def", *sequenze));
-  EXPECT_TRUE(runParser("abc/def/ghi", *sequenze));
-  EXPECT_TRUE(runParser("abc/", *sequenze));
-  EXPECT_TRUE(runParser("@user/data", *sequenze));
-  EXPECT_TRUE(runParser("%20info/more", *sequenze));
-  EXPECT_TRUE(runParser("!$&'()*+,;=@/file", *sequenze));
+  SequenceRule* sequence = pathNoSchemeRule();
+  EXPECT_TRUE(runParser("abc", *sequence));
+  EXPECT_TRUE(runParser("abc/def", *sequence));
+  EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
+  EXPECT_TRUE(runParser("abc/", *sequence));
+  EXPECT_TRUE(runParser("@user/data", *sequence));
+  EXPECT_TRUE(runParser("%20info/more", *sequence));
+  EXPECT_TRUE(runParser("!$&'()*+,;=@/file", *sequence));
 
   // Invalid
   // must not start with '/'
-  EXPECT_FALSE(runParser("/abc", *sequenze));
+  EXPECT_FALSE(runParser("/abc", *sequence));
   // segment-nz-nc can’t contain ':'
-  EXPECT_FALSE(runParser(":abc", *sequenze));
+  EXPECT_FALSE(runParser(":abc", *sequence));
   // ':' not allowed in first segment
-  EXPECT_FALSE(runParser("a:b", *sequenze));
+  EXPECT_FALSE(runParser("a:b", *sequence));
   // same reason: first char must not be '/'
-  EXPECT_FALSE(runParser("//abc", *sequenze));
-  EXPECT_FALSE(runParser("///", *sequenze));
-  EXPECT_FALSE(runParser("//abc/", *sequenze));
+  EXPECT_FALSE(runParser("//abc", *sequence));
+  EXPECT_FALSE(runParser("///", *sequence));
+  EXPECT_FALSE(runParser("//abc/", *sequence));
 }
 
 /**
@@ -501,21 +501,21 @@ TEST(UriAbnfTest, PathNoScheme)
  */
 TEST(UriAbnfTest, PathRootless)
 {
-  SequenceRule* sequenze = pathRootless();
+  SequenceRule* sequence = pathRootlessRule();
 
-  EXPECT_TRUE(runParser("abc", *sequenze));
-  EXPECT_TRUE(runParser("abc/def", *sequenze));
-  EXPECT_TRUE(runParser("abc/def/ghi", *sequenze));
-  EXPECT_TRUE(runParser("abc/", *sequenze));
-  EXPECT_TRUE(runParser("foo:bar", *sequenze));
-  EXPECT_TRUE(runParser("a:b/c", *sequenze));
-  EXPECT_TRUE(runParser("@user/data", *sequenze));
-  EXPECT_TRUE(runParser("%20info/more", *sequenze));
-  EXPECT_TRUE(runParser(":abc", *sequenze));
+  EXPECT_TRUE(runParser("abc", *sequence));
+  EXPECT_TRUE(runParser("abc/def", *sequence));
+  EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
+  EXPECT_TRUE(runParser("abc/", *sequence));
+  EXPECT_TRUE(runParser("foo:bar", *sequence));
+  EXPECT_TRUE(runParser("a:b/c", *sequence));
+  EXPECT_TRUE(runParser("@user/data", *sequence));
+  EXPECT_TRUE(runParser("%20info/more", *sequence));
+  EXPECT_TRUE(runParser(":abc", *sequence));
 
   // Invalid
-  EXPECT_FALSE(runParser("/abc", *sequenze));
-  EXPECT_FALSE(runParser("//abc", *sequenze));
+  EXPECT_FALSE(runParser("/abc", *sequence));
+  EXPECT_FALSE(runParser("//abc", *sequence));
 }
 
 /**
@@ -523,25 +523,25 @@ TEST(UriAbnfTest, PathRootless)
  */
 TEST(UriAbnfTest, Segment)
 {
-  SequenceRule sequenze;
+  SequenceRule sequence;
   RepetitionRule* rep = segmentRule();
-  sequenze.addRule(rep);
-  EXPECT_TRUE(runParser("", sequenze));
+  sequence.addRule(rep);
+  EXPECT_TRUE(runParser("", sequence));
   EXPECT_EQ(rep->getReps(), 0);
-  EXPECT_TRUE(runParser("a", sequenze));
+  EXPECT_TRUE(runParser("a", sequence));
   EXPECT_EQ(rep->getReps(), 1);
-  EXPECT_TRUE(runParser("1", sequenze));
+  EXPECT_TRUE(runParser("1", sequence));
   EXPECT_EQ(rep->getReps(), 1);
-  EXPECT_TRUE(runParser("abc%20", sequenze));
+  EXPECT_TRUE(runParser("abc%20", sequence));
   EXPECT_EQ(rep->getReps(), 4);
-  EXPECT_TRUE(runParser("foo:bar", sequenze));
+  EXPECT_TRUE(runParser("foo:bar", sequence));
   EXPECT_EQ(rep->getReps(), 7);
-  EXPECT_TRUE(runParser("test@site", sequenze));
+  EXPECT_TRUE(runParser("test@site", sequence));
   EXPECT_EQ(rep->getReps(), 9);
-  EXPECT_TRUE(runParser("-._~", sequenze));
+  EXPECT_TRUE(runParser("-._~", sequence));
   EXPECT_EQ(rep->getReps(), 4);
 
-  // Invalid tests make more sense in a sequenze combination
+  // Invalid tests make more sense in a sequence combination
   // this will be done with the path tests
 }
 
@@ -550,23 +550,23 @@ TEST(UriAbnfTest, Segment)
  */
 TEST(UriAbnfTest, SegmentNz)
 {
-  SequenceRule sequenze;
+  SequenceRule sequence;
   RepetitionRule* rep = segmentNzRule();
-  sequenze.addRule(rep);
-  EXPECT_TRUE(runParser("a", sequenze));
+  sequence.addRule(rep);
+  EXPECT_TRUE(runParser("a", sequence));
   EXPECT_EQ(rep->getReps(), 1);
-  EXPECT_TRUE(runParser("1", sequenze));
+  EXPECT_TRUE(runParser("1", sequence));
   EXPECT_EQ(rep->getReps(), 1);
-  EXPECT_TRUE(runParser("abc%20", sequenze));
+  EXPECT_TRUE(runParser("abc%20", sequence));
   EXPECT_EQ(rep->getReps(), 4);
-  EXPECT_TRUE(runParser("foo:bar", sequenze));
+  EXPECT_TRUE(runParser("foo:bar", sequence));
   EXPECT_EQ(rep->getReps(), 7);
-  EXPECT_TRUE(runParser("test@site", sequenze));
+  EXPECT_TRUE(runParser("test@site", sequence));
   EXPECT_EQ(rep->getReps(), 9);
-  EXPECT_TRUE(runParser("-._~", sequenze));
+  EXPECT_TRUE(runParser("-._~", sequence));
   EXPECT_EQ(rep->getReps(), 4);
 
-  // Invalid tests make more sense in a sequenze combination
+  // Invalid tests make more sense in a sequence combination
   // this will be done with the path tests
 }
 
@@ -576,31 +576,31 @@ TEST(UriAbnfTest, SegmentNz)
  */
 TEST(UriAbnfTest, SegmentNzNc)
 {
-  SequenceRule sequenze;
+  SequenceRule sequence;
   RepetitionRule* rep = segmentNzNcRule();
-  sequenze.addRule(rep);
-  EXPECT_TRUE(runParser("a", sequenze));
+  sequence.addRule(rep);
+  EXPECT_TRUE(runParser("a", sequence));
   EXPECT_EQ(rep->getReps(), 1);
-  EXPECT_TRUE(runParser("abc", sequenze));
+  EXPECT_TRUE(runParser("abc", sequence));
   EXPECT_EQ(rep->getReps(), 3);
-  EXPECT_TRUE(runParser("@user", sequenze));
+  EXPECT_TRUE(runParser("@user", sequence));
   EXPECT_EQ(rep->getReps(), 5);
-  EXPECT_TRUE(runParser("%20", sequenze));
+  EXPECT_TRUE(runParser("%20", sequence));
   EXPECT_EQ(rep->getReps(), 1);
-  EXPECT_TRUE(runParser("abc%7E", sequenze));
+  EXPECT_TRUE(runParser("abc%7E", sequence));
   EXPECT_EQ(rep->getReps(), 4);
-  EXPECT_TRUE(runParser("!$&'()*+,;=@", sequenze));
+  EXPECT_TRUE(runParser("!$&'()*+,;=@", sequence));
   EXPECT_EQ(rep->getReps(), 12);
-  EXPECT_TRUE(runParser("abc%20@id", sequenze));
+  EXPECT_TRUE(runParser("abc%20@id", sequence));
   EXPECT_EQ(rep->getReps(), 7);
 
   // Invalid
   // valid until : so cout is 3
-  EXPECT_FALSE(runParser("foo:bar", sequenze));
+  EXPECT_FALSE(runParser("foo:bar", sequence));
   // EXPECT_TRUE(rep->getReps(), 3);
-  EXPECT_FALSE(runParser("a:b", sequenze));
+  EXPECT_FALSE(runParser("a:b", sequence));
   // EXPECT_TRUE(rep->getReps(), 1);
-  EXPECT_FALSE(runParser(":", sequenze));
+  EXPECT_FALSE(runParser(":", sequence));
 }
 
 /**
@@ -609,22 +609,22 @@ TEST(UriAbnfTest, SegmentNzNc)
 TEST(UriAbnfTest, Pchar)
 {
   {
-    SequenceRule sequenze;
+    SequenceRule sequence;
     RepetitionRule* rep = new RepetitionRule(pcharRule());
     rep->setMin(3);
-    sequenze.addRule(rep);
-    EXPECT_TRUE(runParser("user@test", sequenze));
-    EXPECT_TRUE(runParser("%0F%0F%0F", sequenze));
-    EXPECT_TRUE(runParser("abc%0F!ac", sequenze));
+    sequence.addRule(rep);
+    EXPECT_TRUE(runParser("user@test", sequence));
+    EXPECT_TRUE(runParser("%0F%0F%0F", sequence));
+    EXPECT_TRUE(runParser("abc%0F!ac", sequence));
   }
 
   {
     // Invalid
-    SequenceRule sequenze;
+    SequenceRule sequence;
     RepetitionRule* rep = new RepetitionRule(pcharRule());
     rep->setMin(4);
-    sequenze.addRule(rep);
-    EXPECT_FALSE(runParser("abc%1Z!ac", sequenze));
+    sequence.addRule(rep);
+    EXPECT_FALSE(runParser("abc%1Z!ac", sequence));
   }
 }
 
@@ -633,9 +633,9 @@ TEST(UriAbnfTest, Pchar)
  */
 TEST(UriAbnfTest, Query)
 {
-  SequenceRule sequenze;
-  sequenze.addRule(queryRule());
-  EXPECT_TRUE(runParser("abc%0F!ac/abc/?", sequenze));
+  SequenceRule sequence;
+  sequence.addRule(queryRule());
+  EXPECT_TRUE(runParser("abc%0F!ac/abc/?", sequence));
 }
 
 /**
@@ -643,9 +643,9 @@ TEST(UriAbnfTest, Query)
  */
 TEST(UriAbnfTest, Fragment)
 {
-  SequenceRule sequenze;
-  sequenze.addRule(fragmentRule());
-  EXPECT_TRUE(runParser("abc%0F!ac/abc/?", sequenze));
+  SequenceRule sequence;
+  sequence.addRule(fragmentRule());
+  EXPECT_TRUE(runParser("abc%0F!ac/abc/?", sequence));
 }
 
 /**
@@ -653,19 +653,19 @@ TEST(UriAbnfTest, Fragment)
  */
 TEST(UriAbnfTest, PercentEncoded)
 {
-  SequenceRule sequenze;
-  sequenze.addRule(new LiteralRule("%"));
-  sequenze.addRule(new RangeRule(http::isHexDigit));
-  sequenze.addRule(new RangeRule(http::isHexDigit));
+  SequenceRule sequence;
+  sequence.addRule(new LiteralRule("%"));
+  sequence.addRule(new RangeRule(http::isHexDigit));
+  sequence.addRule(new RangeRule(http::isHexDigit));
 
   // Valid
-  EXPECT_TRUE(runParser("%aB", sequenze));
-  EXPECT_TRUE(runParser("%0F", sequenze));
+  EXPECT_TRUE(runParser("%aB", sequence));
+  EXPECT_TRUE(runParser("%0F", sequence));
 
   // Invalid
-  EXPECT_FALSE(runParser("%A ", sequenze));
-  EXPECT_FALSE(runParser("%G1", sequenze));
-  EXPECT_FALSE(runParser("%1Z", sequenze));
+  EXPECT_FALSE(runParser("%A ", sequence));
+  EXPECT_FALSE(runParser("%G1", sequence));
+  EXPECT_FALSE(runParser("%1Z", sequence));
 }
 
 /**

@@ -73,7 +73,7 @@ AlternativeRule* hierPartRule()
   alter->addRule(pathAbsoluteRule());
 
   // path-rootless
-  alter->addRule(pathRootless());
+  alter->addRule(pathRootlessRule());
 
   // path-empty
   alter->addRule(pathEmptyRule());
@@ -564,8 +564,8 @@ AlternativeRule* pathRule()
   AlternativeRule* alter = new AlternativeRule();
   alter->addRule(pathAbEmptyRule());
   alter->addRule(pathAbsoluteRule());
-  alter->addRule(pathNoScheme());
-  alter->addRule(pathRootless());
+  alter->addRule(pathNoSchemeRule());
+  alter->addRule(pathRootlessRule());
   alter->addRule(pathEmptyRule());
 
   alter->setDebugTag("pathRule");
@@ -613,25 +613,25 @@ SequenceRule* pathAbsoluteRule()
 /**
  * path-noscheme = segment-nz-nc *( "/" segment )
  */
-SequenceRule* pathNoScheme()
+SequenceRule* pathNoSchemeRule()
 {
   SequenceRule* sequence = new SequenceRule();
   sequence->addRule(segmentNzNcRule());
   sequence->addRule(pathAbEmptyRule());
-  sequence->setDebugTag("pathNoScheme");
+  sequence->setDebugTag("pathNoSchemeRule");
   return sequence;
 }
 
 /**
  * path-rootless = segment-nz *( "/" segment )
  */
-SequenceRule* pathRootless()
+SequenceRule* pathRootlessRule()
 {
   SequenceRule* sequence = new SequenceRule();
   sequence->addRule(segmentNzRule());
   sequence->addRule(pathAbEmptyRule());
 
-  sequence->setDebugTag("pathRootless");
+  sequence->setDebugTag("pathRootlessRule");
   return sequence;
 }
 
