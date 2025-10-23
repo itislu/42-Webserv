@@ -48,6 +48,17 @@ void control_block_pointer_deleter<Yp, Deleter>::dispose() throw()
 	_deleter(_ptr);
 }
 
+/**
+ * 20.3.2.2.11 [util.smartptr.getdeleter]
+ * "If p owns a deleter d of type cv-unqualified D, returns addressof(d);
+ * otherwise returns nullptr."
+ *
+ * I am not sure what this means if `Deleter` is const qualified. As it is now,
+ * this will not compile.
+ * libstd++ also does not compile.
+ * libc++ does compile, but casts away the constness in `std::get_deleter<D>(p)`
+ * with a `p` that has a `const D` deleter.
+ */
 template <typename Yp, typename Deleter>
 void* control_block_pointer_deleter<Yp, Deleter>::get_deleter(
     const std::type_info& t) throw()
