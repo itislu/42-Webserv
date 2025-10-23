@@ -24,9 +24,9 @@
 	public:                                         \
 		LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)    \
 	public:                                         \
-		TYPE& operator=(TYPE& t)                    \
+		TYPE& operator=(TYPE& other)                \
 		{                                           \
-			*this = const_cast<const TYPE&>(t);     \
+			*this = const_cast<const TYPE&>(other); \
 			return *this;                           \
 		}                                           \
                                                     \
@@ -42,14 +42,14 @@
 	private:
 
 // NOLINTBEGIN(bugprone-macro-parentheses): Not valid syntax.
-#	define LIBFTPP_MOVABLE_BUT_NOT_COPYABLE_IMPL(TYPE)          \
-	public:                                                      \
-		LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)                 \
-	private:                                                     \
-		TYPE(TYPE&);                                             \
-		TYPE& operator=(TYPE&);                                  \
-		TYPE& operator=(const ft::copy_assign_ref<TYPE>& other); \
-                                                                 \
+#	define LIBFTPP_MOVABLE_BUT_NOT_COPYABLE_IMPL(TYPE)    \
+	public:                                                \
+		LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)           \
+	private:                                               \
+		TYPE(TYPE&);                                       \
+		TYPE& operator=(TYPE&);                            \
+		TYPE& operator=(const ft::copy_assign_ref<TYPE>&); \
+                                                           \
 	private:
 // NOLINTEND(bugprone-macro-parentheses)
 
