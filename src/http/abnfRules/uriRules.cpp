@@ -1,13 +1,13 @@
 #include "uriRules.hpp"
 
 #include <http/http.hpp>
-#include <utils/abnfRules/AlternativRule.hpp>
+#include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
-#include <cctype>
+#include <ctype.h>
 
 /**
  * Reference:
@@ -58,9 +58,9 @@ SequenceRule* uriRule()
  *            / path-rootless
  *            / path-empty
  */
-AlternativRule* hierPartRule()
+AlternativeRule* hierPartRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
 
   // "//" authority path-abempty
   SequenceRule* seq1 = new SequenceRule();
@@ -76,7 +76,7 @@ AlternativRule* hierPartRule()
   alter->addRule(pathRootless());
 
   // path-empty
-  // alter->addRule(pathEmptyRule()); // TODO necessary ?
+  alter->addRule(pathEmptyRule());
 
   alter->setDebugTag("hierPartRule");
   return alter;
@@ -142,10 +142,10 @@ SequenceRule* authorityRule()
  */
 RepetitionRule* userinfoRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isUnreserved));
   alter->addRule(pctRule());
-  alter->addRule(new RangeRule(http::isSubdelim));
+  alter->addRule(new RangeRule(http::isSubDelim));
   alter->addRule(new LiteralRule(":"));
 
   RepetitionRule* rep = new RepetitionRule(alter);
@@ -156,9 +156,9 @@ RepetitionRule* userinfoRule()
 /**
  * host          = IP-literal / IPv4address / reg-name
  */
-AlternativRule* hostRule()
+AlternativeRule* hostRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(ipLiteralRule());
   alter->addRule(ipv4AddressRule());
   alter->addRule(regNameRule());
@@ -188,7 +188,7 @@ SequenceRule* ipLiteralRule()
   seq->addRule(new LiteralRule("["));
 
   // ( IPv6address / IPvFuture )
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(ipv6AddressRule());
   alter->addRule(ipvFutureRule());
   seq->addRule(alter);
@@ -219,9 +219,9 @@ SequenceRule* ipvFutureRule()
   seq->addRule(new LiteralRule("."));
 
   // 1*( unreserved / sub-delims / ":" )
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isUnreserved));
-  alter->addRule(new RangeRule(http::isSubdelim));
+  alter->addRule(new RangeRule(http::isSubDelim));
   alter->addRule(new LiteralRule(":"));
 
   RepetitionRule* rep = new RepetitionRule(alter);
@@ -417,9 +417,9 @@ static SequenceRule* ipv6AddressRuleAlt9()
  *             / [ *5( h16 ":" ) h16 ] "::"              h16
  *             / [ *6( h16 ":" ) h16 ] "::"
  */
-AlternativRule* ipv6AddressRule()
+AlternativeRule* ipv6AddressRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(ipv6AddressRuleAlt1());
   alter->addRule(ipv6AddressRuleAlt2());
   alter->addRule(ipv6AddressRuleAlt3());
@@ -450,9 +450,9 @@ RepetitionRule* h16Rule()
  * ls32 = ( h16 ":" h16 ) / IPv4address
  *        ; least-significant 32 bits of address
  */
-AlternativRule* ls32Rule()
+AlternativeRule* ls32Rule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
 
   // h16 ":" h16
   SequenceRule* seq = new SequenceRule();
@@ -494,9 +494,9 @@ SequenceRule* ipv4AddressRule()
  *            / "2" %x30-34 DIGIT    ; 200-249
  *            / "25" %x30-35         ; 250-255
  */
-AlternativRule* decOctetRule()
+AlternativeRule* decOctetRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
 
   // DIGIT → 0-9
   alter->addRule(new RangeRule(::isdigit));
@@ -536,10 +536,10 @@ AlternativRule* decOctetRule()
  */
 RepetitionRule* regNameRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isUnreserved));
   alter->addRule(pctRule());
-  alter->addRule(new RangeRule(http::isSubdelim));
+  alter->addRule(new RangeRule(http::isSubDelim));
 
   RepetitionRule* rep = new RepetitionRule(alter);
   rep->setDebugTag("regNameRule");
@@ -559,13 +559,14 @@ RepetitionRule* regNameRule()
  *   path-rootless = segment-nz *( "/" segment )
  *   path-empty    = 0<pchar>
  */
-AlternativRule* pathRule()
+AlternativeRule* pathRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(pathAbEmptyRule());
   alter->addRule(pathAbsoluteRule());
   alter->addRule(pathNoScheme());
   alter->addRule(pathRootless());
+  alter->addRule(pathEmptyRule());
 
   alter->setDebugTag("pathRule");
   return alter;
@@ -576,11 +577,11 @@ AlternativRule* pathRule()
  */
 RepetitionRule* pathAbEmptyRule()
 {
-  SequenceRule* sequenze = new SequenceRule();
-  sequenze->addRule(new LiteralRule("/"));
-  sequenze->addRule(segmentRule());
+  SequenceRule* sequence = new SequenceRule();
+  sequence->addRule(new LiteralRule("/"));
+  sequence->addRule(segmentRule());
 
-  RepetitionRule* rep = new RepetitionRule(sequenze);
+  RepetitionRule* rep = new RepetitionRule(sequence);
   rep->setDebugTag("pathAbEmptyRule");
   return rep;
 }
@@ -592,7 +593,7 @@ SequenceRule* pathAbsoluteRule()
 {
   SequenceRule* optSeq = new SequenceRule();
   optSeq->addRule(segmentNzRule());
-  optSeq->addRule(new RepetitionRule(pathAbEmptyRule()));
+  optSeq->addRule(pathAbEmptyRule());
 
   RepetitionRule* option = new RepetitionRule(optSeq);
   // to make it actually optional we set the limits between 0 and 1
@@ -601,12 +602,12 @@ SequenceRule* pathAbsoluteRule()
   option->setMin(0);
   option->setMax(1);
 
-  SequenceRule* sequenze = new SequenceRule();
-  sequenze->addRule(new LiteralRule("/"));
-  sequenze->addRule(option);
+  SequenceRule* sequence = new SequenceRule();
+  sequence->addRule(new LiteralRule("/"));
+  sequence->addRule(option);
 
-  sequenze->setDebugTag("pathAbsoluteRule");
-  return sequenze;
+  sequence->setDebugTag("pathAbsoluteRule");
+  return sequence;
 }
 
 /**
@@ -614,11 +615,11 @@ SequenceRule* pathAbsoluteRule()
  */
 SequenceRule* pathNoScheme()
 {
-  SequenceRule* sequenze = new SequenceRule();
-  sequenze->addRule(segmentNzNcRule());
-  sequenze->addRule(pathAbEmptyRule());
-  sequenze->setDebugTag("pathNoScheme");
-  return sequenze;
+  SequenceRule* sequence = new SequenceRule();
+  sequence->addRule(segmentNzNcRule());
+  sequence->addRule(pathAbEmptyRule());
+  sequence->setDebugTag("pathNoScheme");
+  return sequence;
 }
 
 /**
@@ -626,12 +627,25 @@ SequenceRule* pathNoScheme()
  */
 SequenceRule* pathRootless()
 {
-  SequenceRule* sequenze = new SequenceRule();
-  sequenze->addRule(segmentNzRule());
-  sequenze->addRule(pathAbEmptyRule());
+  SequenceRule* sequence = new SequenceRule();
+  sequence->addRule(segmentNzRule());
+  sequence->addRule(pathAbEmptyRule());
 
-  sequenze->setDebugTag("pathRootless");
-  return sequenze;
+  sequence->setDebugTag("pathRootless");
+  return sequence;
+}
+
+/**
+ * path-empty    = 0<pchar>
+ */
+RepetitionRule* pathEmptyRule()
+{
+  RepetitionRule* rep = new RepetitionRule(pcharRule());
+  rep->setMin(0);
+  rep->setMax(0);
+
+  rep->setDebugTag("pathEmptyRule");
+  return rep;
 }
 
 /**
@@ -661,10 +675,10 @@ RepetitionRule* segmentNzRule()
  */
 RepetitionRule* segmentNzNcRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isUnreserved));
   alter->addRule(pctRule());
-  alter->addRule(new RangeRule(http::isSubdelim));
+  alter->addRule(new RangeRule(http::isSubDelim));
   alter->addRule(new LiteralRule("@"));
 
   RepetitionRule* rep = new RepetitionRule(alter);
@@ -676,9 +690,9 @@ RepetitionRule* segmentNzNcRule()
 /**
  * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
  */
-AlternativRule* pcharRule()
+AlternativeRule* pcharRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isPchar));
   alter->addRule(pctRule());
 
@@ -691,7 +705,7 @@ AlternativRule* pcharRule()
  */
 RepetitionRule* queryRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(pcharRule());
   alter->addRule(new RangeRule(http::isFragmentChar));
 
@@ -705,7 +719,7 @@ RepetitionRule* queryRule()
  */
 RepetitionRule* fragmentRule()
 {
-  AlternativRule* alter = new AlternativRule();
+  AlternativeRule* alter = new AlternativeRule();
   alter->addRule(pcharRule());
   alter->addRule(new RangeRule(http::isFragmentChar));
 

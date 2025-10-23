@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LiteralRule_HPP
-#define LiteralRule_HPP
+#ifndef LITERAL_RULE_HPP
+#define LITERAL_RULE_HPP
 
 #include "Rule.hpp"
 

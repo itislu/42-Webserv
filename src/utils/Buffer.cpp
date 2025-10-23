@@ -32,7 +32,7 @@ std::size_t Buffer::getSize() const
   return _buff.size();
 }
 
-unsigned char Buffer::at(size_t pos)
+unsigned char Buffer::at(size_t pos) const
 {
   return _buff.at(pos);
 }
@@ -58,7 +58,7 @@ Buffer::iterator Buffer::getIterAt(long offset)
 std::string Buffer::getString(long fromIndex, long toIndex) const
 {
   if (toIndex < fromIndex) {
-    throw std::invalid_argument("toIndex must bigger or equal to fromIndex");
+    throw std::invalid_argument("toIndex must be bigger or equal to fromIndex");
   }
   if (fromIndex < 0 || toIndex < 0) {
     throw std::invalid_argument("index must be > 0");

@@ -43,4 +43,4 @@ private:
   Range _range;
 };
 
-#endif // RANGE_RULE_HPP
+#endif

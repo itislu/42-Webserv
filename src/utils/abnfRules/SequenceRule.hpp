@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SEQUENZE_RULE_HPP
-#define SEQUENZE_RULE_HPP
+#ifndef SEQUENCE_RULE_HPP
+#define SEQUENCE_RULE_HPP
 
 #include "Rule.hpp"
 
@@ -30,11 +30,10 @@ private:
   void _setNextRule();
   static bool _isRepetitionRule(Rule* rule);
   static bool _isRepOrSeqRule(Rule* rule);
-  bool _isLastRule();
-  void _validateFail();
+  bool _isLastRule() const;
 
   std::size_t _currRule;
   std::vector<Rule*> _rules;
 };
 
-#endif // SEQUENZE_RULE_HPP
+#endif

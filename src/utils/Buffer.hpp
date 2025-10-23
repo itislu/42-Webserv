@@ -17,10 +17,10 @@ public:
   void add(const std::string& str);
   void add(const Container& buffer);
   void remove(ssize_t bytes);
-  void remove(size_t bytes);
+  void remove(std::size_t bytes);
   std::size_t getSize() const;
 
-  unsigned char at(size_t pos);
+  unsigned char at(std::size_t pos) const;
   iterator begin();
   iterator end();
   iterator getIterAt(long offset);

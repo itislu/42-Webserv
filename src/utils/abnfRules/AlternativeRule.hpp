@@ -8,17 +8,17 @@
 #include <vector>
 
 /* ************************************************************************** */
-class AlternativRule : public Rule
+class AlternativeRule : public Rule
 {
 public:
-  enum AlternativMode
+  enum AlternativeMode
   {
     FirstMatchWins,
     Greedy // find longest match
   };
 
-  AlternativRule();
-  ~AlternativRule();
+  AlternativeRule();
+  ~AlternativeRule();
 
   bool matches();
   void reset();
@@ -28,14 +28,14 @@ public:
   void addRule(Rule* rule);
 
 private:
-  AlternativRule(const AlternativRule& other);
-  AlternativRule& operator=(const AlternativRule& other);
+  AlternativeRule(const AlternativeRule& other);
+  AlternativeRule& operator=(const AlternativeRule& other);
 
   bool _firstMatchMode();
   bool _greedyMode();
 
   std::vector<Rule*> _rules;
-  int _mode; // FirstMatchWins or Greedy
+  AlternativeMode _mode; // FirstMatchWins or Greedy
 };
 
-#endif // OPTION_RULE_HPP
+#endif

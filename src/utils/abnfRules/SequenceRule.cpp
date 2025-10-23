@@ -12,7 +12,7 @@
 SequenceRule::SequenceRule()
   : _currRule(0)
 {
-  setDebugTag("Sequenze");
+  setDebugTag("Sequence");
 }
 
 SequenceRule::~SequenceRule()
@@ -89,20 +89,6 @@ void SequenceRule::addRule(Rule* rule)
 /* ************************************************************************** */
 // PRIVATE
 
-SequenceRule::SequenceRule(const SequenceRule& other)
-  : _currRule(0)
-{
-  *this = other;
-}
-
-SequenceRule& SequenceRule::operator=(const SequenceRule& other)
-{
-  if (this != &other) {
-    // todo copy logic
-  }
-  return *this;
-}
-
 void SequenceRule::_setNextRule()
 {
   if (_currRule < _rules.size()) {
@@ -121,7 +107,7 @@ bool SequenceRule::_isRepOrSeqRule(Rule* rule)
          dynamic_cast<SequenceRule*>(rule) != NULL;
 }
 
-bool SequenceRule::_isLastRule()
+bool SequenceRule::_isLastRule() const
 {
   return _currRule >= _rules.size() - 1;
 }

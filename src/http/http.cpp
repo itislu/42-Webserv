@@ -2,7 +2,7 @@
 
 #include <libftpp/algorithm.hpp>
 
-#include <cctype>
+#include <ctype.h>
 
 namespace http {
 
@@ -11,7 +11,8 @@ int isSchemeChar(int chr)
   if (::isalnum(chr) != 0) {
     return 1;
   }
-  return static_cast<int>(ft::contains(specialSchemeChars, chr));
+  return static_cast<int>(
+    ft::contains(specialSchemeChars, static_cast<char>(chr)));
 }
 
 int isAuthChar(int chr)
@@ -19,16 +20,17 @@ int isAuthChar(int chr)
   if (::isalnum(chr) != 0) {
     return 1;
   }
-  return static_cast<int>(ft::contains(specialAuthorityChars, chr));
+  return static_cast<int>(
+    ft::contains(specialAuthorityChars, static_cast<char>(chr)));
 }
 
 int isReserved(int chr)
 {
-  return static_cast<int>(isGenDelim(chr) != 0 || isSubdelim(chr) != 0);
+  return static_cast<int>(isGenDelim(chr) != 0 || isSubDelim(chr) != 0);
 }
 
 /**
- * reserved = gen-delims / sub-delims
+ * unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
  */
 int isUnreserved(int chr)
 {
@@ -53,7 +55,7 @@ int isGenDelim(int chr)
  * sub-delims = "!" / "$" / "&" / "'" / "(" / ")" /
  *              "*" / "+" / "," / ";" / "="
  */
-int isSubdelim(int chr)
+int isSubDelim(int chr)
 {
   return static_cast<int>(ft::contains(subDelims, static_cast<char>(chr)));
 }
@@ -63,7 +65,7 @@ int isSubdelim(int chr)
  */
 int isPchar(int chr)
 {
-  return static_cast<int>((isUnreserved(chr) != 0) || (isSubdelim(chr) != 0) ||
+  return static_cast<int>((isUnreserved(chr) != 0) || (isSubDelim(chr) != 0) ||
                           chr == ':' || chr == '@');
 }
 
@@ -84,10 +86,10 @@ int isTchar(int chr)
 
 int isHexDigit(int chr)
 {
-  if (ft::contains(hexDigitsLower, chr)) {
+  if (ft::contains(hexDigitsLower, static_cast<char>(chr))) {
     return 1;
   }
-  if (ft::contains(hexDigitsUpper, chr)) {
+  if (ft::contains(hexDigitsUpper, static_cast<char>(chr))) {
     return 1;
   }
   return 0;

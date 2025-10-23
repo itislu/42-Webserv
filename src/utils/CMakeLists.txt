@@ -5,7 +5,7 @@
 set(LIB_NAME utils)
 
 add_library(${LIB_NAME} STATIC
-  abnfRules/AlternativRule.cpp
+  abnfRules/AlternativeRule.cpp
   abnfRules/LiteralRule.cpp
   abnfRules/RangeRule.cpp
   abnfRules/RepetitionRule.cpp

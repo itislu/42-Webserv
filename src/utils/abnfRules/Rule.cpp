@@ -174,25 +174,3 @@ void Rule::debugPrintMatchStatus(bool matches)
 
 /* ************************************************************************** */
 // PRIVATE
-
-Rule::Rule(const Rule& other)
-  : _endOfRule(false)
-  , _buffReader()
-  , _startPos()
-  , _endPos()
-  , _ruleId(_ruleIdUndefined)
-  , _results(NULL)
-  , _debugPrintIndent(_debugInitPrintIndent)
-  , _debugTag(NULL)
-  , _debugMatchReason(NULL)
-{
-  *this = other;
-}
-
-Rule& Rule::operator=(const Rule& other)
-{
-  if (this != &other) {
-    // todo copy logic
-  }
-  return *this;
-}

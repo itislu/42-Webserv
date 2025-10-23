@@ -28,6 +28,8 @@ RangeRule::RangeRule(int (*func)(int))
 }
 // NOLINTEND(cppcoreguidelines-pro-type-union-access)
 
+RangeRule::~RangeRule() {}
+
 // NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
 bool RangeRule::matches()
 {
@@ -39,11 +41,16 @@ bool RangeRule::matches()
 
   setEndOfRule(true);
   bool matches = false;
-  if (_range.type == Func) {
-    matches = _range.func(chr) != 0;
-  } else if (_range.type == Charset) {
-    matches = std::strchr(_range.set, chr) != NULL;
+
+  switch (_range.type) {
+    case Func:
+      matches = _range.func(chr) != 0;
+      break;
+    case Charset:
+      matches = std::strchr(_range.set, chr) != NULL;
+      break;
   }
+
   debugPrintMatchStatus(matches);
   return matches;
 }
@@ -66,24 +73,3 @@ void RangeRule::setResultMap(ResultMap* results)
 
 /* ************************************************************************** */
 // PRIVATE
-
-RangeRule::RangeRule()
-  : _range()
-{
-}
-
-RangeRule::~RangeRule() {}
-
-RangeRule::RangeRule(const RangeRule& other)
-  : _range()
-{
-  *this = other;
-}
-
-RangeRule& RangeRule::operator=(const RangeRule& other)
-{
-  if (this != &other) {
-    // todo copy logic
-  }
-  return *this;
-}

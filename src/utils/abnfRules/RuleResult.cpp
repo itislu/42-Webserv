@@ -14,24 +14,6 @@ RuleResult::RuleResult(long start, long end)
 {
 }
 
-RuleResult::~RuleResult() {}
-
-RuleResult::RuleResult(const RuleResult& other)
-  : _start(other._start)
-  , _end(other._end)
-{
-  *this = other;
-}
-
-RuleResult& RuleResult::operator=(const RuleResult& other)
-{
-  if (this != &other) {
-    _start = other._start;
-    _end = other._end;
-  }
-  return *this;
-}
-
 long RuleResult::getStart() const
 {
   return _start;

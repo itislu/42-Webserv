@@ -56,22 +56,3 @@ void LiteralRule::setResultMap(ResultMap* results)
 
 /* ************************************************************************** */
 // PRIVATE
-
-LiteralRule::LiteralRule()
-  : _pos(0)
-{
-}
-
-LiteralRule::LiteralRule(const LiteralRule& other)
-  : _pos(0)
-{
-  *this = other;
-}
-
-LiteralRule& LiteralRule::operator=(const LiteralRule& other)
-{
-  if (this != &other) {
-    // todo copy logic
-  }
-  return *this;
-}

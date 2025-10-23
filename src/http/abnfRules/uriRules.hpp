@@ -1,37 +1,38 @@
 #pragma once
-#ifndef RULE_FACTORIES_HPP
-#define RULE_FACTORIES_HPP
+#ifndef URI_RULES_HPP
+#define URI_RULES_HPP
 
-#include <utils/abnfRules/AlternativRule.hpp>
+#include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
 SequenceRule* uriRule();
-AlternativRule* hierPartRule();
+AlternativeRule* hierPartRule();
 SequenceRule* schemeRule();
 SequenceRule* authorityRule();
 RepetitionRule* userinfoRule();
-AlternativRule* hostRule();
+AlternativeRule* hostRule();
 RepetitionRule* portRule();
 SequenceRule* ipLiteralRule();
 SequenceRule* ipvFutureRule();
-AlternativRule* ipv6AddressRule();
+AlternativeRule* ipv6AddressRule();
 RepetitionRule* h16Rule();
-AlternativRule* ls32Rule();
+AlternativeRule* ls32Rule();
 SequenceRule* ipv4AddressRule();
-AlternativRule* decOctetRule();
+AlternativeRule* decOctetRule();
 RepetitionRule* regNameRule();
-AlternativRule* pathRule();
+AlternativeRule* pathRule();
 RepetitionRule* pathAbEmptyRule();
 SequenceRule* pathAbsoluteRule();
 SequenceRule* pathNoScheme();
 SequenceRule* pathRootless();
+RepetitionRule* pathEmptyRule();
 RepetitionRule* segmentRule();
 RepetitionRule* segmentNzRule();
 RepetitionRule* segmentNzNcRule();
-AlternativRule* pcharRule();
+AlternativeRule* pcharRule();
 RepetitionRule* queryRule();
 RepetitionRule* fragmentRule();
 SequenceRule* pctRule();
 
-#endif // RULE_FACTORIES_HPP
+#endif

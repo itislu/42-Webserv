@@ -1,7 +1,7 @@
 #include "http/abnfRules/uriRules.hpp"
 #include "utils/Buffer.hpp"
 #include "utils/BufferReader.hpp"
-#include "utils/abnfRules/AlternativRule.hpp"
+#include "utils/abnfRules/AlternativeRule.hpp"
 #include "utils/abnfRules/LiteralRule.hpp"
 #include "utils/abnfRules/RangeRule.hpp"
 #include "utils/abnfRules/RepetitionRule.hpp"
@@ -75,6 +75,9 @@ TEST(UriAbnfTest, URI)
   // --- encoded characters ---
   EXPECT_TRUE(runParser("https://example.com/a%20b/c%2Fd", *s));
   EXPECT_TRUE(runParser("https://user%40mail.com@host.org", *s));
+
+  // frag only
+  EXPECT_TRUE(runParser("http:#frag", *s));
   delete s;
 }
 
@@ -197,7 +200,9 @@ TEST(UriAbnfTest, UserInfo)
  */
 TEST(UriAbnfTest, Host)
 {
-  // TODO if needed
+  AlternativeRule* alter = hostRule();
+  EXPECT_FALSE(runParser("example.com:abc", *alter));
+  delete alter;
 }
 
 /**
@@ -205,9 +210,10 @@ TEST(UriAbnfTest, Host)
  */
 TEST(UriAbnfTest, Port)
 {
-  AlternativRule* alter = hostRule();
-  EXPECT_FALSE(runParser("example.com:abc", *alter));
-  delete alter;
+  RepetitionRule* rep = portRule();
+  EXPECT_FALSE(runParser("abc", *rep));
+  EXPECT_TRUE(runParser("8080", *rep));
+  delete rep;
 }
 
 /**
@@ -239,7 +245,7 @@ TEST(UriAbnfTest, IPvFuture)
  */
 TEST(UriAbnfTest, IPv6address)
 {
-  AlternativRule* alter = ipv6AddressRule();
+  AlternativeRule* alter = ipv6AddressRule();
 
   // Todo
   // EXPECT_TRUE(runParser("2001:db8::1", *alter));
@@ -299,7 +305,7 @@ TEST(UriAbnfTest, h16)
  */
 TEST(UriAbnfTest, ls32)
 {
-  AlternativRule* alter = ls32Rule();
+  AlternativeRule* alter = ls32Rule();
   EXPECT_TRUE(runParser("abcd:1234", *alter));
   EXPECT_TRUE(runParser("0:0", *alter));
   EXPECT_TRUE(runParser("FFFF:FFFF", *alter));
@@ -407,8 +413,9 @@ TEST(UriAbnfTest, RegName)
  */
 TEST(UriAbnfTest, Path)
 {
-  AlternativRule* alter = pathRule();
+  AlternativeRule* alter = pathRule();
   // path-abempty    ; begins with "/" or is empty
+  EXPECT_TRUE(runParser("", *alter));
   EXPECT_TRUE(runParser("/", *alter));
   EXPECT_TRUE(runParser("//", *alter));
   EXPECT_TRUE(runParser("/abc/def", *alter));
@@ -719,17 +726,17 @@ TEST(UriAbnfTest, ValidGenDelims)
  */
 TEST(UriAbnfTest, ValidSubDelims)
 {
-  EXPECT_TRUE(http::isSubdelim('!'));
-  EXPECT_TRUE(http::isSubdelim('$'));
-  EXPECT_TRUE(http::isSubdelim('&'));
-  EXPECT_TRUE(http::isSubdelim('\''));
-  EXPECT_TRUE(http::isSubdelim('('));
-  EXPECT_TRUE(http::isSubdelim(')'));
-  EXPECT_TRUE(http::isSubdelim('*'));
-  EXPECT_TRUE(http::isSubdelim('+'));
-  EXPECT_TRUE(http::isSubdelim(','));
-  EXPECT_TRUE(http::isSubdelim(';'));
-  EXPECT_TRUE(http::isSubdelim('='));
+  EXPECT_TRUE(http::isSubDelim('!'));
+  EXPECT_TRUE(http::isSubDelim('$'));
+  EXPECT_TRUE(http::isSubDelim('&'));
+  EXPECT_TRUE(http::isSubDelim('\''));
+  EXPECT_TRUE(http::isSubDelim('('));
+  EXPECT_TRUE(http::isSubDelim(')'));
+  EXPECT_TRUE(http::isSubDelim('*'));
+  EXPECT_TRUE(http::isSubDelim('+'));
+  EXPECT_TRUE(http::isSubDelim(','));
+  EXPECT_TRUE(http::isSubDelim(';'));
+  EXPECT_TRUE(http::isSubDelim('='));
 }
 
 // NOLINTEND

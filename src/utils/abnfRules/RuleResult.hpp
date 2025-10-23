@@ -8,10 +8,6 @@ class RuleResult
 public:
   RuleResult();
   RuleResult(long start, long end);
-  ~RuleResult();
-  RuleResult(const RuleResult& other);
-  RuleResult& operator=(const RuleResult& other);
-
   long getStart() const;
   long getEnd() const;
 

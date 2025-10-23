@@ -1,28 +1,28 @@
-#include "AlternativRule.hpp"
+#include "AlternativeRule.hpp"
 
-#include <algorithm>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 
+#include <algorithm>
 #include <cstddef>
 
 /* ************************************************************************** */
 // PUBLIC
 
-AlternativRule::AlternativRule()
+AlternativeRule::AlternativeRule()
   : _mode(Greedy)
 {
-  setDebugTag("Alternativ");
+  setDebugTag("Alternative");
 }
 
-AlternativRule::~AlternativRule()
+AlternativeRule::~AlternativeRule()
 {
   for (std::size_t i = 0; i < _rules.size(); i++) {
     delete _rules[i];
   }
 }
 
-bool AlternativRule::matches()
+bool AlternativeRule::matches()
 {
   debugPrintRuleEntry();
 
@@ -34,8 +34,6 @@ bool AlternativRule::matches()
     case Greedy:
       matches = _greedyMode();
       break;
-    default:
-      matches = false;
   }
 
   addRuleResult(matches);
@@ -43,7 +41,7 @@ bool AlternativRule::matches()
   return matches;
 }
 
-void AlternativRule::reset()
+void AlternativeRule::reset()
 {
   for (std::size_t i = 0; i < _rules.size(); i++) {
     _rules[i]->reset();
@@ -51,7 +49,7 @@ void AlternativRule::reset()
   setEndOfRule(false);
 }
 
-void AlternativRule::setBufferReader(BufferReader* bufferReader)
+void AlternativeRule::setBufferReader(BufferReader* bufferReader)
 {
   Rule::setBufferReader(bufferReader);
   for (std::size_t i = 0; i < _rules.size(); i++) {
@@ -59,7 +57,7 @@ void AlternativRule::setBufferReader(BufferReader* bufferReader)
   }
 }
 
-void AlternativRule::setResultMap(ResultMap* results)
+void AlternativeRule::setResultMap(ResultMap* results)
 {
   Rule::setResultMap(results);
   for (std::size_t i = 0; i < _rules.size(); i++) {
@@ -67,7 +65,7 @@ void AlternativRule::setResultMap(ResultMap* results)
   }
 }
 
-void AlternativRule::addRule(Rule* rule)
+void AlternativeRule::addRule(Rule* rule)
 {
   _rules.push_back(rule);
 }
@@ -75,21 +73,7 @@ void AlternativRule::addRule(Rule* rule)
 /* ************************************************************************** */
 // PRIVATE
 
-AlternativRule::AlternativRule(const AlternativRule& other)
-  : _mode(Greedy)
-{
-  *this = other;
-}
-
-AlternativRule& AlternativRule::operator=(const AlternativRule& other)
-{
-  if (this != &other) {
-    // todo copy logic
-  }
-  return *this;
-}
-
-bool AlternativRule::_firstMatchMode()
+bool AlternativeRule::_firstMatchMode()
 {
   setStartPos(getBuffReader()->getPosInBuff());
   bool matches = false;
@@ -106,20 +90,22 @@ bool AlternativRule::_firstMatchMode()
   return matches;
 }
 
-bool AlternativRule::_greedyMode()
+bool AlternativeRule::_greedyMode()
 {
   setStartPos(getBuffReader()->getPosInBuff());
   setEndPos(-1);
+  bool somethingMatched = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
 
     _rules[i]->setDebugPrintIndent(getDebugPrintIndent() + 2);
 
     if (_rules[i]->matches()) {
       setEndPos(std::max(getBuffReader()->getPosInBuff(), getEndPos()));
+      somethingMatched = true;
     }
     rewindToStartPos();
   }
-  if (getEndPos() == -1) {
+  if (!somethingMatched) {
     return false;
   }
   moveToEndPos();

@@ -3,7 +3,6 @@
 
 #include <utils/BufferReader.hpp>
 
-#include <cstddef>
 #include <limits>
 
 /* ************************************************************************** */
@@ -101,33 +100,6 @@ int RepetitionRule::getReps() const
 
 /* ************************************************************************** */
 // PRIVATE
-
-RepetitionRule::RepetitionRule()
-  : _minReps(0)
-  , _maxReps(std::numeric_limits<int>::max())
-  , _currReps(0)
-  , _reachedMin(_currReps >= _minReps)
-  , _rule(NULL)
-{
-}
-
-RepetitionRule::RepetitionRule(const RepetitionRule& other)
-  : _minReps(other._minReps)
-  , _maxReps(other._maxReps)
-  , _currReps(0)
-  , _reachedMin(_currReps >= _minReps)
-  , _rule(other._rule)
-{
-  *this = other;
-}
-
-RepetitionRule& RepetitionRule::operator=(const RepetitionRule& other)
-{
-  if (this != &other) {
-    // todo copy logic
-  }
-  return *this;
-}
 
 void RepetitionRule::_incrementReps()
 {
