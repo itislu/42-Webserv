@@ -3,6 +3,7 @@
 #ifndef LIBFTPP_MOVABLE_MOVABLE_IPP
 #	define LIBFTPP_MOVABLE_MOVABLE_IPP
 
+// NOLINTBEGIN(cppcoreguidelines-pro-type-static-cast-downcast): CRTP.
 #	define LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)            \
 		operator ft::rvalue<TYPE>&() throw()                    \
 		{                                                       \
@@ -12,6 +13,7 @@
 		{                                                       \
 			return static_cast<const ft::rvalue<TYPE>&>(*this); \
 		}
+// NOLINTEND(cppcoreguidelines-pro-type-static-cast-downcast)
 
 // NOLINTBEGIN(bugprone-macro-parentheses): Not valid syntax.
 // NOLINTBEGIN(bugprone-unhandled-self-assignment): Only forwarding.
