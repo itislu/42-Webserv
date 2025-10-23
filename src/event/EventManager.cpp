@@ -48,7 +48,7 @@ bool EventManager::receiveFromClient(Client* client)
 
 bool EventManager::handleClient(Client* client, unsigned events)
 {
-  if (client == 0) {
+  if (client == NULL) {
     return false;
   }
   bool alive = true;
@@ -66,7 +66,7 @@ bool EventManager::handleClient(Client* client, unsigned events)
 
 void EventManager::disconnectClient(Client* client)
 {
-  if (client == 0) {
+  if (client == NULL) {
     return;
   }
   const int clientFd = client->getFd();

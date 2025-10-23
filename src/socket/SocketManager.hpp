@@ -24,7 +24,6 @@ public:
   bool listenerExists(int port) const;
   bool isListener(int fdes) const;
 
-  void addToListenerMap(int fdes, const Socket* socket);
   void addToPfd(int fdes);
 
   std::size_t getPfdsSize() const;

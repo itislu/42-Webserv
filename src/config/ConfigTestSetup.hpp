@@ -89,7 +89,7 @@ Config createTestConfig()
   std::vector<std::string> hosts1;
   hosts1.push_back("test.com");
   ServerConfig server1 =
-    createTestServer(config, ports1, hosts1, 20, "./www/server1");
+    createTestServer(config, ports1, hosts1, 60, "./www/server1");
   config.addServer(server1);
 
   // Server 2: single port
@@ -100,7 +100,7 @@ Config createTestConfig()
   hosts2.push_back("example.com");
   hosts2.push_back("localhost");
   ServerConfig server2 =
-    createTestServer(config, ports2, hosts2, 3, "./www/server2");
+    createTestServer(config, ports2, hosts2, 60, "./www/server2");
   config.addServer(server2);
   config.setDefaultTimeout();
 

@@ -1,4 +1,5 @@
 #include "Buffer.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <stdexcept>
 #include <string>
@@ -26,6 +27,7 @@ void Buffer::add(const Container& buffer)
 
 void Buffer::remove(ssize_t bytes)
 {
+  bytes = std::min(bytes, static_cast<ssize_t>(_buff.size()));
   _buff.erase(_buff.begin(), _buff.begin() + bytes);
 }
 
@@ -72,6 +74,9 @@ std::string Buffer::getString(long fromIndex, long toIndex) const
   }
   if (fromIndex < 0 || toIndex < 0) {
     throw std::invalid_argument("index must be >= 0");
+  }
+  if (static_cast<size_t>(toIndex) > _buff.size()) {
+    throw std::out_of_range("toIndex exceeds buffer size");
   }
   return std::string(_buff.begin() + fromIndex, _buff.begin() + toIndex);
 }

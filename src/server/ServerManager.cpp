@@ -105,7 +105,7 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
 const Server* ServerManager::getInitServer(int fdes) const
 {
   const Socket* const socket = _socketManager.getSocket(fdes);
-  if (socket != 0) {
+  if (socket != NULL) {
     const c_sockToServIter iter = _socketToServers.find(socket);
     if (iter->second.size() == 1) {
       return iter->second[0];

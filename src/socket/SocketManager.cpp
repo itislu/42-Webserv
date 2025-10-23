@@ -45,7 +45,7 @@ void SocketManager::createListener(const std::vector<int>& ports)
     }
     const Socket* const socket = new Socket(*it);
     _sockets.push_back(socket);
-    addToListenerMap(socket->getFd(), socket);
+    _listeners.insert(std::make_pair(socket->getFd(), socket));
     addToPfd(socket->getFd());
   }
 }
@@ -67,12 +67,6 @@ bool SocketManager::isListener(int fdes) const
   const std::map<int, const Socket*>::const_iterator iter =
     _listeners.find(fdes);
   return iter != _listeners.end();
-}
-
-void SocketManager::addToListenerMap(int fdes, const Socket* socket)
-{
-
-  _listeners.insert(std::make_pair(fdes, socket));
 }
 
 void SocketManager::addToPfd(int fdes)
@@ -136,7 +130,7 @@ pollfd* SocketManager::getPollFd(int fdes)
 void SocketManager::enablePollout(int fdes)
 {
   pollfd* const pfd = getPollFd(fdes);
-  if (pfd != 0) {
+  if (pfd != NULL) {
     pfd->events = static_cast<short>(static_cast<unsigned>(pfd->events) |
                                      static_cast<unsigned>(POLLOUT));
   }
@@ -145,7 +139,7 @@ void SocketManager::enablePollout(int fdes)
 void SocketManager::disablePollout(int fdes)
 {
   pollfd* const pfd = getPollFd(fdes);
-  if (pfd != 0) {
+  if (pfd != NULL) {
     pfd->events = static_cast<short>(static_cast<unsigned>(pfd->events) &
                                      ~static_cast<unsigned>(POLLOUT));
   }

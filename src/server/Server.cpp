@@ -5,7 +5,7 @@
 #include <vector>
 
 Server::Server(const ServerConfig* config,
-               const std::vector<Socket const*>& listeners)
+               const std::vector<const Socket*>& listeners)
   : _config(config)
   , _listeners(listeners)
   , _hostnames(config->getHostnames())
@@ -18,7 +18,7 @@ const ServerConfig* Server::getConfig() const
   return _config;
 }
 
-const std::vector<Socket const*>& Server::getListeners() const
+const std::vector<const Socket*>& Server::getListeners() const
 {
   return _listeners;
 }

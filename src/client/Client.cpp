@@ -56,7 +56,7 @@ Buffer Client::getOutBuff() const
 
 long Client::getTimeout() const
 {
-  if (_server != 0) {
+  if (_server != NULL) {
     return _server->getTimeout();
   }
   return Config::getDefaultTimeout();

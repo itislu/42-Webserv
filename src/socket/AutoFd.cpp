@@ -16,7 +16,7 @@ AutoFd::~AutoFd()
 void AutoFd::set(int fdes)
 {
   if (_fd >= 0) {
-    close(_fd);
+    ::close(_fd);
   }
   _fd = fdes;
 }
