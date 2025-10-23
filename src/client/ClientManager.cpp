@@ -1,6 +1,7 @@
 #include "ClientManager.hpp"
 #include "client/Client.hpp"
 #include "client/TimeStamp.hpp"
+#include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include <algorithm>
 #include <climits>
@@ -24,7 +25,7 @@ Client* ClientManager::getClient(int fdes) const
 {
   const const_clientIter iter = _clients.find(fdes);
   if (iter == _clients.end()) {
-    return NULL;
+    return FT_NULLPTR;
   }
   return iter->second;
 }

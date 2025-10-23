@@ -1,6 +1,7 @@
 #include "ServerManager.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
+#include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/Socket.hpp"
 #include <cerrno>
@@ -88,16 +89,16 @@ void ServerManager::mapServerToSocket(
 
 const Server* ServerManager::getServerFromSocket(const Socket* socket) const
 {
-  if (socket == NULL) {
-    return NULL;
+  if (socket == FT_NULLPTR) {
+    return FT_NULLPTR;
   }
   const c_sockToServIter iter = _socketToServers.find(socket);
   if (iter == _socketToServers.end()) {
-    return NULL;
+    return FT_NULLPTR;
   }
   const std::vector<const Server*>& servers = iter->second;
   if (servers.size() != 1) {
-    return NULL;
+    return FT_NULLPTR;
   }
   return servers[0];
 }
@@ -105,13 +106,13 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
 const Server* ServerManager::getInitServer(int fdes) const
 {
   const Socket* const socket = _socketManager.getSocket(fdes);
-  if (socket != NULL) {
+  if (socket != FT_NULLPTR) {
     const c_sockToServIter iter = _socketToServers.find(socket);
     if (iter->second.size() == 1) {
       return iter->second[0];
     }
   }
-  return NULL;
+  return FT_NULLPTR;
 }
 
 std::size_t ServerManager::serverCount() const

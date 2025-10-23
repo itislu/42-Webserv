@@ -3,6 +3,7 @@
 #include "client/ClientManager.hpp"
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
+#include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "server/ServerManager.hpp"
 #include "socket/SocketManager.hpp"
@@ -48,7 +49,7 @@ bool EventManager::receiveFromClient(Client* client)
 
 bool EventManager::handleClient(Client* client, unsigned events)
 {
-  if (client == NULL) {
+  if (client == FT_NULLPTR) {
     return false;
   }
   bool alive = true;
@@ -66,7 +67,7 @@ bool EventManager::handleClient(Client* client, unsigned events)
 
 void EventManager::disconnectClient(Client* client)
 {
-  if (client == NULL) {
+  if (client == FT_NULLPTR) {
     return;
   }
   const int clientFd = client->getFd();

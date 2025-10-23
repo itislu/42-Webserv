@@ -1,6 +1,7 @@
 #include "Client.hpp"
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
+#include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
@@ -56,7 +57,7 @@ Buffer Client::getOutBuff() const
 
 long Client::getTimeout() const
 {
-  if (_server != NULL) {
+  if (_server != FT_NULLPTR) {
     return _server->getTimeout();
   }
   return Config::getDefaultTimeout();

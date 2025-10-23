@@ -2,6 +2,7 @@
 #include "Socket.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
+#include "libftpp/utility.hpp"
 #include <cstddef>
 #include <exception>
 #include <map>
@@ -95,7 +96,7 @@ pollfd* SocketManager::getPfdStart()
 
 int SocketManager::acceptClient(int fdes)
 {
-  const int clientFd = accept(fdes, NULL, NULL);
+  const int clientFd = accept(fdes, FT_NULLPTR, FT_NULLPTR);
   if (clientFd < 0) {
 
     return -1;
@@ -105,7 +106,7 @@ int SocketManager::acceptClient(int fdes)
     Socket::setFlags(clientFd);
     addToPfd(clientFd);
     const Socket* const listener = getSocket(fdes);
-    if (listener != NULL) {
+    if (listener != FT_NULLPTR) {
       _fdToSocket[clientFd] = listener;
     }
   } catch (std::exception& e) {
@@ -124,13 +125,13 @@ pollfd* SocketManager::getPollFd(int fdes)
       return &(*it);
     }
   }
-  return NULL;
+  return FT_NULLPTR;
 }
 
 void SocketManager::enablePollout(int fdes)
 {
   pollfd* const pfd = getPollFd(fdes);
-  if (pfd != NULL) {
+  if (pfd != FT_NULLPTR) {
     pfd->events = static_cast<short>(static_cast<unsigned>(pfd->events) |
                                      static_cast<unsigned>(POLLOUT));
   }
@@ -139,7 +140,7 @@ void SocketManager::enablePollout(int fdes)
 void SocketManager::disablePollout(int fdes)
 {
   pollfd* const pfd = getPollFd(fdes);
-  if (pfd != NULL) {
+  if (pfd != FT_NULLPTR) {
     pfd->events = static_cast<short>(static_cast<unsigned>(pfd->events) &
                                      ~static_cast<unsigned>(POLLOUT));
   }
@@ -152,7 +153,7 @@ const Socket* SocketManager::getSocket(int fdes) const
   if (iter != _listeners.end()) {
     return iter->second;
   }
-  return NULL;
+  return FT_NULLPTR;
 }
 
 const Socket* SocketManager::getListener(int port) const
@@ -163,7 +164,7 @@ const Socket* SocketManager::getListener(int port) const
       return it->second;
     }
   }
-  return NULL;
+  return FT_NULLPTR;
 }
 
 void SocketManager::removePfd(int fdes)
