@@ -4,12 +4,15 @@
 #	define LIBFTPP_MEMORY_SHARED_PTR_CONTROL_DERIVED_TPP
 
 #	include "shared_ptr_detail.hpp"
-#	include "addressof.tpp" // NOLINT(misc-include-cleaner): Avoid circular
-// include of libftpp/memory.hpp.
 #	include "libftpp/utility.hpp"
 #	include <typeinfo>
 
 namespace ft {
+
+// Forward declaration to avoid circular dependency with libftpp/memory.hpp.
+template <typename T>
+T* addressof(T& arg) throw();
+
 namespace _shared_ptr {
 
 /* control_block_pointer */
@@ -63,10 +66,12 @@ template <typename Yp, typename Deleter>
 void* control_block_pointer_deleter<Yp, Deleter>::get_deleter(
     const std::type_info& t) throw()
 {
-	return t == typeid(Deleter) ? ft::addressof(_deleter) : FT_NULLPTR;
+	return t == typeid(Deleter) ? ::ft::addressof<Deleter>(_deleter)
+	                            : FT_NULLPTR;
 }
 
 } // namespace _shared_ptr
+
 } // namespace ft
 
 #endif // LIBFTPP_MEMORY_SHARED_PTR_CONTROL_DERIVED_TPP

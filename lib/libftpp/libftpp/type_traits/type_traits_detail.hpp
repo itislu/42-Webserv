@@ -4,7 +4,7 @@
 
 namespace ft {
 
-// Forward declaration to prevent circular include with libftpp/movable.hpp.
+// Forward declaration to avoid circular dependency with libftpp/movable.hpp.
 template <typename T>
 struct rvalue;
 
