@@ -26,9 +26,10 @@ include_directories(PUBLIC ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   ftpp
-  utils
-  server
   client
+  http
+  server
+  utils
 )
 
 
@@ -40,9 +41,10 @@ add_subdirectory(lib/libftpp)
 
 # **************************************************************************** #
 # MODULES
-add_subdirectory(src/utils)
-add_subdirectory(src/server)
 add_subdirectory(src/client)
+add_subdirectory(src/http)
+add_subdirectory(src/server)
+add_subdirectory(src/utils)
 
 
 # **************************************************************************** #

@@ -1,0 +1,113 @@
+#include "SequenceRule.hpp"
+
+#include <utils/BufferReader.hpp>
+#include <utils/abnfRules/RepetitionRule.hpp>
+#include <utils/abnfRules/Rule.hpp>
+
+#include <cstddef>
+
+/* ************************************************************************** */
+// PUBLIC
+
+SequenceRule::SequenceRule()
+  : _currRule(0)
+{
+  setDebugTag("Sequence");
+}
+
+SequenceRule::~SequenceRule()
+{
+  for (std::size_t i = 0; i < _rules.size(); i++) {
+    delete _rules[i];
+  }
+}
+
+bool SequenceRule::matches()
+{
+  debugPrintRuleEntry();
+  setStartPos(getBuffReader()->getPosInBuff());
+  bool matches = true;
+  while (!getBuffReader()->reachedEnd()) {
+
+    _rules[_currRule]->setDebugPrintIndent(getDebugPrintIndent() + 2);
+    matches = _rules[_currRule]->matches();
+
+    if (matches) {
+      _setNextRule();
+    }
+
+    if (_currRule >= _rules.size()) {
+      setEndOfRule(true);
+      break;
+    }
+
+    if (!matches) {
+      break;
+    }
+  }
+
+  if (getBuffReader()->reachedEnd() && !end()) {
+    setDebugMatchReason("end of buffer; not end of seq");
+  }
+
+  setEndPos(getBuffReader()->getPosInBuff());
+  addRuleResult(matches);
+  debugPrintMatchStatus(matches);
+  return matches;
+}
+
+void SequenceRule::reset()
+{
+  for (std::size_t i = 0; i < _rules.size(); i++) {
+    _rules[i]->reset();
+  }
+  _currRule = 0;
+  setEndOfRule(false);
+}
+
+void SequenceRule::setBufferReader(BufferReader* bufferReader)
+{
+  Rule::setBufferReader(bufferReader);
+  for (std::size_t i = 0; i < _rules.size(); i++) {
+    _rules[i]->setBufferReader(bufferReader);
+  }
+}
+
+void SequenceRule::setResultMap(ResultMap* results)
+{
+  Rule::setResultMap(results);
+  for (std::size_t i = 0; i < _rules.size(); i++) {
+    _rules[i]->setResultMap(results);
+  }
+}
+
+void SequenceRule::addRule(Rule* rule)
+{
+  _rules.push_back(rule);
+}
+
+/* ************************************************************************** */
+// PRIVATE
+
+void SequenceRule::_setNextRule()
+{
+  if (_currRule < _rules.size()) {
+    _currRule++;
+  }
+}
+
+bool SequenceRule::_isRepetitionRule(Rule* rule)
+{
+  return dynamic_cast<RepetitionRule*>(rule) != NULL;
+}
+
+bool SequenceRule::_isRepOrSeqRule(Rule* rule)
+{
+  return dynamic_cast<RepetitionRule*>(rule) != NULL ||
+         dynamic_cast<SequenceRule*>(rule) != NULL;
+}
+
+bool SequenceRule::_isLastRule() const
+{
+  return _currRule >= _rules.size() - 1;
+}
