@@ -11,6 +11,8 @@ int isSchemeChar(int chr)
   if (::isalnum(chr) != 0) {
     return 1;
   }
+
+  static const char specialSchemeChars[] = "+-.";
   return static_cast<int>(
     ft::contains(specialSchemeChars, static_cast<char>(chr)));
 }
@@ -20,6 +22,10 @@ int isAuthChar(int chr)
   if (::isalnum(chr) != 0) {
     return 1;
   }
+
+  static const char specialAuthorityChars[] = "-._~"
+                                              "!$&'()*+,;=:@"
+                                              "[]";
   return static_cast<int>(
     ft::contains(specialAuthorityChars, static_cast<char>(chr)));
 }
@@ -37,6 +43,8 @@ int isUnreserved(int chr)
   if (::isalnum(chr) != 0) {
     return 1;
   }
+
+  static const char specialUnreservedChars[] = "-._~";
   if (ft::contains(specialUnreservedChars, static_cast<char>(chr))) {
     return 1;
   }
@@ -48,6 +56,7 @@ int isUnreserved(int chr)
  */
 int isGenDelim(int chr)
 {
+  static const char genDelims[] = ":/?#[]@";
   return static_cast<int>(ft::contains(genDelims, static_cast<char>(chr)));
 }
 
@@ -57,6 +66,7 @@ int isGenDelim(int chr)
  */
 int isSubDelim(int chr)
 {
+  static const char subDelims[] = "!$&'()*+,;=";
   return static_cast<int>(ft::contains(subDelims, static_cast<char>(chr)));
 }
 
@@ -80,12 +90,17 @@ int isTchar(int chr)
   if (::isalnum(chr) != 0) {
     return 1;
   }
+
+  static const char specialTokenChars[] = "!#$%&'*+-.^_`|~";
   return static_cast<int>(
     ft::contains(specialTokenChars, static_cast<char>(chr)));
 }
 
 int isHexDigit(int chr)
 {
+  static const char hexDigitsLower[] = "0123456789abcdef";
+  static const char hexDigitsUpper[] = "0123456789ABCDEF";
+
   if (ft::contains(hexDigitsLower, static_cast<char>(chr))) {
     return 1;
   }
