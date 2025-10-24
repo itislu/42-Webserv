@@ -27,7 +27,7 @@ bool SequenceRule::matches()
   debugPrintRuleEntry();
   setStartPos(getBuffReader()->getPosInBuff());
   bool matches = true;
-  while (!getBuffReader()->reachedEnd()) {
+  while (matches && !getBuffReader()->reachedEnd()) {
 
     _rules[_currRule]->setDebugPrintIndent(getDebugPrintIndent() + 2);
     matches = _rules[_currRule]->matches();
@@ -38,10 +38,6 @@ bool SequenceRule::matches()
 
     if (_currRule >= _rules.size()) {
       setEndOfRule(true);
-      break;
-    }
-
-    if (!matches) {
       break;
     }
   }
@@ -91,6 +87,16 @@ void SequenceRule::addRule(Rule* rule)
 
 void SequenceRule::_setNextRule()
 {
+  // If the last executed rule is a sequence
+  // check if the sequence also reached the end
+  const SequenceRule* const currSeq =
+    dynamic_cast<SequenceRule*>(_rules[_currRule]);
+  if (currSeq != NULL) {
+    if (!currSeq->end()) {
+      return;
+    }
+  }
+
   if (_currRule < _rules.size()) {
     _currRule++;
   }
