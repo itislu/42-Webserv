@@ -11,7 +11,7 @@ namespace ft {
 
 inline safe_bool<void>::operator safe_bool_t() const
 {
-	return boolean_test()
+	return operator_bool()
 	           ? &safe_bool_base::this_type_does_not_support_comparisons
 	           : FT_NULLPTR;
 }

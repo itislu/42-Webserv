@@ -11,6 +11,7 @@
 #	define LIBFTPP_MOVABLE_HPP
 
 #	include "libftpp/movable/movable.ipp"
+#	include "libftpp/movable/movable_detail.hpp"
 
 /**
  * @brief Make a type copyable and movable
@@ -102,7 +103,7 @@ namespace ft {
  * operators and in combination with `FT_COPYABLE_AND_MOVABLE()`.
  */
 template <typename T>
-struct copy_assign_ref : public T {
+struct copy_assign_ref : public _movable::inherit_if_class_or_union<T> {
 private:
 	copy_assign_ref();
 	copy_assign_ref(const copy_assign_ref&);
@@ -118,6 +119,8 @@ private:
  * argument is an rvalue (temporary object or `ft::move()` cast).
  *
  * https://www.boost.org/doc/libs/1_84_0/doc/html/move/how_the_library_works.html
+ *
+ * @note `T` must be a class type.
  */
 template <typename T>
 struct rvalue : public copy_assign_ref<T> {

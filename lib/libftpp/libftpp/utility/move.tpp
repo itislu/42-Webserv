@@ -10,9 +10,15 @@
 namespace ft {
 
 template <typename T>
-ft::rvalue<typename ft::remove_reference<T&>::type>& move(T& t) throw()
+typename ft::conditional<ft::is_class_or_union<T>::value,
+                         ft::rvalue<typename ft::remove_reference<T&>::type>&,
+                         T&>::type
+move(T& t) throw()
 {
-	return static_cast<ft::rvalue<typename ft::remove_reference<T&>::type>&>(t);
+	return static_cast<typename ft::conditional<
+	    ft::is_class_or_union<T>::value,
+	    ft::rvalue<typename ft::remove_reference<T&>::type>&,
+	    T&>::type>(t);
 }
 
 } // namespace ft

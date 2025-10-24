@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "libftpp/utility.hpp"
 #pragma once
 #ifndef LIBFTPP_UTILITY_COUNTOF_IPP
 #	define LIBFTPP_UTILITY_COUNTOF_IPP

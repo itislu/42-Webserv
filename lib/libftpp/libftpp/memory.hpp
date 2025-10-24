@@ -2,8 +2,9 @@
 #ifndef LIBFTPP_MEMORY_HPP
 #	define LIBFTPP_MEMORY_HPP
 
-#	include "libftpp/assert.hpp"
+#	include "libftpp/memory/shared_ptr_detail.hpp"
 #	include "libftpp/memory/unique_ptr_detail.hpp"
+#	include "libftpp/assert.hpp"
 #	include "libftpp/movable.hpp"
 #	include "libftpp/safe_bool.hpp"
 #	include "libftpp/type_traits.hpp"
@@ -154,7 +155,7 @@ public:
 	typename ft::add_lvalue_reference<Deleter>::type get_deleter() throw();
 	typename ft::add_lvalue_reference<const Deleter>::type get_deleter() const
 	    throw();
-	bool boolean_test() const throw();
+	bool operator_bool() const throw();
 
 	typename ft::add_lvalue_reference<T>::type operator*() const;
 	pointer operator->() const throw();
@@ -176,6 +177,9 @@ private:
 	Deleter _deleter;
 };
 
+/**
+ * https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
+ */
 template <typename T>
 FT_REQUIRES(!ft::is_array<T>::value)
 (unique_ptr<T>)make_unique();
@@ -295,6 +299,9 @@ FT_REQUIRES(!ft::is_array<T>::value)
                            const A8& arg8,
                            const A9& arg9);
 
+/**
+ * https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
+ */
 template <typename T>
 FT_REQUIRES(!ft::is_array<T>::value)
 (unique_ptr<T>)make_unique_for_overwrite();
@@ -442,7 +449,7 @@ public:
 	typename ft::add_lvalue_reference<Deleter>::type get_deleter() throw();
 	typename ft::add_lvalue_reference<const Deleter>::type get_deleter() const
 	    throw();
-	bool boolean_test() const throw();
+	bool operator_bool() const throw();
 
 	T& operator[](std::size_t i) const;
 
@@ -463,17 +470,407 @@ private:
 	Deleter _deleter;
 };
 
+/**
+ * https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
+ */
 template <typename T>
 FT_REQUIRES(ft::is_unbounded_array<T>::value)
 (unique_ptr<T>)make_unique(std::size_t size);
 
+/**
+ * https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
+ */
 template <typename T>
 FT_REQUIRES(ft::is_unbounded_array<T>::value)
 (unique_ptr<T>)make_unique_for_overwrite(std::size_t size);
 
+/* shared_ptr */
+
+/**
+ * @brief Basic implementation of `shared_ptr`
+ *
+ * Limitations:
+ * - No `weak_ptr`.
+ * - No `enable_shared_from_this`.
+ * - Limited `make_shared` implementation.
+ * - No support for custom allocators.
+ * - Not thread-safe and no atomic operations.
+ *
+ * https://en.cppreference.com/w/cpp/memory/shared_ptr
+ *
+ * @note Don't construct or `reset` a `shared_ptr` with a raw pointer to an
+ * object that is already managed by a `shared_ptr`. This will lead to double
+ * deletions.
+ */
+template <typename T>
+class shared_ptr : public ft::safe_bool<shared_ptr<T> >,
+                   public _shared_ptr::shared_ptr_access<T> {
+private:
+	struct _enabler {};
+
+public:
+	typedef typename ft::remove_extent<T>::type element_type;
+
+	// 1)
+	shared_ptr() throw();
+	// 2)
+	// Original in `std::shared_ptr` is not `explicit`.
+	// NOLINTNEXTLINE(google-explicit-constructor)
+	shared_ptr(ft::nullptr_t /*unused*/) throw();
+	// 3)
+	template <typename Y>
+	explicit shared_ptr(Y* ptr,
+	                    typename ft::enable_if<
+	                        _shared_ptr::is_compatible_raw_pointee<Y, T>::value,
+	                        _enabler>::type /*unused*/
+	                    = _enabler());
+	// 4)
+	template <typename Y, typename Deleter>
+	shared_ptr(Y* ptr,
+	           Deleter d,
+	           typename ft::enable_if<
+	               _shared_ptr::is_compatible_raw_pointee<Y, T>::value,
+	               _enabler>::type /*unused*/
+	           = _enabler());
+	// 5)
+	template <typename Deleter>
+	shared_ptr(ft::nullptr_t ptr, Deleter d);
+	// 8)
+	/**
+	 * @note Use of this constructor leads to a dangling pointer unless `ptr`
+	 * remains valid at least until the ownership group of `r` is destroyed.
+	 */
+	template <typename Y>
+	shared_ptr(const shared_ptr<Y>& r, element_type* ptr) throw();
+	template <typename Y>
+	shared_ptr(ft::rvalue<shared_ptr<Y> >& r, element_type* ptr) throw();
+	// 9)
+	shared_ptr(const shared_ptr& r) throw();
+	// NOLINTBEGIN(google-explicit-constructor): Originals in `std::shared_ptr`
+	// are not `explicit`.
+	template <typename Y>
+	shared_ptr(const shared_ptr<Y>& r,
+	           typename ft::enable_if<
+	               _shared_ptr::is_compatible_smart_pointer<Y, T>::value,
+	               _enabler>::type /*unused*/
+	           = _enabler()) throw();
+	// 10)
+	shared_ptr(ft::rvalue<shared_ptr>& r) throw();
+	template <typename Y>
+	shared_ptr(ft::rvalue<shared_ptr<Y> >& r,
+	           typename ft::enable_if<
+	               _shared_ptr::is_compatible_smart_pointer<Y, T>::value,
+	               _enabler>::type /*unused*/
+	           = _enabler()) throw();
+	// 13)
+	template <typename Y, typename Deleter>
+	shared_ptr(
+	    ft::rvalue<unique_ptr<Y, Deleter> >& r,
+	    typename ft::enable_if<
+	        _shared_ptr::is_compatible_smart_pointer<Y, T>::value
+	            && ft::is_convertible<typename unique_ptr<Y, Deleter>::pointer,
+	                                  element_type*>::value,
+	        _enabler>::type /*unused*/
+	    = _enabler());
+	// NOLINTEND(google-explicit-constructor)
+	~shared_ptr();
+	// Take by value to allow for more copy-elision.
+	shared_ptr& operator=(shared_ptr r) throw();
+
+	void reset() throw();
+	template <typename Y>
+	void reset(Y* ptr);
+	template <typename Y, typename Deleter>
+	void reset(Y* ptr, Deleter d);
+	void swap(shared_ptr& r) throw();
+
+	element_type* get() const throw();
+	long use_count() const throw();
+	bool operator_bool() const throw();
+	template <typename Y>
+	bool owner_before(const shared_ptr<Y>& other) const throw();
+	template <typename Y>
+	bool owner_equal(const shared_ptr<Y>& other) const throw();
+
+private:
+	FT_COPYABLE_AND_MOVABLE_SWAP(shared_ptr)
+
+	template <typename>
+	friend class shared_ptr;
+	template <typename Deleter, typename U>
+	friend Deleter* get_deleter(const shared_ptr<U>& p) throw();
+
+	element_type* _ptr;
+	_shared_ptr::control_block_base* _control;
+};
+
+/**
+ * Limitations:
+ * - Not a single allocation.
+ * - No support for initial values for arrays.
+ *
+ * https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared
+ */
+template <typename T>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared();
+template <typename T, typename A0>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0);
+template <typename T, typename A0, typename A1>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0, const A1& arg1);
+template <typename T, typename A0, typename A1, typename A2>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0, const A1& arg1, const A2& arg2);
+template <typename T, typename A0, typename A1, typename A2, typename A3>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)
+    make_shared(const A0& arg0, const A1& arg1, const A2& arg2, const A3& arg3);
+template <typename T,
+          typename A0,
+          typename A1,
+          typename A2,
+          typename A3,
+          typename A4>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0,
+                           const A1& arg1,
+                           const A2& arg2,
+                           const A3& arg3,
+                           const A4& arg4);
+template <typename T,
+          typename A0,
+          typename A1,
+          typename A2,
+          typename A3,
+          typename A4,
+          typename A5>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0,
+                           const A1& arg1,
+                           const A2& arg2,
+                           const A3& arg3,
+                           const A4& arg4,
+                           const A5& arg5);
+template <typename T,
+          typename A0,
+          typename A1,
+          typename A2,
+          typename A3,
+          typename A4,
+          typename A5,
+          typename A6>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0,
+                           const A1& arg1,
+                           const A2& arg2,
+                           const A3& arg3,
+                           const A4& arg4,
+                           const A5& arg5,
+                           const A6& arg6);
+template <typename T,
+          typename A0,
+          typename A1,
+          typename A2,
+          typename A3,
+          typename A4,
+          typename A5,
+          typename A6,
+          typename A7>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0,
+                           const A1& arg1,
+                           const A2& arg2,
+                           const A3& arg3,
+                           const A4& arg4,
+                           const A5& arg5,
+                           const A6& arg6,
+                           const A7& arg7);
+template <typename T,
+          typename A0,
+          typename A1,
+          typename A2,
+          typename A3,
+          typename A4,
+          typename A5,
+          typename A6,
+          typename A7,
+          typename A8>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0,
+                           const A1& arg1,
+                           const A2& arg2,
+                           const A3& arg3,
+                           const A4& arg4,
+                           const A5& arg5,
+                           const A6& arg6,
+                           const A7& arg7,
+                           const A8& arg8);
+template <typename T,
+          typename A0,
+          typename A1,
+          typename A2,
+          typename A3,
+          typename A4,
+          typename A5,
+          typename A6,
+          typename A7,
+          typename A8,
+          typename A9>
+FT_REQUIRES(!ft::is_array<T>::value)
+(shared_ptr<T>)make_shared(const A0& arg0,
+                           const A1& arg1,
+                           const A2& arg2,
+                           const A3& arg3,
+                           const A4& arg4,
+                           const A5& arg5,
+                           const A6& arg6,
+                           const A7& arg7,
+                           const A8& arg8,
+                           const A9& arg9);
+template <typename T>
+FT_REQUIRES(ft::is_unbounded_array<T>::value)
+(shared_ptr<T>)make_shared(std::size_t N);
+template <typename T>
+FT_REQUIRES(ft::is_bounded_array<T>::value)
+(shared_ptr<T>)make_shared();
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared
+ */
+template <typename T>
+FT_REQUIRES(!ft::is_unbounded_array<T>::value)
+(shared_ptr<T>)make_shared_for_overwrite();
+template <typename T>
+FT_REQUIRES(ft::is_unbounded_array<T>::value)
+(shared_ptr<T>)make_shared_for_overwrite(std::size_t N);
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/shared_ptr/pointer_cast
+ */
+template <typename T, typename U>
+shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> static_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
+template <typename T, typename U>
+shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> dynamic_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
+template <typename T, typename U>
+shared_ptr<T> const_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> const_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
+template <typename T, typename U>
+shared_ptr<T> reinterpret_pointer_cast(const shared_ptr<U>& r) throw();
+template <typename T, typename U>
+shared_ptr<T> reinterpret_pointer_cast(ft::rvalue<shared_ptr<U> >& r) throw();
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/shared_ptr/get_deleter
+ */
+template <typename Deleter, typename T>
+Deleter* get_deleter(const shared_ptr<T>& p) throw();
+
+template <typename T, typename U>
+bool operator==(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw();
+template <typename T, typename U>
+bool operator!=(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw();
+template <typename T, typename U>
+bool operator<(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw();
+template <typename T, typename U>
+bool operator>(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw();
+template <typename T, typename U>
+bool operator<=(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw();
+template <typename T, typename U>
+bool operator>=(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) throw();
+template <typename T>
+bool operator==(const shared_ptr<T>& lhs, ft::nullptr_t /*unused*/) throw();
+template <typename T>
+bool operator==(ft::nullptr_t /*unused*/, const shared_ptr<T>& rhs) throw();
+template <typename T>
+bool operator!=(const shared_ptr<T>& lhs, ft::nullptr_t /*unused*/) throw();
+template <typename T>
+bool operator!=(ft::nullptr_t /*unused*/, const shared_ptr<T>& rhs) throw();
+template <typename T>
+bool operator<(const shared_ptr<T>& lhs, ft::nullptr_t /*unused*/) throw();
+template <typename T>
+bool operator<(ft::nullptr_t /*unused*/, const shared_ptr<T>& rhs) throw();
+template <typename T>
+bool operator>(const shared_ptr<T>& lhs, ft::nullptr_t /*unused*/) throw();
+template <typename T>
+bool operator>(ft::nullptr_t /*unused*/, const shared_ptr<T>& rhs) throw();
+template <typename T>
+bool operator<=(const shared_ptr<T>& lhs, ft::nullptr_t /*unused*/) throw();
+template <typename T>
+bool operator<=(ft::nullptr_t /*unused*/, const shared_ptr<T>& rhs) throw();
+template <typename T>
+bool operator>=(const shared_ptr<T>& lhs, ft::nullptr_t /*unused*/) throw();
+template <typename T>
+bool operator>=(ft::nullptr_t /*unused*/, const shared_ptr<T>& rhs) throw();
+
+template <typename T, typename U, typename V>
+std::basic_ostream<U, V>& operator<<(std::basic_ostream<U, V>& os,
+                                     const shared_ptr<T>& ptr);
+
+template <typename T>
+void swap(shared_ptr<T>& lhs, shared_ptr<T>& rhs) throw();
+
+/* owner comparison */
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/owner_less
+ */
+template <typename T = void>
+struct owner_less;
+
+template <typename T>
+struct owner_less<shared_ptr<T> > {
+	bool operator()(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs) const
+	    throw();
+};
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/owner_less_void
+ */
+template <>
+struct owner_less<void> {
+	typedef void is_transparent;
+
+	template <typename T, typename U>
+	bool operator()(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) const
+	    throw();
+};
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/owner_equal
+ */
+struct owner_equal {
+	typedef void is_transparent;
+
+	template <typename T, typename U>
+	bool operator()(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) const
+	    throw();
+};
+
+/* addressof */
+
+// NOLINTBEGIN(readability-redundant-declaration): Included from
+// shared_ptr_detail.hpp.
+
+/**
+ * https://en.cppreference.com/w/cpp/memory/addressof
+ */
+template <typename T>
+T* addressof(T& arg) throw();
+// NOLINTEND(readability-redundant-declaration)
+
 } // namespace ft
 
+#	include "libftpp/memory/addressof.tpp"        // IWYU pragma: export
 #	include "libftpp/memory/default_delete.tpp"   // IWYU pragma: export
+#	include "libftpp/memory/owner_comparison.tpp" // IWYU pragma: export
+#	include "libftpp/memory/shared_ptr.tpp"       // IWYU pragma: export
 #	include "libftpp/memory/unique_ptr.tpp"       // IWYU pragma: export
 #	include "libftpp/memory/unique_ptr_array.tpp" // IWYU pragma: export
 

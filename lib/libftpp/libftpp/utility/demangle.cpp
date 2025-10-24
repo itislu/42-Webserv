@@ -1,6 +1,7 @@
+#include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
-#include <exception>
 #include <string>
+#include <typeinfo>
 
 #if defined(__GNUC__) || defined(__clang__)
 #	include <cstdlib>
@@ -10,23 +11,22 @@
 
 namespace ft {
 
+std::string demangle(const std::type_info& type_id)
+{
+	return ft::demangle(type_id.name());
+}
+
 std::string demangle(const char* mangled_name)
 {
+	if (mangled_name == FT_NULLPTR) {
+		return "";
+	}
 #ifdef LIBFTPP_HAVE_CXXABI_H
-	std::string result;
 	int status = 0;
-	char* const demangled =
-	    abi::__cxa_demangle(mangled_name, FT_NULLPTR, FT_NULLPTR, &status);
-
-	try {
-		result = status == 0 ? demangled : mangled_name;
-	}
-	catch (const std::exception& e) {
-		std::free(demangled); // NOLINT(cppcoreguidelines-no-malloc)
-		throw;
-	}
-	std::free(demangled); // NOLINT(cppcoreguidelines-no-malloc)
-	return result;
+	const ft::unique_ptr<char, void (*)(void*)> demangled(
+	    abi::__cxa_demangle(mangled_name, FT_NULLPTR, FT_NULLPTR, &status),
+	    std::free);
+	return status == 0 ? demangled.get() : mangled_name;
 #else  // LIBFTPP_HAVE_CXXABI_H
 	return mangled_name;
 #endif // LIBFTPP_HAVE_CXXABI_H

@@ -50,7 +50,7 @@ public:
 	T* operator->() throw();
 	const T& operator*() const throw();
 	T& operator*() throw();
-	bool boolean_test() const throw();
+	bool operator_bool() const throw();
 	bool has_value() const throw();
 	const T& value() const;
 	T& value();

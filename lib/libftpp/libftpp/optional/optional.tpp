@@ -23,7 +23,7 @@ optional<T>::optional(nullopt_t /*unused*/) throw()
 
 template <typename T>
 optional<T>::optional(const optional& other)
-    : ft::safe_bool<optional<T> >(),
+    : ft::safe_bool<optional>(),
       _value(other.has_value() ? new T(*other._value) : FT_NULLPTR)
 {}
 
@@ -88,7 +88,7 @@ T& optional<T>::operator*() throw()
 }
 
 template <typename T>
-bool optional<T>::boolean_test() const throw()
+bool optional<T>::operator_bool() const throw()
 {
 	return has_value();
 }

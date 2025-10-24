@@ -11,7 +11,7 @@ namespace ft {
 /* Iterator traits */
 
 /**
- * @brief Checks wether `T` is an iterator
+ * @brief Checks whether `T` is an iterator
  *
  * Provides the member constant `value` which is equal to `true`, if
  * `std::iterator_traits<T>::iterator_category` exists and is one of the
@@ -29,7 +29,7 @@ template <typename T>
 struct is_iterator;
 
 /**
- * @brief Checks wether `T` is an input iterator
+ * @brief Checks whether `T` is an input iterator
  *
  * Provides the member constant `value` which is equal to `true`, if
  * `std::iterator_traits<T>::iterator_category` is convertible to
@@ -41,7 +41,7 @@ template <typename T>
 struct is_input_iterator;
 
 /**
- * @brief Checks wether `T` is an output iterator
+ * @brief Checks whether `T` is an output iterator
  *
  * Provides the member constant `value` which is equal to `true`, if
  * `std::iterator_traits<T>::iterator_category` is convertible to
@@ -53,7 +53,7 @@ template <typename T>
 struct is_output_iterator;
 
 /**
- * @brief Checks wether `T` is a forward iterator
+ * @brief Checks whether `T` is a forward iterator
  *
  * Provides the member constant `value` which is equal to `true`, if
  * `std::iterator_traits<T>::iterator_category` is convertible to
@@ -65,7 +65,7 @@ template <typename T>
 struct is_forward_iterator;
 
 /**
- * @brief Checks wether `T` is a bidirectional iterator
+ * @brief Checks whether `T` is a bidirectional iterator
  *
  * Provides the member constant `value` which is equal to `true`, if
  * `std::iterator_traits<T>::iterator_category` is convertible to
@@ -77,7 +77,7 @@ template <typename T>
 struct is_bidirectional_iterator;
 
 /**
- * @brief Checks wether `T` is a random access iterator
+ * @brief Checks whether `T` is a random access iterator
  *
  * Provides the member constant `value` which is equal to `true`, if
  * `std::iterator_traits<T>::iterator_category` is convertible to
