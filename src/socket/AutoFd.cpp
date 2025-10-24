@@ -15,6 +15,10 @@ AutoFd::~AutoFd()
 
 void AutoFd::set(int fdes)
 {
+  if (fdes == _fd) {
+    return;
+  }
+
   if (_fd >= 0) {
     ::close(_fd);
   }

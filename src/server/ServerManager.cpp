@@ -8,6 +8,7 @@
 #include <csignal>
 #include <cstring>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -29,8 +30,7 @@ ServerManager::ServerManager(const Config* const config)
   , _eventManager(&_clientManager, &_socketManager, this)
 {
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
-    error("Failed to set SIGINT handler");
-    return;
+    throw std::runtime_error("Failed to set SIGIN handler");
   }
   createServers(config->getServers());
 }
@@ -108,7 +108,7 @@ const Server* ServerManager::getInitServer(int fdes) const
   const Socket* const socket = _socketManager.getSocket(fdes);
   if (socket != FT_NULLPTR) {
     const c_sockToServIter iter = _socketToServers.find(socket);
-    if (iter->second.size() == 1) {
+    if (iter != _socketToServers.end() && iter->second.size() == 1) {
       return iter->second[0];
     }
   }
@@ -120,7 +120,7 @@ std::size_t ServerManager::serverCount() const
   return _servers.size();
 }
 
-const std::vector<const Server*>& ServerManager::getServers()
+const std::vector<const Server*>& ServerManager::getServers() const
 {
   return _servers;
 }

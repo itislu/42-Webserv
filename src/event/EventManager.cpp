@@ -10,6 +10,7 @@
 #include <climits>
 #include <csignal>
 #include <cstring>
+#include <exception>
 #include <iostream>
 #include <new>
 #include <sys/poll.h>
@@ -120,13 +121,13 @@ int EventManager::calculateTimeout() const
   // No clients yet, get default
   if (!_clientsManager->hasClients()) {
     const long timeout = Config::getDefaultTimeout();
-    const int timeoutMs = convertToMs(timeout);
+    const int timeoutMs = convertSecondsToMs(timeout);
     std::cout << "No clients - use default timeout: " << timeoutMs << "ms\n";
     return timeoutMs;
   }
 
   const long minRemaining = _clientsManager->getMinTimeout();
-  const int timeoutMs = convertToMs(minRemaining);
+  const int timeoutMs = convertSecondsToMs(minRemaining);
   std::cout << "using client min remaining timeout: " << timeoutMs << "ms\n";
 
   return timeoutMs;
@@ -153,7 +154,7 @@ int EventManager::check()
   }
   try {
     checkActivity();
-  } catch (std::bad_alloc& e) {
+  } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";
   }
   return ready;

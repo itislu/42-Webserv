@@ -16,7 +16,7 @@ class Client
 public:
   Client();
   explicit Client(int fdes);
-  explicit Client(int fdes, const Server* server);
+  Client(int fdes, const Server* server);
 
   int getFd() const;
   const std::string& getHost() const;
@@ -26,7 +26,7 @@ public:
 
   void setServer(const Server* server);
 
-  const TimeStamp& getLastActivity();
+  const TimeStamp& getLastActivity() const;
   void updateLastActivity();
   long getTimeout() const;
 

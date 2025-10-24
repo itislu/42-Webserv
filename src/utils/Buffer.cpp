@@ -13,9 +13,9 @@ void Buffer::add(const std::string& str)
   _buff.insert(_buff.end(), str.begin(), str.end());
 }
 
-void Buffer::add(const Container& buffer)
+void Buffer::add(const Container& buffer, ssize_t bytes)
 {
-  _buff.insert(_buff.end(), buffer.begin(), buffer.end());
+  _buff.insert(_buff.end(), buffer.begin(), buffer.begin() + bytes);
 }
 
 void Buffer::remove(ssize_t bytes)

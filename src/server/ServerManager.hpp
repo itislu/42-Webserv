@@ -29,7 +29,7 @@ public:
   const Socket* getListener(int port);
 
   const Server* getServerFromSocket(const Socket* socket) const;
-  const std::vector<const Server*>& getServers();
+  const std::vector<const Server*>& getServers() const;
   const Server* getInitServer(int fdes) const;
 
   void mapServerToSocket(const Server* server,

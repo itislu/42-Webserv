@@ -4,11 +4,12 @@
 #include <climits>
 #include <ctime>
 
-int convertToMs(long timeout)
+int convertSecondsToMs(long timeoutSecs)
 {
-  long timeoutMs = timeout * MS_MULTIPLIER;
-  timeoutMs = std::min(timeoutMs, static_cast<long>(INT_MAX));
-  timeoutMs = std::max(timeoutMs, 0L);
+  timeoutSecs = std::max(timeoutSecs, 0L);
+  timeoutSecs =
+    std::min(timeoutSecs, static_cast<long>(INT_MAX) / MS_MULTIPLIER);
+  const long timeoutMs = timeoutSecs * MS_MULTIPLIER;
   return static_cast<int>(timeoutMs);
 }
 

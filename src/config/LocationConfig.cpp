@@ -124,22 +124,22 @@ void LocationConfig::setCgiPass(const std::string& cgiPass)
   _cgiPass = cgiPass;
 }
 
-void LocationConfig::getCgiExtension(const std::string& cgiExtension)
+void LocationConfig::setCgiExtension(const std::string& cgiExtension)
 {
   _cgiExtension = cgiExtension;
 }
 
-void LocationConfig::isRedirect(bool redirect)
+void LocationConfig::setRedirect(bool redirect)
 {
   _redirect = redirect;
 }
 
-void LocationConfig::getRedirection(const std::string& redirectUrl)
+void LocationConfig::setRedirection(const std::string& redirectUrl)
 {
   _redirectUrl = redirectUrl;
 }
 
-void LocationConfig::getRedirectCode(int code)
+void LocationConfig::setRedirectCode(int code)
 {
   _redirectCode = code;
 }

@@ -9,7 +9,7 @@ Server::Server(const ServerConfig* config,
   : _config(config)
   , _listeners(listeners)
   , _hostnames(config->getHostnames())
-  , _timeOut(config->getTimeOut())
+  , _timeOut(config->getTimeout())
 {
 }
 

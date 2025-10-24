@@ -21,6 +21,7 @@ private:
 };
 
 // TODO: add print overload so it prints a formated time
-int convertToMs(long timeout);
+
+int convertSecondsToMs(long timeoutSecs);
 
 #endif

@@ -40,11 +40,11 @@ public:
 
   void setCgi(bool cgi);
   void setCgiPass(const std::string& cgiPass);
-  void getCgiExtension(const std::string& cgiExtension);
+  void setCgiExtension(const std::string& cgiExtension);
 
-  void isRedirect(bool redirect);
-  void getRedirection(const std::string& redirectUrl);
-  void getRedirectCode(int code);
+  void setRedirect(bool redirect);
+  void setRedirection(const std::string& redirectUrl);
+  void setRedirectCode(int code);
 
 private:
   std::string _path; // URL prefix (e.g. "/upload, /, /cgi-bin")
@@ -55,7 +55,6 @@ private:
   std::string _index;                       // override default index (optional)
   std::size_t
     _maxBodysize; // optional: override maxuploadsize for this location
-  // optional: override error pages for this directory
 
   // CGI
   bool _cgiEnabled;

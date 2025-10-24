@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-int Config::_defaultTimeOut = 0;
+int Config::_defaultTimeout = 0;
 
 Config::Config(const std::string& configFile)
   : _configFile(configFile)
@@ -45,7 +45,7 @@ const std::string& Config::getErrorLogPath() const
 
 const std::string& Config::getAccessLogPath() const
 {
-  return _accesLogPath;
+  return _accessLogPath;
 }
 
 void Config::addServer(const ServerConfig& server)
@@ -70,27 +70,25 @@ void Config::setErrorLogPath(const std::string& path)
 
 void Config::setAccessLogPath(const std::string& path)
 {
-  _accesLogPath = path;
+  _accessLogPath = path;
 }
 
 void Config::setDefaultTimeout()
 {
-  long timeout = LONG_MAX;
-  if (_servers.empty()) {
-    timeout = _timeout;
-  }
+  long timeout = _timeout;
+
   for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
-    timeout = std::min(timeout, (*it).getTimeOut());
+    timeout = std::min(timeout, (*it).getTimeout());
   }
   timeout = std::min(timeout, static_cast<long>(INT_MAX));
   timeout = std::max(timeout, 0L);
 
-  Config::_defaultTimeOut = static_cast<int>(timeout);
+  Config::_defaultTimeout = static_cast<int>(timeout);
 }
 
 int Config::getDefaultTimeout()
 {
-  return Config::_defaultTimeOut;
+  return Config::_defaultTimeout;
 }
 
 std::ostream& operator<<(std::ostream& out, const Config& config)
@@ -108,7 +106,7 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
       out << *portIt << " ";
     }
     out << "\n";
-    out << "Timeout: " << serverIt->getTimeOut() << "s\n";
+    out << "Timeout: " << serverIt->getTimeout() << "s\n";
     out << "Hosts: ";
     const std::vector<std::string>& hostnames = serverIt->getHostnames();
     for (std::vector<std::string>::const_iterator hostIt = hostnames.begin();

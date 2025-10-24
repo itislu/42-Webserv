@@ -51,12 +51,12 @@ private:
   std::size_t _maxBodySize;
   std::map<int, std::string> _errorPages;
   std::vector<ServerConfig> _servers;
-  static int _defaultTimeOut;
+  static int _defaultTimeout;
   long _timeout;
 
   // for Logging
   std::string _errorLogPath;
-  std::string _accesLogPath;
+  std::string _accessLogPath;
 };
 
 std::ostream& operator<<(std::ostream& out, const Config& config);

@@ -9,12 +9,11 @@
 
 class Config;
 
-typedef std::vector<ServerConfig>::const_iterator c_srvConfIter;
-
 class ServerConfig
 {
 public:
   // Constructor initializes with defaults
+  typedef std::vector<ServerConfig>::const_iterator c_srvConfIter;
   explicit ServerConfig(const Config& global);
 
   // GETTERS
@@ -25,7 +24,7 @@ public:
   const std::map<int, std::string>& getErrorPages() const;
   std::size_t getMaxBodySize() const;
   const std::vector<std::string>& getAllowedMethods() const;
-  long getTimeOut() const;
+  long getTimeout() const;
   const std::vector<LocationConfig>& getLocations() const;
 
   // SETTERS
@@ -36,7 +35,7 @@ public:
   void addErrorPage(int code, const std::string& path);
   void setMaxBodySize(std::size_t size);
   void addAllowedMethod(const std::string& method);
-  void setTimeOut(long time);
+  void setTimeout(long time);
   void addLocation(const LocationConfig& location);
 
   const LocationConfig& getLocationForPath(const std::string& uri) const;

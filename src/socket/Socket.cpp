@@ -1,13 +1,11 @@
-#include "Socket.hpp"
-#include "socket/AutoFd.hpp"
 #include "socket/Socket.hpp"
+#include "socket/AutoFd.hpp"
 #include <cstring>      //std::memset()
 #include <fcntl.h>      //fcntl()
 #include <netinet/in.h> //struct sockaddr
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h> //socket(), setsockopt(),
-#include <unistd.h>
 
 Socket::Socket(int port)
   : _port(port)
@@ -24,14 +22,6 @@ int Socket::getFd() const
 int Socket::getPort() const
 {
   return _port;
-}
-
-void Socket::throwSocketException(const std::string& msg)
-{
-  if (_fd.get() >= 0) {
-    close(_fd.get());
-  }
-  throw std::runtime_error(msg);
 }
 
 struct sockaddr_in Socket::getIpv4SockAddr() const
@@ -56,12 +46,12 @@ void Socket::initSocket()
 {
   _fd.set(socket(AF_INET, SOCK_STREAM, 0));
   if (_fd.get() < 0) {
-    throwSocketException("server socket creation failed");
+    throw std::runtime_error("server socket creation failed");
   }
 
   int opt = 1;
   if (setsockopt(_fd.get(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-    throwSocketException("setting options for server socket failed");
+    throw std::runtime_error("setting options for server socket failed");
   }
 
   struct sockaddr_in sockAddr = getIpv4SockAddr();
@@ -72,15 +62,15 @@ void Socket::initSocket()
            sizeof(sockAddr)) < 0)
   // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
   {
-    throwSocketException("failed to bind server socket");
+    throw std::runtime_error("failed to bind server socket");
   }
 
   if (listen(_fd.get(), SOMAXCONN) < 0) {
-    throwSocketException("failed to set server socket to listen");
+    throw std::runtime_error("failed to set server socket to listen");
   }
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg): POSIX C API.
   if (fcntl(_fd.get(), F_SETFL, O_NONBLOCK) < 0) {
-    throwSocketException("failed to set socket to non-blocking");
+    throw std::runtime_error("failed to set socket to non-blocking");
   }
 }

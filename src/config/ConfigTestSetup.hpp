@@ -57,7 +57,7 @@ static ServerConfig createTestServer(const Config& config,
 
   server.setRoot(root);
 
-  server.setTimeOut(timeout);
+  server.setTimeout(timeout);
 
   std::vector<std::string> methods;
   methods.push_back("GET");
