@@ -113,7 +113,7 @@ T& expected<T, E>::operator*() throw()
 }
 
 template <typename T, typename E>
-bool expected<T, E>::boolean_test() const throw()
+bool expected<T, E>::operator_bool() const throw()
 {
 	return _has_value;
 }

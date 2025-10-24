@@ -155,7 +155,7 @@ public:
 	typename ft::add_lvalue_reference<Deleter>::type get_deleter() throw();
 	typename ft::add_lvalue_reference<const Deleter>::type get_deleter() const
 	    throw();
-	bool boolean_test() const throw();
+	bool operator_bool() const throw();
 
 	typename ft::add_lvalue_reference<T>::type operator*() const;
 	pointer operator->() const throw();
@@ -449,7 +449,7 @@ public:
 	typename ft::add_lvalue_reference<Deleter>::type get_deleter() throw();
 	typename ft::add_lvalue_reference<const Deleter>::type get_deleter() const
 	    throw();
-	bool boolean_test() const throw();
+	bool operator_bool() const throw();
 
 	T& operator[](std::size_t i) const;
 
@@ -586,7 +586,7 @@ public:
 
 	element_type* get() const throw();
 	long use_count() const throw();
-	bool boolean_test() const throw();
+	bool operator_bool() const throw();
 	template <typename Y>
 	bool owner_before(const shared_ptr<Y>& other) const throw();
 	template <typename Y>

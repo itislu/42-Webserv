@@ -20,7 +20,7 @@ namespace ft {
  * Usage:
  * 1. Publicly inherit from this class using CRTP idiom:
  *    `class YourClass : public safe_bool<YourClass>`.
- * 2. Implement `bool boolean_test() const` instead of `operator bool() const`.
+ * 2. Implement `bool operator_bool() const` instead of `operator bool() const`.
  */
 template <typename Derived = void>
 class safe_bool : private _safe_bool::safe_bool_base {
@@ -51,7 +51,7 @@ private:
  * Usage:
  * 1. Publicly inherit from this class with no template parameter:
  *    `class YourClass : public safe_bool<>`.
- * 2. Implement `bool boolean_test() const` instead of `operator bool() const`.
+ * 2. Implement `bool operator_bool() const` instead of `operator bool() const`.
  *
  * @note If your class is not virtual yet, prefer to pass your class as template
  * parameter (CRTP idiom) to avoid it becoming virtual.
@@ -67,7 +67,7 @@ protected:
 	safe_bool();
 	~safe_bool();
 
-	virtual bool boolean_test() const = 0;
+	virtual bool operator_bool() const = 0;
 
 private:
 	safe_bool(const safe_bool& /*unused*/);

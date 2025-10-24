@@ -238,7 +238,7 @@ long shared_ptr<T>::use_count() const throw()
 }
 
 template <typename T>
-bool shared_ptr<T>::boolean_test() const throw()
+bool shared_ptr<T>::operator_bool() const throw()
 {
 	return _ptr != FT_NULLPTR;
 }

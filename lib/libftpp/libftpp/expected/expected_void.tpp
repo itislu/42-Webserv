@@ -64,7 +64,7 @@ void expected<void, E>::operator*() const throw()
 }
 
 template <typename E>
-bool expected<void, E>::boolean_test() const throw()
+bool expected<void, E>::operator_bool() const throw()
 {
 	return _has_value;
 }

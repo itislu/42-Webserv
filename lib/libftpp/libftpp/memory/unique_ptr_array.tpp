@@ -212,7 +212,7 @@ unique_ptr<T[], Deleter>::get_deleter() const throw()
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
-bool unique_ptr<T[], Deleter>::boolean_test() const throw()
+bool unique_ptr<T[], Deleter>::operator_bool() const throw()
 {
 	return _ptr != pointer();
 }
