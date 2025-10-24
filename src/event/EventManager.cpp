@@ -12,7 +12,6 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
-#include <new>
 #include <sys/poll.h>
 #include <vector>
 
