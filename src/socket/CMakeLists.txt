@@ -1,19 +1,16 @@
 # **************************************************************************** #
-# SERVER MODULE
+# SOCKET MODULE
 # **************************************************************************** #
 
-set(LIB_NAME server)
+set(LIB_NAME socket)
 
 add_library(${LIB_NAME} STATIC
-  Server.cpp
-  ServerManager.cpp
+  SocketManager.cpp
+  Socket.cpp
+  AutoFd.cpp
 )
 
 target_link_libraries(${LIB_NAME} 
   PRIVATE
-  client
-  event
   ftpp
-  socket
-  utils
 )
