@@ -8,13 +8,6 @@
 /* ************************************************************************** */
 // PUBLIC
 
-Buffer::Buffer() {}
-
-Buffer::Buffer(std::size_t size)
-{
-  _buff.reserve(size);
-}
-
 void Buffer::add(const std::string& str)
 {
   _buff.insert(_buff.end(), str.begin(), str.end());
@@ -44,6 +37,11 @@ std::size_t Buffer::getSize() const
 unsigned char* Buffer::data()
 {
   return _buff.data();
+}
+
+unsigned char Buffer::at(size_t pos) const
+{
+  return _buff.at(pos);
 }
 
 Buffer::iterator Buffer::begin()
@@ -84,4 +82,11 @@ std::string Buffer::getString(long fromIndex, long toIndex) const
 bool Buffer::isEmpty() const
 {
   return _buff.empty();
+}
+
+std::string Buffer::consume(long bytes)
+{
+  const std::string newStr = getString(0, bytes);
+  remove(bytes);
+  return newStr;
 }

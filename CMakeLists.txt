@@ -26,12 +26,13 @@ include_directories(PUBLIC ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   ftpp
-  utils
-  server
   client
   socket
   config
   event
+  http
+  server
+  utils
 )
 
 
@@ -48,6 +49,7 @@ add_subdirectory(src/config)
 add_subdirectory(src/event)
 add_subdirectory(src/server)
 add_subdirectory(src/socket)
+add_subdirectory(src/http)
 add_subdirectory(src/utils)
 
 

@@ -14,22 +14,22 @@ public:
   typedef std::vector<unsigned char> Container;
   typedef Container::iterator iterator;
 
-  Buffer();
-  explicit Buffer(std::size_t size);
-
   void add(const std::string& str);
   void add(const Container& buffer);
   void remove(ssize_t bytes);
-  void remove(size_t bytes);
+  void remove(std::size_t bytes);
   std::size_t getSize() const;
-  bool isEmpty() const;
-  unsigned char* data();
 
+  unsigned char* data();
+  bool isEmpty() const;
+
+  unsigned char at(std::size_t pos) const;
   iterator begin();
   iterator end();
   iterator getIterAt(long offset);
 
   std::string getString(long fromIndex, long toIndex) const;
+  std::string consume(long bytes);
 
 private:
   Container _buff;
