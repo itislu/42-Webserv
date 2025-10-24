@@ -143,4 +143,13 @@ int isDigit05(int chr)
 {
   return static_cast<int>(chr >= '0' && chr <= '5');
 }
+
+/**
+ * ( SP / HTAB )
+ */
+int isWhitespace(int chr)
+{
+  return static_cast<int>(chr == ' ' || chr == '\t');
+}
+
 }

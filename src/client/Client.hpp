@@ -1,6 +1,11 @@
+#pragma once
+#include "utils/state/StateHandler.hpp"
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "http/Request.hpp"
+#include <utils/state/IState.hpp>
+#include "utils/Buffer.hpp"
 #include <string>
 #include <sys/types.h>
 #include <vector>
@@ -8,13 +13,13 @@
 class Client
 {
 public:
-  typedef std::vector<unsigned char> Buffer;
   Client();
   explicit Client(int sockFd);
 
   int getFd() const;
-  Buffer getInBuff() const;
-  Buffer getOutBuff() const;
+  Buffer& getInBuff();
+  Buffer& getOutBuff();
+  Request& getRequest();
 
   void addToInBuff(const std::string& str);
   void addToInBuff(const Buffer& buffer);
@@ -26,11 +31,15 @@ public:
 
   bool hasDataToSend() const;
 
+  StateHandler<Client>& getStateHandler();
+
 private:
   int _fd;
-  // int _state;
+  StateHandler<Client> _stateHandler;
+
   Buffer _inBuff;
   Buffer _outBuff;
+  Request _request;
 };
 
 #endif

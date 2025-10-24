@@ -1,5 +1,4 @@
-#include "server/Server.hpp"
-#include <exception>
+// #include "server/Server.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[])
@@ -10,14 +9,9 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  try {
-    const int port = 8080; // should come from config
-    Server server(port);
-    server.initServer();
-    server.run();
-  } catch (const std::exception& e) {
-    std::cerr << "Error: " << e.what() << "\n";
-    return 1;
-  }
+  // const int port = 8080;
+  // Server server(port);
+  // server.run();
+
   return 0;
 }
