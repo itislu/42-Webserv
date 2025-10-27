@@ -306,6 +306,12 @@ template <typename T>
 struct remove_pointer;
 
 /**
+ * https://en.cppreference.com/w/cpp/types/add_pointer
+ */
+template <typename T>
+struct add_pointer;
+
+/**
  * https://en.cppreference.com/w/cpp/types/remove_cvref
  */
 template <typename T>
@@ -396,7 +402,39 @@ struct negation;
 FT_HAS_MEMBER_FUNCTION(void, swap, (T&))
 
 /**
- * @brief Checks wether `T` is an lvalue reference to a const-qualified type
+ * @brief Checks whether `T` is a class or union type
+ *
+ * Provides the member constant `value` which is equal to `true`, if `T` is a
+ * class or union type. Otherwise, `value` is equal to `false`.
+ *
+ * Classes and unions cannot be differentiated without compiler builtins, so
+ * this is a portable compromise.
+ */
+template <typename T>
+struct is_class_or_union;
+
+/**
+ * @brief Checks whether `T` is a complete type
+ *
+ * Provides the member constant `value` which is equal to `true`, if `T` is a
+ * complete type at the point of instantiation of this trait. Otherwise, `value`
+ * is equal to `false`.
+ *
+ * The following types are incomplete types:
+ * - the type void (possibly cv-qualified);
+ * - incompletely-defined object types:
+ *   - class type that has been declared (e.g. by forward declaration) but not
+ *     defined;
+ *   - array of unknown bound;
+ *   - array of elements of incomplete type;
+ *   - enumeration type from the point of declaration until its underlying type
+ *     is determined.
+ */
+template <typename T>
+struct is_complete;
+
+/**
+ * @brief Checks whether `T` is an lvalue reference to a const-qualified type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is an
  * lvalue reference to a const-qualified type. Otherwise, `value` is equal to
@@ -409,7 +447,8 @@ template <typename T>
 struct is_const_lvalue_reference;
 
 /**
- * @brief Checks wether `T` is an lvalue reference to a non-const-qualified type
+ * @brief Checks whether `T` is an lvalue reference to a non-const-qualified
+ * type
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is an
  * lvalue reference to a non-const-qualified type. Otherwise, `value` is equal
@@ -422,7 +461,7 @@ template <typename T>
 struct is_nonconst_lvalue_reference;
 
 /**
- * @brief Checks wether `T` can be a return type of a function
+ * @brief Checks whether `T` can be a return type of a function
  *
  * Provides the member constant `value` which is equal to `true`, if `T` is not
  * an abstract class, an array, or a function. Otherwise, `value` is equal to

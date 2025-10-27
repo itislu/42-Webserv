@@ -22,7 +22,7 @@ bool equal_to<void>::operator()(const T& lhs, const U& rhs) const
 	return lhs == rhs;
 }
 
-template <class T, class U>
+template <typename T, typename U>
 bool equal_to<void>::operator()(T* a, U* b) const
 {
 	return std::equal_to<const volatile void*>()(a, b);
@@ -42,7 +42,7 @@ bool not_equal_to<void>::operator()(const T& lhs, const U& rhs) const
 	return lhs != rhs;
 }
 
-template <class T, class U>
+template <typename T, typename U>
 bool not_equal_to<void>::operator()(T* a, U* b) const
 {
 	return std::not_equal_to<const volatile void*>()(a, b);
@@ -62,7 +62,7 @@ bool greater<void>::operator()(const T& lhs, const U& rhs) const
 	return lhs > rhs;
 }
 
-template <class T, class U>
+template <typename T, typename U>
 bool greater<void>::operator()(T* a, U* b) const
 {
 	return std::greater<const volatile void*>()(a, b);
@@ -82,7 +82,7 @@ bool less<void>::operator()(const T& lhs, const U& rhs) const
 	return lhs < rhs;
 }
 
-template <class T, class U>
+template <typename T, typename U>
 bool less<void>::operator()(T* a, U* b) const
 {
 	return std::less<const volatile void*>()(a, b);
@@ -102,7 +102,7 @@ bool greater_equal<void>::operator()(const T& lhs, const U& rhs) const
 	return lhs >= rhs;
 }
 
-template <class T, class U>
+template <typename T, typename U>
 bool greater_equal<void>::operator()(T* a, U* b) const
 {
 	return std::greater_equal<const volatile void*>()(a, b);
@@ -122,7 +122,7 @@ bool less_equal<void>::operator()(const T& lhs, const U& rhs) const
 	return lhs <= rhs;
 }
 
-template <class T, class U>
+template <typename T, typename U>
 bool less_equal<void>::operator()(T* a, U* b) const
 {
 	return std::less_equal<const volatile void*>()(a, b);

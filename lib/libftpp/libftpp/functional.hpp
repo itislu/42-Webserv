@@ -33,10 +33,6 @@ struct function_traits;
  */
 template <typename T = void>
 struct equal_to {
-	typedef bool result_type;
-	typedef T first_argument_type;
-	typedef T second_argument_type;
-
 	bool operator()(const T& lhs, const T& rhs) const;
 };
 
@@ -56,7 +52,7 @@ struct equal_to<void> {
 
 	template <typename T, typename U>
 	bool operator()(const T& lhs, const U& rhs) const;
-	template <class T, class U>
+	template <typename T, typename U>
 	bool operator()(T* a, U* b) const;
 };
 
@@ -67,10 +63,6 @@ struct equal_to<void> {
  */
 template <typename T = void>
 struct not_equal_to {
-	typedef bool result_type;
-	typedef T first_argument_type;
-	typedef T second_argument_type;
-
 	bool operator()(const T& lhs, const T& rhs) const;
 };
 
@@ -90,7 +82,7 @@ struct not_equal_to<void> {
 
 	template <typename T, typename U>
 	bool operator()(const T& lhs, const U& rhs) const;
-	template <class T, class U>
+	template <typename T, typename U>
 	bool operator()(T* a, U* b) const;
 };
 
@@ -101,10 +93,6 @@ struct not_equal_to<void> {
  */
 template <typename T = void>
 struct greater {
-	typedef bool result_type;
-	typedef T first_argument_type;
-	typedef T second_argument_type;
-
 	bool operator()(const T& lhs, const T& rhs) const;
 };
 
@@ -124,7 +112,7 @@ struct greater<void> {
 
 	template <typename T, typename U>
 	bool operator()(const T& lhs, const U& rhs) const;
-	template <class T, class U>
+	template <typename T, typename U>
 	bool operator()(T* a, U* b) const;
 };
 
@@ -135,10 +123,6 @@ struct greater<void> {
  */
 template <typename T = void>
 struct less {
-	typedef bool result_type;
-	typedef T first_argument_type;
-	typedef T second_argument_type;
-
 	bool operator()(const T& lhs, const T& rhs) const;
 };
 
@@ -158,7 +142,7 @@ struct less<void> {
 
 	template <typename T, typename U>
 	bool operator()(const T& lhs, const U& rhs) const;
-	template <class T, class U>
+	template <typename T, typename U>
 	bool operator()(T* a, U* b) const;
 };
 
@@ -169,10 +153,6 @@ struct less<void> {
  */
 template <typename T = void>
 struct greater_equal {
-	typedef bool result_type;
-	typedef T first_argument_type;
-	typedef T second_argument_type;
-
 	bool operator()(const T& lhs, const T& rhs) const;
 };
 
@@ -192,7 +172,7 @@ struct greater_equal<void> {
 
 	template <typename T, typename U>
 	bool operator()(const T& lhs, const U& rhs) const;
-	template <class T, class U>
+	template <typename T, typename U>
 	bool operator()(T* a, U* b) const;
 };
 
@@ -203,10 +183,6 @@ struct greater_equal<void> {
  */
 template <typename T = void>
 struct less_equal {
-	typedef bool result_type;
-	typedef T first_argument_type;
-	typedef T second_argument_type;
-
 	bool operator()(const T& lhs, const T& rhs) const;
 };
 
@@ -226,7 +202,7 @@ struct less_equal<void> {
 
 	template <typename T, typename U>
 	bool operator()(const T& lhs, const U& rhs) const;
-	template <class T, class U>
+	template <typename T, typename U>
 	bool operator()(T* a, U* b) const;
 };
 

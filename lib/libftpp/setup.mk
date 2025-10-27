@@ -7,7 +7,7 @@ SETUP_MK		:=	1
 MAKEFLAGS		+=	--silent --no-builtin-rules --no-builtin-variables
 SHELL			:=	/bin/bash
 PWD				:=	$(shell pwd)
-MAKEFILES_DIR	:=	$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+MAKEFILES_DIR	:=	Makefiles
 REPO_ROOT		:=	$(abspath $(dir $(MAKEFILES_DIR)))
 REPO_SUBDIR		:=	$(patsubst /%,%,$(subst $(REPO_ROOT),,$(PWD)))
 

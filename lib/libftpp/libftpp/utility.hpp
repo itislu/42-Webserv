@@ -6,6 +6,7 @@
 #	include "libftpp/movable.hpp"
 #	include "libftpp/type_traits.hpp"
 #	include <string>
+#	include <typeinfo>
 
 /**
  * https://en.cppreference.com/w/cpp/utility/unreachable
@@ -42,6 +43,7 @@ namespace ft {
 
 /* demangle */
 
+std::string demangle(const std::type_info& type_id);
 std::string demangle(const char* mangled_name);
 
 /* move */
@@ -56,9 +58,16 @@ std::string demangle(const char* mangled_name);
  * `ft::remove_reference<T&>::type` is used to prevent nesting of `ft::rvalue`s.
  *
  * https://en.cppreference.com/w/cpp/utility/move
+ *
+ * @note Does not support union types.
+ * @note Due to implementation limitations, non-class types are returned as
+ * lvalue references.
  */
 template <typename T>
-ft::rvalue<typename ft::remove_reference<T&>::type>& move(T& t) throw();
+typename ft::conditional<ft::is_class_or_union<T>::value,
+                         ft::rvalue<typename ft::remove_reference<T&>::type>&,
+                         T&>::type
+move(T& t) throw();
 
 /* nullptr_t */
 

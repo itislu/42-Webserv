@@ -9,6 +9,7 @@ add_library(${LIB_NAME} STATIC
   libftpp/expected/bad_expected_access_void.cpp
   libftpp/expected/unexpect_t.cpp
   libftpp/format/log.cpp
+  libftpp/memory/shared_ptr_control_base.cpp
   libftpp/numeric/abs_diff.cpp
   libftpp/numeric/arithmetic_exception.cpp
   libftpp/numeric/numeric_cast_exception.cpp
