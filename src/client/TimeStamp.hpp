@@ -8,7 +8,7 @@ public:
   TimeStamp();
 
   std::time_t getTime() const;
-  void setTime(long time);
+  void setTime(std::time_t time);
   std::time_t operator-(const TimeStamp& other) const;
 
   static std::time_t now();

@@ -24,7 +24,7 @@ std::time_t TimeStamp::getTime() const
   return _timeStamp;
 }
 
-void TimeStamp::setTime(long time)
+void TimeStamp::setTime(std::time_t time)
 {
   _timeStamp = time;
 }

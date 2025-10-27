@@ -11,10 +11,10 @@
 class Server
 {
 public:
-  Server(const ServerConfig* servConfig,
+  Server(const ServerConfig& servConfig,
          const std::vector<const Socket*>& listeners);
 
-  const ServerConfig* getConfig() const;
+  const ServerConfig& getConfig() const;
   const std::vector<const Socket*>& getListeners() const;
   const std::vector<std::string>& getHostnames() const;
   long getTimeout() const;

@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
   try {
     const Config config = TestConfigSetup::createTestConfig();
     std::cout << config;
-    ServerManager serverManager(&config);
+    ServerManager serverManager(config);
 
     serverManager.run();
 

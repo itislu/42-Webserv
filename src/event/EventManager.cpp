@@ -18,12 +18,12 @@
 // Calls checkActivity() (or delegate to ClientManager/SocketManager)
 // Checks timeouts
 
-EventManager::EventManager(ClientManager* clients,
-                           SocketManager* sockets,
-                           ServerManager* servers)
-  : _clientsManager(clients)
-  , _socketsManager(sockets)
-  , _serverManager(servers)
+EventManager::EventManager(ClientManager& clients,
+                           SocketManager& sockets,
+                           ServerManager& servers)
+  : _clientsManager(&clients)
+  , _socketsManager(&sockets)
+  , _serverManager(&servers)
 {
 }
 

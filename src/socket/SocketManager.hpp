@@ -16,7 +16,7 @@ public:
   typedef std::map<int, const Socket*>::iterator fdToSockIter;
   typedef std::map<int, const Socket*>::const_iterator const_fdToSockIter;
 
-  explicit SocketManager(const Config* config);
+  explicit SocketManager(const Config& config);
   ~SocketManager();
 
   bool isListener(int fdes) const;

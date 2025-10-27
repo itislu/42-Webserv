@@ -42,7 +42,7 @@ const std::string& LocationConfig::getIndex() const
   return _index;
 }
 
-size_t LocationConfig::getMaxBodySize() const
+std::size_t LocationConfig::getMaxBodySize() const
 {
   return _maxBodysize;
 }

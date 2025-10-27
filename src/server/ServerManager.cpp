@@ -24,15 +24,15 @@ extern "C" void sigIntHandler(int /*sigNum*/)
   g_running = 0;
 }
 
-ServerManager::ServerManager(const Config* const config)
-  : _config(config)
+ServerManager::ServerManager(const Config& config)
+  : _config(&config)
   , _socketManager(config)
-  , _eventManager(&_clientManager, &_socketManager, this)
+  , _eventManager(_clientManager, _socketManager, *this)
 {
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
   }
-  createServers(config->getServers());
+  createServers(_config->getServers());
 }
 
 ServerManager::~ServerManager()
@@ -50,7 +50,7 @@ void ServerManager::createServers(const std::vector<ServerConfig>& configs)
        ++it) {
     const std::vector<const Socket*> listeners =
       createListeners(it->getPorts());
-    addServer(&(*it), listeners);
+    addServer(*it, listeners);
   }
 }
 
@@ -68,7 +68,7 @@ std::vector<const Socket*> ServerManager::createListeners(
   return listeners;
 }
 
-void ServerManager::addServer(const ServerConfig* config,
+void ServerManager::addServer(const ServerConfig& config,
                               const std::vector<const Socket*>& listeners)
 {
   const Server* const server = new Server(config, listeners);

@@ -4,18 +4,18 @@
 #include <string>
 #include <vector>
 
-Server::Server(const ServerConfig* config,
+Server::Server(const ServerConfig& config,
                const std::vector<const Socket*>& listeners)
-  : _config(config)
+  : _config(&config)
   , _listeners(listeners)
-  , _hostnames(config->getHostnames())
-  , _timeOut(config->getTimeout())
+  , _hostnames(config.getHostnames())
+  , _timeOut(config.getTimeout())
 {
 }
 
-const ServerConfig* Server::getConfig() const
+const ServerConfig& Server::getConfig() const
 {
-  return _config;
+  return *_config;
 }
 
 const std::vector<const Socket*>& Server::getListeners() const

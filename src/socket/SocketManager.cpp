@@ -16,9 +16,9 @@
 // Owns _portToSocket and _pfds.
 // Handles creating listeners and pollfds.
 
-SocketManager::SocketManager(const Config* config)
+SocketManager::SocketManager(const Config& config)
 {
-  createListeningSockets(config->getServers());
+  createListeningSockets(config.getServers());
 }
 
 SocketManager::~SocketManager()
@@ -164,6 +164,7 @@ const Socket& SocketManager::getListener(int port) const
     }
   }
   assert(false && "SocketManager::getListener: port not found");
+  FT_UNREACHABLE();
 }
 
 void SocketManager::removePfd(int fdes)

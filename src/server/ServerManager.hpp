@@ -19,7 +19,7 @@ class ServerManager
     const_sockToServIter;
 
 public:
-  explicit ServerManager(const Config* config);
+  explicit ServerManager(const Config& config);
   ~ServerManager();
 
   const Server* getServerFromSocket(const Socket* socket) const;
@@ -31,7 +31,7 @@ public:
   std::size_t serverCount() const;
 
 private:
-  void addServer(const ServerConfig* config,
+  void addServer(const ServerConfig& config,
                  const std::vector<const Socket*>& listeners);
   void createServers(const std::vector<ServerConfig>& configs);
   std::vector<const Socket*> createListeners(const std::vector<int>& ports);

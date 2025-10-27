@@ -10,9 +10,9 @@ class ServerManager;
 class EventManager
 {
 public:
-  EventManager(ClientManager* clients,
-               SocketManager* sockets,
-               ServerManager* servers);
+  EventManager(ClientManager& clients,
+               SocketManager& sockets,
+               ServerManager& servers);
 
   int check();
   void checkTimeouts();
@@ -28,7 +28,6 @@ private:
 
   /* TIMEOUT */
   int calculateTimeout() const;
-  long getClientTimeout(const Client* client) const;
 
   ClientManager* _clientsManager;
   SocketManager* _socketsManager;
