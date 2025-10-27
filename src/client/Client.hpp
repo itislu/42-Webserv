@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include "client/TimeStamp.hpp"
+#include "libftpp/memory.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
@@ -16,15 +17,15 @@ class Client
 public:
   Client();
   explicit Client(int fdes);
-  Client(int fdes, const Server* server);
+  Client(int fdes, const ft::shared_ptr<const Server>& server);
 
   int getFd() const;
   const std::string& getHost() const;
   Buffer getInBuff() const;
   Buffer getOutBuff() const;
-  const Server* getServer() const;
+  ft::shared_ptr<const Server> getServer() const;
 
-  void setServer(const Server* server);
+  void setServer(const ft::shared_ptr<const Server>& server);
 
   const TimeStamp& getLastActivity() const;
   long getTimeout() const;
@@ -38,7 +39,7 @@ private:
 
   // int _state;
   AutoFd _fd;
-  const Server* _server;
+  ft::shared_ptr<const Server> _server;
   std::string _host;
   TimeStamp _lastActivity;
   Buffer _inBuff;

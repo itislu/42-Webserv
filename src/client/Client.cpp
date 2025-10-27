@@ -1,6 +1,7 @@
 #include "Client.hpp"
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
+#include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
@@ -17,18 +18,16 @@
 
 Client::Client()
   : _fd(-1)
-  //, _state(0)
-  , _server()
+//, _state(0)
 {
 }
 
 Client::Client(int fdes)
   : _fd(fdes)
-  , _server()
 {
 }
 
-Client::Client(int fdes, const Server* server)
+Client::Client(int fdes, const ft::shared_ptr<const Server>& server)
   : _fd(fdes)
   , _server(server)
 {
@@ -62,12 +61,12 @@ long Client::getTimeout() const
   return Config::getDefaultTimeout();
 }
 
-const Server* Client::getServer() const
+ft::shared_ptr<const Server> Client::getServer() const
 {
   return _server;
 }
 
-void Client::setServer(const Server* server)
+void Client::setServer(const ft::shared_ptr<const Server>& server)
 {
   _server = server;
 }

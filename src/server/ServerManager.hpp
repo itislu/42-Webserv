@@ -5,6 +5,7 @@
 #include "client/ClientManager.hpp"
 #include "config/ServerConfig.hpp"
 #include "event/EventManager.hpp"
+#include "libftpp/memory.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
 #include <cstddef>
@@ -13,30 +14,32 @@
 
 class ServerManager
 {
-  typedef std::map<const Socket*, std::vector<const Server*> >::iterator
-    sockToServIter;
-  typedef std::map<const Socket*, std::vector<const Server*> >::const_iterator
-    const_sockToServIter;
-
 public:
-  explicit ServerManager(const Config& config);
-  ~ServerManager();
+  typedef std::vector<ft::shared_ptr<const Server> > Servers;
 
-  const Server* getServerFromSocket(const Socket* socket) const;
-  const std::vector<const Server*>& getServers() const;
-  const Server* getInitServer(int fdes) const;
+  explicit ServerManager(const Config& config);
+  ~ServerManager() {}
+
+  ft::shared_ptr<const Server> getServerFromSocket(
+    const ft::shared_ptr<const Socket>& socket) const;
+  const Servers& getServers() const;
+  ft::shared_ptr<const Server> getInitServer(int fdes) const;
 
   void run();
 
   std::size_t serverCount() const;
 
 private:
+  typedef std::map<ft::shared_ptr<const Socket>, Servers> SockToServ;
+  typedef SockToServ::iterator sockToServIter;
+  typedef SockToServ::const_iterator const_sockToServIter;
+
   void addServer(const ServerConfig& config,
-                 const std::vector<const Socket*>& listeners);
+                 const Server::Listeners& listeners);
   void createServers(const std::vector<ServerConfig>& configs);
-  std::vector<const Socket*> createListeners(const std::vector<int>& ports);
-  void mapServerToSocket(const Server* server,
-                         const std::vector<const Socket*>& listeners);
+  Server::Listeners createListeners(const std::vector<int>& ports);
+  void mapServerToSocket(const ft::shared_ptr<const Server>& server,
+                         const Server::Listeners& listeners);
 
   ServerManager(const ServerManager& other);
   ServerManager& operator=(const ServerManager& other);
@@ -45,8 +48,8 @@ private:
   SocketManager _socketManager;
   ClientManager _clientManager;
   EventManager _eventManager;
-  std::vector<const Server*> _servers;
-  std::map<const Socket*, std::vector<const Server*> > _socketToServers;
+  Servers _servers;
+  SockToServ _socketToServers;
 };
 
 #endif

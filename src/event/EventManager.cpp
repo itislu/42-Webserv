@@ -3,6 +3,7 @@
 #include "client/ClientManager.hpp"
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
+#include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "server/ServerManager.hpp"
@@ -27,35 +28,36 @@ EventManager::EventManager(ClientManager& clients,
 {
 }
 
-bool EventManager::sendToClient(Client* client)
+bool EventManager::sendToClient(Client& client)
 {
-  const bool alive = client->sendTo();
-  if (alive && !client->hasDataToSend()) {
-    _socketsManager->disablePollout(client->getFd());
+  const bool alive = client.sendTo();
+  if (alive && !client.hasDataToSend()) {
+    _socketsManager->disablePollout(client.getFd());
   }
   return alive;
 }
 
-bool EventManager::receiveFromClient(Client* client)
+bool EventManager::receiveFromClient(Client& client)
 {
-  const bool alive = client->receive();
-  if (alive && client->hasDataToSend()) {
-    _socketsManager->enablePollout(client->getFd());
+  const bool alive = client.receive();
+  if (alive && client.hasDataToSend()) {
+    _socketsManager->enablePollout(client.getFd());
   }
   return alive;
 }
 
-bool EventManager::handleClient(Client* client, unsigned events)
+bool EventManager::handleClient(const ft::shared_ptr<Client>& client,
+                                unsigned events)
 {
   if (client == FT_NULLPTR) {
     return false;
   }
   bool alive = true;
   if ((events & POLLIN) != 0 && alive) { // Receive Data
-    alive = receiveFromClient(client);
+    alive = receiveFromClient(*client);
   }
   if ((events & POLLOUT) != 0 && alive) { // Send Data
-    alive = sendToClient(client);
+    alive = sendToClient(*client);
   }
   if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 && alive) {
     return false; // disconnect client
@@ -63,7 +65,7 @@ bool EventManager::handleClient(Client* client, unsigned events)
   return alive;
 }
 
-void EventManager::disconnectClient(Client* client)
+void EventManager::disconnectClient(const ft::shared_ptr<Client>& client)
 {
   if (client == FT_NULLPTR) {
     return;
@@ -86,7 +88,8 @@ void EventManager::acceptClient(int fdes, const unsigned events)
 
   const int clientFd = _socketsManager->acceptClient(fdes);
   if (clientFd > 0) {
-    const Server* const server = _serverManager->getInitServer(fdes);
+    const ft::shared_ptr<const Server> server =
+      _serverManager->getInitServer(fdes);
     _clientsManager->addClient(clientFd, server);
     std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
@@ -103,7 +106,8 @@ void EventManager::checkActivity()
       acceptClient(pfds[i].fd, events);
       i++;
     } else {
-      Client* const client = _clientsManager->getClient(pfds[i].fd);
+      const ft::shared_ptr<Client> client =
+        _clientsManager->getClient(pfds[i].fd);
       if (!handleClient(client, events)) {
         disconnectClient(client);
       } else {
@@ -132,7 +136,7 @@ int EventManager::calculateTimeout() const
 
 void EventManager::checkTimeouts()
 {
-  std::vector<Client*> timedOut;
+  std::vector<ft::shared_ptr<Client> > timedOut;
   _clientsManager->getTimedOutClients(timedOut);
   for (std::size_t i = 0; i < timedOut.size(); ++i) {
     std::cout << "[SERVER] Client fd=" << timedOut[i]->getFd()
