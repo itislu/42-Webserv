@@ -34,10 +34,10 @@ public:
 
 private:
   typedef std::vector<ft::shared_ptr<const Socket> > Sockets;
-  typedef Sockets::iterator sockIter;
+  typedef Sockets::iterator SockIter;
   typedef std::map<int /* fd */, ft::shared_ptr<const Socket> > FdToSock;
-  typedef FdToSock::iterator fdToSockIter;
-  typedef FdToSock::const_iterator const_fdToSockIter;
+  typedef FdToSock::iterator FdToSockIter;
+  typedef FdToSock::const_iterator const_FdToSockIter;
 
   void createListeningSockets(const std::vector<ServerConfig>& configs);
   void createListener(const std::vector<int>& ports);

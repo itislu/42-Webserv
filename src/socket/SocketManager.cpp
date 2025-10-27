@@ -51,7 +51,7 @@ void SocketManager::createListener(const std::vector<int>& ports)
 
 bool SocketManager::listenerExists(int port) const
 {
-  for (const_fdToSockIter it = _listeners.begin(); it != _listeners.end();
+  for (const_FdToSockIter it = _listeners.begin(); it != _listeners.end();
        ++it) {
     if (it->second->getPort() == port) {
       return true;
@@ -62,7 +62,7 @@ bool SocketManager::listenerExists(int port) const
 
 bool SocketManager::isListener(int fdes) const
 {
-  const const_fdToSockIter iter = _listeners.find(fdes);
+  const const_FdToSockIter iter = _listeners.find(fdes);
   return iter != _listeners.end();
 }
 
@@ -141,14 +141,14 @@ void SocketManager::disablePollout(int fdes)
 
 ft::shared_ptr<const Socket> SocketManager::getSocket(int fdes) const
 {
-  const const_fdToSockIter iter = _listeners.find(fdes);
+  const const_FdToSockIter iter = _listeners.find(fdes);
   assert(iter != _listeners.end() && "SocketManager::getSocket: fd not found");
   return iter->second;
 }
 
 ft::shared_ptr<const Socket> SocketManager::getListener(int port) const
 {
-  for (const_fdToSockIter it = _listeners.begin(); it != _listeners.end();
+  for (const_FdToSockIter it = _listeners.begin(); it != _listeners.end();
        ++it) {
     if (it->second->getPort() == port) {
       return it->second;
@@ -172,7 +172,7 @@ void SocketManager::removePfd(int fdes)
 
 void SocketManager::removeFdFromMap(int fdes)
 {
-  const fdToSockIter iter = _fdToSocket.find(fdes);
+  const FdToSockIter iter = _fdToSocket.find(fdes);
   if (iter != _fdToSocket.end()) {
     _fdToSocket.erase(iter);
   }

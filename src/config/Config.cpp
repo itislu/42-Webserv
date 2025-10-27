@@ -77,7 +77,7 @@ void Config::setDefaultTimeout()
 {
   long timeout = _timeout;
 
-  for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
+  for (const_ServConfIt it = _servers.begin(); it != _servers.end(); ++it) {
     timeout = std::min(timeout, it->getTimeout());
   }
   timeout = std::min(timeout, static_cast<long>(INT_MAX));

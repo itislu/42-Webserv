@@ -12,8 +12,8 @@ class ClientManager
 {
 public:
   typedef std::map<int /* fd */, ft::shared_ptr<Client> > FdToClient;
-  typedef FdToClient::iterator fdToClientIter;
-  typedef FdToClient::const_iterator const_fdToClientIter;
+  typedef FdToClient::iterator FdToClientIter;
+  typedef FdToClient::const_iterator const_FdToClientIter;
 
   ClientManager() {}
   ~ClientManager() {}

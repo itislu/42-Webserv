@@ -87,7 +87,7 @@ ft::shared_ptr<const Server> ServerManager::getServerFromSocket(
   if (socket == FT_NULLPTR) {
     return FT_NULLPTR;
   }
-  const const_sockToServIter iter = _socketToServers.find(socket);
+  const const_SockToServIter iter = _socketToServers.find(socket);
   if (iter == _socketToServers.end()) {
     return FT_NULLPTR;
   }
@@ -108,7 +108,7 @@ ft::shared_ptr<const Server> ServerManager::getServerFromSocket(
 ft::shared_ptr<const Server> ServerManager::getInitServer(int fdes) const
 {
   const ft::shared_ptr<const Socket> socket = _socketManager.getSocket(fdes);
-  const const_sockToServIter iter = _socketToServers.find(socket);
+  const const_SockToServIter iter = _socketToServers.find(socket);
   if (iter != _socketToServers.end() && iter->second.size() == 1) {
     return iter->second[0];
   }

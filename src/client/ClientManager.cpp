@@ -13,7 +13,7 @@
 
 ft::shared_ptr<Client> ClientManager::getClient(int fdes) const
 {
-  const const_fdToClientIter iter = _clients.find(fdes);
+  const const_FdToClientIter iter = _clients.find(fdes);
   if (iter == _clients.end()) {
     return FT_NULLPTR;
   }
@@ -33,7 +33,7 @@ void ClientManager::addClient(int fdes,
 
 void ClientManager::removeClient(int fdes)
 {
-  const fdToClientIter iter = _clients.find(fdes);
+  const FdToClientIter iter = _clients.find(fdes);
   if (iter != _clients.end()) {
     _clients.erase(iter);
   }
@@ -53,7 +53,7 @@ long ClientManager::getMinTimeout() const
 {
   const TimeStamp now;
   long minRemaining = LONG_MAX;
-  for (const_fdToClientIter it = _clients.begin(); it != _clients.end(); ++it) {
+  for (const_FdToClientIter it = _clients.begin(); it != _clients.end(); ++it) {
     const long clientTimeout = it->second->getTimeout();
     const long remaining =
       clientTimeout - (now - it->second->getLastActivity());
@@ -66,7 +66,7 @@ void ClientManager::getTimedOutClients(
   std::vector<ft::shared_ptr<Client> >& timedOut) const
 {
   const TimeStamp now;
-  for (const_fdToClientIter it = _clients.begin(); it != _clients.end(); ++it) {
+  for (const_FdToClientIter it = _clients.begin(); it != _clients.end(); ++it) {
     const long timeout = it->second->getTimeout();
     if (now - it->second->getLastActivity() >= timeout) {
       timedOut.push_back(it->second);

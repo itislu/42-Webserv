@@ -12,8 +12,8 @@
 
 class Config
 {
-  typedef std::vector<ServerConfig>::iterator servConfIt;
-  typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
+  typedef std::vector<ServerConfig>::iterator ServConfIt;
+  typedef std::vector<ServerConfig>::const_iterator const_ServConfIt;
 
 public:
   explicit Config(const std::string& configFile);

@@ -31,8 +31,8 @@ public:
 
 private:
   typedef std::map<ft::shared_ptr<const Socket>, Servers> SockToServ;
-  typedef SockToServ::iterator sockToServIter;
-  typedef SockToServ::const_iterator const_sockToServIter;
+  typedef SockToServ::iterator SockToServIter;
+  typedef SockToServ::const_iterator const_SockToServIter;
 
   void addServer(const ServerConfig& config,
                  const Server::Listeners& listeners);
