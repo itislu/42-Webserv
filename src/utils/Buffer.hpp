@@ -15,10 +15,13 @@ public:
   typedef Container::iterator iterator;
 
   void add(const std::string& str);
-  void add(const Container& buffer);
+  void add(const Container& buffer, ssize_t bytes);
   void remove(ssize_t bytes);
   void remove(std::size_t bytes);
   std::size_t getSize() const;
+
+  unsigned char* data();
+  bool isEmpty() const;
 
   unsigned char at(std::size_t pos) const;
   iterator begin();
