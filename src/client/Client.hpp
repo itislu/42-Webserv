@@ -1,34 +1,46 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "client/TimeStamp.hpp"
+#include "server/Server.hpp"
+#include "socket/AutoFd.hpp"
+#include "utils/Buffer.hpp"
 #include <string>
-#include <sys/types.h>
-#include <vector>
+
+#ifndef MAX_CHUNK
+#define MAX_CHUNK 1024
+#endif
 
 class Client
 {
 public:
-  typedef std::vector<unsigned char> Buffer;
   Client();
-  explicit Client(int sockFd);
+  explicit Client(int fdes);
+  Client(int fdes, const Server* server);
 
   int getFd() const;
+  const std::string& getHost() const;
   Buffer getInBuff() const;
   Buffer getOutBuff() const;
+  const Server* getServer() const;
 
-  void addToInBuff(const std::string& str);
-  void addToInBuff(const Buffer& buffer);
+  void setServer(const Server* server);
 
-  void addToOutBuff(const std::string& str);
-  void addToOutBuff(const Buffer& buffer);
-
-  void removeFromOutBuff(ssize_t bytes);
+  const TimeStamp& getLastActivity() const;
+  long getTimeout() const;
 
   bool hasDataToSend() const;
+  bool sendTo();
+  bool receive();
 
 private:
-  int _fd;
+  void updateLastActivity();
+
   // int _state;
+  AutoFd _fd;
+  const Server* _server;
+  std::string _host;
+  TimeStamp _lastActivity;
   Buffer _inBuff;
   Buffer _outBuff;
 };

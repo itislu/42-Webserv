@@ -27,6 +27,9 @@ target_link_libraries(${PROJECT_NAME}
   PRIVATE
   ftpp
   client
+  socket
+  config
+  event
   http
   server
   utils
@@ -42,8 +45,11 @@ add_subdirectory(lib/libftpp)
 # **************************************************************************** #
 # MODULES
 add_subdirectory(src/client)
-add_subdirectory(src/http)
+add_subdirectory(src/config)
+add_subdirectory(src/event)
 add_subdirectory(src/server)
+add_subdirectory(src/socket)
+add_subdirectory(src/http)
 add_subdirectory(src/utils)
 
 

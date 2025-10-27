@@ -1,61 +1,132 @@
 #include "Client.hpp"
+#include "client/TimeStamp.hpp"
+#include "config/Config.hpp"
+#include "libftpp/utility.hpp"
+#include "server/Server.hpp"
+#include "socket/AutoFd.hpp"
+#include "utils/Buffer.hpp"
+#include <algorithm>
+#include <cerrno>
+#include <cstddef>
+#include <cstring>
+#include <iostream>
 #include <string>
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <vector>
 
 Client::Client()
   : _fd(-1)
-//, _state(0)
+  //, _state(0)
+  , _server()
 {
 }
 
-Client::Client(int sockFd)
-  : _fd(sockFd)
-//, _state(0)
+Client::Client(int fdes)
+  : _fd(fdes)
+  , _server()
+{
+}
+
+Client::Client(int fdes, const Server* server)
+  : _fd(fdes)
+  , _server(server)
 {
 }
 
 int Client::getFd() const
 {
-  return _fd;
+  return _fd.get();
 }
 
-Client::Buffer Client::getInBuff() const
+const std::string& Client::getHost() const
+{
+  return _host;
+}
+
+Buffer Client::getInBuff() const
 {
   return _inBuff;
 }
 
-Client::Buffer Client::getOutBuff() const
+Buffer Client::getOutBuff() const
 {
   return _outBuff;
 }
 
-void Client::addToInBuff(const std::string& str)
+long Client::getTimeout() const
 {
-  _inBuff.insert(_inBuff.end(), str.begin(), str.end());
+  if (_server != FT_NULLPTR) {
+    return _server->getTimeout();
+  }
+  return Config::getDefaultTimeout();
 }
 
-void Client::addToInBuff(const Buffer& buffer)
+const Server* Client::getServer() const
 {
-  _inBuff.insert(_inBuff.end(), buffer.begin(), buffer.end());
+  return _server;
 }
 
-void Client::addToOutBuff(const std::string& str)
+void Client::setServer(const Server* server)
 {
-  _outBuff.insert(_outBuff.end(), str.begin(), str.end());
+  _server = server;
 }
 
-void Client::addToOutBuff(const Buffer& buffer)
+bool Client::receive()
 {
-  _outBuff.insert(_outBuff.end(), buffer.begin(), buffer.end());
+  static std::vector<unsigned char> buffer(MAX_CHUNK);
+  const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
+  if (bytes > 0) {
+    std::cout << "Client " << getFd() << ": ";
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
+    std::cout.write(reinterpret_cast<const char*>(buffer.data()),
+                    static_cast<std::streamsize>(bytes));
+    // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+    _inBuff.add(buffer, bytes);
+
+    // TODO: STATEMACHINE/PARSING
+  } else if (bytes == 0) {
+    std::cout << "[CLIENT] wants to disconnect\n";
+    return false;
+  } else // bytes < 0
+  {
+    std::cerr << ("[SERVER] recv failed, removing client\n");
+    return false;
+  }
+  updateLastActivity();
+  return true;
 }
 
-void Client::removeFromOutBuff(ssize_t bytes)
+bool Client::sendTo()
 {
-  _outBuff.erase(_outBuff.begin(), _outBuff.begin() + bytes);
+  const std::size_t toSend =
+    std::min(_outBuff.getSize(), static_cast<std::size_t>(MAX_CHUNK));
+  const ssize_t bytes = send(getFd(), _outBuff.data(), toSend, 0);
+
+  if (bytes > 0) {
+    _outBuff.remove(bytes);
+  } else if (bytes == 0) {
+    std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
+  } else {
+    std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
+              << strerror(errno) << "\n";
+    return false;
+  }
+  updateLastActivity();
+  return true;
+}
+
+const TimeStamp& Client::getLastActivity() const
+{
+  return _lastActivity;
+}
+
+void Client::updateLastActivity()
+{
+  _lastActivity.setTime(TimeStamp::now());
 }
 
 bool Client::hasDataToSend() const
 {
-  return !_outBuff.empty();
+  return !_outBuff.isEmpty();
 }
