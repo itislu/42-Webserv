@@ -30,7 +30,7 @@ ServerManager::ServerManager(const Config* const config)
   , _eventManager(&_clientManager, &_socketManager, this)
 {
   if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
-    throw std::runtime_error("Failed to set SIGIN handler");
+    throw std::runtime_error("Failed to set SIGINT handler");
   }
   createServers(config->getServers());
 }
