@@ -3,6 +3,7 @@
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
 #include "libftpp/utility.hpp"
+#include <cassert>
 #include <cstddef>
 #include <exception>
 #include <map>
@@ -27,16 +28,18 @@ SocketManager::~SocketManager()
   }
 }
 
+// only call in the constructor - because no exception guarantee
 void SocketManager::createListeningSockets(
   const std::vector<ServerConfig>& configs)
 {
   for (std::vector<ServerConfig>::const_iterator it = configs.begin();
        it != configs.end();
        ++it) {
-    createListener((*it).getPorts());
+    createListener(it->getPorts());
   }
 }
 
+// only call in the constructor - because no exception guarantee
 void SocketManager::createListener(const std::vector<int>& ports)
 {
   for (std::vector<int>::const_iterator it = ports.begin(); it != ports.end();
@@ -56,7 +59,7 @@ bool SocketManager::listenerExists(int port) const
   for (std::map<int, const Socket*>::const_iterator it = _listeners.begin();
        it != _listeners.end();
        ++it) {
-    if ((*it).second->getPort() == port) {
+    if (it->second->getPort() == port) {
       return true;
     }
   }
@@ -84,7 +87,7 @@ std::size_t SocketManager::getPfdsSize() const
   return _pfds.size();
 }
 
-std::vector<pollfd>& SocketManager::getPfds()
+const std::vector<pollfd>& SocketManager::getPfds() const
 {
   return _pfds;
 }
@@ -98,18 +101,16 @@ int SocketManager::acceptClient(int fdes)
 {
   const int clientFd = accept(fdes, FT_NULLPTR, FT_NULLPTR);
   if (clientFd < 0) {
-
     return -1;
   }
 
   try {
     Socket::setFlags(clientFd);
     addToPfd(clientFd);
-    const Socket* const listener = getSocket(fdes);
-    if (listener != FT_NULLPTR) {
-      _fdToSocket[clientFd] = listener;
-    }
-  } catch (std::exception& e) {
+    const Socket& listener = getSocket(fdes);
+    _fdToSocket[clientFd] = &listener;
+  } catch (const std::exception&) {
+    removePfd(clientFd);
     close(clientFd);
     return -1;
   }
@@ -121,7 +122,7 @@ pollfd* SocketManager::getPollFd(int fdes)
 {
   for (std::vector<pollfd>::iterator it = _pfds.begin(); it != _pfds.end();
        ++it) {
-    if ((*it).fd == fdes) {
+    if (it->fd == fdes) {
       return &(*it);
     }
   }
@@ -146,33 +147,32 @@ void SocketManager::disablePollout(int fdes)
   }
 }
 
-const Socket* SocketManager::getSocket(int fdes) const
+const Socket& SocketManager::getSocket(int fdes) const
 {
   const std::map<int, const Socket*>::const_iterator iter =
     _listeners.find(fdes);
-  if (iter != _listeners.end()) {
-    return iter->second;
-  }
-  return FT_NULLPTR;
+  assert(iter != _listeners.end() && "SocketManager::getSocket: fd not found");
+  return (*iter->second);
 }
 
-const Socket* SocketManager::getListener(int port) const
+const Socket& SocketManager::getListener(int port) const
 {
   for (const_fdToSockIter it = _listeners.begin(); it != _listeners.end();
        ++it) {
-    if ((*it).second->getPort() == port) {
-      return it->second;
+    if (it->second->getPort() == port) {
+      return (*it->second);
     }
   }
-  return FT_NULLPTR;
+  assert(false && "SocketManager::getListener: port not found");
 }
 
 void SocketManager::removePfd(int fdes)
 {
   for (std::vector<pollfd>::iterator it = _pfds.begin(); it != _pfds.end();
        ++it) {
-    if ((*it).fd == fdes) {
-      _pfds.erase(it);
+    if (it->fd == fdes) {
+      *it = _pfds.back();
+      _pfds.pop_back();
       break;
     }
   }

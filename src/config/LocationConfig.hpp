@@ -18,7 +18,7 @@ public:
   bool isAutoindex() const;
   const std::vector<std::string>& getAllowedMethods() const;
   const std::string& getIndex() const;
-  size_t getMaxSize() const;
+  std::size_t getMaxBodySize() const;
 
   bool isCgi() const;
   const std::string& getCgiPass() const;

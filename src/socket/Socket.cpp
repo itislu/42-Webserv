@@ -1,6 +1,5 @@
 #include "socket/Socket.hpp"
 #include "socket/AutoFd.hpp"
-#include <cstring>      //std::memset()
 #include <fcntl.h>      //fcntl()
 #include <netinet/in.h> //struct sockaddr
 #include <stdexcept>

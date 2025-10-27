@@ -10,21 +10,17 @@
 #include <string>
 #include <vector>
 
-#ifndef MAX_CLIENTS
-#define MAX_CLIENTS 1024
-#endif
-
-typedef std::vector<ServerConfig>::iterator servConfIt;
-typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
-
 class Config
 {
+  typedef std::vector<ServerConfig>::iterator servConfIt;
+  typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
+
 public:
   explicit Config(const std::string& configFile);
 
   // Getters
   const std::vector<ServerConfig>& getServers() const;
-  std::size_t getBodySize() const;
+  std::size_t getMaxBodySize() const;
   long getTimeout() const;
   const std::string& getErrorLogPath() const;
   const std::string& getAccessLogPath() const;

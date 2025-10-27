@@ -16,30 +16,28 @@ class ServerManager
   typedef std::map<const Socket*, std::vector<const Server*> >::iterator
     sockToServIter;
   typedef std::map<const Socket*, std::vector<const Server*> >::const_iterator
-    c_sockToServIter;
+    const_sockToServIter;
 
 public:
   explicit ServerManager(const Config* config);
   ~ServerManager();
 
-  void addServer(const ServerConfig* config,
-                 const std::vector<const Socket*>& listeners);
-  void createServers(const std::vector<ServerConfig>& configs);
-  std::vector<const Socket*> createListeners(const std::vector<int>& ports);
-  const Socket* getListener(int port);
-
   const Server* getServerFromSocket(const Socket* socket) const;
   const std::vector<const Server*>& getServers() const;
   const Server* getInitServer(int fdes) const;
-
-  void mapServerToSocket(const Server* server,
-                         const std::vector<const Socket*>& listeners);
 
   void run();
 
   std::size_t serverCount() const;
 
 private:
+  void addServer(const ServerConfig* config,
+                 const std::vector<const Socket*>& listeners);
+  void createServers(const std::vector<ServerConfig>& configs);
+  std::vector<const Socket*> createListeners(const std::vector<int>& ports);
+  void mapServerToSocket(const Server* server,
+                         const std::vector<const Socket*>& listeners);
+
   ServerManager(const ServerManager& other);
   ServerManager& operator=(const ServerManager& other);
 

@@ -12,8 +12,6 @@ class Config;
 class ServerConfig
 {
 public:
-  // Constructor initializes with defaults
-  typedef std::vector<ServerConfig>::const_iterator c_srvConfIter;
   explicit ServerConfig(const Config& global);
 
   // GETTERS

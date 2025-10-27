@@ -1,23 +1,20 @@
 #ifndef TIMESTAMP_HPP
 #define TIMESTAMP_HPP
 
-#ifndef MS_MULTIPLIER
-#define MS_MULTIPLIER 1000L
-#endif
-
+#include <ctime>
 class TimeStamp
 {
 public:
   TimeStamp();
 
-  long getTime() const;
+  std::time_t getTime() const;
   void setTime(long time);
-  long operator-(const TimeStamp& other) const;
+  std::time_t operator-(const TimeStamp& other) const;
 
-  static long now();
+  static std::time_t now();
 
 private:
-  long _timeStamp;
+  std::time_t _timeStamp;
 };
 
 // TODO: add print overload so it prints a formated time

@@ -23,7 +23,7 @@ const std::vector<ServerConfig>& Config::getServers() const
   return _servers;
 }
 
-std::size_t Config::getBodySize() const
+std::size_t Config::getMaxBodySize() const
 {
   return _maxBodySize;
 }
@@ -78,7 +78,7 @@ void Config::setDefaultTimeout()
   long timeout = _timeout;
 
   for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
-    timeout = std::min(timeout, (*it).getTimeout());
+    timeout = std::min(timeout, it->getTimeout());
   }
   timeout = std::min(timeout, static_cast<long>(INT_MAX));
   timeout = std::max(timeout, 0L);

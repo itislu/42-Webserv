@@ -27,14 +27,15 @@ public:
   void setServer(const Server* server);
 
   const TimeStamp& getLastActivity() const;
-  void updateLastActivity();
   long getTimeout() const;
 
   bool hasDataToSend() const;
-  bool receive();
   bool sendTo();
+  bool receive();
 
 private:
+  void updateLastActivity();
+
   // int _state;
   AutoFd _fd;
   const Server* _server;

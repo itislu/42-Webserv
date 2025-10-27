@@ -15,7 +15,9 @@ public:
                ServerManager* servers);
 
   int check();
+  void checkTimeouts();
 
+private:
   /* EVENTS */
   void checkActivity();
   bool handleClient(Client* client, unsigned events);
@@ -25,11 +27,9 @@ public:
   void acceptClient(int fdes, unsigned events);
 
   /* TIMEOUT */
-  void checkTimeouts();
   int calculateTimeout() const;
   long getClientTimeout(const Client* client) const;
 
-private:
   ClientManager* _clientsManager;
   SocketManager* _socketsManager;
   ServerManager* _serverManager;

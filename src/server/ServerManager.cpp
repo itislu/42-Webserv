@@ -49,7 +49,7 @@ void ServerManager::createServers(const std::vector<ServerConfig>& configs)
        it != configs.end();
        ++it) {
     const std::vector<const Socket*> listeners =
-      createListeners((*it).getPorts());
+      createListeners(it->getPorts());
     addServer(&(*it), listeners);
   }
 }
@@ -62,8 +62,8 @@ std::vector<const Socket*> ServerManager::createListeners(
   for (std::vector<int>::const_iterator it = ports.begin(); it != ports.end();
        ++it) {
     const int port = *it;
-    const Socket* const sock = _socketManager.getListener(port);
-    listeners.push_back(sock);
+    const Socket& sock = _socketManager.getListener(port);
+    listeners.push_back(&sock);
   }
   return listeners;
 }
@@ -92,7 +92,7 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
   if (socket == FT_NULLPTR) {
     return FT_NULLPTR;
   }
-  const c_sockToServIter iter = _socketToServers.find(socket);
+  const const_sockToServIter iter = _socketToServers.find(socket);
   if (iter == _socketToServers.end()) {
     return FT_NULLPTR;
   }
@@ -103,14 +103,17 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
   return servers[0];
 }
 
+/*
+  it shouldn't be possible, that no server is found, but it should still return
+  NULL if the socket has more than on server. We need to parse the host header
+  to know which server is specifically.
+*/
 const Server* ServerManager::getInitServer(int fdes) const
 {
-  const Socket* const socket = _socketManager.getSocket(fdes);
-  if (socket != FT_NULLPTR) {
-    const c_sockToServIter iter = _socketToServers.find(socket);
-    if (iter != _socketToServers.end() && iter->second.size() == 1) {
-      return iter->second[0];
-    }
+  const Socket& socket = _socketManager.getSocket(fdes);
+  const const_sockToServIter iter = _socketToServers.find(&socket);
+  if (iter != _socketToServers.end() && iter->second.size() == 1) {
+    return iter->second[0];
   }
   return FT_NULLPTR;
 }

@@ -7,9 +7,7 @@
 #include "server/Server.hpp"
 #include "server/ServerManager.hpp"
 #include "socket/SocketManager.hpp"
-#include <climits>
-#include <csignal>
-#include <cstring>
+#include <cstddef>
 #include <exception>
 #include <iostream>
 #include <sys/poll.h>
@@ -98,7 +96,7 @@ void EventManager::acceptClient(int fdes, const unsigned events)
 
 void EventManager::checkActivity()
 {
-  std::vector<pollfd>& pfds = _socketsManager->getPfds();
+  const std::vector<pollfd>& pfds = _socketsManager->getPfds();
   for (std::size_t i = 0; i < pfds.size();) {
     const unsigned events = static_cast<unsigned>(pfds[i].revents);
     if (_socketsManager->isListener(pfds[i].fd)) {
@@ -136,7 +134,7 @@ void EventManager::checkTimeouts()
 {
   std::vector<Client*> timedOut;
   _clientsManager->getTimedOutClients(timedOut);
-  for (size_t i = 0; i < timedOut.size(); ++i) {
+  for (std::size_t i = 0; i < timedOut.size(); ++i) {
     std::cout << "[SERVER] Client fd=" << timedOut[i]->getFd()
               << " timed out.\n";
     disconnectClient(timedOut[i]);

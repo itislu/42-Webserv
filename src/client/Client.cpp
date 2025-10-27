@@ -7,7 +7,6 @@
 #include "utils/Buffer.hpp"
 #include <algorithm>
 #include <cerrno>
-#include <climits>
 #include <cstddef>
 #include <cstring>
 #include <iostream>

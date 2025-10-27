@@ -3,6 +3,7 @@
 #define SOCKET_HPP
 
 #include "AutoFd.hpp"
+#include "netinet/in.h"
 
 class Socket
 {
@@ -13,7 +14,6 @@ public:
   int getPort() const;
 
   void initSocket();
-  void makeNonBlocking(int sockFd);
 
   struct sockaddr_in getIpv4SockAddr() const;
   static void setFlags(int sockFd);
