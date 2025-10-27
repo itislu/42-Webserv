@@ -104,9 +104,11 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
 }
 
 /*
-  it shouldn't be possible, that no server is found, but it should still return
-  NULL if the socket has more than on server. We need to parse the host header
-  to know which server is specifically.
+  It should never happen that no server is found for this socket.
+  However, if the socket is associated with multiple servers, we can only
+  return a specific server once we parse the Host header.
+  Until then, return nullptr to indicate client is not associated with a
+  specific server yet.
 */
 const Server* ServerManager::getInitServer(int fdes) const
 {
