@@ -109,7 +109,7 @@ bool Client::sendTo()
     std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
   } else {
     std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
-              << strerror(errno) << "\n";
+              << std::strerror(errno) << "\n";
     return false;
   }
   updateLastActivity();

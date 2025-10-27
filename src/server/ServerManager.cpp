@@ -12,11 +12,11 @@
 #include <string>
 #include <vector>
 
-static volatile sig_atomic_t g_running = 0;
+static volatile std::sig_atomic_t g_running = 0;
 
 static void error(const std::string& msg)
 {
-  std::cerr << "Error: " << msg << " (" << strerror(errno) << ")\n";
+  std::cerr << "Error: " << msg << " (" << std::strerror(errno) << ")\n";
 }
 
 extern "C" void sigIntHandler(int /*sigNum*/)
@@ -29,7 +29,7 @@ ServerManager::ServerManager(const Config& config)
   , _socketManager(config)
   , _eventManager(_clientManager, _socketManager, *this)
 {
-  if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
+  if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
   }
   createServers(_config->getServers());
@@ -37,7 +37,7 @@ ServerManager::ServerManager(const Config& config)
 
 ServerManager::~ServerManager()
 {
-  for (size_t i = 0; i < _servers.size(); ++i) {
+  for (std::size_t i = 0; i < _servers.size(); ++i) {
     delete _servers[i];
   }
 }
