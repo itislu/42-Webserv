@@ -3,8 +3,8 @@
 #include <client/Client.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
-#include <http/states/readStartLine/ParseUri.hpp>
-#include <http/states/readStartLine/ReadStartLine.hpp>
+#include <http/states/readRequestLine/ParseUri.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/string.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
@@ -20,8 +20,8 @@
 /* ************************************************************************** */
 // PUBLIC
 
-ParseMethod::ParseMethod(ReadStartLine* context)
-  : IState<ReadStartLine>(context)
+ParseMethod::ParseMethod(ReadRequestLine* context)
+  : IState<ReadRequestLine>(context)
   , _client(context->getContext())
   , _buffReader()
 {

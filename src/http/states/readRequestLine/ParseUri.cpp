@@ -5,8 +5,8 @@
 #include <http/Uri.hpp>
 #include <http/abnfRules/requestLineRules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
-#include <http/states/readStartLine/ParseVersion.hpp>
-#include <http/states/readStartLine/ReadStartLine.hpp>
+#include <http/states/readRequestLine/ParseVersion.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/string.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
@@ -22,8 +22,8 @@
 /* ************************************************************************** */
 // PUBLIC
 
-ParseUri::ParseUri(ReadStartLine* context)
-  : IState<ReadStartLine>(context)
+ParseUri::ParseUri(ReadRequestLine* context)
+  : IState<ReadRequestLine>(context)
   , _client(context->getContext())
   , _parseState(ParseScheme)
   , _buffReader()

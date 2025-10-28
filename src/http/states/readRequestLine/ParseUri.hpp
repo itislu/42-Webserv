@@ -11,13 +11,13 @@
 #include <string>
 
 class Client;
-class ReadStartLine;
+class ReadRequestLine;
 
 /* ************************************************************************** */
-class ParseUri : public IState<ReadStartLine>
+class ParseUri : public IState<ReadRequestLine>
 {
 public:
-  explicit ParseUri(ReadStartLine* context);
+  explicit ParseUri(ReadRequestLine* context);
 
   void run();
 

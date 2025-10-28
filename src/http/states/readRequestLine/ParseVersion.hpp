@@ -7,13 +7,13 @@
 #include <utils/state/IState.hpp>
 
 class Client;
-class ReadStartLine;
+class ReadRequestLine;
 
 /* ************************************************************************** */
-class ParseVersion : public IState<ReadStartLine>
+class ParseVersion : public IState<ReadRequestLine>
 {
 public:
-  explicit ParseVersion(ReadStartLine* context);
+  explicit ParseVersion(ReadRequestLine* context);
 
   void run();
 

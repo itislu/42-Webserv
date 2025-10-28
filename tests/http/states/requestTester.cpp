@@ -1,6 +1,6 @@
 #include "client/Client.hpp"
 #include "http/Request.hpp"
-#include "http/states/readStartLine/ReadStartLine.hpp"
+#include "http/states/readRequestLine/ReadRequestLine.hpp"
 #include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 
@@ -19,7 +19,7 @@ namespace {
 ft::unique_ptr<Client> requestTestCharByChar(std::string& rawBuffer)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
-  client->getStateHandler().setState<ReadStartLine>();
+  client->getStateHandler().setState<ReadRequestLine>();
 
   std::size_t index = 0;
   while (!client->getStateHandler().isDone() && index < rawBuffer.size()) {
@@ -38,7 +38,7 @@ ft::unique_ptr<Client> requestTestCharByChar(std::string& rawBuffer)
 ft::unique_ptr<Client> requestTest(std::string& rawBuffer)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
-  client->getStateHandler().setState<ReadStartLine>();
+  client->getStateHandler().setState<ReadRequestLine>();
   client->getInBuff().add(rawBuffer);
 
   while (!client->getStateHandler().isDone()) {

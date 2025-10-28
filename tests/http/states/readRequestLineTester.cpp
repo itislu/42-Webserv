@@ -3,24 +3,24 @@
 #include <client/Client.hpp>
 #include <gtest/gtest.h>
 #include <http/Request.hpp>
-#include <http/states/readStartLine/ReadStartLine.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <string>
 #include <utils/state/IState.hpp>
 
 // NOLINTBEGIN
 
 namespace {
-ft::unique_ptr<Client> StateTest(std::string& startLine)
+ft::unique_ptr<Client> StateTest(std::string& requestLine)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
-  client->getInBuff().add(startLine);
-  client->getStateHandler().setState<ReadStartLine>();
+  client->getInBuff().add(requestLine);
+  client->getStateHandler().setState<ReadRequestLine>();
   client->getStateHandler().getState()->run();
   return ft::move(client);
 }
 }
 
-TEST(ReadStartLineTester, BasicRequests)
+TEST(ReadRequestLineTester, BasicRequests)
 {
   std::string line("GET http://test/ HTTP/1.0\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
@@ -32,7 +32,7 @@ TEST(ReadStartLineTester, BasicRequests)
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 }
 
-TEST(ReadStartLineTester, OriginForm)
+TEST(ReadRequestLineTester, OriginForm)
 {
   std::string line("GET /where?test#frag HTTP/1.1\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
@@ -46,7 +46,7 @@ TEST(ReadStartLineTester, OriginForm)
   EXPECT_EQ(request.getVersion(), "HTTP/1.1");
 }
 
-TEST(ReadStartLineTester, AbsoluteForm)
+TEST(ReadRequestLineTester, AbsoluteForm)
 {
   std::string line("GET "
                    "http://www.example.org/pub/WWW/TheProject.html?test#frag "

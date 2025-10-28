@@ -83,8 +83,8 @@ add_my_test(readHeaderLinesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readHeaderLinesTester.cpp
 )
 
-add_my_test(readStartLineTester
-  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readStartLineTester.cpp
+add_my_test(readRequestLineTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readRequestLineTester.cpp
 )
 
 add_my_test(requestTester

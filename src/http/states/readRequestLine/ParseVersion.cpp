@@ -4,7 +4,7 @@
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
-#include <http/states/readStartLine/ReadStartLine.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/string.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
@@ -18,8 +18,8 @@
 /* ************************************************************************** */
 // PUBLIC
 
-ParseVersion::ParseVersion(ReadStartLine* context)
-  : IState<ReadStartLine>(context)
+ParseVersion::ParseVersion(ReadRequestLine* context)
+  : IState<ReadRequestLine>(context)
   , _client(context->getContext())
   , _buffReader()
 {

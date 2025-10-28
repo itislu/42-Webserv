@@ -9,10 +9,10 @@ add_library(${LIB_NAME} STATIC
   abnfRules/requestLineRules.cpp
   abnfRules/uriRules.cpp
   abnfRules/headerLineRules.cpp
-  states/readStartLine/ParseMethod.cpp
-  states/readStartLine/ParseUri.cpp
-  states/readStartLine/ParseVersion.cpp
-  states/readStartLine/ReadStartLine.cpp
+  states/readRequestLine/ParseMethod.cpp
+  states/readRequestLine/ParseUri.cpp
+  states/readRequestLine/ParseVersion.cpp
+  states/readRequestLine/ReadRequestLine.cpp
   states/readHeaderLines/ReadHeaderLines.cpp
   states/writeStatusLine/WriteStatusLine.cpp
   http.cpp

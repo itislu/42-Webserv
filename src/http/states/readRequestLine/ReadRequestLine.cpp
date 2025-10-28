@@ -1,4 +1,4 @@
-#include "ReadStartLine.hpp"
+#include "ReadRequestLine.hpp"
 #include "ParseMethod.hpp"
 
 #include <client/Client.hpp>
@@ -9,7 +9,7 @@
 /* ************************************************************************** */
 // PUBLIC
 
-ReadStartLine::ReadStartLine(Client* context)
+ReadRequestLine::ReadRequestLine(Client* context)
   : IState(context)
   , _stateHandler(this)
 {
@@ -21,7 +21,7 @@ ReadStartLine::ReadStartLine(Client* context)
  *
  * Example: `GET test/hello_world.html HTTP/1.1\r\n`
  */
-void ReadStartLine::run()
+void ReadRequestLine::run()
 {
   _stateHandler.setStateHasChanged(true);
   while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
@@ -35,7 +35,7 @@ void ReadStartLine::run()
   }
 }
 
-StateHandler<ReadStartLine>& ReadStartLine::getStateHandler()
+StateHandler<ReadRequestLine>& ReadRequestLine::getStateHandler()
 {
   return _stateHandler;
 }

@@ -2,17 +2,17 @@
 #include "http/states/readHeaderLines/ReadHeaderLines.hpp"
 #include <client/Client.hpp>
 #include <gtest/gtest.h>
-#include <http/states/readStartLine/ReadStartLine.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <string>
 #include <utils/state/IState.hpp>
 
 // NOLINTBEGIN
 
 namespace {
-Client* StateTest(std::string& startLine)
+Client* StateTest(std::string& requestLine)
 {
   Client* client = new Client();
-  client->getInBuff().add(startLine);
+  client->getInBuff().add(requestLine);
   IState<Client>* state = new ReadHeaderLines(client);
   state->run();
   delete state;
@@ -20,7 +20,7 @@ Client* StateTest(std::string& startLine)
 }
 }
 
-TEST(ReadStartLineTester, BasicRequests)
+TEST(ReadRequestLineTester, BasicRequests)
 {
   std::string line("Host: webserv\r\n"
                    "Conten-Length: 7\r\n"
