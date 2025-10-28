@@ -37,7 +37,7 @@ ServerManager::ServerManager(const Config& config)
   createServers(_config->getServers());
 }
 
-void ServerManager::createServers(const std::vector<ServerConfig>& configs)
+void ServerManager::createServers(const Config::ServerConfigs& configs)
 {
   _servers.reserve(configs.size());
   for (Config::const_ServConfIter it = configs.begin(); it != configs.end();

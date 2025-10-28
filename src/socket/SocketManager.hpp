@@ -39,7 +39,7 @@ private:
   typedef FdToSock::iterator FdToSockIter;
   typedef FdToSock::const_iterator const_FdToSockIter;
 
-  void createListeningSockets(const std::vector<ServerConfig>& configs);
+  void createListeningSockets(const Config::ServerConfigs& configs);
   void createListener(const std::vector<int>& ports);
   bool listenerExists(int port) const;
 

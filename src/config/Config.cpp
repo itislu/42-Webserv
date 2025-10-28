@@ -18,7 +18,7 @@ Config::Config(const std::string& configFile)
 {
 }
 
-const std::vector<ServerConfig>& Config::getServers() const
+const Config::ServerConfigs& Config::getServers() const
 {
   return _servers;
 }
@@ -93,7 +93,7 @@ int Config::getDefaultTimeout()
 
 std::ostream& operator<<(std::ostream& out, const Config& config)
 {
-  const std::vector<ServerConfig>& servers = config.getServers();
+  const Config::ServerConfigs& servers = config.getServers();
   for (Config::const_ServConfIter serverIt = servers.begin();
        serverIt != servers.end();
        ++serverIt) {

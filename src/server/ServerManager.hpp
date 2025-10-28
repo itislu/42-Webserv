@@ -36,7 +36,7 @@ private:
 
   void addServer(const ServerConfig& config,
                  const Server::Listeners& listeners);
-  void createServers(const std::vector<ServerConfig>& configs);
+  void createServers(const Config::ServerConfigs& configs);
   Server::Listeners createListeners(const std::vector<int>& ports);
   void mapServerToSocket(const ft::shared_ptr<const Server>& server,
                          const Server::Listeners& listeners);

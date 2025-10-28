@@ -13,13 +13,14 @@
 class Config
 {
 public:
-  typedef std::vector<ServerConfig>::iterator ServConfIter;
-  typedef std::vector<ServerConfig>::const_iterator const_ServConfIter;
+  typedef std::vector<ServerConfig> ServerConfigs;
+  typedef ServerConfigs::iterator ServConfIter;
+  typedef ServerConfigs::const_iterator const_ServConfIter;
 
   explicit Config(const std::string& configFile);
 
   // Getters
-  const std::vector<ServerConfig>& getServers() const;
+  const ServerConfigs& getServers() const;
   std::size_t getMaxBodySize() const;
   long getTimeout() const;
   const std::string& getErrorLogPath() const;
@@ -46,7 +47,7 @@ private:
   std::string _root;
   std::size_t _maxBodySize;
   std::map<int, std::string> _errorPages;
-  std::vector<ServerConfig> _servers;
+  ServerConfigs _servers;
   static int _defaultTimeout;
   long _timeout;
 
