@@ -65,7 +65,7 @@ Token Lexer::next()
 
   if (isspace(static_cast<unsigned char>(chr)) == 0) {
     std::size_t idx = _pos;
-    while (_pos < _input.size()) {
+    while (idx < _input.size()) {
       const unsigned char curr = _input[idx];
       if ((isspace(curr) != 0) || curr == '{' || curr == '}' || curr == ';' ||
           curr == '#') {

@@ -40,7 +40,7 @@ void Token::setValue(const std::string& value)
   _value = value;
 }
 
-void Token::setLine(int line)
+void Token::setLine(std::size_t line)
 {
   _line = line;
 }
@@ -54,6 +54,7 @@ std::ostream& operator<<(std::ostream& out, const Token& token)
   switch (token.getType()) {
     case INVALID:
       out << "Invalid" << "\n";
+      break;
     case IDENT:
       out << "Identifier" << "\n";
       break;
@@ -61,10 +62,10 @@ std::ostream& operator<<(std::ostream& out, const Token& token)
       out << "Semicolon (;)" << "\n";
       break;
     case LBRACE:
-      out << "Left Bracer ({)" << "\n";
+      out << "Left Brace ({)" << "\n";
       break;
     case RBRACE:
-      out << "Right Bracer (})" << "\n";
+      out << "Right Brace (})" << "\n";
       break;
     case END:
       out << "END" << "\n";

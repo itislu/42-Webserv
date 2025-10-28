@@ -27,7 +27,7 @@ public:
 
   void setType(e_type type);
   void setValue(const std::string& value);
-  void setLine(int line);
+  void setLine(std::size_t line);
 
 private:
   e_type _type;
