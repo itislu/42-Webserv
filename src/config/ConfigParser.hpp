@@ -7,12 +7,11 @@ class ConfigParser
 public:
   explicit ConfigParser(const char* path);
 
-  void parse();
+  void readConfig();
 
 private:
-  bool validateInputFile() const;
-  bool checkFileExtension() const;
-  bool isFile() const;
+  void validateInputFile() const;
+  void parse();
 
   std::string _filepath;
 };

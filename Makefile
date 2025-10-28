@@ -52,7 +52,7 @@ fclean:
 
 
 # **************************************************************************** #
-ARGS ?= "assets/config.json"
+ARGS ?= "resources/config/webserv.conf"
 
 VALGRINDFLAGS	=	--errors-for-leak-kinds=all \
 								--leak-check=full \

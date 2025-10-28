@@ -6,6 +6,8 @@ set(LIB_NAME config)
 
 add_library(${LIB_NAME} STATIC
    Config.cpp
+   ConfigParser.cpp
+   FileUtils.cpp
    LocationConfig.cpp
    ServerConfig.cpp
  )
