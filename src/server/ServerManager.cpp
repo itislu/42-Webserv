@@ -40,8 +40,7 @@ ServerManager::ServerManager(const Config& config)
 void ServerManager::createServers(const std::vector<ServerConfig>& configs)
 {
   _servers.reserve(configs.size());
-  for (std::vector<ServerConfig>::const_iterator it = configs.begin();
-       it != configs.end();
+  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     const Server::Listeners listeners = createListeners(it->getPorts());
     addServer(*it, listeners);

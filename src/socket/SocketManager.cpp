@@ -26,8 +26,7 @@ SocketManager::SocketManager(const Config& config)
 void SocketManager::createListeningSockets(
   const std::vector<ServerConfig>& configs)
 {
-  for (std::vector<ServerConfig>::const_iterator it = configs.begin();
-       it != configs.end();
+  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     createListener(it->getPorts());
   }
