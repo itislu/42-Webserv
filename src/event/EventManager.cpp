@@ -46,8 +46,7 @@ bool EventManager::receiveFromClient(Client& client)
   return alive;
 }
 
-bool EventManager::handleClient(const ft::shared_ptr<Client>& client,
-                                unsigned events)
+bool EventManager::handleClient(Client* client, unsigned events)
 {
   if (client == FT_NULLPTR) {
     return false;
@@ -65,7 +64,7 @@ bool EventManager::handleClient(const ft::shared_ptr<Client>& client,
   return alive;
 }
 
-void EventManager::disconnectClient(const ft::shared_ptr<Client>& client)
+void EventManager::disconnectClient(Client* client)
 {
   if (client == FT_NULLPTR) {
     return;
@@ -108,8 +107,8 @@ void EventManager::checkActivity()
     } else {
       const ft::shared_ptr<Client> client =
         _clientsManager->getClient(pfds[i].fd);
-      if (!handleClient(client, events)) {
-        disconnectClient(client);
+      if (!handleClient(client.get(), events)) {
+        disconnectClient(client.get());
       } else {
         i++;
       }
@@ -141,7 +140,7 @@ void EventManager::checkTimeouts()
   for (std::size_t i = 0; i < timedOut.size(); ++i) {
     std::cout << "[SERVER] Client fd=" << timedOut[i]->getFd()
               << " timed out.\n";
-    disconnectClient(timedOut[i]);
+    disconnectClient(timedOut[i].get());
   }
 }
 

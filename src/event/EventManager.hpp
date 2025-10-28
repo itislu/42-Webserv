@@ -3,7 +3,6 @@
 
 #include "client/Client.hpp"
 #include "client/ClientManager.hpp"
-#include "libftpp/memory.hpp"
 #include "socket/SocketManager.hpp"
 
 class ServerManager;
@@ -21,10 +20,10 @@ public:
 private:
   /* EVENTS */
   void checkActivity();
-  bool handleClient(const ft::shared_ptr<Client>& client, unsigned events);
+  bool handleClient(Client* client, unsigned events);
   bool sendToClient(Client& client);
   bool receiveFromClient(Client& client);
-  void disconnectClient(const ft::shared_ptr<Client>& client);
+  void disconnectClient(Client* client);
   void acceptClient(int fdes, unsigned events);
 
   /* TIMEOUT */
