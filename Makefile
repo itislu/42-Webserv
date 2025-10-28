@@ -52,7 +52,7 @@ fclean:
 
 
 # **************************************************************************** #
-ARGS ?= "resources/config/webserv.conf"
+ARGS ?= "resources/config/test.conf"
 
 VALGRINDFLAGS	=	--errors-for-leak-kinds=all \
 								--leak-check=full \

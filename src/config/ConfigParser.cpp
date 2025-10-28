@@ -1,6 +1,8 @@
 #include "ConfigParser.hpp"
 #include "FileUtils.hpp"
 #include "config/Lexer.hpp"
+#include "config/Token.hpp"
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -22,7 +24,7 @@ void ConfigParser::validateInputFile() const
   }
 
   if (!isFile(_filepath)) {
-    throw std::invalid_argument("invalid file not a file: " + _filepath);
+    throw std::invalid_argument("invalid file: " + _filepath);
   }
 
   std::ifstream file(_filepath.c_str());
@@ -36,10 +38,11 @@ void ConfigParser::parse()
   Lexer lexer(_filepath);
   Token token = lexer.next();
 
-  while (token.type != END) {
-    
+  while (token.getType() != END) {
+    std::cout << token << "\n";
     token = lexer.next();
   }
+  std::cout << token << "\n";
 }
 
 void ConfigParser::readConfig()

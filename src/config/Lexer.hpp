@@ -1,25 +1,10 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
+#include "Token.hpp"
 #include <cstddef>
 #include <fstream>
 #include <string>
-
-enum e_type
-{
-  IDENT,
-  SEMICOLON,
-  LBRACE,
-  RBRACE,
-  END
-};
-
-struct Token
-{
-  int type;
-  std::string value;
-  int line;
-};
 
 class Lexer
 {
