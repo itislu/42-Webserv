@@ -11,12 +11,11 @@
 class Server
 {
 public:
-  typedef std::vector<const Socket*> Listeners;
-
-  Server(const ServerConfig& servConfig, const Listeners& listeners);
+  Server(const ServerConfig& servConfig,
+         const std::vector<const Socket*>& listeners);
 
   const ServerConfig& getConfig() const;
-  const Listeners& getListeners() const;
+  const std::vector<const Socket*>& getListeners() const;
   const std::vector<std::string>& getHostnames() const;
   long getTimeout() const;
 
@@ -24,8 +23,8 @@ private:
   const ServerConfig* _config;
 
   // server specific
-  Listeners _listeners;                // listeners (ports)
-  std::vector<std::string> _hostnames; // names for virtual hosting
+  std::vector<const Socket*> _listeners; // listeners (ports)
+  std::vector<std::string> _hostnames;   // names for virtual hosting
   long _timeOut;
 
   // Maybe for Logging

@@ -38,7 +38,7 @@ void ClientManager::removeClient(int fdes)
   }
 }
 
-const ClientManager::FdToClient& ClientManager::getClients() const
+const std::map<int, ft::shared_ptr<Client> >& ClientManager::getClients() const
 {
   return _clients;
 }

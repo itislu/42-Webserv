@@ -37,19 +37,21 @@ ServerManager::ServerManager(const Config& config)
   createServers(_config->getServers());
 }
 
-void ServerManager::createServers(const Config::ServerConfigs& configs)
+void ServerManager::createServers(const std::vector<ServerConfig>& configs)
 {
   _servers.reserve(configs.size());
   for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
-    const Server::Listeners listeners = createListeners(it->getPorts());
+    const std::vector<const Socket*> listeners =
+      createListeners(it->getPorts());
     addServer(*it, listeners);
   }
 }
 
-Server::Listeners ServerManager::createListeners(const std::vector<int>& ports)
+std::vector<const Socket*> ServerManager::createListeners(
+  const std::vector<int>& ports)
 {
-  Server::Listeners listeners;
+  std::vector<const Socket*> listeners;
   listeners.reserve(ports.size());
   for (std::vector<int>::const_iterator it = ports.begin(); it != ports.end();
        ++it) {
@@ -61,7 +63,7 @@ Server::Listeners ServerManager::createListeners(const std::vector<int>& ports)
 }
 
 void ServerManager::addServer(const ServerConfig& config,
-                              const Server::Listeners& listeners)
+                              const std::vector<const Socket*>& listeners)
 {
   const ft::shared_ptr<const Server> server =
     ft::make_shared<const Server>(config, listeners);
@@ -69,10 +71,11 @@ void ServerManager::addServer(const ServerConfig& config,
   mapServerToSocket(*server, listeners);
 }
 
-void ServerManager::mapServerToSocket(const Server& server,
-                                      const Server::Listeners& listeners)
+void ServerManager::mapServerToSocket(
+  const Server& server,
+  const std::vector<const Socket*>& listeners)
 {
-  for (Server::Listeners::const_iterator it = listeners.begin();
+  for (std::vector<const Socket*>::const_iterator it = listeners.begin();
        it != listeners.end();
        ++it) {
     _socketToServers[*it].push_back(&server);
@@ -117,7 +120,8 @@ std::size_t ServerManager::serverCount() const
   return _servers.size();
 }
 
-const ServerManager::Servers& ServerManager::getServers() const
+const std::vector<ft::shared_ptr<const Server> >& ServerManager::getServers()
+  const
 {
   return _servers;
 }

@@ -15,13 +15,11 @@
 class ServerManager
 {
 public:
-  typedef std::vector<ft::shared_ptr<const Server> > Servers;
-
   explicit ServerManager(const Config& config);
   ~ServerManager() {}
 
   const Server* getServerFromSocket(const Socket* socket) const;
-  const Servers& getServers() const;
+  const std::vector<ft::shared_ptr<const Server> >& getServers() const;
   const Server* getInitServer(int fdes) const;
 
   void run();
@@ -29,16 +27,17 @@ public:
   std::size_t serverCount() const;
 
 private:
-  typedef std::map<const Socket*, std::vector<const Server*> > SockToServ;
-  typedef SockToServ::iterator SockToServIter;
-  typedef SockToServ::const_iterator const_SockToServIter;
+  typedef std::map<const Socket*, std::vector<const Server*> >::iterator
+    SockToServIter;
+  typedef std::map<const Socket*, std::vector<const Server*> >::const_iterator
+    const_SockToServIter;
 
   void addServer(const ServerConfig& config,
-                 const Server::Listeners& listeners);
-  void createServers(const Config::ServerConfigs& configs);
-  Server::Listeners createListeners(const std::vector<int>& ports);
+                 const std::vector<const Socket*>& listeners);
+  void createServers(const std::vector<ServerConfig>& configs);
+  std::vector<const Socket*> createListeners(const std::vector<int>& ports);
   void mapServerToSocket(const Server& server,
-                         const Server::Listeners& listeners);
+                         const std::vector<const Socket*>& listeners);
 
   ServerManager(const ServerManager& other);
   ServerManager& operator=(const ServerManager& other);
@@ -47,8 +46,8 @@ private:
   SocketManager _socketManager;
   ClientManager _clientManager;
   EventManager _eventManager;
-  Servers _servers;
-  SockToServ _socketToServers;
+  std::vector<ft::shared_ptr<const Server> > _servers;
+  std::map<const Socket*, std::vector<const Server*> > _socketToServers;
 };
 
 #endif

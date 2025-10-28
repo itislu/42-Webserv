@@ -33,13 +33,11 @@ public:
   void removeFd(int fdes);
 
 private:
-  typedef std::vector<ft::shared_ptr<const Socket> > Sockets;
-  typedef Sockets::iterator SockIter;
-  typedef std::map<int /* fd */, const Socket*> FdToSock;
-  typedef FdToSock::iterator FdToSockIter;
-  typedef FdToSock::const_iterator const_FdToSockIter;
+  typedef std::vector<ft::shared_ptr<const Socket> >::iterator SockIter;
+  typedef std::map<int, const Socket*>::iterator FdToSockIter;
+  typedef std::map<int, const Socket*>::const_iterator const_FdToSockIter;
 
-  void createListeningSockets(const Config::ServerConfigs& configs);
+  void createListeningSockets(const std::vector<ServerConfig>& configs);
   void createListener(const std::vector<int>& ports);
   bool listenerExists(int port) const;
 
@@ -53,9 +51,9 @@ private:
   SocketManager& operator=(const SocketManager& other);
 
   std::vector<pollfd> _pfds;
-  Sockets _sockets;
-  FdToSock _listeners;
-  FdToSock _fdToSocket; // clientfds to socket
+  std::vector<ft::shared_ptr<const Socket> > _sockets;
+  std::map<int /* fd */, const Socket*> _listeners;
+  std::map<int /* fd */, const Socket*> _fdToSocket; // clientfds to socket
 };
 
 #endif

@@ -23,7 +23,8 @@ SocketManager::SocketManager(const Config& config)
 }
 
 // only call in the constructor - because no exception guarantee
-void SocketManager::createListeningSockets(const Config::ServerConfigs& configs)
+void SocketManager::createListeningSockets(
+  const std::vector<ServerConfig>& configs)
 {
   for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {

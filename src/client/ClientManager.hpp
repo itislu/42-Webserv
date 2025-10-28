@@ -11,16 +11,16 @@
 class ClientManager
 {
 public:
-  typedef std::map<int /* fd */, ft::shared_ptr<Client> > FdToClient;
-  typedef FdToClient::iterator FdToClientIter;
-  typedef FdToClient::const_iterator const_FdToClientIter;
+  typedef std::map<int, ft::shared_ptr<Client> >::iterator FdToClientIter;
+  typedef std::map<int, ft::shared_ptr<Client> >::const_iterator
+    const_FdToClientIter;
 
   ClientManager() {}
   ~ClientManager() {}
 
   Client* getClient(int fdes) const;
   std::size_t getClientCount() const;
-  const FdToClient& getClients() const;
+  const std::map<int, ft::shared_ptr<Client> >& getClients() const;
   bool hasClients() const;
 
   void addClient(int fdes, const Server* server);
@@ -33,7 +33,7 @@ private:
   ClientManager(const ClientManager& other);
   ClientManager& operator=(const ClientManager& other);
 
-  FdToClient _clients;
+  std::map<int, ft::shared_ptr<Client> > _clients;
 };
 
 #endif
