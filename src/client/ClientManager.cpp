@@ -11,13 +11,13 @@
 #include <utility>
 #include <vector>
 
-ft::shared_ptr<Client> ClientManager::getClient(int fdes) const
+Client* ClientManager::getClient(int fdes) const
 {
   const const_FdToClientIter iter = _clients.find(fdes);
   if (iter == _clients.end()) {
     return FT_NULLPTR;
   }
-  return iter->second;
+  return iter->second.get();
 }
 
 std::size_t ClientManager::getClientCount() const
@@ -25,8 +25,7 @@ std::size_t ClientManager::getClientCount() const
   return _clients.size();
 }
 
-void ClientManager::addClient(int fdes,
-                              const ft::shared_ptr<const Server>& server)
+void ClientManager::addClient(int fdes, const Server* server)
 {
   _clients.insert(std::make_pair(fdes, ft::make_shared<Client>(fdes, server)));
 }

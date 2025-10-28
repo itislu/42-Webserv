@@ -3,7 +3,6 @@
 
 #include "config/LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
-#include "libftpp/memory.hpp"
 #include "socket/Socket.hpp"
 #include <string>
 #include <vector>
@@ -12,7 +11,7 @@
 class Server
 {
 public:
-  typedef std::vector<ft::shared_ptr<const Socket> > Listeners;
+  typedef std::vector<const Socket*> Listeners;
 
   Server(const ServerConfig& servConfig, const Listeners& listeners);
 

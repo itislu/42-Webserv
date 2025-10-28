@@ -27,15 +27,15 @@ public:
   void enablePollout(int fdes);
   void disablePollout(int fdes);
 
-  ft::shared_ptr<const Socket> getSocket(int fdes) const;
-  ft::shared_ptr<const Socket> getListener(int port) const;
+  const Socket& getSocket(int fdes) const;
+  const Socket& getListener(int port) const;
 
   void removeFd(int fdes);
 
 private:
   typedef std::vector<ft::shared_ptr<const Socket> > Sockets;
   typedef Sockets::iterator SockIter;
-  typedef std::map<int /* fd */, ft::shared_ptr<const Socket> > FdToSock;
+  typedef std::map<int /* fd */, const Socket*> FdToSock;
   typedef FdToSock::iterator FdToSockIter;
   typedef FdToSock::const_iterator const_FdToSockIter;
 

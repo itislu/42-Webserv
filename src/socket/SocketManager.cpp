@@ -42,7 +42,7 @@ void SocketManager::createListener(const std::vector<int>& ports)
     const ft::shared_ptr<const Socket> socket =
       ft::make_shared<const Socket>(*it);
     _sockets.push_back(socket);
-    _listeners.insert(std::make_pair(socket->getFd(), socket));
+    _listeners.insert(std::make_pair(socket->getFd(), socket.get()));
     addToPfd(socket->getFd());
   }
 }
@@ -98,7 +98,8 @@ int SocketManager::acceptClient(int fdes)
   try {
     Socket::setFlags(clientFd);
     addToPfd(clientFd);
-    _fdToSocket[clientFd] = getSocket(fdes);
+    const Socket& listener = getSocket(fdes);
+    _fdToSocket[clientFd] = &listener;
   } catch (const std::exception&) {
     removePfd(clientFd);
     close(clientFd);
@@ -137,19 +138,19 @@ void SocketManager::disablePollout(int fdes)
   }
 }
 
-ft::shared_ptr<const Socket> SocketManager::getSocket(int fdes) const
+const Socket& SocketManager::getSocket(int fdes) const
 {
   const const_FdToSockIter iter = _listeners.find(fdes);
   assert(iter != _listeners.end() && "SocketManager::getSocket: fd not found");
-  return iter->second;
+  return *iter->second;
 }
 
-ft::shared_ptr<const Socket> SocketManager::getListener(int port) const
+const Socket& SocketManager::getListener(int port) const
 {
   for (const_FdToSockIter it = _listeners.begin(); it != _listeners.end();
        ++it) {
     if (it->second->getPort() == port) {
-      return it->second;
+      return *it->second;
     }
   }
   assert(false && "SocketManager::getListener: port not found");

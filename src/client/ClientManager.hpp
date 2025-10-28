@@ -18,12 +18,12 @@ public:
   ClientManager() {}
   ~ClientManager() {}
 
-  ft::shared_ptr<Client> getClient(int fdes) const;
+  Client* getClient(int fdes) const;
   std::size_t getClientCount() const;
   const FdToClient& getClients() const;
   bool hasClients() const;
 
-  void addClient(int fdes, const ft::shared_ptr<const Server>& server);
+  void addClient(int fdes, const Server* server);
   void removeClient(int fdes);
 
   long getMinTimeout() const;

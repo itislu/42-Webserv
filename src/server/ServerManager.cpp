@@ -54,8 +54,8 @@ Server::Listeners ServerManager::createListeners(const std::vector<int>& ports)
   for (std::vector<int>::const_iterator it = ports.begin(); it != ports.end();
        ++it) {
     const int port = *it;
-    const ft::shared_ptr<const Socket> sock = _socketManager.getListener(port);
-    listeners.push_back(sock);
+    const Socket& sock = _socketManager.getListener(port);
+    listeners.push_back(&sock);
   }
   return listeners;
 }
@@ -66,22 +66,20 @@ void ServerManager::addServer(const ServerConfig& config,
   const ft::shared_ptr<const Server> server =
     ft::make_shared<const Server>(config, listeners);
   _servers.push_back(server);
-  mapServerToSocket(server, listeners);
+  mapServerToSocket(*server, listeners);
 }
 
-void ServerManager::mapServerToSocket(
-  const ft::shared_ptr<const Server>& server,
-  const Server::Listeners& listeners)
+void ServerManager::mapServerToSocket(const Server& server,
+                                      const Server::Listeners& listeners)
 {
   for (Server::Listeners::const_iterator it = listeners.begin();
        it != listeners.end();
        ++it) {
-    _socketToServers[*it].push_back(server);
+    _socketToServers[*it].push_back(&server);
   }
 }
 
-ft::shared_ptr<const Server> ServerManager::getServerFromSocket(
-  const ft::shared_ptr<const Socket>& socket) const
+const Server* ServerManager::getServerFromSocket(const Socket* socket) const
 {
   if (socket == FT_NULLPTR) {
     return FT_NULLPTR;
@@ -90,7 +88,7 @@ ft::shared_ptr<const Server> ServerManager::getServerFromSocket(
   if (iter == _socketToServers.end()) {
     return FT_NULLPTR;
   }
-  const Servers& servers = iter->second;
+  const std::vector<const Server*>& servers = iter->second;
   if (servers.size() != 1) {
     return FT_NULLPTR;
   }
@@ -104,10 +102,10 @@ ft::shared_ptr<const Server> ServerManager::getServerFromSocket(
   Until then, return nullptr to indicate client is not associated with a
   specific server yet.
 */
-ft::shared_ptr<const Server> ServerManager::getInitServer(int fdes) const
+const Server* ServerManager::getInitServer(int fdes) const
 {
-  const ft::shared_ptr<const Socket> socket = _socketManager.getSocket(fdes);
-  const const_SockToServIter iter = _socketToServers.find(socket);
+  const Socket& socket = _socketManager.getSocket(fdes);
+  const const_SockToServIter iter = _socketToServers.find(&socket);
   if (iter != _socketToServers.end() && iter->second.size() == 1) {
     return iter->second[0];
   }

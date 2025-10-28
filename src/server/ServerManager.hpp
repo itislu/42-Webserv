@@ -20,17 +20,16 @@ public:
   explicit ServerManager(const Config& config);
   ~ServerManager() {}
 
-  ft::shared_ptr<const Server> getServerFromSocket(
-    const ft::shared_ptr<const Socket>& socket) const;
+  const Server* getServerFromSocket(const Socket* socket) const;
   const Servers& getServers() const;
-  ft::shared_ptr<const Server> getInitServer(int fdes) const;
+  const Server* getInitServer(int fdes) const;
 
   void run();
 
   std::size_t serverCount() const;
 
 private:
-  typedef std::map<ft::shared_ptr<const Socket>, Servers> SockToServ;
+  typedef std::map<const Socket*, std::vector<const Server*> > SockToServ;
   typedef SockToServ::iterator SockToServIter;
   typedef SockToServ::const_iterator const_SockToServIter;
 
@@ -38,7 +37,7 @@ private:
                  const Server::Listeners& listeners);
   void createServers(const Config::ServerConfigs& configs);
   Server::Listeners createListeners(const std::vector<int>& ports);
-  void mapServerToSocket(const ft::shared_ptr<const Server>& server,
+  void mapServerToSocket(const Server& server,
                          const Server::Listeners& listeners);
 
   ServerManager(const ServerManager& other);

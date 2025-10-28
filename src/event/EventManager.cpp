@@ -87,8 +87,7 @@ void EventManager::acceptClient(int fdes, const unsigned events)
 
   const int clientFd = _socketsManager->acceptClient(fdes);
   if (clientFd > 0) {
-    const ft::shared_ptr<const Server> server =
-      _serverManager->getInitServer(fdes);
+    const Server* const server = _serverManager->getInitServer(fdes);
     _clientsManager->addClient(clientFd, server);
     std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
@@ -105,10 +104,9 @@ void EventManager::checkActivity()
       acceptClient(pfds[i].fd, events);
       i++;
     } else {
-      const ft::shared_ptr<Client> client =
-        _clientsManager->getClient(pfds[i].fd);
-      if (!handleClient(client.get(), events)) {
-        disconnectClient(client.get());
+      Client* const client = _clientsManager->getClient(pfds[i].fd);
+      if (!handleClient(client, events)) {
+        disconnectClient(client);
       } else {
         i++;
       }
