@@ -44,12 +44,12 @@ const std::string& Client::getHost() const
   return _host;
 }
 
-Buffer Client::getInBuff() const
+const Buffer& Client::getInBuff() const
 {
   return _inBuff;
 }
 
-Buffer Client::getOutBuff() const
+const Buffer& Client::getOutBuff() const
 {
   return _outBuff;
 }
