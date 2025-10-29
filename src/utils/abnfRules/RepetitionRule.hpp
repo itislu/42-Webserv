@@ -4,13 +4,14 @@
 
 #include "Rule.hpp"
 
-#include "utils/BufferReader.hpp"
+#include <libftpp/memory.hpp>
+#include <utils/BufferReader.hpp>
 
 /* ************************************************************************** */
 class RepetitionRule : public Rule
 {
 public:
-  explicit RepetitionRule(Rule* rule);
+  explicit RepetitionRule(ft::unique_ptr<Rule> rule);
   ~RepetitionRule();
 
   bool matches();
@@ -34,7 +35,7 @@ private:
   int _maxReps;
   int _currReps;
   bool _reachedMin;
-  Rule* _rule;
+  ft::unique_ptr<Rule> _rule;
 };
 
 #endif // REPETITION_RULE_HPP

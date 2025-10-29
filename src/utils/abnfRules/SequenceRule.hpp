@@ -4,7 +4,8 @@
 
 #include "Rule.hpp"
 
-#include "utils/BufferReader.hpp"
+#include <libftpp/memory.hpp>
+#include <utils/BufferReader.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -21,7 +22,7 @@ public:
   void setBufferReader(BufferReader* bufferReader);
   void setResultMap(ResultMap* results);
 
-  void addRule(Rule* rule);
+  void addRule(ft::unique_ptr<Rule> rule);
 
 private:
   SequenceRule(const SequenceRule& other);
@@ -33,7 +34,7 @@ private:
   bool _isLastRule() const;
 
   std::size_t _currRule;
-  std::vector<Rule*> _rules;
+  std::vector<ft::shared_ptr<Rule> > _rules;
 };
 
 #endif

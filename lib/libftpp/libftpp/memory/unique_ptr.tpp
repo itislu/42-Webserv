@@ -220,6 +220,13 @@ FT_REQUIRES(!ft::is_array<T>::value)
 	return unique_ptr<T>(new T(arg0));
 }
 
+template <typename T, typename A0>
+FT_REQUIRES(!ft::is_array<T>::value)
+(unique_ptr<T>)make_unique(ft::rvalue<A0>& arg0)
+{
+	return unique_ptr<T>(new T(arg0));
+}
+
 template <typename T, typename A0, typename A1>
 FT_REQUIRES(!ft::is_array<T>::value)
 (unique_ptr<T>)make_unique(const A0& arg0, const A1& arg1)

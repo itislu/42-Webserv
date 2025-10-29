@@ -1,4 +1,6 @@
 #include "SequenceRule.hpp"
+#include "libftpp/memory.hpp"
+#include "libftpp/utility.hpp"
 
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
@@ -15,12 +17,7 @@ SequenceRule::SequenceRule()
   setDebugTag("Sequence");
 }
 
-SequenceRule::~SequenceRule()
-{
-  for (std::size_t i = 0; i < _rules.size(); i++) {
-    delete _rules[i];
-  }
-}
+SequenceRule::~SequenceRule() {}
 
 bool SequenceRule::matches()
 {
@@ -81,9 +78,9 @@ void SequenceRule::setResultMap(ResultMap* results)
   }
 }
 
-void SequenceRule::addRule(Rule* rule)
+void SequenceRule::addRule(ft::unique_ptr<Rule> rule)
 {
-  _rules.push_back(rule);
+  _rules.push_back(ft::move(rule));
 }
 
 /* ************************************************************************** */

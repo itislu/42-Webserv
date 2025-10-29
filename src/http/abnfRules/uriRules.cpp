@@ -1,4 +1,6 @@
 #include "uriRules.hpp"
+#include "libftpp/memory.hpp"
+#include "libftpp/utility.hpp"
 
 #include <http/http.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
@@ -17,9 +19,9 @@
 /**
  * URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
  */
-SequenceRule* uriRule()
+ft::unique_ptr<SequenceRule> uriRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
 
   // scheme ":"
   seq->addRule(schemeRule());
@@ -29,7 +31,7 @@ SequenceRule* uriRule()
   seq->addRule(hierPartRule());
 
   // [ "?" query ]
-  SequenceRule* querySeq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> querySeq = new SequenceRule();
   querySeq->addRule(new LiteralRule("?"));
   querySeq->addRule(queryRule());
 
@@ -39,7 +41,7 @@ SequenceRule* uriRule()
   seq->addRule(optQuery);
 
   // [ "#" fragment ]
-  SequenceRule* fragSeq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> fragSeq = new SequenceRule();
   fragSeq->addRule(new LiteralRule("#"));
   fragSeq->addRule(fragmentRule());
 
@@ -63,7 +65,7 @@ AlternativeRule* hierPartRule()
   AlternativeRule* alter = new AlternativeRule();
 
   // "//" authority path-abempty
-  SequenceRule* seq1 = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq1 = new SequenceRule();
   seq1->addRule(new LiteralRule("//"));
   seq1->addRule(authorityRule());
   seq1->addRule(pathAbEmptyRule());
@@ -85,28 +87,31 @@ AlternativeRule* hierPartRule()
 /**
  * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
  */
-SequenceRule* schemeRule()
+ft::unique_ptr<SequenceRule> schemeRule()
 {
-  RangeRule* const range = new RangeRule(http::isSchemeChar);
-  RepetitionRule* const rep = new RepetitionRule(range);
+  // RangeRule* const range = new RangeRule(http::isSchemeChar);
+  ft::unique_ptr<RangeRule> range =
+    ft::make_unique<RangeRule>(http::isSchemeChar);
+  ft::unique_ptr<RepetitionRule> rep =
+    ft::make_unique<RepetitionRule>(ft::move(range));
 
-  SequenceRule* seq = new SequenceRule();
-  seq->addRule(new RangeRule(::isalpha));
-  seq->addRule(rep);
+  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
+  seq->addRule(ft::make_unique<RangeRule>(::isalpha));
+  seq->addRule(ft::move(rep));
 
   seq->setDebugTag("schemeRule");
-  return seq;
+  return ft::move(seq);
 }
 
 /**
  * authority = [ userinfo "@" ] host [ ":" port ]
  */
-SequenceRule* authorityRule()
+ft::unique_ptr<SequenceRule> authorityRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
 
   // [ userinfo "@" ]
-  SequenceRule* userinfoSeq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> userinfoSeq = new SequenceRule();
   userinfoSeq->addRule(userinfoRule());
   userinfoSeq->addRule(new LiteralRule("@"));
   userinfoSeq->setDebugTag("userinfoSeq");
@@ -122,7 +127,7 @@ SequenceRule* authorityRule()
   seq->addRule(hostRule());
 
   // [ ":" port ]
-  SequenceRule* portSeq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> portSeq = new SequenceRule();
   portSeq->addRule(new LiteralRule(":"));
   portSeq->addRule(portRule());
 
@@ -180,9 +185,9 @@ RepetitionRule* portRule()
 /**
  * IP-literal = "[" ( IPv6address / IPvFuture ) "]"
  */
-SequenceRule* ipLiteralRule()
+ft::unique_ptr<SequenceRule> ipLiteralRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
 
   // "["
   seq->addRule(new LiteralRule("["));
@@ -203,9 +208,9 @@ SequenceRule* ipLiteralRule()
 /**
  * IPvFuture = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
  */
-SequenceRule* ipvFutureRule()
+ft::unique_ptr<SequenceRule> ipvFutureRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
 
   // "v"
   seq->addRule(new LiteralRule("v"));
@@ -237,7 +242,7 @@ SequenceRule* ipvFutureRule()
  */
 static RepetitionRule* h16_colon(int min, int max)
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
   seq->addRule(h16Rule());
   seq->addRule(new LiteralRule(":"));
 
@@ -250,11 +255,11 @@ static RepetitionRule* h16_colon(int min, int max)
 /**
  *                                          6( h16 ":" ) ls32
  */
-static SequenceRule* ipv6AddressRuleAlt1()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt1()
 {
   const int min = 6;
   const int max = 6;
-  SequenceRule* rule1 = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule1 = new SequenceRule();
   rule1->addRule(h16_colon(min, max));
   rule1->addRule(ls32Rule());
   return rule1;
@@ -263,11 +268,11 @@ static SequenceRule* ipv6AddressRuleAlt1()
 /**
  *             /                       "::" 5( h16 ":" ) ls32
  */
-static SequenceRule* ipv6AddressRuleAlt2()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt2()
 {
   const int min = 5;
   const int max = 5;
-  SequenceRule* rule2 = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule2 = new SequenceRule();
   rule2->addRule(new LiteralRule("::"));
   rule2->addRule(h16_colon(min, max));
   rule2->addRule(ls32Rule());
@@ -277,9 +282,9 @@ static SequenceRule* ipv6AddressRuleAlt2()
 /**
  *             / [               h16 ] "::" 4( h16 ":" ) ls32
  */
-static SequenceRule* ipv6AddressRuleAlt3()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt3()
 {
-  SequenceRule* rule = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule = new SequenceRule();
   RepetitionRule* opt_h16 = new RepetitionRule(h16Rule());
   opt_h16->setMin(0);
   opt_h16->setMax(1);
@@ -293,10 +298,10 @@ static SequenceRule* ipv6AddressRuleAlt3()
 /**
  *             / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
  */
-static SequenceRule* ipv6AddressRuleAlt4()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt4()
 {
-  SequenceRule* rule = new SequenceRule();
-  SequenceRule* opt = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule = new SequenceRule();
+  ft::unique_ptr<SequenceRule> opt = new SequenceRule();
   opt->addRule(h16_colon(0, 1));
   opt->addRule(h16Rule());
   RepetitionRule* optWrap = new RepetitionRule(opt);
@@ -312,10 +317,10 @@ static SequenceRule* ipv6AddressRuleAlt4()
 /**
  *             / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
  */
-static SequenceRule* ipv6AddressRuleAlt5()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt5()
 {
-  SequenceRule* rule = new SequenceRule();
-  SequenceRule* opt = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule = new SequenceRule();
+  ft::unique_ptr<SequenceRule> opt = new SequenceRule();
   opt->addRule(h16_colon(0, 2));
   opt->addRule(h16Rule());
   RepetitionRule* optWrap = new RepetitionRule(opt);
@@ -331,10 +336,10 @@ static SequenceRule* ipv6AddressRuleAlt5()
 /**
  *             / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
  */
-static SequenceRule* ipv6AddressRuleAlt6()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt6()
 {
-  SequenceRule* rule = new SequenceRule();
-  SequenceRule* opt = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule = new SequenceRule();
+  ft::unique_ptr<SequenceRule> opt = new SequenceRule();
   opt->addRule(h16_colon(0, 3));
   opt->addRule(h16Rule());
   RepetitionRule* optWrap = new RepetitionRule(opt);
@@ -351,10 +356,10 @@ static SequenceRule* ipv6AddressRuleAlt6()
 /**
  *             / [ *4( h16 ":" ) h16 ] "::"              ls32
  */
-static SequenceRule* ipv6AddressRuleAlt7()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt7()
 {
-  SequenceRule* rule = new SequenceRule();
-  SequenceRule* opt = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule = new SequenceRule();
+  ft::unique_ptr<SequenceRule> opt = new SequenceRule();
   opt->addRule(h16_colon(0, 4));
   opt->addRule(h16Rule());
   RepetitionRule* optWrap = new RepetitionRule(opt);
@@ -369,12 +374,12 @@ static SequenceRule* ipv6AddressRuleAlt7()
 /**
  *             / [ *5( h16 ":" ) h16 ] "::"              h16
  */
-static SequenceRule* ipv6AddressRuleAlt8()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt8()
 {
   const int min = 0;
   const int max = 5;
-  SequenceRule* rule = new SequenceRule();
-  SequenceRule* opt = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule = new SequenceRule();
+  ft::unique_ptr<SequenceRule> opt = new SequenceRule();
   opt->addRule(h16_colon(min, max));
   opt->addRule(h16Rule());
   RepetitionRule* optWrap = new RepetitionRule(opt);
@@ -389,12 +394,12 @@ static SequenceRule* ipv6AddressRuleAlt8()
 /**
  *             / [ *6( h16 ":" ) h16 ] "::"
  */
-static SequenceRule* ipv6AddressRuleAlt9()
+static ft::unique_ptr<SequenceRule> ipv6AddressRuleAlt9()
 {
   const int min = 0;
   const int max = 6;
-  SequenceRule* rule = new SequenceRule();
-  SequenceRule* opt = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule = new SequenceRule();
+  ft::unique_ptr<SequenceRule> opt = new SequenceRule();
   opt->addRule(h16_colon(min, max));
   opt->addRule(h16Rule());
   RepetitionRule* optWrap = new RepetitionRule(opt);
@@ -455,7 +460,7 @@ AlternativeRule* ls32Rule()
   AlternativeRule* alter = new AlternativeRule();
 
   // h16 ":" h16
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
   seq->addRule(h16Rule());
   seq->addRule(new LiteralRule(":"));
   seq->addRule(h16Rule());
@@ -471,9 +476,9 @@ AlternativeRule* ls32Rule()
 /**
  * IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
  */
-SequenceRule* ipv4AddressRule()
+ft::unique_ptr<SequenceRule> ipv4AddressRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
 
   seq->addRule(decOctetRule());
   seq->addRule(new LiteralRule("."));
@@ -502,27 +507,27 @@ AlternativeRule* decOctetRule()
   alter->addRule(new RangeRule(::isdigit));
 
   // %x31-39 DIGIT → [1-9][0-9]
-  SequenceRule* rule10_99 = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule10_99 = new SequenceRule();
   rule10_99->addRule(new RangeRule(http::isDigit19));
   rule10_99->addRule(new RangeRule(::isdigit));
   alter->addRule(rule10_99);
 
   // "1" 2DIGIT → 100–199
-  SequenceRule* rule100_199 = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule100_199 = new SequenceRule();
   rule100_199->addRule(new LiteralRule("1"));
   rule100_199->addRule(new RangeRule(::isdigit));
   rule100_199->addRule(new RangeRule(::isdigit));
   alter->addRule(rule100_199);
 
   // "2" %x30-34 DIGIT → 200–249
-  SequenceRule* rule200_249 = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule200_249 = new SequenceRule();
   rule200_249->addRule(new LiteralRule("2"));
   rule200_249->addRule(new RangeRule(http::isDigit04));
   rule200_249->addRule(new RangeRule(::isdigit));
   alter->addRule(rule200_249);
 
   // "25" %x30-35 → 250–255
-  SequenceRule* rule250_255 = new SequenceRule();
+  ft::unique_ptr<SequenceRule> rule250_255 = new SequenceRule();
   rule250_255->addRule(new LiteralRule("25"));
   rule250_255->addRule(new RangeRule(http::isDigit05));
   alter->addRule(rule250_255);
@@ -534,14 +539,14 @@ AlternativeRule* decOctetRule()
 /**
  * reg-name      = *( unreserved / pct-encoded / sub-delims )
  */
-RepetitionRule* regNameRule()
+ft::unique_ptr<RepetitionRule> regNameRule()
 {
-  AlternativeRule* alter = new AlternativeRule();
+  ft::unique_ptr<AlternativeRule> alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isUnreserved));
   alter->addRule(pctRule());
   alter->addRule(new RangeRule(http::isSubDelim));
 
-  RepetitionRule* rep = new RepetitionRule(alter);
+  ft::unique_ptr<RepetitionRule> rep = new RepetitionRule(alter);
   rep->setDebugTag("regNameRule");
   return rep;
 }
@@ -559,9 +564,9 @@ RepetitionRule* regNameRule()
  *   path-rootless = segment-nz *( "/" segment )
  *   path-empty    = 0<pchar>
  */
-AlternativeRule* pathRule()
+ft::unique_ptr<AlternativeRule> pathRule()
 {
-  AlternativeRule* alter = new AlternativeRule();
+  ft::unique_ptr<AlternativeRule> alter = new AlternativeRule();
   alter->addRule(pathAbEmptyRule());
   alter->addRule(pathAbsoluteRule());
   alter->addRule(pathNoSchemeRule());
@@ -575,13 +580,13 @@ AlternativeRule* pathRule()
 /**
  * path-abempty  = *( "/" segment )
  */
-RepetitionRule* pathAbEmptyRule()
+ft::unique_ptr<RepetitionRule> pathAbEmptyRule()
 {
-  SequenceRule* sequence = new SequenceRule();
+  ft::unique_ptr<SequenceRule> sequence = new SequenceRule();
   sequence->addRule(new LiteralRule("/"));
   sequence->addRule(segmentRule());
 
-  RepetitionRule* rep = new RepetitionRule(sequence);
+  ft::unique_ptr<RepetitionRule> rep = new RepetitionRule(sequence);
   rep->setDebugTag("pathAbEmptyRule");
   return rep;
 }
@@ -589,20 +594,20 @@ RepetitionRule* pathAbEmptyRule()
 /**
  * path-absolute = "/" [ segment-nz *( "/" segment ) ]
  */
-SequenceRule* pathAbsoluteRule()
+ft::unique_ptr<SequenceRule> pathAbsoluteRule()
 {
-  SequenceRule* optSeq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> optSeq = new SequenceRule();
   optSeq->addRule(segmentNzRule());
   optSeq->addRule(pathAbEmptyRule());
 
-  RepetitionRule* option = new RepetitionRule(optSeq);
+  ft::unique_ptr<RepetitionRule> option = new RepetitionRule(optSeq);
   // to make it actually optional we set the limits between 0 and 1
   // also described here:
   // https://datatracker.ietf.org/doc/html/rfc2234#autoid-15
   option->setMin(0);
   option->setMax(1);
 
-  SequenceRule* sequence = new SequenceRule();
+  ft::unique_ptr<SequenceRule> sequence = new SequenceRule();
   sequence->addRule(new LiteralRule("/"));
   sequence->addRule(option);
 
@@ -613,9 +618,9 @@ SequenceRule* pathAbsoluteRule()
 /**
  * path-noscheme = segment-nz-nc *( "/" segment )
  */
-SequenceRule* pathNoSchemeRule()
+ft::unique_ptr<SequenceRule> pathNoSchemeRule()
 {
-  SequenceRule* sequence = new SequenceRule();
+  ft::unique_ptr<SequenceRule> sequence = new SequenceRule();
   sequence->addRule(segmentNzNcRule());
   sequence->addRule(pathAbEmptyRule());
   sequence->setDebugTag("pathNoSchemeRule");
@@ -625,9 +630,9 @@ SequenceRule* pathNoSchemeRule()
 /**
  * path-rootless = segment-nz *( "/" segment )
  */
-SequenceRule* pathRootlessRule()
+ft::unique_ptr<SequenceRule> pathRootlessRule()
 {
-  SequenceRule* sequence = new SequenceRule();
+  ft::unique_ptr<SequenceRule> sequence = new SequenceRule();
   sequence->addRule(segmentNzRule());
   sequence->addRule(pathAbEmptyRule());
 
@@ -638,9 +643,9 @@ SequenceRule* pathRootlessRule()
 /**
  * path-empty    = 0<pchar>
  */
-RepetitionRule* pathEmptyRule()
+ft::unique_ptr<RepetitionRule> pathEmptyRule()
 {
-  RepetitionRule* rep = new RepetitionRule(pcharRule());
+  ft::unique_ptr<RepetitionRule> rep = new RepetitionRule(pcharRule());
   rep->setMin(0);
   rep->setMax(0);
 
@@ -651,9 +656,9 @@ RepetitionRule* pathEmptyRule()
 /**
  * segment      = *pchar
  */
-RepetitionRule* segmentRule()
+ft::unique_ptr<RepetitionRule> segmentRule()
 {
-  RepetitionRule* rep = new RepetitionRule(pcharRule());
+  ft::unique_ptr<RepetitionRule> rep = new RepetitionRule(pcharRule());
   rep->setDebugTag("segmentRule");
   return rep;
 }
@@ -661,9 +666,9 @@ RepetitionRule* segmentRule()
 /**
  * segment-nz    = 1*pchar
  */
-RepetitionRule* segmentNzRule()
+ft::unique_ptr<RepetitionRule> segmentNzRule()
 {
-  RepetitionRule* rep = new RepetitionRule(pcharRule());
+  ft::unique_ptr<RepetitionRule> rep = new RepetitionRule(pcharRule());
   rep->setMin(1);
   rep->setDebugTag("segmentNzRule");
   return rep;
@@ -673,9 +678,9 @@ RepetitionRule* segmentNzRule()
  * segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
  *                 ; non-zero-length segment without any colon ":"
  */
-RepetitionRule* segmentNzNcRule()
+ft::unique_ptr<RepetitionRule> segmentNzNcRule()
 {
-  AlternativeRule* alter = new AlternativeRule();
+  ft::unique_ptr<AlternativeRule> alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isUnreserved));
   alter->addRule(pctRule());
   alter->addRule(new RangeRule(http::isSubDelim));
@@ -690,9 +695,9 @@ RepetitionRule* segmentNzNcRule()
 /**
  * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
  */
-AlternativeRule* pcharRule()
+ft::unique_ptr<AlternativeRule> pcharRule()
 {
-  AlternativeRule* alter = new AlternativeRule();
+  ft::unique_ptr<AlternativeRule> alter = new AlternativeRule();
   alter->addRule(new RangeRule(http::isPchar));
   alter->addRule(pctRule());
 
@@ -703,7 +708,7 @@ AlternativeRule* pcharRule()
 /**
  * query = *( pchar / "/" / "?" )
  */
-RepetitionRule* queryRule()
+ft::unique_ptr<RepetitionRule> queryRule()
 {
   AlternativeRule* alter = new AlternativeRule();
   alter->addRule(pcharRule());
@@ -717,27 +722,27 @@ RepetitionRule* queryRule()
 /**
  * fragment = *( pchar / "/" / "?" )
  */
-RepetitionRule* fragmentRule()
+ft::unique_ptr<RepetitionRule> fragmentRule()
 {
-  AlternativeRule* alter = new AlternativeRule();
+  ft::unique_ptr<AlternativeRule> alter = ft::make_unique<AlternativeRule>();
   alter->addRule(pcharRule());
   alter->addRule(new RangeRule(http::isFragmentChar));
 
   RepetitionRule* rep = new RepetitionRule(alter);
   rep->setDebugTag("fragmentRule");
-  return rep;
+  return ft::move(rep);
 }
 
 /**
  * pct-encoded   = "%" HEXDIG HEXDIG
  */
-SequenceRule* pctRule()
+ft::unique_ptr<SequenceRule> pctRule()
 {
-  SequenceRule* pctSeq = new SequenceRule();
-  pctSeq->addRule(new LiteralRule("%"));
-  pctSeq->addRule(new RangeRule(http::isHexDigit));
-  pctSeq->addRule(new RangeRule(http::isHexDigit));
+  ft::unique_ptr<SequenceRule> pctSeq = ft::make_unique<SequenceRule>();
+  pctSeq->addRule(ft::make_unique<LiteralRule>("%"));
+  pctSeq->addRule(ft::make_nuique<RangeRule>(http::isHexDigit));
+  pctSeq->addRule(ft::make_nuique<RangeRule>(http::isHexDigit));
 
   pctSeq->setDebugTag("pctRule");
-  return pctSeq;
+  return ft::move(pctSeq);
 }

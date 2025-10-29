@@ -1,9 +1,32 @@
 #include "config/Config.hpp"
 #include "config/ConfigTestSetup.hpp"
 #include "config/ServerConfig.hpp"
+#include "http/http.hpp"
+#include "libftpp/memory.hpp"
+#include "libftpp/utility.hpp"
 #include "server/ServerManager.hpp"
+#include "utils/abnfRules/RangeRule.hpp"
+#include "utils/abnfRules/RepetitionRule.hpp"
+#include "utils/abnfRules/SequenceRule.hpp"
 #include <exception>
 #include <iostream>
+
+ft::unique_ptr<SequenceRule> schemeRule()
+{
+  // RangeRule* const range = new RangeRule(http::isSchemeChar);
+  ft::unique_ptr<RangeRule> range =
+    ft::make_unique<RangeRule>(http::isSchemeChar);
+  ft::unique_ptr<RepetitionRule> rep =
+    ft::make_unique<RepetitionRule>(ft::move(range));
+
+  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
+  // seq->addRule(ft::unique_ptr<RangeRule>(new RangeRule(::isalpha)));
+  // seq->addRule(ft::make_unique<RangeRule>(::isalpha));
+  // seq->addRule(ft::move(rep));
+
+  seq->setDebugTag("schemeRule");
+  return ft::move(seq);
+}
 
 int main(int argc, char* argv[])
 {

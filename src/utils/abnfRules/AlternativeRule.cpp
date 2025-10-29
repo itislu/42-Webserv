@@ -1,4 +1,6 @@
 #include "AlternativeRule.hpp"
+#include "libftpp/memory.hpp"
+#include "libftpp/utility.hpp"
 
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -15,12 +17,7 @@ AlternativeRule::AlternativeRule()
   setDebugTag("Alternative");
 }
 
-AlternativeRule::~AlternativeRule()
-{
-  for (std::size_t i = 0; i < _rules.size(); i++) {
-    delete _rules[i];
-  }
-}
+AlternativeRule::~AlternativeRule() {}
 
 bool AlternativeRule::matches()
 {
@@ -65,9 +62,9 @@ void AlternativeRule::setResultMap(ResultMap* results)
   }
 }
 
-void AlternativeRule::addRule(Rule* rule)
+void AlternativeRule::addRule(ft::unique_ptr<Rule> rule)
 {
-  _rules.push_back(rule);
+  _rules.push_back(ft::move(rule));
 }
 
 /* ************************************************************************** */

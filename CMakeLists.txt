@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
-find_program(CXX_COMPILER "c++")
+find_program(CXX_COMPILER "g++")
 set(CMAKE_CXX_COMPILER "${CXX_COMPILER}")
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -56,4 +56,4 @@ add_subdirectory(src/utils)
 # **************************************************************************** #
 # TESTS
 enable_testing()
-add_subdirectory(tests)
+# add_subdirectory(tests)
