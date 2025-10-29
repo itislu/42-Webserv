@@ -20,8 +20,8 @@ public:
 
   int getFd() const;
   const std::string& getHost() const;
-  Buffer getInBuff() const;
-  Buffer getOutBuff() const;
+  const Buffer& getInBuff() const;
+  const Buffer& getOutBuff() const;
   const Server* getServer() const;
 
   void setServer(const Server* server);

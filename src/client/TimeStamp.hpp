@@ -2,6 +2,7 @@
 #define TIMESTAMP_HPP
 
 #include <ctime>
+
 class TimeStamp
 {
 public:
