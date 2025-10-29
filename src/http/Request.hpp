@@ -22,6 +22,8 @@ public:
     DELETE
   };
 
+  Request();
+
   static const std::size_t MaxMethodLen;
   static Method strToMethod(const std::string& strMethod);
 

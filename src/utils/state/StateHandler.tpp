@@ -35,9 +35,10 @@ template<typename Context>
 template<typename T>
 void StateHandler<Context>::setState()
 {
-  setStateHasChanged(true);
+  T* newState = new T(_context);
   delete _state;
-  _state = new T(_context);
+  _state = newState;
+  setStateHasChanged(true);
 }
 
 template<typename Context>

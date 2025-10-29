@@ -25,7 +25,6 @@ private:
   void _readLines();
   std::string _extractPart(const Rule::RuleId& ruleId);
   void _addLineToHeaders(const std::string& line);
-  bool _partFound(const Rule::RuleId& ruleId);
 
   Client* _client;
   ft::unique_ptr<SequenceRule> _fieldLine;

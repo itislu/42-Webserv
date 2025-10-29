@@ -5,7 +5,7 @@
 #include "client/Client.hpp"
 #include "utils/state/IState.hpp"
 
-class WriteStatusLine : IState<Client>
+class WriteStatusLine : public IState<Client>
 {
 public:
   explicit WriteStatusLine(Client* context);

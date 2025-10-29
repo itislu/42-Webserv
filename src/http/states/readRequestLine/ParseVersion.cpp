@@ -39,15 +39,15 @@ ParseVersion::ParseVersion(ReadRequestLine* context)
  */
 void ParseVersion::run()
 {
-  _sequenze.reset();
+  _sequence.reset();
   _buffReader.resetPosInBuff();
-  if (!_sequenze.matches()) {
+  if (!_sequence.matches()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     getContext()->getStateHandler().setDone();
     return;
   }
 
-  if (_sequenze.end()) {
+  if (_sequence.end()) {
     _extractVersion();
     getContext()->getStateHandler().setDone();
     return;
@@ -69,11 +69,11 @@ void ParseVersion::_init()
 {
   _buffReader.init(&_client->getInBuff());
 
-  _sequenze.addRule(rwsRule());
-  _sequenze.addRule(new LiteralRule("HTTP/"));
-  _sequenze.addRule(new RangeRule(::isdigit));
-  _sequenze.addRule(new LiteralRule("."));
-  _sequenze.addRule(new RangeRule(::isdigit));
-  _sequenze.addRule(endOfLineRule());
-  _sequenze.setBufferReader(&_buffReader);
+  _sequence.addRule(rwsRule());
+  _sequence.addRule(new LiteralRule("HTTP/"));
+  _sequence.addRule(new RangeRule(::isdigit));
+  _sequence.addRule(new LiteralRule("."));
+  _sequence.addRule(new RangeRule(::isdigit));
+  _sequence.addRule(endOfLineRule());
+  _sequence.setBufferReader(&_buffReader);
 }

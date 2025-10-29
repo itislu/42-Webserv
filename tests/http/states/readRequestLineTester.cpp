@@ -10,7 +10,7 @@
 // NOLINTBEGIN
 
 namespace {
-ft::unique_ptr<Client> StateTest(std::string& requestLine)
+ft::unique_ptr<Client> StateTest(const std::string& requestLine)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
   client->getInBuff().add(requestLine);
@@ -27,7 +27,7 @@ TEST(ReadRequestLineTester, BasicRequests)
   Request& request = client->getRequest();
   EXPECT_EQ(request.getMethod(), Request::GET);
   EXPECT_EQ(request.getUri().getScheme(), "http");
-  EXPECT_EQ(request.getUri().getAuthority(), "//test");
+  EXPECT_EQ(request.getUri().getAuthority(), "test");
   EXPECT_EQ(request.getUri().getPath(), "/");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 }
@@ -55,7 +55,7 @@ TEST(ReadRequestLineTester, AbsoluteForm)
   Request& request = client->getRequest();
   EXPECT_EQ(request.getMethod(), Request::GET);
   EXPECT_EQ(request.getUri().getScheme(), "http");
-  EXPECT_EQ(request.getUri().getAuthority(), "//www.example.org");
+  EXPECT_EQ(request.getUri().getAuthority(), "www.example.org");
   EXPECT_EQ(request.getUri().getPath(), "/pub/WWW/TheProject.html");
   EXPECT_EQ(request.getUri().getQuery(), "?test");
   EXPECT_EQ(request.getUri().getFragment(), "#frag");

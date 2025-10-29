@@ -12,7 +12,6 @@ public:
   void setRaw(const std::string& rawUri);
 
   const std::string& getScheme() const;
-  std::string& getScheme();
   void setScheme(const std::string& str);
   const std::string& getAuthority() const;
   void setAuthority(const std::string& str);

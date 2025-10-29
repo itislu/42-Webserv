@@ -19,11 +19,6 @@ const std::string& Uri::getScheme() const
   return _scheme;
 }
 
-std::string& Uri::getScheme()
-{
-  return _scheme;
-}
-
 void Uri::setScheme(const std::string& str)
 {
   _scheme = str;

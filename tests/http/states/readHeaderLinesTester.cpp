@@ -1,5 +1,7 @@
 #include "http/Request.hpp"
 #include "http/states/readHeaderLines/ReadHeaderLines.hpp"
+#include "libftpp/memory.hpp"
+#include "libftpp/utility.hpp"
 #include <client/Client.hpp>
 #include <gtest/gtest.h>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
@@ -9,29 +11,27 @@
 // NOLINTBEGIN
 
 namespace {
-Client* StateTest(std::string& requestLine)
+ft::unique_ptr<Client> StateTest(const std::string& requestLine)
 {
-  Client* client = new Client();
+  ft::unique_ptr<Client> client = ft::make_unique<Client>();
   client->getInBuff().add(requestLine);
-  IState<Client>* state = new ReadHeaderLines(client);
-  state->run();
-  delete state;
-  return client;
+  client->getStateHandler().setState<ReadHeaderLines>();
+  client->getStateHandler().getState()->run();
+  return ft::move(client);
 }
 }
 
-TEST(ReadRequestLineTester, BasicRequests)
+TEST(ReadRequestLineTester, BasicHeaders)
 {
   std::string line("Host: webserv\r\n"
-                   "Conten-Length: 7\r\n"
+                   "Content-Length: 7\r\n"
                    "\r\n");
-  Client* client = StateTest(line);
+  ft::unique_ptr<Client> client = StateTest(line);
   Request& request = client->getRequest();
   Request::HeaderMap& headers = request.getHeaders();
 
   EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["Conten-Length"], "7");
-  delete client;
+  EXPECT_EQ(headers["Content-Length"], "7");
 }
 
 // NOLINTEND

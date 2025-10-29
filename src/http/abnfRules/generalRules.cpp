@@ -39,6 +39,6 @@ RepetitionRule* rwsRule()
   RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isWhitespace));
   rep->setMin(1);
 
-  rep->setDebugTag("owsRule");
+  rep->setDebugTag("rwsRule");
   return rep;
 }

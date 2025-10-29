@@ -13,7 +13,7 @@ public:
   const std::string& getVersion() const;
   void setVersion(const std::string& version);
 
-  StatusCode& getStatusCode();
+  const StatusCode& getStatusCode() const;
   void setStatusCode(StatusCode::Code code);
 
 private:

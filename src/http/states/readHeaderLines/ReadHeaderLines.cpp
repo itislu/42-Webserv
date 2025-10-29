@@ -95,19 +95,13 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 void ReadHeaderLines::_addLineToHeaders(const std::string& line)
 {
   // todo if header exit append value with ', '
-  const std::size_t index = line.find(' ');
+  const std::size_t index = line.find(':');
   if (index != std::string::npos) {
     std::string name = line.substr(0, index);
-    std::string value = line.substr(index, line.size());
+    std::string value = line.substr(index + 1, line.size());
     ft::trim(name);
     ft::trim(value);
-    name = name.substr(0, name.length() - 1);
     Request::HeaderMap& headers = _client->getRequest().getHeaders();
     headers[name] = value;
   }
-}
-
-bool ReadHeaderLines::_partFound(const Rule::RuleId& ruleId)
-{
-  return _results.find(ruleId) != _results.end();
 }

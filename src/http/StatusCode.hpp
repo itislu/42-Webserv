@@ -18,12 +18,15 @@ public:
 
   StatusCode();
   explicit StatusCode(Code code);
+  StatusCode& operator=(Code code);
 
   Code getCode() const;
   const char* getReason() const;
-  std::string toString();
+  std::string toString() const;
 
 private:
+  void _findReason();
+
   struct CodeEntry;
   static const int _codes = 3;
   static const CodeEntry _codeMap[_codes];

@@ -127,7 +127,9 @@ void ParseUri::_parseAuthority()
   }
   if (_sequence->end()) {
     if (_partFound(AuthorityPart)) {
-      _tmpUri.setAuthority(_extractPartWithoutCurrChar(AuthorityPart));
+      std::string auth = _extractPartWithoutCurrChar(AuthorityPart);
+      auth = auth.substr(2, auth.size()); // remove '//'
+      _tmpUri.setAuthority(auth);
     }
     _updateState(ParsePath);
   }

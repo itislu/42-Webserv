@@ -1,5 +1,7 @@
 #include "StatusCode.hpp"
 
+#include <libftpp/utility.hpp>
+
 #include <cassert>
 #include <cstddef>
 #include <ostream>
@@ -24,20 +26,19 @@ StatusCode::StatusCode()
 {
 }
 
-// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 StatusCode::StatusCode(Code code)
   : _code(code)
   , _reason(NULL)
 {
-  for (int i = 0; i < _codes; i++) {
-    if (code == _codeMap[i].code) {
-      _reason = _codeMap[i].reason;
-      return;
-    }
-  }
-  assert(false && "StatusCode: code out of range");
+  _findReason();
 }
-// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
+
+StatusCode& StatusCode::operator=(Code code)
+{
+  _code = code;
+  _findReason();
+  return *this;
+}
 
 StatusCode::Code StatusCode::getCode() const
 {
@@ -48,7 +49,7 @@ const char* StatusCode::getReason() const
   return _reason;
 }
 
-std::string StatusCode::toString()
+std::string StatusCode::toString() const
 {
   std::stringstream oss;
   oss << _code << " " << _reason;
@@ -63,3 +64,17 @@ std::ostream& operator<<(std::ostream& out, const StatusCode& statuscode)
 
 /* ************************************************************************** */
 // PRIVATE
+
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
+void StatusCode::_findReason()
+{
+  for (int i = 0; i < _codes; i++) {
+    if (_code == _codeMap[i].code) {
+      _reason = _codeMap[i].reason;
+      return;
+    }
+  }
+  assert(false && "StatusCode: code out of range");
+  FT_UNREACHABLE();
+}
+// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)

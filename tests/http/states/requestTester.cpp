@@ -13,7 +13,7 @@
 namespace {
 
 /**
- * Test with uncomplete buffer
+ * Test with incomplete buffer
  * The buffer is extended by one char until parsing is done
  */
 ft::unique_ptr<Client> requestTestCharByChar(std::string& rawBuffer)
@@ -59,7 +59,7 @@ TEST(RequestTester, PartialBufferTest)
 
   EXPECT_EQ(request.getMethod(), Request::GET);
   EXPECT_EQ(request.getUri().getScheme(), "http");
-  EXPECT_EQ(request.getUri().getAuthority(), "//www.example.com");
+  EXPECT_EQ(request.getUri().getAuthority(), "www.example.com");
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
@@ -79,7 +79,7 @@ TEST(RequestTester, CompleteBufferTest)
 
   EXPECT_EQ(request.getMethod(), Request::GET);
   EXPECT_EQ(request.getUri().getScheme(), "http");
-  EXPECT_EQ(request.getUri().getAuthority(), "//www.example.com");
+  EXPECT_EQ(request.getUri().getAuthority(), "www.example.com");
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 

@@ -23,7 +23,7 @@ private:
 
   Client* _client;
   BufferReader _buffReader;
-  SequenceRule _sequenze;
+  SequenceRule _sequence;
 };
 
 #endif

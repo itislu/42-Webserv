@@ -87,7 +87,7 @@ void SequenceRule::addRule(Rule* rule)
 
 void SequenceRule::_setNextRule()
 {
-  // If the last executed rule is a sequence
+  // If the current rule is a sequence
   // check if the sequence also reached the end
   const SequenceRule* const currSeq =
     dynamic_cast<SequenceRule*>(_rules[_currRule]);

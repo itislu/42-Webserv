@@ -19,10 +19,10 @@ void Response::setVersion(const std::string& version)
 
 void Response::setStatusCode(StatusCode::Code code)
 {
-  _statuscode = StatusCode(code);
+  _statuscode = code;
 }
 
-StatusCode& Response::getStatusCode()
+const StatusCode& Response::getStatusCode() const
 {
   return _statuscode;
 }

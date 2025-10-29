@@ -21,6 +21,7 @@ void WriteStatusLine::run()
   Buffer& buff = _client->getOutBuff();
   buff.add("HTTP/1.1 ");
   buff.add(_client->getResponse().getStatusCode().toString());
+  buff.add("\r\n");
   _client->getStateHandler().setDone();
 }
 

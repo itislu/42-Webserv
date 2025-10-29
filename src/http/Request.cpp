@@ -19,6 +19,11 @@ const std::size_t Request::MaxMethodLen = Request::_getMaxMethodLen();
 /* ************************************************************************** */
 // PUBLIC
 
+Request::Request()
+  : _method(UNDEFINED)
+{
+}
+
 Request::Method Request::getMethod() const
 {
   return _method;
