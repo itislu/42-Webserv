@@ -1,9 +1,9 @@
 #include "StatusCode.hpp"
 
+#include <cassert>
 #include <cstddef>
 #include <ostream>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 
 /* ************************************************************************** */
@@ -35,8 +35,7 @@ StatusCode::StatusCode(Code code)
       return;
     }
   }
-  // todo assert ?
-  throw std::out_of_range("StatusCode: code out of range");
+  assert(false && "StatusCode: code out of range");
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 

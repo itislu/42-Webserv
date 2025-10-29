@@ -2,7 +2,7 @@
 #ifndef RULE_IDS_HPP
 #define RULE_IDS_HPP
 
-enum RuleId
+enum HttpRuleId
 {
   EndOfRule,
 
