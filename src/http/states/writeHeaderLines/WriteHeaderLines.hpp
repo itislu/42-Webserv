@@ -1,17 +1,19 @@
 #pragma once
-#ifndef WRITE_STATUS_LINE_HPP
-#define WRITE_STATUS_LINE_HPP
+#ifndef WRITE_HEADER_LINES_HPP
+#define WRITE_HEADER_LINES_HPP
 
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <cstddef>
+
 class Client;
 
 /* ************************************************************************** */
-class WriteStatusLine : public IState<Client>
+class WriteHeaderLines : public IState<Client>
 {
 public:
-  explicit WriteStatusLine(Client* context);
+  explicit WriteHeaderLines(Client* context);
 
   void run();
 

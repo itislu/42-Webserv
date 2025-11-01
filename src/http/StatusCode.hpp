@@ -19,6 +19,8 @@ public:
   StatusCode();
   explicit StatusCode(Code code);
   StatusCode& operator=(Code code);
+  bool operator==(Code code) const;
+  bool operator!=(Code code) const;
 
   Code getCode() const;
   const char* getReason() const;

@@ -1,8 +1,13 @@
 #include "ReadRequestLine.hpp"
 #include "ParseMethod.hpp"
+#include "http/StatusCode.hpp"
+#include "http/states/prepareResponse/PrepareResponse.hpp"
+#include "http/states/writeStatusLine/WriteStatusLine.hpp"
 
 #include <client/Client.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/logger/LoggerHandler.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
 
@@ -11,8 +16,11 @@
 
 ReadRequestLine::ReadRequestLine(Client* context)
   : IState(context)
+  , _client(context)
   , _stateHandler(this)
+  , _log(LoggerHandler::getInstance(log::http))
 {
+  _log.info("ReadRequestLine");
   _stateHandler.setState<ParseMethod>();
 }
 
@@ -30,7 +38,12 @@ void ReadRequestLine::run()
   }
 
   if (_stateHandler.isDone()) {
-    getContext()->getStateHandler().setState<ReadHeaderLines>();
+    _log.info(getContext()->getRequest().toString());
+    if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+      getContext()->getStateHandler().setState<ReadHeaderLines>();
+    } else {
+      getContext()->getStateHandler().setState<PrepareResponse>();
+    }
     return;
   }
 }

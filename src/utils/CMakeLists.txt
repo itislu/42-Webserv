@@ -12,6 +12,8 @@ add_library(${LIB_NAME} STATIC
   abnfRules/Rule.cpp
   abnfRules/RuleResult.cpp
   abnfRules/SequenceRule.cpp
+  logger/Logger.cpp
+  logger/LoggerHandler.cpp
   Buffer.cpp
   BufferReader.cpp
 )

@@ -1,5 +1,6 @@
 #include "ParseMethod.hpp"
 
+#include "utils/logger/LoggerHandler.hpp"
 #include <client/Client.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
@@ -24,7 +25,9 @@ ParseMethod::ParseMethod(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
   , _buffReader()
+  , _log(&LoggerHandler::getInstance(log::http))
 {
+  _log->info("ParseMethod");
   _init();
 }
 
@@ -38,6 +41,7 @@ void ParseMethod::run()
   _sequence.reset();
   _buffReader.resetPosInBuff();
   if (!_sequence.matches()) {
+    _log->error("Bad Request");
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     getContext()->getStateHandler().setDone();
     return;

@@ -2,6 +2,8 @@
 #include "config/ConfigTestSetup.hpp"
 #include "config/ServerConfig.hpp"
 #include "server/ServerManager.hpp"
+#include "utils/logger/Logger.hpp"
+#include "utils/logger/LoggerHandler.hpp"
 #include <exception>
 #include <iostream>
 
@@ -13,6 +15,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  LoggerHandler::getInstance(log::general).info("Server started");
   try {
     const Config config = TestConfigSetup::createTestConfig();
     std::cout << config;

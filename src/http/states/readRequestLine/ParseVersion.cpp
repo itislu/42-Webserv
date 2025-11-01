@@ -10,6 +10,7 @@
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
+#include <utils/logger/LoggerHandler.hpp>
 #include <utils/state/IState.hpp>
 
 #include <cctype>
@@ -22,7 +23,9 @@ ParseVersion::ParseVersion(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
   , _buffReader()
+  , _log(&LoggerHandler::getInstance(log::http))
 {
+  _log->info("ParseVersion");
   _init();
 }
 

@@ -2,10 +2,11 @@
 #ifndef READ_HEADER_LINES_HPP
 #define READ_HEADER_LINES_HPP
 
-#include "libftpp/memory.hpp"
-#include "utils/BufferReader.hpp"
-#include "utils/abnfRules/Rule.hpp"
+#include <libftpp/memory.hpp>
+#include <utils/BufferReader.hpp>
+#include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <string>
@@ -23,6 +24,7 @@ public:
 private:
   void _init();
   void _readLines();
+  void _setNextState();
   std::string _extractPart(const Rule::RuleId& ruleId);
   void _addLineToHeaders(const std::string& line);
 
@@ -31,6 +33,8 @@ private:
   SequenceRule* _endOfLine;
   BufferReader _buffReader;
   Rule::ResultMap _results;
+  Logger* _log;
+  bool _done;
 };
 
 #endif

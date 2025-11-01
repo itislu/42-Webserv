@@ -1,12 +1,14 @@
-#include "http/Request.hpp"
-#include "http/states/readHeaderLines/ReadHeaderLines.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
 #include <client/Client.hpp>
-#include <gtest/gtest.h>
+#include <http/Headers.hpp>
+#include <http/Request.hpp>
+#include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
-#include <string>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/state/IState.hpp>
+
+#include <gtest/gtest.h>
+#include <string>
 
 // NOLINTBEGIN
 
@@ -28,7 +30,7 @@ TEST(ReadRequestLineTester, BasicHeaders)
                    "\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
   Request& request = client->getRequest();
-  Request::HeaderMap& headers = request.getHeaders();
+  Headers& headers = request.getHeaders();
 
   EXPECT_EQ(headers["Host"], "webserv");
   EXPECT_EQ(headers["Content-Length"], "7");
