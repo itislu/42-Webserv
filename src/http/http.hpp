@@ -16,6 +16,7 @@ int isFragmentChar(int chr);
 int isDigit19(int chr);
 int isDigit04(int chr);
 int isDigit05(int chr);
+int isWhitespace(int chr);
 }
 
-#endif // HTTP_HPP
+#endif
