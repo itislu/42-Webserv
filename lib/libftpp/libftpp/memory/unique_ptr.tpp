@@ -34,15 +34,12 @@ unique_ptr<T, Deleter>::unique_ptr() throw()
 }
 
 template <typename T, typename Deleter /*= default_delete<T> */>
-template <typename Nullptr_t>
-unique_ptr<T, Deleter>::unique_ptr(
-    Nullptr_t /*unused*/,
-    typename ft::enable_if<ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
-                               && !ft::is_pointer<Deleter>::value,
-                           _enabler>::type /*unused = _enabler()*/) throw()
+unique_ptr<T, Deleter>::unique_ptr(ft::nullptr_t /*unused*/) throw()
     : _ptr(),
       _deleter()
-{}
+{
+	FT_STATIC_ASSERT(!ft::is_pointer<Deleter>::value);
+}
 
 // 2)
 template <typename T, typename Deleter /*= default_delete<T> */>

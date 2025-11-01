@@ -93,13 +93,7 @@ public:
 	unique_ptr() throw();
 	// NOLINTBEGIN(google-explicit-constructor): Original in `std::unique_ptr`
 	// is not `explicit`.
-	template <typename Nullptr_t>
-	unique_ptr(Nullptr_t /*unused*/,
-	           typename ft::enable_if<
-	               ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
-	                   && !ft::is_pointer<Deleter>::value,
-	               _enabler>::type /*unused*/
-	           = _enabler()) throw();
+	unique_ptr(ft::nullptr_t /*unused*/) throw();
 	// NOLINTEND(google-explicit-constructor)
 	// 2)
 	template <typename Pointer>
@@ -378,13 +372,7 @@ public:
 	unique_ptr() throw();
 	// NOLINTBEGIN(google-explicit-constructor): Original in `std::unique_ptr`
 	// is not `explicit`.
-	template <typename Nullptr_t>
-	unique_ptr(Nullptr_t /*unused*/,
-	           typename ft::enable_if<
-	               ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
-	                   && !ft::is_pointer<Deleter>::value,
-	               _enabler>::type /*unused*/
-	           = _enabler()) throw();
+	unique_ptr(ft::nullptr_t /*unused*/) throw();
 	// NOLINTEND(google-explicit-constructor)
 	// 2)
 	template <typename U>
