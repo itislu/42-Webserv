@@ -1,5 +1,6 @@
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
+#include <libftpp/memory.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
@@ -43,7 +44,7 @@ bool runParser(const std::string& str, Rule& rule)
  */
 TEST(UriAbnfTest, URI)
 {
-  SequenceRule* s = uriRule();
+  ft::shared_ptr<SequenceRule> s = uriRule();
   // --- minimal valid schemes ---
   EXPECT_TRUE(runParser("http:", *s));
   EXPECT_TRUE(runParser("mailto:user@example.com", *s));
@@ -78,7 +79,6 @@ TEST(UriAbnfTest, URI)
 
   // frag only
   EXPECT_TRUE(runParser("http:#frag", *s));
-  delete s;
 }
 
 /**
@@ -132,7 +132,7 @@ TEST(UriAbnfTest, RelativePart)
  */
 TEST(UriAbnfTest, Scheme)
 {
-  SequenceRule* sequence = schemeRule();
+  ft::shared_ptr<SequenceRule> sequence = schemeRule();
   EXPECT_TRUE(runParser("a1234", *sequence));
   EXPECT_TRUE(runParser("a", *sequence));
   EXPECT_TRUE(runParser("a+", *sequence));
@@ -148,7 +148,7 @@ TEST(UriAbnfTest, Scheme)
  */
 TEST(UriAbnfTest, Authority)
 {
-  SequenceRule* sequence = authorityRule();
+  ft::shared_ptr<SequenceRule> sequence = authorityRule();
   // --- host only ---
   EXPECT_TRUE(runParser("example.com", *sequence));
   EXPECT_TRUE(runParser("localhost", *sequence));
@@ -190,7 +190,7 @@ TEST(UriAbnfTest, Authority)
  */
 TEST(UriAbnfTest, UserInfo)
 {
-  RepetitionRule* rep = userinfoRule();
+  ft::shared_ptr<RepetitionRule> rep = userinfoRule();
   EXPECT_TRUE(runParser("a1234", *rep));
   EXPECT_TRUE(runParser("a:", *rep));
 }
@@ -200,9 +200,8 @@ TEST(UriAbnfTest, UserInfo)
  */
 TEST(UriAbnfTest, Host)
 {
-  AlternativeRule* alter = hostRule();
+  ft::shared_ptr<AlternativeRule> alter = hostRule();
   EXPECT_FALSE(runParser("example.com:abc", *alter));
-  delete alter;
 }
 
 /**
@@ -210,10 +209,9 @@ TEST(UriAbnfTest, Host)
  */
 TEST(UriAbnfTest, Port)
 {
-  RepetitionRule* rep = portRule();
+  ft::shared_ptr<RepetitionRule> rep = portRule();
   EXPECT_FALSE(runParser("abc", *rep));
   EXPECT_TRUE(runParser("8080", *rep));
-  delete rep;
 }
 
 /**
@@ -245,7 +243,7 @@ TEST(UriAbnfTest, IPvFuture)
  */
 TEST(UriAbnfTest, IPv6address)
 {
-  AlternativeRule* alter = ipv6AddressRule();
+  ft::shared_ptr<AlternativeRule> alter = ipv6AddressRule();
 
   // Todo
   // EXPECT_TRUE(runParser("2001:db8::1", *alter));
@@ -272,7 +270,6 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_FALSE(runParser(":::", *alter));
   EXPECT_FALSE(runParser("2001:db8:::", *alter));
   EXPECT_FALSE(runParser("::ffff:999.999.999.999", *alter));
-  delete alter;
 }
 
 /**
@@ -280,7 +277,7 @@ TEST(UriAbnfTest, IPv6address)
  */
 TEST(UriAbnfTest, h16)
 {
-  RepetitionRule* rep = h16Rule();
+  ft::shared_ptr<RepetitionRule> rep = h16Rule();
   EXPECT_TRUE(runParser("0", *rep));
   EXPECT_TRUE(runParser("A", *rep));
   EXPECT_TRUE(runParser("f", *rep));
@@ -305,7 +302,7 @@ TEST(UriAbnfTest, h16)
  */
 TEST(UriAbnfTest, ls32)
 {
-  AlternativeRule* alter = ls32Rule();
+  ft::shared_ptr<AlternativeRule> alter = ls32Rule();
   EXPECT_TRUE(runParser("abcd:1234", *alter));
   EXPECT_TRUE(runParser("0:0", *alter));
   EXPECT_TRUE(runParser("FFFF:FFFF", *alter));
@@ -334,7 +331,7 @@ TEST(UriAbnfTest, ls32)
  */
 TEST(UriAbnfTest, IPv4address_Valid)
 {
-  SequenceRule* sequence = ipv4AddressRule();
+  ft::shared_ptr<SequenceRule> sequence = ipv4AddressRule();
 
   EXPECT_TRUE(runParser("0.0.0.0", *sequence));
   EXPECT_TRUE(runParser("9.9.9.9", *sequence));
@@ -413,7 +410,7 @@ TEST(UriAbnfTest, RegName)
  */
 TEST(UriAbnfTest, Path)
 {
-  AlternativeRule* alter = pathRule();
+  ft::shared_ptr<AlternativeRule> alter = pathRule();
   // path-abempty    ; begins with "/" or is empty
   EXPECT_TRUE(runParser("", *alter));
   EXPECT_TRUE(runParser("/", *alter));
@@ -447,7 +444,7 @@ TEST(UriAbnfTest, Path)
 TEST(UriAbnfTest, PathAbEmpty)
 {
   SequenceRule sequence;
-  RepetitionRule* rep = pathAbEmptyRule();
+  ft::shared_ptr<RepetitionRule> rep = pathAbEmptyRule();
   sequence.addRule(rep);
   EXPECT_TRUE(runParser("/abc/def", sequence));
   EXPECT_TRUE(runParser("/abc/def//", sequence));
@@ -459,7 +456,7 @@ TEST(UriAbnfTest, PathAbEmpty)
  */
 TEST(UriAbnfTest, PathAbsolute)
 {
-  SequenceRule* sequence = pathAbsoluteRule();
+  ft::shared_ptr<SequenceRule> sequence = pathAbsoluteRule();
   EXPECT_TRUE(runParser("/abc/def", *sequence));
   EXPECT_TRUE(runParser("/abc/def//", *sequence));
   EXPECT_TRUE(runParser("/", *sequence));
@@ -474,7 +471,7 @@ TEST(UriAbnfTest, PathAbsolute)
  */
 TEST(UriAbnfTest, PathNoScheme)
 {
-  SequenceRule* sequence = pathNoSchemeRule();
+  ft::shared_ptr<SequenceRule> sequence = pathNoSchemeRule();
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
   EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
@@ -501,7 +498,7 @@ TEST(UriAbnfTest, PathNoScheme)
  */
 TEST(UriAbnfTest, PathRootless)
 {
-  SequenceRule* sequence = pathRootlessRule();
+  ft::shared_ptr<SequenceRule> sequence = pathRootlessRule();
 
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
@@ -524,7 +521,7 @@ TEST(UriAbnfTest, PathRootless)
 TEST(UriAbnfTest, Segment)
 {
   SequenceRule sequence;
-  RepetitionRule* rep = segmentRule();
+  ft::shared_ptr<RepetitionRule> rep = segmentRule();
   sequence.addRule(rep);
   EXPECT_TRUE(runParser("", sequence));
   EXPECT_EQ(rep->getReps(), 0);
@@ -551,7 +548,7 @@ TEST(UriAbnfTest, Segment)
 TEST(UriAbnfTest, SegmentNz)
 {
   SequenceRule sequence;
-  RepetitionRule* rep = segmentNzRule();
+  ft::shared_ptr<RepetitionRule> rep = segmentNzRule();
   sequence.addRule(rep);
   EXPECT_TRUE(runParser("a", sequence));
   EXPECT_EQ(rep->getReps(), 1);
@@ -577,7 +574,7 @@ TEST(UriAbnfTest, SegmentNz)
 TEST(UriAbnfTest, SegmentNzNc)
 {
   SequenceRule sequence;
-  RepetitionRule* rep = segmentNzNcRule();
+  ft::shared_ptr<RepetitionRule> rep = segmentNzNcRule();
   sequence.addRule(rep);
   EXPECT_TRUE(runParser("a", sequence));
   EXPECT_EQ(rep->getReps(), 1);
@@ -610,7 +607,8 @@ TEST(UriAbnfTest, Pchar)
 {
   {
     SequenceRule sequence;
-    RepetitionRule* rep = new RepetitionRule(pcharRule());
+    ft::shared_ptr<RepetitionRule> rep =
+      ft::make_shared<RepetitionRule>(pcharRule());
     rep->setMin(3);
     sequence.addRule(rep);
     EXPECT_TRUE(runParser("user@test", sequence));
@@ -621,7 +619,8 @@ TEST(UriAbnfTest, Pchar)
   {
     // Invalid
     SequenceRule sequence;
-    RepetitionRule* rep = new RepetitionRule(pcharRule());
+    ft::shared_ptr<RepetitionRule> rep =
+      ft::make_shared<RepetitionRule>(pcharRule());
     rep->setMin(4);
     sequence.addRule(rep);
     EXPECT_FALSE(runParser("abc%1Z!ac", sequence));
@@ -654,9 +653,9 @@ TEST(UriAbnfTest, Fragment)
 TEST(UriAbnfTest, PercentEncoded)
 {
   SequenceRule sequence;
-  sequence.addRule(new LiteralRule("%"));
-  sequence.addRule(new RangeRule(http::isHexDigit));
-  sequence.addRule(new RangeRule(http::isHexDigit));
+  sequence.addRule(ft::make_shared<LiteralRule>("%"));
+  sequence.addRule(ft::make_shared<RangeRule>(http::isHexDigit));
+  sequence.addRule(ft::make_shared<RangeRule>(http::isHexDigit));
 
   // Valid
   EXPECT_TRUE(runParser("%aB", sequence));
