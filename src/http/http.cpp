@@ -143,4 +143,20 @@ int isDigit05(int chr)
 {
   return static_cast<int>(chr >= '0' && chr <= '5');
 }
+
+/**
+ * ( SP / HTAB )
+ */
+int isWhitespace(int chr)
+{
+  return static_cast<int>(chr == ' ' || chr == '\t');
+}
+
+int isObsText(int chr)
+{
+  const int begin = 0x80;
+  const int end = 0xFF;
+  return static_cast<int>(chr >= begin && chr <= end);
+}
+
 }

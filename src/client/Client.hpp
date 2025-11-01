@@ -2,9 +2,12 @@
 #define CLIENT_HPP
 
 #include "client/TimeStamp.hpp"
+#include "http/Request.hpp"
+#include "http/Response.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
+#include "utils/state/StateHandler.hpp"
 #include <string>
 
 #ifndef MAX_CHUNK
@@ -20,9 +23,12 @@ public:
 
   int getFd() const;
   const std::string& getHost() const;
-  Buffer getInBuff() const;
-  Buffer getOutBuff() const;
+  Buffer& getInBuff();
+  Buffer& getOutBuff();
   const Server* getServer() const;
+  StateHandler<Client>& getStateHandler();
+  Request& getRequest();
+  Response& getResponse();
 
   void setServer(const Server* server);
 
@@ -36,13 +42,15 @@ public:
 private:
   void updateLastActivity();
 
-  // int _state;
   AutoFd _fd;
   const Server* _server;
   std::string _host;
   TimeStamp _lastActivity;
   Buffer _inBuff;
   Buffer _outBuff;
+  StateHandler<Client> _stateHandler;
+  Request _request;
+  Response _response;
 };
 
 #endif

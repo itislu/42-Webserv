@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GET Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      color: #333;
+    }
+    input {
+      margin: 5px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 250px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2980b9;
+      color: white;
+      cursor: pointer;
+    }
+    pre {
+      margin-top: 20px;
+      width: 80%;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>GET Request Tester</h1>
+
+  <input id="baseUrl" type="text" placeholder="Base URL (e.g. https://api.example.com/users)">
+  <input id="param1Key" type="text" placeholder="Param 1 Key">
+  <input id="param1Value" type="text" placeholder="Param 1 Value">
+  <input id="param2Key" type="text" placeholder="Param 2 Key">
+  <input id="param2Value" type="text" placeholder="Param 2 Value">
+
+  <button id="sendBtn">Send Request</button>
+
+  <pre id="output"></pre>
+
+  <a href="index.html">⬅ Back to Home</a>
+
+  <script>
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+      const base = document.getElementById('baseUrl').value;
+      const key1 = document.getElementById('param1Key').value;
+      const val1 = document.getElementById('param1Value').value;
+      const key2 = document.getElementById('param2Key').value;
+      const val2 = document.getElementById('param2Value').value;
+
+      const params = new URLSearchParams();
+      if (key1 && val1) params.append(key1, val1);
+      if (key2 && val2) params.append(key2, val2);
+
+      const fullUrl = `${base}?${params.toString()}`;
+      const output = document.getElementById('output');
+      output.textContent = `Requesting: ${fullUrl}\n\n`;
+
+      try {
+        const response = await fetch(fullUrl);
+        const text = await response.text();
+        output.textContent += text;
+      } catch (err) {
+        output.textContent += 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

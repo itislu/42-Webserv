@@ -31,6 +31,8 @@ public:
   std::string getString(long fromIndex, long toIndex) const;
   std::string consume(long bytes);
 
+  std::string toString();
+
 private:
   Container _buff;
 };
