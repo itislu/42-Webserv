@@ -12,6 +12,7 @@
 #	include "libftpp/utility.hpp"
 #	include <algorithm>
 #	include <cassert>
+#	include <memory>
 #	include <ostream>
 
 namespace ft {
@@ -98,6 +99,21 @@ unique_ptr<T, Deleter>::unique_ptr(
       _deleter(ft::is_reference<E>::value ? u.get_deleter()
                                           : ft::move(u.get_deleter()))
 {}
+
+#	if __cplusplus <= 201402L
+// 8)
+template <typename T, typename Deleter /*= default_delete<T> */>
+template <typename U>
+unique_ptr<T, Deleter>::unique_ptr(
+    ft::rvalue<std::auto_ptr<U> >& u,
+    typename ft::enable_if<
+        ft::is_convertible<U*, T*>::value
+            && ft::is_same<Deleter, default_delete<T> >::value,
+        _enabler>::type /*unused = _enabler()*/) throw()
+    : _ptr(u.release()),
+      _deleter()
+{}
+#	endif // __cplusplus <= 201402L
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 unique_ptr<T, Deleter>::~unique_ptr()
