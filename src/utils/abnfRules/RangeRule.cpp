@@ -1,5 +1,6 @@
 #include "RangeRule.hpp"
 
+#include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 
@@ -47,7 +48,7 @@ bool RangeRule::matches()
       matches = _range.func(chr) != 0;
       break;
     case Charset:
-      matches = std::strchr(_range.set, chr) != NULL;
+      matches = std::strchr(_range.set, chr) != FT_NULLPTR;
       break;
   }
 
