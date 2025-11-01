@@ -34,7 +34,7 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
 /**
  * @brief ### Read header lines of a HTTP request
  *
- * HTTP-message   = request-line CRLF
+ * HTTP-message   = start-line CRLF
  *                  *( field-line CRLF )
  *                  CRLF
  *                  [ message-body ]
