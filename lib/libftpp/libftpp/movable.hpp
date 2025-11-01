@@ -124,6 +124,25 @@ private:
  */
 template <typename T>
 struct rvalue : public copy_assign_ref<T> {
+public:
+	// template <typename U>
+	// operator U&() {
+	// 	return static_cast<U&>(static_cast<T&>(*this));
+	// }
+	// template <typename U>
+	// operator const U&() const {
+	// 	return static_cast<const U&>(static_cast<const T&>(*this));
+	// }
+
+	// template <typename U>
+	// operator rvalue<U>&() {
+	// 	return static_cast<rvalue<U>&>(static_cast<T&>(*this));
+	// }
+	// template <typename U>
+	// operator const rvalue<U>&() const {
+	// 	return static_cast<const rvalue<U>&>(static_cast<const T&>(*this));
+	// }
+
 private:
 	rvalue();
 	rvalue(const rvalue&);

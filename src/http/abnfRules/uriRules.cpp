@@ -1,8 +1,10 @@
 #include "uriRules.hpp"
 #include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
+#include "utils/abnfRules/Rule.hpp"
 
 #include <http/http.hpp>
+#include <memory>
 #include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
@@ -19,40 +21,40 @@
 /**
  * URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
  */
-ft::unique_ptr<SequenceRule> uriRule()
-{
-  ft::unique_ptr<SequenceRule> seq = new SequenceRule();
+// ft::unique_ptr<SequenceRule> uriRule()
+// {
+//   ft::unique_ptr<SequenceRule> seq = new SequenceRule();
 
-  // scheme ":"
-  seq->addRule(schemeRule());
-  seq->addRule(new LiteralRule(":"));
+//   // scheme ":"
+//   seq->addRule(schemeRule());
+//   seq->addRule(new LiteralRule(":"));
 
-  // hier-part
-  seq->addRule(hierPartRule());
+//   // hier-part
+//   seq->addRule(hierPartRule());
 
-  // [ "?" query ]
-  ft::unique_ptr<SequenceRule> querySeq = new SequenceRule();
-  querySeq->addRule(new LiteralRule("?"));
-  querySeq->addRule(queryRule());
+//   // [ "?" query ]
+//   ft::unique_ptr<SequenceRule> querySeq = new SequenceRule();
+//   querySeq->addRule(new LiteralRule("?"));
+//   querySeq->addRule(queryRule());
 
-  RepetitionRule* optQuery = new RepetitionRule(querySeq);
-  optQuery->setMin(0);
-  optQuery->setMax(1);
-  seq->addRule(optQuery);
+//   RepetitionRule* optQuery = new RepetitionRule(querySeq);
+//   optQuery->setMin(0);
+//   optQuery->setMax(1);
+//   seq->addRule(optQuery);
 
-  // [ "#" fragment ]
-  ft::unique_ptr<SequenceRule> fragSeq = new SequenceRule();
-  fragSeq->addRule(new LiteralRule("#"));
-  fragSeq->addRule(fragmentRule());
+//   // [ "#" fragment ]
+//   ft::unique_ptr<SequenceRule> fragSeq = new SequenceRule();
+//   fragSeq->addRule(new LiteralRule("#"));
+//   fragSeq->addRule(fragmentRule());
 
-  RepetitionRule* optFrag = new RepetitionRule(fragSeq);
-  optFrag->setMin(0);
-  optFrag->setMax(1);
-  seq->addRule(optFrag);
+//   RepetitionRule* optFrag = new RepetitionRule(fragSeq);
+//   optFrag->setMin(0);
+//   optFrag->setMax(1);
+//   seq->addRule(optFrag);
 
-  seq->setDebugTag("uriRule");
-  return seq;
-}
+//   seq->setDebugTag("uriRule");
+//   return seq;
+// }
 
 /**
  * hier-part = "//" authority path-abempty
@@ -60,29 +62,29 @@ ft::unique_ptr<SequenceRule> uriRule()
  *            / path-rootless
  *            / path-empty
  */
-AlternativeRule* hierPartRule()
-{
-  AlternativeRule* alter = new AlternativeRule();
+// AlternativeRule* hierPartRule()
+// {
+//   AlternativeRule* alter = new AlternativeRule();
 
-  // "//" authority path-abempty
-  ft::unique_ptr<SequenceRule> seq1 = new SequenceRule();
-  seq1->addRule(new LiteralRule("//"));
-  seq1->addRule(authorityRule());
-  seq1->addRule(pathAbEmptyRule());
-  alter->addRule(seq1);
+//   // "//" authority path-abempty
+//   ft::unique_ptr<SequenceRule> seq1 = new SequenceRule();
+//   seq1->addRule(new LiteralRule("//"));
+//   seq1->addRule(authorityRule());
+//   seq1->addRule(pathAbEmptyRule());
+//   alter->addRule(seq1);
 
-  // path-absolute
-  alter->addRule(pathAbsoluteRule());
+//   // path-absolute
+//   alter->addRule(pathAbsoluteRule());
 
-  // path-rootless
-  alter->addRule(pathRootlessRule());
+//   // path-rootless
+//   alter->addRule(pathRootlessRule());
 
-  // path-empty
-  alter->addRule(pathEmptyRule());
+//   // path-empty
+//   alter->addRule(pathEmptyRule());
 
-  alter->setDebugTag("hierPartRule");
-  return alter;
-}
+//   alter->setDebugTag("hierPartRule");
+//   return alter;
+// }
 
 /**
  * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
@@ -96,8 +98,25 @@ ft::unique_ptr<SequenceRule> schemeRule()
     ft::make_unique<RepetitionRule>(ft::move(range));
 
   ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
-  seq->addRule(ft::make_unique<RangeRule>(::isalpha));
+  ft::unique_ptr<Rule> init = ft::make_unique<RangeRule>(::isalpha);
+  ft::unique_ptr<Rule> init2(new RangeRule(::isalpha));
+  ft::unique_ptr<Rule> init3(ft::make_unique<RangeRule>(::isalpha));
+  ft::unique_ptr<int> init4(ft::make_unique<RangeRule>(::isalpha)); // ughh...
+  seq->addRule(static_cast<ft::unique_ptr<Rule> >(ft::make_unique<RangeRule>(::isalpha)));
+  seq->addRule(init3);
   seq->addRule(ft::move(rep));
+  seq->addRule(ft::move<ft::unique_ptr<Rule> >(rep));
+  seq->addRule(rep);
+  seq->addRule(ft::unique_ptr<Rule>(new RangeRule(::isalpha)));
+  seq->addRule(ft::unique_ptr<Rule>(ft::make_unique<RangeRule>(::isalpha)));
+  seq->addRule(ft::unique_ptr<Rule>(ft::move(rep)));
+  seq->addRule(rep.release());
+  ft::unique_ptr<Rule> r = rep.release();
+  seq->addRule(ft::make_unique<RangeRule>(::isalpha));
+
+  
+  seq->addRule(ft::unique_ptr<Rule>(ft::make_unique<RangeRule>(::isalpha)));
+  seq->addRule(ft::unique_ptr<Rule>(ft::move(rep)));
 
   seq->setDebugTag("schemeRule");
   return ft::move(seq);

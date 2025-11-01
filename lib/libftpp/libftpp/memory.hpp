@@ -122,6 +122,13 @@ public:
 	// 5)
 	unique_ptr(ft::rvalue<unique_ptr>& u) throw();
 	// 6)
+	// template <typename U, typename E>
+	// unique_ptr(unique_ptr<U, E>& u,
+	//            typename ft::enable_if<
+	//                _is_compatible_unique_ptr<U, E>::value
+	//                    && _unique_ptr::is_compatible_deleter<E, Deleter>::value,
+	//                _enabler>::type /*unused*/
+	//            = _enabler()) throw();
 	template <typename U, typename E>
 	unique_ptr(ft::rvalue<unique_ptr<U, E> >& u,
 	           typename ft::enable_if<
@@ -153,6 +160,19 @@ public:
 
 	typename ft::add_lvalue_reference<T>::type operator*() const;
 	pointer operator->() const throw();
+
+
+
+	template <typename U, typename E>
+	operator ft ::rvalue<unique_ptr<U, E> >&() throw()
+	{
+		return static_cast<ft ::rvalue<unique_ptr<U, E> >&>(*this);
+	}
+	template <typename U, typename E>
+	operator const ft ::rvalue<unique_ptr<U, E> >&() const throw()
+	{
+		return static_cast<const ft ::rvalue<unique_ptr<U, E> >&>(*this);
+	}
 
 private:
 	FT_MOVABLE_BUT_NOT_COPYABLE(unique_ptr)

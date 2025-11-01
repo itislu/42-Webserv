@@ -21,6 +21,18 @@ move(T& t) throw()
 	    T&>::type>(t);
 }
 
+template <typename U, typename T>
+typename ft::conditional<ft::is_class_or_union<T>::value,
+                         ft::rvalue<typename ft::remove_reference<U&>::type>&,
+                         U&>::type
+move(T& t) throw()
+{
+	return static_cast<typename ft::conditional<
+	    ft::is_class_or_union<T>::value,
+	    ft::rvalue<typename ft::remove_reference<U&>::type>&,
+	    U&>::type>(t);
+}
+
 } // namespace ft
 
 #endif // LIBFTPP_UTILITY_MOVE_TPP
