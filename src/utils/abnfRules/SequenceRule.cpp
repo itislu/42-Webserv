@@ -95,13 +95,13 @@ void SequenceRule::_setNextRule()
 
 bool SequenceRule::_isRepetitionRule(Rule* rule)
 {
-  return dynamic_cast<RepetitionRule*>(rule) != NULL;
+  return dynamic_cast<RepetitionRule*>(rule) != FT_NULLPTR;
 }
 
 bool SequenceRule::_isRepOrSeqRule(Rule* rule)
 {
-  return dynamic_cast<RepetitionRule*>(rule) != NULL ||
-         dynamic_cast<SequenceRule*>(rule) != NULL;
+  return dynamic_cast<RepetitionRule*>(rule) != FT_NULLPTR ||
+         dynamic_cast<SequenceRule*>(rule) != FT_NULLPTR;
 }
 
 bool SequenceRule::_isLastRule() const

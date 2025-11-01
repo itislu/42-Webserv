@@ -1,10 +1,10 @@
 #include "Rule.hpp"
 
 #include <libftpp/format.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 
-#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -23,10 +23,10 @@ Rule::Rule()
   , _startPos()
   , _endPos()
   , _ruleId(_ruleIdUndefined)
-  , _results(NULL)
+  , _results(FT_NULLPTR)
   , _debugPrintIndent(_debugInitPrintIndent)
-  , _debugTag(NULL)
-  , _debugMatchReason(NULL)
+  , _debugTag(FT_NULLPTR)
+  , _debugMatchReason(FT_NULLPTR)
 {
   setDebugTag("Base Rule");
 }
@@ -130,7 +130,7 @@ void Rule::moveToEndPos()
 
 void Rule::addRuleResult(bool matches)
 {
-  if (_results == NULL || _ruleId == _ruleIdUndefined || !matches) {
+  if (_results == FT_NULLPTR || _ruleId == _ruleIdUndefined || !matches) {
     return;
   }
   ResultMap& results = *_results;
@@ -163,7 +163,7 @@ void Rule::debugPrintMatchStatus(bool matches)
     std::cout << ft::red("no match");
   }
 
-  if (_debugMatchReason != NULL) {
+  if (_debugMatchReason != FT_NULLPTR) {
     std::cout << "  (" << _debugMatchReason << ")";
   }
 
