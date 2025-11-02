@@ -3,7 +3,6 @@
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 
-#include <algorithm>
 #include <cstddef>
 
 /* ************************************************************************** */
@@ -100,8 +99,11 @@ bool AlternativeRule::_greedyMode()
     _rules[i]->setDebugPrintIndent(getDebugPrintIndent() + 2);
 
     if (_rules[i]->matches()) {
-      setEndPos(std::max(getBuffReader()->getPosInBuff(), getEndPos()));
       somethingMatched = true;
+      if (getBuffReader()->getPosInBuff() > getEndPos()) {
+        setEndOfRule(_rules[i]->end());
+        setEndPos(getBuffReader()->getPosInBuff());
+      }
     }
     rewindToStartPos();
   }

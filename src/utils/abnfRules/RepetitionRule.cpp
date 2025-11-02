@@ -53,6 +53,7 @@ bool RepetitionRule::matches()
     setDebugMatchReason("_minReps == 0");
     _reachedMin = true;
   }
+  setEndOfRule(_reachedMin);
   addRuleResult(_reachedMin);
   debugPrintMatchStatus(_reachedMin);
   return _reachedMin;

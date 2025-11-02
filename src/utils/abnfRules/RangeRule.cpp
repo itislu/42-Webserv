@@ -39,9 +39,7 @@ bool RangeRule::matches()
   }
   const char chr = getBuffReader()->getNextChar();
 
-  setEndOfRule(true);
   bool matches = false;
-
   switch (_range.type) {
     case Func:
       matches = _range.func(chr) != 0;
@@ -51,6 +49,7 @@ bool RangeRule::matches()
       break;
   }
 
+  setEndOfRule(true);
   debugPrintMatchStatus(matches);
   return matches;
 }

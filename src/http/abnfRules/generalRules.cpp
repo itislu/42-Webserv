@@ -5,13 +5,10 @@
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
-#include <utils/abnfRules/SequenceRule.hpp>
 
-SequenceRule* endOfLineRule()
+LiteralRule* endOfLineRule()
 {
-  SequenceRule* seq = new SequenceRule();
-  seq->addRule(new LiteralRule("\r"));
-  seq->addRule(new LiteralRule("\n"));
+  LiteralRule* seq = new LiteralRule("\r\n");
 
   seq->setDebugTag("endOfLineRule");
   seq->setRuleId(EndOfLine);

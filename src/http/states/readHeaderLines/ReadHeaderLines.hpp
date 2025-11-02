@@ -1,11 +1,11 @@
 #pragma once
-#include "utils/abnfRules/LiteralRule.hpp"
 #ifndef READ_HEADER_LINES_HPP
 #define READ_HEADER_LINES_HPP
 
-#include "libftpp/memory.hpp"
-#include "utils/BufferReader.hpp"
-#include "utils/abnfRules/Rule.hpp"
+#include <libftpp/memory.hpp>
+#include <utils/BufferReader.hpp>
+#include <utils/abnfRules/LiteralRule.hpp>
+#include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/state/IState.hpp>
 
@@ -24,12 +24,13 @@ public:
 private:
   void _init();
   void _readLines();
+  bool _hasEndOfLine();
   std::string _extractPart(const Rule::RuleId& ruleId);
   void _addLineToHeaders(const std::string& line);
 
   Client* _client;
   ft::unique_ptr<SequenceRule> _fieldLine;
-  SequenceRule* _endOfLine;
+  LiteralRule* _endOfLine;
   BufferReader _buffReader;
   Rule::ResultMap _results;
 };

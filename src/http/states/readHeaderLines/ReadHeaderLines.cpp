@@ -70,7 +70,7 @@ void ReadHeaderLines::_readLines()
         const std::string fieldLine = _extractPart(FieldLinePart);
         _addLineToHeaders(fieldLine);
       }
-    } else if (_endOfLine->matches()) {
+    } else if (_hasEndOfLine()) {
       if (_endOfLine->end()) {
         _extractPart(EndOfLine);
         getContext()->getStateHandler().setDone();
@@ -82,6 +82,12 @@ void ReadHeaderLines::_readLines()
       return;
     }
   }
+}
+
+bool ReadHeaderLines::_hasEndOfLine()
+{
+  _buffReader.resetPosInBuff();
+  return _endOfLine->matches();
 }
 
 std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)

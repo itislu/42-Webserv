@@ -87,14 +87,9 @@ void SequenceRule::addRule(Rule* rule)
 
 void SequenceRule::_setNextRule()
 {
-  // If the current rule is a sequence
-  // check if the sequence also reached the end
-  const SequenceRule* const currSeq =
-    dynamic_cast<SequenceRule*>(_rules[_currRule]);
-  if (currSeq != NULL) {
-    if (!currSeq->end()) {
-      return;
-    }
+  // the current rule has to be at the end to go to the next rule
+  if (!_rules[_currRule]->end()) {
+    return;
   }
 
   if (_currRule < _rules.size()) {
