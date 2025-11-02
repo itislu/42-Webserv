@@ -37,6 +37,7 @@ jobs:
           version: '20'
           files-changed-only: false # Changes in header files can affect other files.
           ignore: 'build'
+          thread-comments: true
           step-summary: true
           database: 'build'
           tidy-review: true
