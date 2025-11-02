@@ -28,6 +28,7 @@ jobs:
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
+          CPP_LINTER_PR_REVIEW_SUMMARY_ONLY: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           style: 'file' # Use .clang-format config file.
