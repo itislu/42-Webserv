@@ -1,4 +1,5 @@
 #pragma once
+#include "utils/abnfRules/LiteralRule.hpp"
 #ifndef READ_HEADER_LINES_HPP
 #define READ_HEADER_LINES_HPP
 

@@ -2,7 +2,8 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
-#include "http/Uri.hpp"
+#include <http/Uri.hpp>
+#include <libftpp/array.hpp>
 
 #include <cstddef>
 #include <map>
@@ -41,7 +42,7 @@ public:
 private:
   struct MethodMap;
   static const int _methods = 3;
-  static const MethodMap _methodMap[_methods];
+  static const ft::array<MethodMap, _methods> _methodMap;
   static std::size_t _getMaxMethodLen() throw();
 
   Method _method;

@@ -1,5 +1,6 @@
 #include "StatusCode.hpp"
 
+#include <libftpp/array.hpp>
 #include <libftpp/utility.hpp>
 
 #include <cassert>
@@ -11,13 +12,12 @@
 /* ************************************************************************** */
 // INIT
 
-const StatusCode::CodeEntry StatusCode::_codeMap[_codes] = {
-  { Ok, "Ok" },
-  { BadRequest, "Bad Request" },
-  { Unauthorized, "Unauthorized" }
-};
+const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
+  StatusCode::_codeMap = { { { Ok, "Ok" },
+                             { BadRequest, "Bad Request" },
+                             { Unauthorized, "Unauthorized" } } };
 
-/* ************************************************************************** */
+/* ***************************************************************************/
 // PUBLIC
 
 StatusCode::StatusCode()
@@ -65,10 +65,9 @@ std::ostream& operator<<(std::ostream& out, const StatusCode& statuscode)
 /* ************************************************************************** */
 // PRIVATE
 
-// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 void StatusCode::_findReason()
 {
-  for (int i = 0; i < _codes; i++) {
+  for (std::size_t i = 0; i < _codeMap.size(); i++) {
     if (_code == _codeMap[i].code) {
       _reason = _codeMap[i].reason;
       return;
@@ -77,4 +76,3 @@ void StatusCode::_findReason()
   assert(false && "StatusCode: code out of range");
   FT_UNREACHABLE();
 }
-// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)

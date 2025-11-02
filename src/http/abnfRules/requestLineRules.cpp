@@ -3,7 +3,6 @@
 
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
-#include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
@@ -18,12 +17,7 @@ SequenceRule* authorityPartRule()
   seq->addRule(new LiteralRule("//"));
   seq->addRule(authorityRule());
 
-  AlternativeRule* terminator = new AlternativeRule();
-  terminator->addRule(new LiteralRule("/"));
-  terminator->addRule(new LiteralRule("?"));
-  terminator->addRule(new LiteralRule("#"));
-  terminator->addRule(new LiteralRule(" "));
-  terminator->setDebugTag("authTerminator");
+  RangeRule* const terminator = new RangeRule("/?# ");
   seq->addRule(terminator);
 
   seq->setDebugTag("authorityPartRule");

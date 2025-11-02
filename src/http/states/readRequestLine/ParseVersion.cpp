@@ -12,7 +12,7 @@
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cctype>
+#include <ctype.h>
 #include <string>
 
 /* ************************************************************************** */
