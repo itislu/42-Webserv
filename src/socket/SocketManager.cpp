@@ -2,6 +2,7 @@
 #include "Socket.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
+#include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 #include <cassert>
 #include <cstddef>
@@ -21,19 +22,11 @@ SocketManager::SocketManager(const Config& config)
   createListeningSockets(config.getServers());
 }
 
-SocketManager::~SocketManager()
-{
-  for (sockIter it = _sockets.begin(); it != _sockets.end(); ++it) {
-    delete (*it);
-  }
-}
-
 // only call in the constructor - because no exception guarantee
 void SocketManager::createListeningSockets(
   const std::vector<ServerConfig>& configs)
 {
-  for (std::vector<ServerConfig>::const_iterator it = configs.begin();
-       it != configs.end();
+  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     createListener(it->getPorts());
   }
@@ -47,17 +40,17 @@ void SocketManager::createListener(const std::vector<int>& ports)
     if (listenerExists(*it)) {
       continue;
     }
-    const Socket* const socket = new Socket(*it);
+    const ft::shared_ptr<const Socket> socket =
+      ft::make_shared<const Socket>(*it);
     _sockets.push_back(socket);
-    _listeners.insert(std::make_pair(socket->getFd(), socket));
+    _listeners.insert(std::make_pair(socket->getFd(), socket.get()));
     addToPfd(socket->getFd());
   }
 }
 
 bool SocketManager::listenerExists(int port) const
 {
-  for (std::map<int, const Socket*>::const_iterator it = _listeners.begin();
-       it != _listeners.end();
+  for (const_FdToSockIter it = _listeners.begin(); it != _listeners.end();
        ++it) {
     if (it->second->getPort() == port) {
       return true;
@@ -68,8 +61,7 @@ bool SocketManager::listenerExists(int port) const
 
 bool SocketManager::isListener(int fdes) const
 {
-  const std::map<int, const Socket*>::const_iterator iter =
-    _listeners.find(fdes);
+  const const_FdToSockIter iter = _listeners.find(fdes);
   return iter != _listeners.end();
 }
 
@@ -149,18 +141,17 @@ void SocketManager::disablePollout(int fdes)
 
 const Socket& SocketManager::getSocket(int fdes) const
 {
-  const std::map<int, const Socket*>::const_iterator iter =
-    _listeners.find(fdes);
+  const const_FdToSockIter iter = _listeners.find(fdes);
   assert(iter != _listeners.end() && "SocketManager::getSocket: fd not found");
-  return (*iter->second);
+  return *iter->second;
 }
 
 const Socket& SocketManager::getListener(int port) const
 {
-  for (const_fdToSockIter it = _listeners.begin(); it != _listeners.end();
+  for (const_FdToSockIter it = _listeners.begin(); it != _listeners.end();
        ++it) {
     if (it->second->getPort() == port) {
-      return (*it->second);
+      return *it->second;
     }
   }
   assert(false && "SocketManager::getListener: port not found");
@@ -181,7 +172,7 @@ void SocketManager::removePfd(int fdes)
 
 void SocketManager::removeFdFromMap(int fdes)
 {
-  const fdToSockIter iter = _fdToSocket.find(fdes);
+  const FdToSockIter iter = _fdToSocket.find(fdes);
   if (iter != _fdToSocket.end()) {
     _fdToSocket.erase(iter);
   }
