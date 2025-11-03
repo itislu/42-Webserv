@@ -1,8 +1,9 @@
-// IWYU pragma: private; include "libftpp/utility.hpp"
+// IWYU pragma: private; include "libftpp/movable.hpp"
 #pragma once
-#ifndef LIBFTPP_UTILITY_MOVE_IPP
-#	define LIBFTPP_UTILITY_MOVE_IPP
+#ifndef LIBFTPP_MOVABLE_MOVABLE_IPP
+#	define LIBFTPP_MOVABLE_MOVABLE_IPP
 
+// NOLINTBEGIN(cppcoreguidelines-pro-type-static-cast-downcast): CRTP.
 #	define LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)            \
 		operator ft::rvalue<TYPE>&() throw()                    \
 		{                                                       \
@@ -12,6 +13,7 @@
 		{                                                       \
 			return static_cast<const ft::rvalue<TYPE>&>(*this); \
 		}
+// NOLINTEND(cppcoreguidelines-pro-type-static-cast-downcast)
 
 // NOLINTBEGIN(bugprone-macro-parentheses): Not valid syntax.
 // NOLINTBEGIN(bugprone-unhandled-self-assignment): Only forwarding.
@@ -22,9 +24,9 @@
 	public:                                         \
 		LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)    \
 	public:                                         \
-		TYPE& operator=(TYPE& t)                    \
+		TYPE& operator=(TYPE& other)                \
 		{                                           \
-			*this = const_cast<const TYPE&>(t);     \
+			*this = const_cast<const TYPE&>(other); \
 			return *this;                           \
 		}                                           \
                                                     \
@@ -40,15 +42,15 @@
 	private:
 
 // NOLINTBEGIN(bugprone-macro-parentheses): Not valid syntax.
-#	define LIBFTPP_MOVABLE_BUT_NOT_COPYABLE_IMPL(TYPE)          \
-	public:                                                      \
-		LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)                 \
-	private:                                                     \
-		TYPE(TYPE&);                                             \
-		TYPE& operator=(TYPE&);                                  \
-		TYPE& operator=(const ft::copy_assign_ref<TYPE>& other); \
-                                                                 \
+#	define LIBFTPP_MOVABLE_BUT_NOT_COPYABLE_IMPL(TYPE)    \
+	public:                                                \
+		LIBFTPP_IMPLICIT_RVALUE_CONVERSION(TYPE)           \
+	private:                                               \
+		TYPE(TYPE&);                                       \
+		TYPE& operator=(TYPE&);                            \
+		TYPE& operator=(const ft::copy_assign_ref<TYPE>&); \
+                                                           \
 	private:
 // NOLINTEND(bugprone-macro-parentheses)
 
-#endif // LIBFTPP_UTILITY_MOVE_IPP
+#endif // LIBFTPP_MOVABLE_MOVABLE_IPP

@@ -12,7 +12,7 @@ namespace ft {
 template <typename Derived>
 safe_bool<Derived>::operator safe_bool_t() const
 {
-	return (static_cast<const Derived*>(this))->boolean_test()
+	return static_cast<const Derived*>(this)->operator_bool()
 	           ? &safe_bool_base::this_type_does_not_support_comparisons
 	           : FT_NULLPTR;
 }

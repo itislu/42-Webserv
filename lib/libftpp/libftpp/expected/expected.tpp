@@ -20,7 +20,7 @@ expected<T, E>::expected()
 
 template <typename T, typename E>
 expected<T, E>::expected(const expected& other)
-    : ft::safe_bool<expected<T, E> >(),
+    : ft::safe_bool<expected>(),
       _has_value(false)
 {
 	if (other._has_value) {
@@ -113,7 +113,7 @@ T& expected<T, E>::operator*() throw()
 }
 
 template <typename T, typename E>
-bool expected<T, E>::boolean_test() const throw()
+bool expected<T, E>::operator_bool() const throw()
 {
 	return _has_value;
 }

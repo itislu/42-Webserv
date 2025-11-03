@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "libftpp/type_traits.hpp"
 #pragma once
 #ifndef LIBFTPP_TYPE_TRAITS_REQUIRES_IPP
 #	define LIBFTPP_TYPE_TRAITS_REQUIRES_IPP

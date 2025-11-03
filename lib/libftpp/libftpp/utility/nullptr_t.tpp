@@ -1,3 +1,4 @@
+// IWYU pragma: private; include "libftpp/utility.hpp"
 #pragma once
 #ifndef LIBFTPP_UTILITY_NULLPTR_T_TPP
 #	define LIBFTPP_UTILITY_NULLPTR_T_TPP
