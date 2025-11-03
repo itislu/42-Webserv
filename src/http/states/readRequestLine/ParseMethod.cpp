@@ -45,7 +45,7 @@ void ParseMethod::run()
     return;
   }
 
-  if (_sequence.end()) {
+  if (_sequence.reachedEnd()) {
     _extractMethod();
     getContext()->getStateHandler().setState<ParseUri>();
     return;

@@ -98,7 +98,7 @@ bool AlternativeRule::_greedyMode()
     if (_rules[i]->matches()) {
       somethingMatched = true;
       if (getBuffReader()->getPosInBuff() > getEndPos()) {
-        setReachedEnd(_rules[i]->end());
+        setReachedEnd(_rules[i]->reachedEnd());
         setEndPos(getBuffReader()->getPosInBuff());
       }
     }

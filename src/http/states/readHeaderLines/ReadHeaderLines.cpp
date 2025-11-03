@@ -65,12 +65,12 @@ void ReadHeaderLines::_readLines()
     _endOfLine->reset();
 
     if (_fieldLine->matches()) {
-      if (_fieldLine->end()) {
+      if (_fieldLine->reachedEnd()) {
         const std::string fieldLine = _extractPart(FieldLinePart);
         _addLineToHeaders(fieldLine);
       }
     } else if (_hasEndOfLine()) {
-      if (_endOfLine->end()) {
+      if (_endOfLine->reachedEnd()) {
         _extractPart(EndOfLine);
         getContext()->getStateHandler().setDone();
         return;

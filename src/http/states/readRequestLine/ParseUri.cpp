@@ -95,7 +95,7 @@ void ParseUri::_parseScheme()
     _updateState(ParseAuthority);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(SchemePart)) {
       std::string scheme = _extractPart(SchemePart);
       scheme = scheme.substr(0, scheme.size() - 1); // remove "http:" -> "http"
@@ -120,7 +120,7 @@ void ParseUri::_parseAuthority()
     _updateState(ParsePath);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(AuthorityPart)) {
       std::string auth = _extractPartWithoutCurrChar(AuthorityPart);
       auth = auth.substr(2, auth.size()); // remove '//'
@@ -143,7 +143,7 @@ void ParseUri::_parsePath()
     _updateState(ParseDone);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(PathPart)) {
       std::string path = _extractPartWithoutCurrChar(PathPart);
       ft::trim(path);
@@ -166,7 +166,7 @@ void ParseUri::_parseQuery()
     _updateState(ParseDone);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(QueryPart)) {
       std::string query = _extractPartWithoutCurrChar(QueryPart);
       ft::trim(query);
@@ -190,7 +190,7 @@ void ParseUri::_parseFragment()
     return;
   }
 
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(FragmentPart)) {
       std::string frag = _extractPartWithoutCurrChar(FragmentPart);
       ft::trim(frag);

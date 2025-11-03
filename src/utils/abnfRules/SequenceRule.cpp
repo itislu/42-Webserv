@@ -39,7 +39,7 @@ bool SequenceRule::matches()
     }
   }
 
-  if (getBuffReader()->reachedEnd() && !end()) {
+  if (getBuffReader()->reachedEnd() && !reachedEnd()) {
     setDebugMatchReason("end of buffer; not end of seq");
   }
 
@@ -85,7 +85,7 @@ void SequenceRule::addRule(ft::shared_ptr<Rule> rule)
 void SequenceRule::_setNextRule()
 {
   // the current rule has to be at the end to go to the next rule
-  if (!_rules[_currRule]->end()) {
+  if (!_rules[_currRule]->reachedEnd()) {
     return;
   }
 

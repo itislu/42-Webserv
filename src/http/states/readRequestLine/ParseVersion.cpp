@@ -48,7 +48,7 @@ void ParseVersion::run()
     return;
   }
 
-  if (_sequence.end()) {
+  if (_sequence.reachedEnd()) {
     _extractVersion();
     getContext()->getStateHandler().setDone();
     return;
