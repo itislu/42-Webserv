@@ -5,7 +5,6 @@
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 
-#include <algorithm>
 #include <cstddef>
 
 /* ************************************************************************** */
@@ -43,7 +42,7 @@ void AlternativeRule::reset()
   for (std::size_t i = 0; i < _rules.size(); i++) {
     _rules[i]->reset();
   }
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void AlternativeRule::setBufferReader(BufferReader* bufferReader)
@@ -97,8 +96,11 @@ bool AlternativeRule::_greedyMode()
     _rules[i]->setDebugPrintIndent(getDebugPrintIndent() + 2);
 
     if (_rules[i]->matches()) {
-      setEndPos(std::max(getBuffReader()->getPosInBuff(), getEndPos()));
       somethingMatched = true;
+      if (getBuffReader()->getPosInBuff() > getEndPos()) {
+        setReachedEnd(_rules[i]->reachedEnd());
+        setEndPos(getBuffReader()->getPosInBuff());
+      }
     }
     rewindToStartPos();
   }

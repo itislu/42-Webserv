@@ -24,7 +24,7 @@ bool SequenceRule::matches()
   debugPrintRuleEntry();
   setStartPos(getBuffReader()->getPosInBuff());
   bool matches = true;
-  while (!getBuffReader()->reachedEnd()) {
+  while (matches && !getBuffReader()->reachedEnd()) {
 
     _rules[_currRule]->setDebugPrintIndent(getDebugPrintIndent() + 2);
     matches = _rules[_currRule]->matches();
@@ -34,16 +34,12 @@ bool SequenceRule::matches()
     }
 
     if (_currRule >= _rules.size()) {
-      setEndOfRule(true);
-      break;
-    }
-
-    if (!matches) {
+      setReachedEnd(true);
       break;
     }
   }
 
-  if (getBuffReader()->reachedEnd() && !end()) {
+  if (getBuffReader()->reachedEnd() && !reachedEnd()) {
     setDebugMatchReason("end of buffer; not end of seq");
   }
 
@@ -59,7 +55,7 @@ void SequenceRule::reset()
     _rules[i]->reset();
   }
   _currRule = 0;
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void SequenceRule::setBufferReader(BufferReader* bufferReader)
@@ -88,6 +84,11 @@ void SequenceRule::addRule(ft::shared_ptr<Rule> rule)
 
 void SequenceRule::_setNextRule()
 {
+  // the current rule has to be at the end to go to the next rule
+  if (!_rules[_currRule]->reachedEnd()) {
+    return;
+  }
+
   if (_currRule < _rules.size()) {
     _currRule++;
   }

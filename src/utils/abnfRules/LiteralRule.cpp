@@ -25,7 +25,7 @@ bool LiteralRule::matches()
     matches = chr == _literal[_pos];
     _pos++;
     if (_pos >= _literal.size()) {
-      setEndOfRule(true);
+      setReachedEnd(true);
       break;
     }
     if (!matches) {
@@ -41,7 +41,7 @@ bool LiteralRule::matches()
 void LiteralRule::reset()
 {
   _pos = 0;
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void LiteralRule::setBufferReader(BufferReader* bufferReader)

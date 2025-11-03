@@ -1,10 +1,13 @@
 #include "Client.hpp"
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
+#include "http/Request.hpp"
+#include "http/Response.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
+#include "utils/state/StateHandler.hpp"
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>
@@ -17,20 +20,22 @@
 
 Client::Client()
   : _fd(-1)
-  //, _state(0)
   , _server()
+  , _stateHandler(this)
 {
 }
 
 Client::Client(int fdes)
   : _fd(fdes)
   , _server()
+  , _stateHandler(this)
 {
 }
 
 Client::Client(int fdes, const Server* server)
   : _fd(fdes)
   , _server(server)
+  , _stateHandler(this)
 {
 }
 
@@ -44,14 +49,29 @@ const std::string& Client::getHost() const
   return _host;
 }
 
-const Buffer& Client::getInBuff() const
+Buffer& Client::getInBuff()
 {
   return _inBuff;
 }
 
-const Buffer& Client::getOutBuff() const
+Buffer& Client::getOutBuff()
 {
   return _outBuff;
+}
+
+StateHandler<Client>& Client::getStateHandler()
+{
+  return _stateHandler;
+}
+
+Request& Client::getRequest()
+{
+  return _request;
+}
+
+Response& Client::getResponse()
+{
+  return _response;
 }
 
 long Client::getTimeout() const
