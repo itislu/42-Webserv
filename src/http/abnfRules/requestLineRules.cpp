@@ -2,6 +2,8 @@
 
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -10,19 +12,19 @@
  * authority-part = "//" authority
  *                  ; terminated by "/" or "?" or "#" or end of URI
  */
-SequenceRule* authorityPartRule()
+ft::unique_ptr<SequenceRule> authorityPartRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
 
-  seq->addRule(new LiteralRule("//"));
+  seq->addRule(ft::make_shared<LiteralRule>("//"));
   seq->addRule(authorityRule());
 
-  RangeRule* const terminator = new RangeRule("/?# ");
-  seq->addRule(terminator);
+  ft::shared_ptr<RangeRule> terminator = ft::make_shared<RangeRule>("/?# ");
+  seq->addRule(ft::move(terminator));
 
   seq->setDebugTag("authorityPartRule");
   seq->setRuleId(AuthorityPart);
-  return seq;
+  return ft::move(seq);
 }
 
 /**
@@ -30,57 +32,57 @@ SequenceRule* authorityPartRule()
  * by the first question mark ("?") or number sign ("#") character, or
  * by the end of the URI.
  */
-SequenceRule* pathPartRule()
+ft::unique_ptr<SequenceRule> pathPartRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
 
   seq->addRule(pathRule());
 
-  RangeRule* const terminator = new RangeRule("?# ");
-  seq->addRule(terminator);
+  ft::shared_ptr<RangeRule> terminator = ft::make_shared<RangeRule>("?# ");
+  seq->addRule(ft::move(terminator));
 
   seq->setDebugTag("pathPartRule");
   seq->setRuleId(PathPart);
-  return seq;
+  return ft::move(seq);
 }
 
-SequenceRule* schemePartRule()
+ft::unique_ptr<SequenceRule> schemePartRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
 
   seq->addRule(schemeRule());
-  seq->addRule(new LiteralRule(":"));
+  seq->addRule(ft::make_shared<LiteralRule>(":"));
   seq->setRuleId(SchemePart);
 
   seq->setDebugTag("schemePartRule");
-  return seq;
+  return ft::move(seq);
 }
 
-SequenceRule* queryPartRule()
+ft::unique_ptr<SequenceRule> queryPartRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
 
-  seq->addRule(new LiteralRule("?"));
+  seq->addRule(ft::make_shared<LiteralRule>("?"));
   seq->addRule(queryRule());
-  RangeRule* const terminator = new RangeRule("# ");
-  seq->addRule(terminator);
+  ft::shared_ptr<RangeRule> terminator = ft::make_shared<RangeRule>("# ");
+  seq->addRule(ft::move(terminator));
 
   seq->setDebugTag("queryPartRule");
   seq->setRuleId(QueryPart);
-  return seq;
+  return ft::move(seq);
 }
 
-SequenceRule* fragmentPartRule()
+ft::unique_ptr<SequenceRule> fragmentPartRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
 
-  seq->addRule(new LiteralRule("#"));
+  seq->addRule(ft::make_shared<LiteralRule>("#"));
   seq->addRule(fragmentRule());
 
-  LiteralRule* const terminator = new LiteralRule(" ");
-  seq->addRule(terminator);
+  ft::shared_ptr<LiteralRule> terminator = ft::make_shared<LiteralRule>(" ");
+  seq->addRule(ft::move(terminator));
 
   seq->setDebugTag("fragmentPartRule");
   seq->setRuleId(FragmentPart);
-  return seq;
+  return ft::move(seq);
 }

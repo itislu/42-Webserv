@@ -30,7 +30,9 @@ private:
 
   Client* _client;
   ft::unique_ptr<SequenceRule> _fieldLine;
-  LiteralRule* _endOfLine;
+  // Could be unique_ptr, but gets assigned from a function returning
+  // shared_ptr.
+  ft::shared_ptr<LiteralRule> _endOfLine;
   BufferReader _buffReader;
   Rule::ResultMap _results;
 };

@@ -26,11 +26,11 @@ ft::unique_ptr<SequenceRule> fieldLinePartRule()
 /**
  * field-line   = field-name ":" OWS field-value OWS
  */
-SequenceRule* fieldLineRule()
+ft::shared_ptr<SequenceRule> fieldLineRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  const ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
   seq->addRule(fieldNameRule());
-  seq->addRule(new LiteralRule(":"));
+  seq->addRule(ft::make_shared<LiteralRule>(":"));
   seq->addRule(owsRule());
   seq->addRule(fieldValueRule());
   seq->addRule(owsRule());
@@ -40,18 +40,20 @@ SequenceRule* fieldLineRule()
 }
 
 // TODO this is just a test function
-RepetitionRule* fieldNameRule()
+ft::shared_ptr<RepetitionRule> fieldNameRule()
 {
-  RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isTchar));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(http::isTchar));
 
   rep->setDebugTag("fieldNameRule");
   return rep;
 }
 
 // TODO this is just a test function
-RepetitionRule* fieldValueRule()
+ft::shared_ptr<RepetitionRule> fieldValueRule()
 {
-  RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isTchar));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(http::isTchar));
 
   rep->setDebugTag("fieldValueRule");
   return rep;

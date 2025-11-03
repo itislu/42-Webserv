@@ -22,7 +22,6 @@
 ReadHeaderLines::ReadHeaderLines(Client* context)
   : IState(context)
   , _client(context)
-  , _endOfLine()
   , _buffReader()
 {
   _init();
