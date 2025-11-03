@@ -12,9 +12,9 @@
 // Blocks are wrapped in { } (like server { ... }, location { ... })
 // Comments start with # - ignore rest of the line
 
-ConfigParser::ConfigParser(const char* path) : _filepath(path)
+ConfigParser::ConfigParser(const char* path)
+  : _filepath(path)
 {
-  
 }
 
 void ConfigParser::validateInputFile() const
