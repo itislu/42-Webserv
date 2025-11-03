@@ -19,9 +19,9 @@ StateHandler<Context>::StateHandler(Context* context)
 }
 
 template<typename Context>
-const ft::unique_ptr<IState<Context> >& StateHandler<Context>::getState() const
+IState<Context>* StateHandler<Context>::getState() const
 {
-  return _state;
+  return _state.get();
 }
 
 template<typename Context>

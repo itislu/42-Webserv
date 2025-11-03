@@ -13,7 +13,7 @@ public:
   explicit StateHandler(Context* context);
   ~StateHandler() {}
 
-  const ft::unique_ptr<IState<Context> >& getState() const;
+  IState<Context>* getState() const;
 
   template<typename T>
   void setState();
