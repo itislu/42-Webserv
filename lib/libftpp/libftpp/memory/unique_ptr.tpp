@@ -100,7 +100,7 @@ unique_ptr<T, Deleter>::unique_ptr(
                                           : ft::move(u.get_deleter()))
 {}
 
-#	if __cplusplus <= 201402L
+#	if LIBFTPP_SUPPORT_AUTO_PTR
 // 8)
 template <typename T, typename Deleter /*= default_delete<T> */>
 template <typename U>
@@ -113,7 +113,7 @@ unique_ptr<T, Deleter>::unique_ptr(
     : _ptr(u.release()),
       _deleter()
 {}
-#	endif // __cplusplus <= 201402L
+#	endif // LIBFTPP_SUPPORT_AUTO_PTR
 
 template <typename T, typename Deleter /*= default_delete<T> */>
 unique_ptr<T, Deleter>::~unique_ptr()
