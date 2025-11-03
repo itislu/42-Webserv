@@ -1,5 +1,7 @@
 #include "SequenceRule.hpp"
 
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -15,12 +17,7 @@ SequenceRule::SequenceRule()
   setDebugTag("Sequence");
 }
 
-SequenceRule::~SequenceRule()
-{
-  for (std::size_t i = 0; i < _rules.size(); i++) {
-    delete _rules[i];
-  }
-}
+SequenceRule::~SequenceRule() {}
 
 bool SequenceRule::matches()
 {
@@ -77,9 +74,9 @@ void SequenceRule::setResultMap(ResultMap* results)
   }
 }
 
-void SequenceRule::addRule(Rule* rule)
+void SequenceRule::addRule(ft::shared_ptr<Rule> rule)
 {
-  _rules.push_back(rule);
+  _rules.push_back(ft::move(rule));
 }
 
 /* ************************************************************************** */
@@ -99,13 +96,13 @@ void SequenceRule::_setNextRule()
 
 bool SequenceRule::_isRepetitionRule(Rule* rule)
 {
-  return dynamic_cast<RepetitionRule*>(rule) != NULL;
+  return dynamic_cast<RepetitionRule*>(rule) != FT_NULLPTR;
 }
 
 bool SequenceRule::_isRepOrSeqRule(Rule* rule)
 {
-  return dynamic_cast<RepetitionRule*>(rule) != NULL ||
-         dynamic_cast<SequenceRule*>(rule) != NULL;
+  return dynamic_cast<RepetitionRule*>(rule) != FT_NULLPTR ||
+         dynamic_cast<SequenceRule*>(rule) != FT_NULLPTR;
 }
 
 bool SequenceRule::_isLastRule() const

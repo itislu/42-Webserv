@@ -2,8 +2,9 @@
 #ifndef ALTERNATIVE_RULE_HPP
 #define ALTERNATIVE_RULE_HPP
 
-#include "utils/BufferReader.hpp"
-#include "utils/abnfRules/Rule.hpp"
+#include <libftpp/memory.hpp>
+#include <utils/BufferReader.hpp>
+#include <utils/abnfRules/Rule.hpp>
 
 #include <vector>
 
@@ -25,7 +26,7 @@ public:
   void setBufferReader(BufferReader* bufferReader);
   void setResultMap(ResultMap* results);
 
-  void addRule(Rule* rule);
+  void addRule(ft::shared_ptr<Rule> rule);
 
 private:
   AlternativeRule(const AlternativeRule& other);
@@ -34,7 +35,7 @@ private:
   bool _firstMatchMode();
   bool _greedyMode();
 
-  std::vector<Rule*> _rules;
+  std::vector<ft::shared_ptr<Rule> > _rules;
   AlternativeMode _mode; // FirstMatchWins or Greedy
 };
 

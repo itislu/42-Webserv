@@ -3,6 +3,7 @@
 
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
+#include "libftpp/memory.hpp"
 #include "socket/Socket.hpp"
 #include <cstddef>
 #include <map>
@@ -12,12 +13,8 @@
 class SocketManager
 {
 public:
-  typedef std::vector<const Socket*>::iterator sockIter;
-  typedef std::map<int, const Socket*>::iterator fdToSockIter;
-  typedef std::map<int, const Socket*>::const_iterator const_fdToSockIter;
-
   explicit SocketManager(const Config& config);
-  ~SocketManager();
+  ~SocketManager() {}
 
   bool isListener(int fdes) const;
 
@@ -36,6 +33,10 @@ public:
   void removeFd(int fdes);
 
 private:
+  typedef std::vector<ft::shared_ptr<const Socket> >::iterator SockIter;
+  typedef std::map<int, const Socket*>::iterator FdToSockIter;
+  typedef std::map<int, const Socket*>::const_iterator const_FdToSockIter;
+
   void createListeningSockets(const std::vector<ServerConfig>& configs);
   void createListener(const std::vector<int>& ports);
   bool listenerExists(int port) const;
@@ -50,7 +51,7 @@ private:
   SocketManager& operator=(const SocketManager& other);
 
   std::vector<pollfd> _pfds;
-  std::vector<const Socket*> _sockets;
+  std::vector<ft::shared_ptr<const Socket> > _sockets;
   std::map<int /* fd */, const Socket*> _listeners;
   std::map<int /* fd */, const Socket*> _fdToSocket; // clientfds to socket
 };

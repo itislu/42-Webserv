@@ -1,27 +1,26 @@
 #include "RepetitionRule.hpp"
 #include "Rule.hpp"
 
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
 
 #include <limits>
 
 /* ************************************************************************** */
 // PUBLIC
-RepetitionRule::RepetitionRule(Rule* rule)
+RepetitionRule::RepetitionRule(ft::shared_ptr<Rule> rule)
   : _minReps(0)
   , _maxReps(std::numeric_limits<int>::max())
   , _currReps(0)
   , _reachedMin(_currReps >= _minReps)
-  , _rule(rule)
+  , _rule(ft::move(rule))
 {
   setEndOfRule(false);
   setDebugTag("Repetition");
 }
 
-RepetitionRule::~RepetitionRule()
-{
-  delete _rule;
-}
+RepetitionRule::~RepetitionRule() {}
 
 bool RepetitionRule::matches()
 {
