@@ -34,7 +34,7 @@ bool SequenceRule::matches()
     }
 
     if (_currRule >= _rules.size()) {
-      setEndOfRule(true);
+      setReachedEnd(true);
       break;
     }
   }
@@ -55,7 +55,7 @@ void SequenceRule::reset()
     _rules[i]->reset();
   }
   _currRule = 0;
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void SequenceRule::setBufferReader(BufferReader* bufferReader)

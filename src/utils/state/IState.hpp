@@ -8,7 +8,7 @@ class IState
 {
 public:
   explicit IState(Context* context);
-  virtual ~IState();
+  virtual ~IState() {};
 
   virtual void run() = 0;
   Context* getContext() const;

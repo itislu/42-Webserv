@@ -50,7 +50,7 @@ bool RangeRule::matches()
       break;
   }
 
-  setEndOfRule(true);
+  setReachedEnd(matches);
   debugPrintMatchStatus(matches);
   return matches;
 }
@@ -58,7 +58,7 @@ bool RangeRule::matches()
 
 void RangeRule::reset()
 {
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void RangeRule::setBufferReader(BufferReader* bufferReader)

@@ -58,7 +58,7 @@ std::string StatusCode::toString() const
 
 std::ostream& operator<<(std::ostream& out, const StatusCode& statuscode)
 {
-  out << statuscode.getCode() << " " << statuscode.getReason();
+  out << statuscode.toString();
   return out;
 }
 

@@ -42,7 +42,7 @@ void AlternativeRule::reset()
   for (std::size_t i = 0; i < _rules.size(); i++) {
     _rules[i]->reset();
   }
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void AlternativeRule::setBufferReader(BufferReader* bufferReader)
@@ -98,7 +98,7 @@ bool AlternativeRule::_greedyMode()
     if (_rules[i]->matches()) {
       somethingMatched = true;
       if (getBuffReader()->getPosInBuff() > getEndPos()) {
-        setEndOfRule(_rules[i]->end());
+        setReachedEnd(_rules[i]->end());
         setEndPos(getBuffReader()->getPosInBuff());
       }
     }
