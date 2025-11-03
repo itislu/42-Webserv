@@ -2,6 +2,7 @@
 #ifndef STATE_HANDLER_HPP
 #define STATE_HANDLER_HPP
 
+#include <libftpp/memory.hpp>
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
@@ -10,9 +11,9 @@ class StateHandler
 {
 public:
   explicit StateHandler(Context* context);
-  ~StateHandler();
+  ~StateHandler() {}
 
-  IState<Context>* getState() const;
+  const ft::unique_ptr<IState<Context> >& getState() const;
 
   template<typename T>
   void setState();
@@ -29,7 +30,7 @@ private:
   StateHandler& operator=(const StateHandler& other);
 
   Context* _context;
-  IState<Context>* _state;
+  ft::unique_ptr<IState<Context> > _state;
   bool _stateHasChanged;
 };
 

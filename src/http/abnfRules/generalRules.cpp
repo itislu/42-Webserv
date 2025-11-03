@@ -2,13 +2,14 @@
 
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/http.hpp>
+#include <libftpp/memory.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 
-LiteralRule* endOfLineRule()
+ft::shared_ptr<LiteralRule> endOfLineRule()
 {
-  LiteralRule* seq = new LiteralRule("\r\n");
+  const ft::shared_ptr<LiteralRule> seq = ft::make_shared<LiteralRule>("\r\n");
 
   seq->setDebugTag("endOfLineRule");
   seq->setRuleId(EndOfLine);
@@ -19,9 +20,10 @@ LiteralRule* endOfLineRule()
  * OWS            = *( SP / HTAB )
  *                ; optional whitespace
  */
-RepetitionRule* owsRule()
+ft::shared_ptr<RepetitionRule> owsRule()
 {
-  RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isWhitespace));
+  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
+    ft::make_shared<RangeRule>(http::isWhitespace));
 
   rep->setDebugTag("owsRule");
   return rep;
@@ -31,9 +33,10 @@ RepetitionRule* owsRule()
  * RWS            = 1*( SP / HTAB )
  * ; required whitespace
  */
-RepetitionRule* rwsRule()
+ft::shared_ptr<RepetitionRule> rwsRule()
 {
-  RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isWhitespace));
+  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
+    ft::make_shared<RangeRule>(http::isWhitespace));
   rep->setMin(1);
 
   rep->setDebugTag("rwsRule");

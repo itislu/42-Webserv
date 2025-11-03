@@ -7,8 +7,8 @@
 #include <utils/abnfRules/SequenceRule.hpp>
 
 ft::unique_ptr<SequenceRule> fieldLinePartRule();
-SequenceRule* fieldLineRule();
-RepetitionRule* fieldNameRule();
-RepetitionRule* fieldValueRule();
+ft::shared_ptr<SequenceRule> fieldLineRule();
+ft::shared_ptr<RepetitionRule> fieldNameRule();
+ft::shared_ptr<RepetitionRule> fieldValueRule();
 
 #endif

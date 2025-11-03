@@ -28,7 +28,7 @@ StatusCode::StatusCode()
 
 StatusCode::StatusCode(Code code)
   : _code(code)
-  , _reason(NULL)
+  , _reason()
 {
   _findReason();
 }

@@ -8,6 +8,7 @@
 #include <http/states/readRequestLine/ParseVersion.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -16,7 +17,6 @@
 #include <utils/state/IState.hpp>
 
 #include <cctype>
-#include <cstddef>
 #include <string>
 
 /* ************************************************************************** */
@@ -27,7 +27,6 @@ ParseUri::ParseUri(ReadRequestLine* context)
   , _client(context->getContext())
   , _parseState(ParseScheme)
   , _buffReader()
-  , _sequence()
   , _initParser(true)
 {
   _buffReader.init(&_client->getInBuff());
@@ -38,7 +37,7 @@ ParseUri::ParseUri(ReadRequestLine* context)
 
 void ParseUri::run()
 {
-  if (_sequence != NULL) {
+  if (_sequence != FT_NULLPTR) {
     _sequence->reset();
   }
   _buffReader.resetPosInBuff();
@@ -66,10 +65,7 @@ void ParseUri::run()
 
 void ParseUri::_updateState(ParseUriState nextState)
 {
-  if (_sequence != NULL) {
-    delete _sequence;
-    _sequence = NULL;
-  }
+  _sequence = FT_NULLPTR;
   _initParser = true;
   _parseState = nextState;
 }
