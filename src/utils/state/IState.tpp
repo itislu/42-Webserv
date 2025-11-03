@@ -6,7 +6,6 @@
 
 #include "libftpp/utility.hpp"
 
-#include <cassert>
 #include <stdexcept>
 
 /* ************************************************************************** */

@@ -16,7 +16,6 @@
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cctype>
 #include <string>
 
 /* ************************************************************************** */

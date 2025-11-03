@@ -16,7 +16,7 @@
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
 
-#include <cctype>
+#include <ctype.h>
 #include <string>
 
 /* ************************************************************************** */
