@@ -1,7 +1,7 @@
 #include "BufferReader.hpp"
+#include "libftpp/utility.hpp"
 #include "utils/Buffer.hpp"
 #include <algorithm>
-#include <cstddef>
 #include <iostream>
 
 /* ************************************************************************** */
@@ -14,7 +14,7 @@ void BufferReader::init(Buffer* buffer)
 
 bool BufferReader::reachedEnd() const
 {
-  if (_buffer == NULL) {
+  if (_buffer == FT_NULLPTR) {
     return true;
   }
   return (_buffer->begin() + _posInBuff + 1) == _buffer->end();
