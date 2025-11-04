@@ -99,7 +99,7 @@ void LocationConfig::setAllowedMethods(const std::string& method)
   _allowedMethods.push_back(method);
 }
 
-void LocationConfig::addAllowedMethods(const std::string& method)
+void LocationConfig::addAllowedMethod(const std::string& method)
 {
   _allowedMethods.push_back(method);
 }

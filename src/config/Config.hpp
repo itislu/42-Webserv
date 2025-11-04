@@ -16,22 +16,23 @@ class Config
   typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
 
 public:
-  explicit Config(const std::string& configFile);
-
   // Getters
   const std::vector<ServerConfig>& getServers() const;
   std::size_t getMaxBodySize() const;
-  long getTimeout() const;
+  std::size_t getTimeout() const;
+  const std::string& getRoot() const;
   const std::string& getErrorLogPath() const;
   const std::string& getAccessLogPath() const;
   const std::map<int, std::string>& getErrorPages() const;
 
   // Setters
   void addServer(const ServerConfig& server);
+  void setRoot(const std::string& root);
   void setMaxBodySize(std::size_t bytes);
-  void setTimeout(long seconds);
+  void setTimeout(std::size_t seconds);
   void setErrorLogPath(const std::string& path);
   void setAccessLogPath(const std::string& path);
+  void setErrorPages(std::map<int, std::string>& errorPages);
   void setDefaultTimeout();
 
   static int getDefaultTimeout();
@@ -42,13 +43,12 @@ public:
                                            const std::string& path) const;
 
 private:
-  std::string _configFile;
   std::string _root;
   std::size_t _maxBodySize;
   std::map<int, std::string> _errorPages;
   std::vector<ServerConfig> _servers;
   static int _defaultTimeout;
-  long _timeout;
+  std::size_t _timeout;
 
   // for Logging
   std::string _errorLogPath;

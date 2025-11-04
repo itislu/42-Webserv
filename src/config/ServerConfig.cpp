@@ -54,7 +54,7 @@ std::size_t ServerConfig::getMaxBodySize() const
   return _maxBodySize;
 }
 
-long ServerConfig::getTimeout() const
+std::size_t ServerConfig::getTimeout() const
 {
   return _timeOut;
 }
@@ -96,7 +96,7 @@ void ServerConfig::addAllowedMethod(const std::string& method)
   _allowedMethods.push_back(method);
 }
 
-void ServerConfig::setTimeout(long time)
+void ServerConfig::setTimeout(std::size_t time)
 {
   _timeOut = time;
 }

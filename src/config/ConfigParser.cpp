@@ -1,12 +1,18 @@
 #include "ConfigParser.hpp"
-#include "FileUtils.hpp"
+#include "config/Config.hpp"
+#include "config/ConfigBuilder.hpp"
 #include "config/Lexer.hpp"
+#include "config/ParsedConfig.hpp"
+#include "config/ParsedLocation.hpp"
+#include "config/ParsedServer.hpp"
 #include "config/Token.hpp"
-#include <cstddef>
-#include <fstream>
 #include <iostream>
+#include <map>
+#include <ostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 // Directives end with ;
 // Blocks are wrapped in { } (like server { ... }, location { ... })
@@ -14,39 +20,116 @@
 
 ConfigParser::ConfigParser(const char* path)
   : _filepath(path)
+  , _lexer(_filepath)
+  , _token(1)
 {
 }
 
-void ConfigParser::validateInputFile() const
+void ConfigParser::validateParsedConfig() const
 {
-  if (!checkFileExtension(_filepath, ".conf")) {
-    throw std::invalid_argument("invalid file extension: " + _filepath);
+  // TODO: implement
+}
+
+bool ConfigParser::isExpectedNext(e_type type)
+{
+  _token = _lexer.next();
+  return _token.getType() == type;
+}
+
+void ConfigParser::invalidToken(const std::string& err) const
+{
+  std::ostringstream oss;
+  oss << "invalid token in " << err << " at line " << _lexer.getLine() << ": '"
+      << _token.getValue() << "'";
+  throw std::runtime_error(oss.str());
+}
+
+void ConfigParser::parseDirective(
+  std::map<std::string, std::vector<std::string> >& directive)
+{
+  const std::string key = _token.getValue();
+  std::vector<std::string> value;
+  _token = _lexer.next();
+  while (_token.getType() != SEMICOLON && _token.getType() != END) {
+    value.push_back(_token.getValue());
+    _token = _lexer.next();
+  }
+  if (_token.getType() != SEMICOLON) {
+    invalidToken("parse directive - missing ';'");
+  }
+  directive[key] = value;
+}
+
+void ConfigParser::parseLocationConfig(ParsedServer& server)
+{
+  if (!isExpectedNext(IDENT)) {
+    invalidToken("location config");
+  }
+  ParsedLocation location(_token.getValue());
+  if (!isExpectedNext(LBRACE)) {
+    invalidToken("location config");
   }
 
-  if (!isFile(_filepath)) {
-    throw std::invalid_argument("invalid file: " + _filepath);
+  for (_token = _lexer.next();
+       _token.getType() != RBRACE && _token.getType() != END;
+       _token = _lexer.next()) {
+    if (_token.getType() == IDENT) {
+      parseDirective(location.getDirective());
+    } else {
+      invalidToken("location config");
+    }
   }
 
-  std::ifstream file(_filepath.c_str());
-  if (!file.is_open()) {
-    throw std::invalid_argument("couldn't open configfile: " + _filepath);
+  if (_token.getType() != RBRACE) {
+    invalidToken("location config - missing '}'");
   }
+  server.getLocations().push_back(location);
+}
+
+void ConfigParser::parseServerConfig()
+{
+  ParsedServer server;
+
+  if (!isExpectedNext(LBRACE)) {
+    invalidToken("server config - missing '{'");
+  }
+
+  for (_token = _lexer.next();
+       _token.getType() != RBRACE && _token.getType() != END;
+       _token = _lexer.next()) {
+    if (_token.getType() == IDENT && _token.getValue() == "location") {
+      parseLocationConfig(server);
+    } else if (_token.getType() == IDENT) {
+      parseDirective(server.getDirective());
+    } else {
+      invalidToken("server config");
+    }
+  }
+  if (_token.getType() != RBRACE) {
+    invalidToken("server config - missing '}'");
+  }
+
+  _parsed.addServer(server);
 }
 
 void ConfigParser::parse()
 {
-  Lexer lexer(_filepath);
-  Token token = lexer.next();
-
-  while (token.getType() != END) {
-    std::cout << token << "\n";
-    token = lexer.next();
+  for (_token = _lexer.next(); _token.getType() != END;
+       _token = _lexer.next()) {
+    if (_token.getType() == IDENT && _token.getValue() == "server") {
+      parseServerConfig();
+    } else if (_token.getType() == IDENT) {
+      parseDirective(_parsed.getDirective());
+    } else {
+      invalidToken("global config");
+    }
   }
-  std::cout << token << "\n";
 }
 
 void ConfigParser::readConfig()
 {
-  validateInputFile();
+  _lexer.init();
   parse();
+  std::cout << _parsed;
+  const Config conf = ConfigBuilder::build(_parsed);
 }

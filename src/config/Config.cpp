@@ -11,16 +11,20 @@
 
 int Config::_defaultTimeout = 0;
 
-Config::Config(const std::string& configFile)
-  : _configFile(configFile)
-  , _maxBodySize()
-  , _timeout()
-{
-}
+// Config::Config()
+//   : _maxBodySize()
+//   , _timeout()
+// {
+// }
 
 const std::vector<ServerConfig>& Config::getServers() const
 {
   return _servers;
+}
+
+const std::string& Config::getRoot() const
+{
+  return _root;
 }
 
 std::size_t Config::getMaxBodySize() const
@@ -28,7 +32,7 @@ std::size_t Config::getMaxBodySize() const
   return _maxBodySize;
 }
 
-long Config::getTimeout() const
+std::size_t Config::getTimeout() const
 {
   return _timeout;
 }
@@ -53,12 +57,17 @@ void Config::addServer(const ServerConfig& server)
   _servers.push_back(server);
 }
 
+void Config::setRoot(const std::string& root)
+{
+  _root = root;
+}
+
 void Config::setMaxBodySize(std::size_t bytes)
 {
   _maxBodySize = bytes;
 }
 
-void Config::setTimeout(long seconds)
+void Config::setTimeout(std::size_t seconds)
 {
   _timeout = seconds;
 }
@@ -75,15 +84,20 @@ void Config::setAccessLogPath(const std::string& path)
 
 void Config::setDefaultTimeout()
 {
-  long timeout = _timeout;
+  std::size_t timeout = _timeout;
 
   for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
     timeout = std::min(timeout, it->getTimeout());
   }
-  timeout = std::min(timeout, static_cast<long>(INT_MAX));
-  timeout = std::max(timeout, 0L);
+  timeout = std::min(timeout, static_cast<size_t>(INT_MAX));
+  timeout = std::max(timeout, std::size_t(0));
 
   Config::_defaultTimeout = static_cast<int>(timeout);
+}
+
+void Config::setErrorPages(std::map<int, std::string>& errorPages)
+{
+  _errorPages = errorPages;
 }
 
 int Config::getDefaultTimeout()
@@ -93,7 +107,20 @@ int Config::getDefaultTimeout()
 
 std::ostream& operator<<(std::ostream& out, const Config& config)
 {
+  out << "==============================" << "\n";
+  out << " Global Configuration" << "\n";
+  out << "==============================" << "\n";
+
+  out << "Root: " << config.getRoot() << "\n";
+  out << "Timeout: " << config.getTimeout() << "\n";
+  out << "BodySize: " << config.getMaxBodySize() << "\n";
+  out << "Default: " << Config::getDefaultTimeout() << "\n";
+
   const std::vector<ServerConfig>& servers = config.getServers();
+  if (servers.empty()) {
+    out << "no servers";
+    return out;
+  }
   for (std::vector<ServerConfig>::const_iterator serverIt = servers.begin();
        serverIt != servers.end();
        ++serverIt) {

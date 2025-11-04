@@ -48,9 +48,9 @@ void Token::setLine(std::size_t line)
 std::ostream& operator<<(std::ostream& out, const Token& token)
 {
   out << "Token:\n";
-  out << "Line: " << token.getLine() << "\n";
-  out << "Value: " << token.getValue() << "\n";
-  out << "Type: ";
+  out << "\tLine: " << token.getLine() << "\n";
+  out << "\tValue: " << token.getValue() << "\n";
+  out << "\tType: ";
   switch (token.getType()) {
     case INVALID:
       out << "Invalid" << "\n";

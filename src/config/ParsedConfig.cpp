@@ -1,0 +1,132 @@
+#include "ParsedConfig.hpp"
+#include "config/Config.hpp"
+#include "config/ParsedLocation.hpp"
+#include "config/ParsedServer.hpp"
+#include <map>
+#include <ostream>
+#include <string>
+#include <vector>
+
+std::map<std::string, std::vector<std::string> >& ParsedConfig::getDirective()
+{
+  return _directives;
+}
+
+const std::map<std::string, std::vector<std::string> >&
+ParsedConfig::getDirective() const
+{
+  return _directives;
+}
+
+std::vector<ParsedServer>& ParsedConfig::getServers()
+{
+  return _servers;
+}
+
+const std::vector<ParsedServer>& ParsedConfig::getServers() const
+{
+  return _servers;
+}
+
+void ParsedConfig::addServer(const ParsedServer& server)
+{
+  _servers.push_back(server);
+}
+
+void ParsedConfig::addDirective(
+  const std::map<std::string, std::vector<std::string> >& directive)
+{
+  std::map<std::string, std::vector<std::string> >::const_iterator it =
+    directive.begin();
+  for (; it != directive.end(); ++it) {
+    const std::string& key = it->first;
+    const std::vector<std::string>& values = it->second;
+
+    // if key already exists -> append
+    if (_directives.find(key) != _directives.end()) {
+      std::vector<std::string>& existing = _directives[key];
+      existing.insert(existing.end(), values.begin(), values.end());
+    } else {
+      // otherwise, just insert new entry
+      _directives[key] = values;
+    }
+  }
+}
+
+/* DELETE */
+
+static void printIndent(int level, std::ostream& out)
+{
+  for (int i = 0; i < level; ++i) {
+    out << "  ";
+  }
+}
+
+static void printDirectiveMap(
+  const std::map<std::string, std::vector<std::string> >& directives,
+  int indent,
+  std::ostream& out)
+{
+  std::map<std::string, std::vector<std::string> >::const_iterator it;
+  for (it = directives.begin(); it != directives.end(); ++it) {
+    printIndent(indent, out);
+    out << it->first;
+    const std::vector<std::string>& values = it->second;
+    for (std::vector<std::string>::const_iterator v = values.begin();
+         v != values.end();
+         ++v) {
+      out << " " << *v;
+    }
+    out << ";" << "\n";
+  }
+}
+
+std::ostream& operator<<(std::ostream& out, ParsedConfig& parsed)
+{
+  out << "==============================" << "\n";
+  out << " Global Configuration" << "\n";
+  out << "==============================" << "\n";
+  printDirectiveMap(parsed.getDirective(), 1, out);
+
+  std::vector<ParsedServer>& servers = parsed.getServers();
+  for (std::vector<ParsedServer>::iterator servIt = servers.begin();
+       servIt != servers.end();
+       ++servIt) {
+    out << "\n";
+    printIndent(0, out);
+    out << "server {" << "\n";
+
+    printDirectiveMap(servIt->getDirective(), 1, out);
+
+    std::vector<ParsedLocation>& locs = servIt->getLocations();
+    for (std::vector<ParsedLocation>::iterator locIt = locs.begin();
+         locIt != locs.end();
+         ++locIt) {
+      printIndent(1, out);
+      out << "location " << locIt->getPath() << " {" << "\n";
+      printDirectiveMap(locIt->getDirective(), 2, out);
+      printIndent(1, out);
+      out << "}" << "\n";
+    }
+
+    printIndent(0, out);
+    out << "}" << "\n";
+  }
+
+  out << "\n";
+  out << "End of configuration" << "\n";
+  return out;
+}
+
+/*
+  VALID KEYS
+
+  root
+  client_max_body_size
+  error_page
+  keepalive_timeout
+  server
+  index
+
+  error_log
+*/

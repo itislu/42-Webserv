@@ -1,7 +1,9 @@
 #include "Lexer.hpp"
+#include "config/FileUtils.hpp"
 #include "config/Token.hpp"
 #include <cctype>
 #include <cstddef>
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <sstream>
@@ -15,21 +17,40 @@
 // it as an IDENT token.
 
 Lexer::Lexer(const std::string& file)
-  : _pos(0)
+  : _filepath(file)
+  , _pos(0)
   , _line(1)
 {
-  _file.open(file.c_str());
-  if (!_file.is_open()) {
-    throw std::runtime_error("Failed to open file");
-  }
-  init();
 }
 
 void Lexer::init()
 {
+  validateInputFile();
+
   std::stringstream buffer;
   buffer << _file.rdbuf();
   _input = buffer.str();
+}
+
+void Lexer::validateInputFile()
+{
+  if (!checkFileExtension(_filepath, ".conf")) {
+    throw std::invalid_argument("invalid file extension: " + _filepath);
+  }
+
+  if (!isFile(_filepath)) {
+    throw std::invalid_argument("invalid file: " + _filepath);
+  }
+
+  _file.open(_filepath.c_str());
+  if (!_file.is_open()) {
+    throw std::runtime_error("Failed to open input file");
+  }
+}
+
+std::size_t Lexer::getLine() const
+{
+  return _line;
 }
 
 Token Lexer::next()
@@ -63,6 +84,12 @@ Token Lexer::next()
     return token;
   }
 
+  // if (chr == '#') {
+  //   skipComments();
+  //   token.setType(e_type type);
+  //   return token;
+  // }
+
   if (isspace(static_cast<unsigned char>(chr)) == 0) {
     std::size_t idx = _pos;
     while (idx < _input.size()) {
@@ -77,6 +104,7 @@ Token Lexer::next()
     token.setValue(value);
     token.setType(IDENT);
     _pos = idx;
+    std::cout << token;
     return token;
   }
   return token;
@@ -94,5 +122,11 @@ void Lexer::skipWhiteSpaces()
 
 void Lexer::skipComments()
 {
-  // TODO: implement
+  while (_pos < _input.size()) {
+    if (_input[_pos] == '\n') {
+      ++_line;
+      break;
+    }
+    ++_pos;
+  }
 }

@@ -1,4 +1,4 @@
-// ConfigTestSetup.hpp
+/* // ConfigTestSetup.hpp
 #pragma once
 
 #include "Config.hpp"
@@ -31,7 +31,7 @@ static LocationConfig createTestLocation(
   loc.setRoot(root);
   loc.setAutoindex(autoindex);
   for (std::size_t idx = 0; idx < methods.size(); ++idx) {
-    loc.addAllowedMethods(methods[idx]);
+    loc.addAllowedMethod(methods[idx]);
   }
   loc.setIndex("index.html");
   return loc;
@@ -110,3 +110,4 @@ Config createTestConfig()
 // NOLINTEND
 
 } // namespace
+ */
