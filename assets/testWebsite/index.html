@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webserv Test Dashboard</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #6dd5fa, #2980b9);
+      color: white;
+    }
+
+    h1 {
+      margin-bottom: 40px;
+      font-size: 2em;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 20px;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .btn {
+      background-color: white;
+      color: #2980b9;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #f0f0f0;
+      transform: translateY(-3px);
+    }
+  </style>
+</head>
+<body>
+  <h1>Webserv Test Dashboard</h1>
+  <div class="buttons">
+    <a href="get.html" class="btn">Get Tests</a>
+    <a href="post.html" class="btn">Post Tests</a>
+    <a href="delete.html" class="btn">Delete Tests</a>
+  </div>
+</body>
+</html>
