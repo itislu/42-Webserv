@@ -78,6 +78,143 @@ TEST(ReadRequestLineTester, SchemeAuthorityQueryFragment)
   EXPECT_EQ(request.getVersion(), "HTTP/1.1");
 }
 
+TEST(ReadRequestLineTester, SchemePathQueryFragment)
+{
+  std::string line("GET "
+                   "http:///www.example.org?pub/WWW/TheProject.html?test#frag "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "http");
+  EXPECT_EQ(request.getUri().getAuthority(), "");
+  EXPECT_EQ(request.getUri().getPath(), "/www.example.org");
+  EXPECT_EQ(request.getUri().getQuery(), "?pub/WWW/TheProject.html?test");
+  EXPECT_EQ(request.getUri().getFragment(), "#frag");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, SchemeQueryFragment)
+{
+  std::string line("GET "
+                   "http://?www.example.org?pub/WWW/TheProject.html?test#frag "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "http");
+  EXPECT_EQ(request.getUri().getAuthority(), "");
+  EXPECT_EQ(request.getUri().getPath(), "");
+  EXPECT_EQ(request.getUri().getQuery(),
+            "?www.example.org?pub/WWW/TheProject.html?test");
+  EXPECT_EQ(request.getUri().getFragment(), "#frag");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, SchemePathQuery)
+{
+  std::string line("GET "
+                   "http:/?www.example.org?pub/WWW/TheProject.html?test?frag "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "http");
+  EXPECT_EQ(request.getUri().getAuthority(), "");
+  EXPECT_EQ(request.getUri().getPath(), "/");
+  EXPECT_EQ(request.getUri().getQuery(),
+            "?www.example.org?pub/WWW/TheProject.html?test?frag");
+  EXPECT_EQ(request.getUri().getFragment(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, SchemePath)
+{
+  std::string line("GET "
+                   "http:/ "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "http");
+  EXPECT_EQ(request.getUri().getAuthority(), "");
+  EXPECT_EQ(request.getUri().getPath(), "/");
+  EXPECT_EQ(request.getUri().getQuery(), "");
+  EXPECT_EQ(request.getUri().getFragment(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, SchemeQuery)
+{
+  std::string line("GET "
+                   "http://?www.example.org?pub/WWW/TheProject.html?test?frag "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "http");
+  EXPECT_EQ(request.getUri().getAuthority(), "");
+  EXPECT_EQ(request.getUri().getPath(), "");
+  EXPECT_EQ(request.getUri().getQuery(),
+            "?www.example.org?pub/WWW/TheProject.html?test?frag");
+  EXPECT_EQ(request.getUri().getFragment(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, Scheme)
+{
+  std::string line("GET "
+                   "http:// "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "http");
+  EXPECT_EQ(request.getUri().getAuthority(), "");
+  EXPECT_EQ(request.getUri().getPath(), "");
+  EXPECT_EQ(request.getUri().getQuery(), "");
+  EXPECT_EQ(request.getUri().getFragment(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, PathQuery)
+{
+  std::string line("GET "
+                   "/www.example.org/pub?WWW/TheProject.html?test "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "");
+  EXPECT_EQ(request.getUri().getAuthority(), "");
+  EXPECT_EQ(request.getUri().getPath(), "/www.example.org/pub");
+  EXPECT_EQ(request.getUri().getQuery(), "?WWW/TheProject.html?test");
+  EXPECT_EQ(request.getUri().getFragment(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, BadPath)
+{
+  std::string line("GET "
+                   "//www.example.org "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  (void)request;
+  // TODO Don't know what to test for in a bad request.
+}
+
+TEST(ReadRequestLineTester, BadQuery)
+{
+  std::string line("GET "
+                   "?query//www.example.org "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  (void)request;
+  // TODO Don't know what to test for in a bad request.
+}
+
 // NOLINTEND
 
 // Main function to run all tests
