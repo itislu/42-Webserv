@@ -160,7 +160,7 @@ shared_ptr<T>::shared_ptr(
 	r._control = FT_NULLPTR;
 }
 
-#	if __cplusplus <= 201402L
+#	if LIBFTPP_SUPPORT_AUTO_PTR
 // 12)
 template <typename T>
 template <typename Y>
@@ -175,7 +175,7 @@ shared_ptr<T>::shared_ptr(
 {
 	r.release();
 }
-#	endif // __cplusplus <= 201402L
+#	endif // LIBFTPP_SUPPORT_AUTO_PTR
 
 // 13)
 template <typename T>
