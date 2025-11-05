@@ -1,7 +1,10 @@
 #include "WriteStatusLine.hpp"
 
 #include <client/Client.hpp>
+#include <http/http.hpp>
+#include <http/states/writeHeaderLines/WriteHeaderLines.hpp>
 #include <utils/Buffer.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
@@ -10,7 +13,9 @@
 WriteStatusLine::WriteStatusLine(Client* context)
   : IState(context)
   , _client(context)
+  , _log(&Logger::getInstance(logFiles::http))
 {
+  _log->info() << "WriteStatusLine\n";
 }
 
 /**
@@ -21,8 +26,8 @@ void WriteStatusLine::run()
   Buffer& buff = _client->getOutBuff();
   buff.add("HTTP/1.1 ");
   buff.add(_client->getResponse().getStatusCode().toString());
-  buff.add("\r\n");
-  _client->getStateHandler().setDone();
+  buff.add(http::CRLF);
+  _client->getStateHandler().setState<WriteHeaderLines>();
 }
 
 /* ************************************************************************** */

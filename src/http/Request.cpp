@@ -1,8 +1,13 @@
 #include "Request.hpp"
-#include "http/Uri.hpp"
+
+#include <http/Headers.hpp>
+#include <http/Uri.hpp>
+#include <utils/Buffer.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <sstream>
 #include <string>
 
 /* ************************************************************************** */
@@ -66,9 +71,28 @@ Request::Method Request::strToMethod(const std::string& strMethod)
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
-Request::HeaderMap& Request::getHeaders()
+Headers& Request::getHeaders()
 {
   return _headers;
+}
+
+Buffer& Request::getBody()
+{
+  return _body;
+}
+
+std::string Request::toString()
+{
+  std::stringstream oss;
+  oss << "\n{\n";
+  oss << "  \"method\": \"" << _methodToString() << "\",\n";
+  oss << "  \"uri\": \n" << _uri.toString() << ",\n";
+  oss << "  \"version\": \"" << _version << "\",\n";
+  oss << "  \"headers\": {\n";
+  oss << _headers.toLogString();
+  oss << "  }\n";
+  oss << "}\n";
+  return oss.str();
 }
 
 /* ************************************************************************** */
@@ -84,3 +108,17 @@ std::size_t Request::_getMaxMethodLen() throw()
   return maxLen;
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
+
+std::string Request::_methodToString() const
+{
+  switch (_method) {
+    case GET:
+      return "GET";
+    case POST:
+      return "POST";
+    case DELETE:
+      return "DELETE";
+    case UNDEFINED:
+      return "UNDEFINED";
+  }
+}

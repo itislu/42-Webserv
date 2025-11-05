@@ -1,16 +1,20 @@
 #include "ReadHeaderLines.hpp"
-#include "http/StatusCode.hpp"
 
 #include <client/Client.hpp>
+#include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/states/readBody/ReadBody.hpp>
+#include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
-#include <libftpp/string.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <cstddef>
@@ -24,7 +28,10 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
   , _client(context)
   , _endOfLine()
   , _buffReader()
+  , _log(&Logger::getInstance(logFiles::http))
+  , _done(false)
 {
+  _log->info() << "ReadHeaderLines\n";
   _init();
 }
 
@@ -42,6 +49,10 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
 void ReadHeaderLines::run()
 {
   _readLines();
+  if (_done) {
+    _setNextState();
+    return;
+  }
 }
 
 void ReadHeaderLines::_init()
@@ -73,15 +84,29 @@ void ReadHeaderLines::_readLines()
     } else if (_endOfLine->matches()) {
       if (_endOfLine->end()) {
         _extractPart(EndOfLine);
-        getContext()->getStateHandler().setDone();
+        _done = true;
         return;
       }
     } else {
+      _log->error() << "ReadHeaderLines: Bad Request: Headers:\n";
+      _log->error() << _client->getRequest().getHeaders().toString() << '\n';
       _client->getResponse().setStatusCode(StatusCode::BadRequest);
-      getContext()->getStateHandler().setDone();
+      _done = true;
       return;
     }
   }
+}
+
+void ReadHeaderLines::_setNextState()
+{
+  // TODO always body ??
+  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+    if (_client->getRequest().getMethod() == Request::POST) {
+      _client->getStateHandler().setState<ReadBody>();
+      return;
+    }
+  }
+  _client->getStateHandler().setState<PrepareResponse>();
 }
 
 std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
@@ -94,14 +119,11 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 
 void ReadHeaderLines::_addLineToHeaders(const std::string& line)
 {
-  // todo if header exit append value with ', '
   const std::size_t index = line.find(':');
   if (index != std::string::npos) {
-    std::string name = line.substr(0, index);
-    std::string value = line.substr(index + 1, line.size());
-    ft::trim(name);
-    ft::trim(value);
-    Request::HeaderMap& headers = _client->getRequest().getHeaders();
-    headers[name] = value;
+    const std::string name = line.substr(0, index);
+    const std::string value = line.substr(index + 1, line.size());
+    Headers& headers = _client->getRequest().getHeaders();
+    headers.addHeader(name, value);
   }
 }

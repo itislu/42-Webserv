@@ -4,6 +4,7 @@
 
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 class Client;
@@ -24,6 +25,7 @@ private:
   Client* _client;
   BufferReader _buffReader;
   SequenceRule _sequence;
+  Logger* _log;
 };
 
 #endif

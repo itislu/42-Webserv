@@ -1,8 +1,9 @@
-#include "client/Client.hpp"
-#include "http/Request.hpp"
-#include "http/states/readRequestLine/ReadRequestLine.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
+#include <client/Client.hpp>
+#include <http/Headers.hpp>
+#include <http/Request.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 
 #include <cstddef>
 #include <gtest/gtest.h>
@@ -63,7 +64,7 @@ TEST(RequestTester, PartialBufferTest)
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
-  Request::HeaderMap& headers = request.getHeaders();
+  Headers& headers = request.getHeaders();
   EXPECT_EQ(headers["Host"], "webserv");
   EXPECT_EQ(headers["Content-Length"], "7");
 }
@@ -83,7 +84,7 @@ TEST(RequestTester, CompleteBufferTest)
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
-  Request::HeaderMap& headers = request.getHeaders();
+  Headers& headers = request.getHeaders();
   EXPECT_EQ(headers["Host"], "webserv");
   EXPECT_EQ(headers["Content-Length"], "7");
 }

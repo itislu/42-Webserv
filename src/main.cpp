@@ -1,7 +1,9 @@
-#include "config/Config.hpp"
-#include "config/ConfigTestSetup.hpp"
-#include "config/ServerConfig.hpp"
-#include "server/ServerManager.hpp"
+#include <config/Config.hpp>
+#include <config/ConfigTestSetup.hpp>
+#include <config/ServerConfig.hpp>
+#include <server/ServerManager.hpp>
+#include <utils/logger/Logger.hpp>
+
 #include <exception>
 #include <iostream>
 
@@ -13,11 +15,11 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  Logger::getInstance(logFiles::general).info() << "webserv started\n";
   try {
     const Config config = TestConfigSetup::createTestConfig();
     std::cout << config;
     ServerManager serverManager(config);
-
     serverManager.run();
 
   } catch (const std::exception& e) {

@@ -6,6 +6,7 @@
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <string>
@@ -52,6 +53,7 @@ private:
   SequenceRule* _sequence;
   Rule::ResultMap _results;
   bool _initParser;
+  Logger* _log;
 };
 
 #endif

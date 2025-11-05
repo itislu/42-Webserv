@@ -1,18 +1,10 @@
 #include "Uri.hpp"
+
+#include <sstream>
 #include <string>
 
 /* ************************************************************************** */
 // PUBLIC
-
-std::string Uri::getRaw() const
-{
-  return _raw;
-}
-
-void Uri::setRaw(const std::string& rawUri)
-{
-  _raw = rawUri;
-}
 
 const std::string& Uri::getScheme() const
 {
@@ -62,6 +54,21 @@ const std::string& Uri::getFragment() const
 void Uri::setFragment(const std::string& str)
 {
   _fragment = str;
+}
+
+std::string Uri::toString()
+{
+  std::stringstream oss;
+
+  oss << "{\n";
+  oss << "  \"scheme\": \"" << _scheme << "\",\n";
+  oss << "  \"authority\": \"" << _authority << "\",\n";
+  oss << "  \"path\": \"" << _path << "\",\n";
+  oss << "  \"query\": \"" << _query << "\",\n";
+  oss << "  \"fragment\": \"" << _fragment << "\"\n";
+  oss << "}";
+
+  return oss.str();
 }
 
 /* ************************************************************************** */
