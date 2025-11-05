@@ -62,6 +62,22 @@ TEST(ReadRequestLineTester, AbsoluteForm)
   EXPECT_EQ(request.getVersion(), "HTTP/1.1");
 }
 
+TEST(ReadRequestLineTester, SchemeAuthorityQueryFragment)
+{
+  std::string line("GET "
+                   "http://www.example.org?pub/WWW/TheProject.html?test#frag "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "http");
+  EXPECT_EQ(request.getUri().getAuthority(), "www.example.org");
+  EXPECT_EQ(request.getUri().getPath(), "");
+  EXPECT_EQ(request.getUri().getQuery(), "?pub/WWW/TheProject.html?test");
+  EXPECT_EQ(request.getUri().getFragment(), "#frag");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
 // NOLINTEND
 
 // Main function to run all tests
