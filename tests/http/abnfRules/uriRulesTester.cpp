@@ -599,11 +599,13 @@ TEST(UriAbnfTest, SegmentNzNc)
   // Invalid
   // valid until : so cout is 3
   EXPECT_FALSE(runParser("foo:bar", sequence));
-  // EXPECT_TRUE(rep->getReps(), 3);
+  EXPECT_EQ(rep->getReps(), 3);
   EXPECT_FALSE(runParser("a:b", sequence));
-  // EXPECT_TRUE(rep->getReps(), 1);
+  EXPECT_EQ(rep->getReps(), 1);
   EXPECT_FALSE(runParser(":", sequence));
+  EXPECT_EQ(rep->getReps(), 0);
   EXPECT_FALSE(runParser("?", sequence));
+  EXPECT_EQ(rep->getReps(), 0);
 }
 
 /**
