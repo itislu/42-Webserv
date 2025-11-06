@@ -12,8 +12,8 @@ add_library(${LIB_NAME} STATIC
 target_link_libraries(${LIB_NAME} 
   PRIVATE
   client
+  config
   event
   ftpp
   socket
-  utils
 )

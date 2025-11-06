@@ -1,5 +1,6 @@
+#include "headerLineRules.hpp"
+
 #include <http/abnfRules/generalRules.hpp>
-#include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
@@ -29,11 +30,11 @@ ft::unique_ptr<SequenceRule> fieldLinePartRule()
 /**
  * field-line   = field-name ":" OWS field-value OWS
  */
-SequenceRule* fieldLineRule()
+ft::shared_ptr<SequenceRule> fieldLineRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  const ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
   seq->addRule(fieldNameRule());
-  seq->addRule(new LiteralRule(":"));
+  seq->addRule(ft::make_shared<LiteralRule>(":"));
   seq->addRule(owsRule());
   seq->addRule(fieldValueRule());
   seq->addRule(owsRule());
@@ -46,17 +47,18 @@ SequenceRule* fieldLineRule()
  * field-name = token
  * token = 1*tchar
  */
-RepetitionRule* fieldNameRule()
+ft::shared_ptr<RepetitionRule> fieldNameRule()
 {
-  RepetitionRule* rep = tokenRule();
+  const ft::shared_ptr<RepetitionRule> rep = tokenRule();
 
   rep->setDebugTag("fieldNameRule");
   return rep;
 }
 
-RepetitionRule* tokenRule()
+ft::shared_ptr<RepetitionRule> tokenRule()
 {
-  RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isTchar));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(http::isTchar));
   rep->setMin(1);
   rep->setDebugTag("tokenRule");
   return rep;
@@ -65,9 +67,10 @@ RepetitionRule* tokenRule()
 /**
  * field-value = *field-content
  */
-RepetitionRule* fieldValueRule()
+ft::shared_ptr<RepetitionRule> fieldValueRule()
 {
-  RepetitionRule* rep = new RepetitionRule(fieldContentRule());
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(fieldContentRule());
   rep->setDebugTag("fieldValueRule");
   return rep;
 }
@@ -76,29 +79,32 @@ RepetitionRule* fieldValueRule()
  * field-content = field-vchar
  *                 [ 1*( SP / HTAB / field-vchar ) field-vchar ]
  */
-SequenceRule* fieldContentRule()
+ft::shared_ptr<SequenceRule> fieldContentRule()
 {
-  SequenceRule* seq = new SequenceRule();
+  const ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
 
   // leading field-vchar
   seq->addRule(fieldVcharRule());
 
   // 1*( SP / HTAB / field-vchar )
-  AlternativeRule* spaceTabVchar = new AlternativeRule();
-  spaceTabVchar->addRule(new RangeRule(" \t"));  // SP, HTAB
+  ft::shared_ptr<AlternativeRule> spaceTabVchar =
+    ft::make_shared<AlternativeRule>();
+  spaceTabVchar->addRule(ft::make_shared<RangeRule>(" \t")); // SP, HTAB
   spaceTabVchar->addRule(fieldVcharRule());
-  RepetitionRule* repeatPart = new RepetitionRule(spaceTabVchar);
+  ft::shared_ptr<RepetitionRule> repeatPart =
+    ft::make_shared<RepetitionRule>(ft::move(spaceTabVchar));
   repeatPart->setMin(1);
 
-  SequenceRule* optSeq = new SequenceRule();
-  optSeq->addRule(repeatPart);
+  ft::shared_ptr<SequenceRule> optSeq = ft::make_shared<SequenceRule>();
+  optSeq->addRule(ft::move(repeatPart));
   optSeq->addRule(fieldVcharRule());
 
-  RepetitionRule* optWrap = new RepetitionRule(optSeq);
+  ft::shared_ptr<RepetitionRule> optWrap =
+    ft::make_shared<RepetitionRule>(ft::move(optSeq));
   optWrap->setMin(0);
   optWrap->setMax(1);
 
-  seq->addRule(optWrap);
+  seq->addRule(ft::move(optWrap));
   seq->setDebugTag("fieldContentRule");
   return seq;
 }
@@ -106,10 +112,11 @@ SequenceRule* fieldContentRule()
 /**
  * field-vchar = VCHAR / obs-text
  */
-AlternativeRule* fieldVcharRule()
+ft::shared_ptr<AlternativeRule> fieldVcharRule()
 {
-  AlternativeRule* alter = new AlternativeRule();
-  alter->addRule(new RangeRule(http::isVchar));
+  const ft::shared_ptr<AlternativeRule> alter =
+    ft::make_shared<AlternativeRule>();
+  alter->addRule(ft::make_shared<RangeRule>(http::isVchar));
   alter->addRule(obsTextRule());
   alter->setDebugTag("fieldVcharRule");
   return alter;
@@ -120,9 +127,10 @@ AlternativeRule* fieldVcharRule()
  *
  * obs-text = %x80-FF
  */
-RangeRule* obsTextRule()
+ft::shared_ptr<RangeRule> obsTextRule()
 {
-  RangeRule* range = new RangeRule(http::isObsText);
+  const ft::shared_ptr<RangeRule> range =
+    ft::make_shared<RangeRule>(http::isObsText);
   range->setDebugTag("obsTextRule");
   return range;
 }

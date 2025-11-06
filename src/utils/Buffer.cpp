@@ -25,7 +25,7 @@ void Buffer::remove(ssize_t bytes)
   _buff.erase(_buff.begin(), _buff.begin() + bytes);
 }
 
-void Buffer::remove(size_t bytes)
+void Buffer::remove(std::size_t bytes)
 {
   remove(static_cast<ssize_t>(bytes));
 }
@@ -40,7 +40,7 @@ unsigned char* Buffer::data()
   return _buff.data();
 }
 
-unsigned char Buffer::at(size_t pos) const
+unsigned char Buffer::at(std::size_t pos) const
 {
   return _buff.at(pos);
 }
@@ -74,7 +74,7 @@ std::string Buffer::getString(long fromIndex, long toIndex) const
   if (fromIndex < 0 || toIndex < 0) {
     throw std::invalid_argument("index must be >= 0");
   }
-  if (static_cast<size_t>(toIndex) > _buff.size()) {
+  if (static_cast<std::size_t>(toIndex) > _buff.size()) {
     throw std::out_of_range("toIndex exceeds buffer size");
   }
   return std::string(_buff.begin() + fromIndex, _buff.begin() + toIndex);

@@ -15,8 +15,6 @@
  * https://datatracker.ietf.org/doc/html/rfc3986#autoid-69
  */
 
-// NOLINTBEGIN
-
 namespace {
 
 bool runParser(const std::string& str, Rule& rule)
@@ -37,28 +35,26 @@ bool runParser(const std::string& str, Rule& rule)
 
 TEST(HeaderLinesTester, FieldValueRule)
 {
-  RepetitionRule* s = fieldValueRule();
+  const ft::shared_ptr<RepetitionRule> rule = fieldValueRule();
 
-  EXPECT_TRUE(runParser("test, hallo", *s));
+  EXPECT_TRUE(runParser("test, hallo", *rule));
 }
 
 TEST(HeaderLinesTester, FieldLineRule)
 {
-  SequenceRule* s = fieldLineRule();
+  const ft::shared_ptr<SequenceRule> rule = fieldLineRule();
 
   Rule::debugPrint = true;
-  EXPECT_TRUE(runParser("host: test, hallo", *s));
+  EXPECT_TRUE(runParser("host: test, hallo", *rule));
   Rule::debugPrint = false;
 }
 
 TEST(HeaderLinesTester, FieldLinePartRule)
 {
-  ft::unique_ptr<SequenceRule> s = fieldLinePartRule();
+  const ft::unique_ptr<SequenceRule> rule = fieldLinePartRule();
 
-  EXPECT_TRUE(runParser("host: test, hallo\r\n", *s));
+  EXPECT_TRUE(runParser("host: test, hallo\r\n", *rule));
 }
-
-// NOLINTEND
 
 // Main function to run all tests
 int main(int argc, char** argv)

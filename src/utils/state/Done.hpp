@@ -10,7 +10,7 @@ class Done : public IState<Context>
 {
 public:
   explicit Done(Context* ptr);
-  ~Done();
+  ~Done() {};
 
 private:
   Done();

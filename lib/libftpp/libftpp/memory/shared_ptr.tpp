@@ -14,6 +14,7 @@
 #	include <algorithm>
 #	include <cassert>
 #	include <cstddef>
+#	include <memory>
 #	include <ostream>
 #	include <typeinfo> // IWYU pragma: keep: typeid
 
@@ -158,6 +159,23 @@ shared_ptr<T>::shared_ptr(
 	r._ptr = FT_NULLPTR;
 	r._control = FT_NULLPTR;
 }
+
+#	if LIBFTPP_SUPPORT_AUTO_PTR
+// 12)
+template <typename T>
+template <typename Y>
+shared_ptr<T>::shared_ptr(
+    ft::rvalue<std::auto_ptr<Y> >& r,
+    typename ft::enable_if<ft::is_convertible<Y*, T*>::value,
+                           _enabler>::type /*unused = _enabler()*/)
+    : _ptr(r.get()),
+      _control(r.get() != FT_NULLPTR
+                   ? new _shared_ptr::control_block_pointer<Y*, T>(r.get())
+                   : FT_NULLPTR)
+{
+	r.release();
+}
+#	endif // LIBFTPP_SUPPORT_AUTO_PTR
 
 // 13)
 template <typename T>

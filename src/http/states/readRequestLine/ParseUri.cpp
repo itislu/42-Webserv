@@ -8,6 +8,7 @@
 #include <http/states/readRequestLine/ParseVersion.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -16,8 +17,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cctype>
-#include <cstddef>
 #include <string>
 
 /* ************************************************************************** */
@@ -28,7 +27,6 @@ ParseUri::ParseUri(ReadRequestLine* context)
   , _client(context->getContext())
   , _parseState(ParseScheme)
   , _buffReader()
-  , _sequence()
   , _initParser(true)
   , _log(&Logger::getInstance(logFiles::http))
 {
@@ -41,7 +39,7 @@ ParseUri::ParseUri(ReadRequestLine* context)
 
 void ParseUri::run()
 {
-  if (_sequence != NULL) {
+  if (_sequence != FT_NULLPTR) {
     _sequence->reset();
   }
   _buffReader.resetPosInBuff();
@@ -69,10 +67,7 @@ void ParseUri::run()
 
 void ParseUri::_updateState(ParseUriState nextState)
 {
-  if (_sequence != NULL) {
-    delete _sequence;
-    _sequence = NULL;
-  }
+  _sequence = FT_NULLPTR;
   _initParser = true;
   _parseState = nextState;
 }
@@ -104,7 +99,7 @@ void ParseUri::_parseScheme()
     _updateState(ParseAuthority);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(SchemePart)) {
       std::string scheme = _extractPart(SchemePart);
       scheme = scheme.substr(0, scheme.size() - 1); // remove "http:" -> "http"
@@ -130,7 +125,7 @@ void ParseUri::_parseAuthority()
     _updateState(ParsePath);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(AuthorityPart)) {
       std::string auth = _extractPartWithoutCurrChar(AuthorityPart);
       auth = auth.substr(2, auth.size()); // remove '//'
@@ -154,7 +149,7 @@ void ParseUri::_parsePath()
     _updateState(ParseDone);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(PathPart)) {
       std::string path = _extractPartWithoutCurrChar(PathPart);
       ft::trim(path);
@@ -177,7 +172,7 @@ void ParseUri::_parseQuery()
     _updateState(ParseFragment);
     return;
   }
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(QueryPart)) {
       std::string query = _extractPartWithoutCurrChar(QueryPart);
       ft::trim(query);
@@ -201,7 +196,7 @@ void ParseUri::_parseFragment()
     return;
   }
 
-  if (_sequence->end()) {
+  if (_sequence->reachedEnd()) {
     if (_partFound(FragmentPart)) {
       std::string frag = _extractPartWithoutCurrChar(FragmentPart);
       ft::trim(frag);

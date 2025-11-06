@@ -13,11 +13,6 @@ Done<Context>::Done(Context* ptr)
 }
 
 template<typename Context>
-Done<Context>::~Done()
-{
-}
-
-template<typename Context>
 void Done<Context>::run()
 {
 }

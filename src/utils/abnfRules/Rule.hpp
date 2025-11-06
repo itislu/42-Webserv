@@ -22,7 +22,7 @@ public:
   virtual void setBufferReader(BufferReader* bufferReader) = 0;
   virtual void setResultMap(ResultMap* results) = 0;
 
-  bool end() const;
+  bool reachedEnd() const;
   void setRuleId(RuleId ruleId);
 
   void setDebugTag(const char* str);
@@ -32,7 +32,7 @@ public:
   static bool debugPrint;
 
 protected:
-  void setEndOfRule(bool value);
+  void setReachedEnd(bool value);
   BufferReader* getBuffReader();
 
   void setStartPos(long pos);
@@ -52,7 +52,7 @@ private:
   Rule(const Rule& other);
   Rule& operator=(const Rule& other);
 
-  bool _endOfRule;
+  bool _reachedEnd;
   BufferReader* _buffReader;
 
   long _startPos;
@@ -68,4 +68,4 @@ private:
   const char* _debugMatchReason;
 };
 
-#endif // RULE_HPP
+#endif

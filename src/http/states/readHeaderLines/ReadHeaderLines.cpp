@@ -26,7 +26,6 @@
 ReadHeaderLines::ReadHeaderLines(Client* context)
   : IState(context)
   , _client(context)
-  , _endOfLine()
   , _buffReader()
   , _log(&Logger::getInstance(logFiles::http))
   , _done(false)
@@ -41,7 +40,7 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
 /**
  * @brief ### Read header lines of a HTTP request
  *
- * HTTP-message   = request-line CRLF
+ * HTTP-message   = start-line CRLF
  *                  *( field-line CRLF )
  *                  CRLF
  *                  [ message-body ]
@@ -77,13 +76,13 @@ void ReadHeaderLines::_readLines()
     _endOfLine->reset();
 
     if (_fieldLine->matches()) {
-      if (_fieldLine->end()) {
+      if (_fieldLine->reachedEnd()) {
         const std::string fieldLine = _extractPart(FieldLinePart);
         // todo parse each field value
         _addLineToHeaders(fieldLine);
       }
-    } else if (_endOfLine->matches()) {
-      if (_endOfLine->end()) {
+    } else if (_hasEndOfLine()) {
+      if (_endOfLine->reachedEnd()) {
         _extractPart(EndOfLine);
         _done = true;
         return;
@@ -101,6 +100,12 @@ void ReadHeaderLines::_readLines()
 void ReadHeaderLines::_setNextState()
 {
   _client->getStateHandler().setState<ReadBody>();
+}
+
+bool ReadHeaderLines::_hasEndOfLine()
+{
+  _buffReader.resetPosInBuff();
+  return _endOfLine->matches();
 }
 
 std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)

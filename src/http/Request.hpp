@@ -4,6 +4,7 @@
 
 #include <http/Headers.hpp>
 #include <http/Uri.hpp>
+#include <libftpp/array.hpp>
 #include <utils/Buffer.hpp>
 
 #include <cstddef>
@@ -44,7 +45,7 @@ public:
 private:
   struct MethodMap;
   static const int _methods = 3;
-  static const MethodMap _methodMap[_methods];
+  static const ft::array<MethodMap, _methods> _methodMap;
   static std::size_t _getMaxMethodLen() throw();
   std::string _methodToString() const;
 

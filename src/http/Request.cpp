@@ -2,6 +2,7 @@
 
 #include <http/Headers.hpp>
 #include <http/Uri.hpp>
+#include <libftpp/array.hpp>
 #include <utils/Buffer.hpp>
 
 #include <algorithm>
@@ -13,11 +14,11 @@
 /* ************************************************************************** */
 // INIT
 
-const Request::MethodMap Request::_methodMap[_methods] = {
+const ft::array<Request::MethodMap, Request::_methods> Request::_methodMap = { {
   { "GET", Request::GET },
   { "POST", Request::POST },
   { "DELETE", Request::DELETE },
-};
+} };
 
 const std::size_t Request::MaxMethodLen = Request::_getMaxMethodLen();
 
@@ -59,17 +60,15 @@ void Request::setVersion(const std::string& version)
   _version = version;
 }
 
-// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 Request::Method Request::strToMethod(const std::string& strMethod)
 {
-  for (std::size_t i = 0; i < _methods; i++) {
+  for (std::size_t i = 0; i < _methodMap.size(); i++) {
     if (_methodMap[i].methodStr == strMethod) {
       return _methodMap[i].method;
     }
   }
   return Request::UNDEFINED;
 }
-// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
 Headers& Request::getHeaders()
 {
@@ -98,16 +97,14 @@ std::string Request::toString()
 /* ************************************************************************** */
 // PRIVATE
 
-// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 std::size_t Request::_getMaxMethodLen() throw()
 {
   std::size_t maxLen = 0;
-  for (std::size_t i = 0; i < _methods; i++) {
-    maxLen = std::max(maxLen, strlen(_methodMap[i].methodStr));
+  for (std::size_t i = 0; i < _methodMap.size(); i++) {
+    maxLen = std::max(maxLen, std::strlen(_methodMap[i].methodStr));
   }
   return maxLen;
 }
-// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
 std::string Request::_methodToString() const
 {

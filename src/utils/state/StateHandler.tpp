@@ -4,40 +4,31 @@
 #include "StateHandler.hpp"
 #endif
 
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/state/Done.hpp>
 #include <utils/state/IState.hpp>
-
-#include <cstddef>
 
 /* ************************************************************************** */
 // PUBLIC
 template<typename Context>
 StateHandler<Context>::StateHandler(Context* context)
   : _context(context)
-  , _state(NULL)
   , _stateHasChanged(false)
 {
 }
 
 template<typename Context>
-StateHandler<Context>::~StateHandler()
-{
-  delete _state;
-}
-
-template<typename Context>
 IState<Context>* StateHandler<Context>::getState() const
 {
-  return _state;
+  return _state.get();
 }
 
 template<typename Context>
 template<typename T>
 void StateHandler<Context>::setState()
 {
-  T* newState = new T(_context);
-  delete _state;
-  _state = newState;
+  _state.reset(new T(_context));
   setStateHasChanged(true);
 }
 
@@ -50,7 +41,7 @@ void StateHandler<Context>::setDone()
 template<typename Context>
 bool StateHandler<Context>::isDone() const
 {
-  return dynamic_cast<Done<Context>*>(_state) != NULL;
+  return dynamic_cast<Done<Context>*>(_state.get()) != FT_NULLPTR;
 }
 
 template<typename Context>

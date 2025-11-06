@@ -2,6 +2,8 @@
 #ifndef STATUS_CODE_HPP
 #define STATUS_CODE_HPP
 
+#include <libftpp/array.hpp>
+
 #include <ostream>
 #include <string>
 
@@ -31,7 +33,7 @@ private:
 
   struct CodeEntry;
   static const int _codes = 3;
-  static const CodeEntry _codeMap[_codes];
+  static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;
   const char* _reason;

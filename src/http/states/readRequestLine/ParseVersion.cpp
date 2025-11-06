@@ -6,6 +6,7 @@
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
@@ -14,7 +15,7 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cctype>
+#include <ctype.h>
 #include <string>
 
 /* ************************************************************************** */
@@ -51,7 +52,7 @@ void ParseVersion::run()
     return;
   }
 
-  if (_sequence.end()) {
+  if (_sequence.reachedEnd()) {
     _extractVersion();
     getContext()->getStateHandler().setState<ValidateRequest>();
     return;
@@ -74,10 +75,10 @@ void ParseVersion::_init()
   _buffReader.init(&_client->getInBuff());
 
   _sequence.addRule(rwsRule());
-  _sequence.addRule(new LiteralRule("HTTP/"));
-  _sequence.addRule(new RangeRule(::isdigit));
-  _sequence.addRule(new LiteralRule("."));
-  _sequence.addRule(new RangeRule(::isdigit));
+  _sequence.addRule(ft::make_shared<LiteralRule>("HTTP/"));
+  _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
+  _sequence.addRule(ft::make_shared<LiteralRule>("."));
+  _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
   _sequence.addRule(endOfLineRule());
   _sequence.setBufferReader(&_buffReader);
 }

@@ -10,7 +10,13 @@
 #	include "libftpp/type_traits.hpp"
 #	include "libftpp/utility.hpp"
 #	include <cstddef>
+#	include <memory>
 #	include <ostream>
+
+#	if __cplusplus < 201103L
+// Stop support with C++11 to avoid deprecation warnings.
+#		define LIBFTPP_SUPPORT_AUTO_PTR 1
+#	endif // __cplusplus < 201103L
 
 namespace ft {
 
@@ -93,13 +99,7 @@ public:
 	unique_ptr() throw();
 	// NOLINTBEGIN(google-explicit-constructor): Original in `std::unique_ptr`
 	// is not `explicit`.
-	template <typename Nullptr_t>
-	unique_ptr(Nullptr_t /*unused*/,
-	           typename ft::enable_if<
-	               ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
-	                   && !ft::is_pointer<Deleter>::value,
-	               _enabler>::type /*unused*/
-	           = _enabler()) throw();
+	unique_ptr(ft::nullptr_t /*unused*/) throw();
 	// NOLINTEND(google-explicit-constructor)
 	// 2)
 	template <typename Pointer>
@@ -135,6 +135,16 @@ public:
 	                   && _unique_ptr::is_compatible_deleter<E, Deleter>::value,
 	               _enabler>::type /*unused*/
 	           = _enabler()) throw();
+#	if LIBFTPP_SUPPORT_AUTO_PTR
+	// 8)
+	template <typename U>
+	unique_ptr(ft::rvalue<std::auto_ptr<U> >& u,
+	           typename ft::enable_if<
+	               ft::is_convertible<U*, T*>::value
+	                   && ft::is_same<Deleter, default_delete<T> >::value,
+	               _enabler>::type /*unused*/
+	           = _enabler()) throw();
+#	endif // LIBFTPP_SUPPORT_AUTO_PTR
 	// NOLINTEND(google-explicit-constructor)
 	~unique_ptr();
 	unique_ptr& operator=(ft::rvalue<unique_ptr>& r) throw();
@@ -378,13 +388,7 @@ public:
 	unique_ptr() throw();
 	// NOLINTBEGIN(google-explicit-constructor): Original in `std::unique_ptr`
 	// is not `explicit`.
-	template <typename Nullptr_t>
-	unique_ptr(Nullptr_t /*unused*/,
-	           typename ft::enable_if<
-	               ft::is_convertible<Nullptr_t, ft::nullptr_t>::value
-	                   && !ft::is_pointer<Deleter>::value,
-	               _enabler>::type /*unused*/
-	           = _enabler()) throw();
+	unique_ptr(ft::nullptr_t /*unused*/) throw();
 	// NOLINTEND(google-explicit-constructor)
 	// 2)
 	template <typename U>
@@ -562,6 +566,14 @@ public:
 	               _shared_ptr::is_compatible_smart_pointer<Y, T>::value,
 	               _enabler>::type /*unused*/
 	           = _enabler()) throw();
+#	if LIBFTPP_SUPPORT_AUTO_PTR
+	// 12)
+	template <typename Y>
+	shared_ptr(ft::rvalue<std::auto_ptr<Y> >& r,
+	           typename ft::enable_if<ft::is_convertible<Y*, T*>::value,
+	                                  _enabler>::type /*unused*/
+	           = _enabler());
+#	endif // LIBFTPP_SUPPORT_AUTO_PTR
 	// 13)
 	template <typename Y, typename Deleter>
 	shared_ptr(

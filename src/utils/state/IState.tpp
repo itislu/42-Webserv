@@ -4,9 +4,8 @@
 #include "IState.hpp"
 #endif
 
-#include "libftpp/utility.hpp"
+#include <libftpp/utility.hpp>
 
-#include <cassert>
 #include <stdexcept>
 
 /* ************************************************************************** */
@@ -19,11 +18,6 @@ IState<Context>::IState(Context* context)
   if (_context == FT_NULLPTR) {
     throw std::invalid_argument("Context pointer cannot be null");
   }
-}
-
-template<typename Context>
-IState<Context>::~IState()
-{
 }
 
 template<typename Context>

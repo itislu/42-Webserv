@@ -1,5 +1,6 @@
 #include "RangeRule.hpp"
 
+#include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 
@@ -39,18 +40,17 @@ bool RangeRule::matches()
   }
   const char chr = getBuffReader()->getNextChar();
 
-  setEndOfRule(true);
   bool matches = false;
-
   switch (_range.type) {
     case Func:
       matches = _range.func(chr) != 0;
       break;
     case Charset:
-      matches = std::strchr(_range.set, chr) != NULL;
+      matches = std::strchr(_range.set, chr) != FT_NULLPTR;
       break;
   }
 
+  setReachedEnd(matches);
   debugPrintMatchStatus(matches);
   return matches;
 }
@@ -58,7 +58,7 @@ bool RangeRule::matches()
 
 void RangeRule::reset()
 {
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void RangeRule::setBufferReader(BufferReader* bufferReader)

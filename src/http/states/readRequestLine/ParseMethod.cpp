@@ -5,7 +5,9 @@
 #include <http/StatusCode.hpp>
 #include <http/states/readRequestLine/ParseUri.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
@@ -15,7 +17,7 @@
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
 
-#include <cctype>
+#include <ctype.h>
 #include <string>
 
 /* ************************************************************************** */
@@ -47,7 +49,7 @@ void ParseMethod::run()
     return;
   }
 
-  if (_sequence.end()) {
+  if (_sequence.reachedEnd()) {
     _extractMethod();
     getContext()->getStateHandler().setState<ParseUri>();
     return;
@@ -61,10 +63,11 @@ void ParseMethod::_init()
 {
   _buffReader.init(&_client->getInBuff());
 
-  RepetitionRule* rep = new RepetitionRule(new RangeRule(::isupper));
+  ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(::isupper));
   rep->setMax(static_cast<int>(Request::MaxMethodLen));
-  _sequence.addRule(rep);
-  _sequence.addRule(new LiteralRule(" "));
+  _sequence.addRule(ft::move(rep));
+  _sequence.addRule(ft::make_shared<LiteralRule>(" "));
 
   _sequence.setBufferReader(&_buffReader);
 }

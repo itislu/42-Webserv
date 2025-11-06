@@ -1,10 +1,10 @@
 #include "Rule.hpp"
 
 #include <libftpp/format.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 
-#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -18,15 +18,15 @@ bool Rule::debugPrint = false;
 // PUBLIC
 
 Rule::Rule()
-  : _endOfRule(false)
+  : _reachedEnd(false)
   , _buffReader()
   , _startPos()
   , _endPos()
   , _ruleId(_ruleIdUndefined)
-  , _results(NULL)
+  , _results(FT_NULLPTR)
   , _debugPrintIndent(_debugInitPrintIndent)
-  , _debugTag(NULL)
-  , _debugMatchReason(NULL)
+  , _debugTag(FT_NULLPTR)
+  , _debugMatchReason(FT_NULLPTR)
 {
   setDebugTag("Base Rule");
 }
@@ -40,7 +40,7 @@ bool Rule::matches()
 
 void Rule::reset()
 {
-  _endOfRule = false;
+  _reachedEnd = false;
 }
 
 void Rule::setBufferReader(BufferReader* bufferReader)
@@ -53,9 +53,9 @@ void Rule::setResultMap(ResultMap* results)
   _results = results;
 }
 
-bool Rule::end() const
+bool Rule::reachedEnd() const
 {
-  return _endOfRule;
+  return _reachedEnd;
 }
 
 void Rule::setRuleId(RuleId ruleId)
@@ -86,9 +86,9 @@ void Rule::setDebugMatchReason(const char* reason)
 /* ************************************************************************** */
 // PROTECTED
 
-void Rule::setEndOfRule(bool value)
+void Rule::setReachedEnd(bool value)
 {
-  _endOfRule = value;
+  _reachedEnd = value;
 }
 
 BufferReader* Rule::getBuffReader()
@@ -130,7 +130,7 @@ void Rule::moveToEndPos()
 
 void Rule::addRuleResult(bool matches)
 {
-  if (_results == NULL || _ruleId == _ruleIdUndefined || !matches) {
+  if (_results == FT_NULLPTR || _ruleId == _ruleIdUndefined || !matches) {
     return;
   }
   ResultMap& results = *_results;
@@ -163,7 +163,7 @@ void Rule::debugPrintMatchStatus(bool matches)
     std::cout << ft::red("no match");
   }
 
-  if (_debugMatchReason != NULL) {
+  if (_debugMatchReason != FT_NULLPTR) {
     std::cout << "  (" << _debugMatchReason << ")";
   }
 

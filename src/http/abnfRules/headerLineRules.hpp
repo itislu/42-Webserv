@@ -9,12 +9,12 @@
 #include <utils/abnfRules/SequenceRule.hpp>
 
 ft::unique_ptr<SequenceRule> fieldLinePartRule();
-SequenceRule* fieldLineRule();
-RepetitionRule* fieldNameRule();
-RepetitionRule* tokenRule();
-RepetitionRule* fieldValueRule();
-SequenceRule* fieldContentRule();
-AlternativeRule* fieldVcharRule();
-RangeRule* obsTextRule();
+ft::shared_ptr<SequenceRule> fieldLineRule();
+ft::shared_ptr<RepetitionRule> fieldNameRule();
+ft::shared_ptr<RepetitionRule> tokenRule();
+ft::shared_ptr<RepetitionRule> fieldValueRule();
+ft::shared_ptr<SequenceRule> fieldContentRule();
+ft::shared_ptr<AlternativeRule> fieldVcharRule();
+ft::shared_ptr<RangeRule> obsTextRule();
 
 #endif

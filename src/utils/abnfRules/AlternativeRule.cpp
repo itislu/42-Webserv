@@ -1,9 +1,10 @@
 #include "AlternativeRule.hpp"
 
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 
-#include <algorithm>
 #include <cstddef>
 
 /* ************************************************************************** */
@@ -15,12 +16,7 @@ AlternativeRule::AlternativeRule()
   setDebugTag("Alternative");
 }
 
-AlternativeRule::~AlternativeRule()
-{
-  for (std::size_t i = 0; i < _rules.size(); i++) {
-    delete _rules[i];
-  }
-}
+AlternativeRule::~AlternativeRule() {}
 
 bool AlternativeRule::matches()
 {
@@ -46,7 +42,7 @@ void AlternativeRule::reset()
   for (std::size_t i = 0; i < _rules.size(); i++) {
     _rules[i]->reset();
   }
-  setEndOfRule(false);
+  setReachedEnd(false);
 }
 
 void AlternativeRule::setBufferReader(BufferReader* bufferReader)
@@ -65,9 +61,9 @@ void AlternativeRule::setResultMap(ResultMap* results)
   }
 }
 
-void AlternativeRule::addRule(Rule* rule)
+void AlternativeRule::addRule(ft::shared_ptr<Rule> rule)
 {
-  _rules.push_back(rule);
+  _rules.push_back(ft::move(rule));
 }
 
 /* ************************************************************************** */
@@ -100,8 +96,11 @@ bool AlternativeRule::_greedyMode()
     _rules[i]->setDebugPrintIndent(getDebugPrintIndent() + 2);
 
     if (_rules[i]->matches()) {
-      setEndPos(std::max(getBuffReader()->getPosInBuff(), getEndPos()));
       somethingMatched = true;
+      if (getBuffReader()->getPosInBuff() > getEndPos()) {
+        setReachedEnd(_rules[i]->reachedEnd());
+        setEndPos(getBuffReader()->getPosInBuff());
+      }
     }
     rewindToStartPos();
   }

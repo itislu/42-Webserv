@@ -3,6 +3,7 @@
 #define PARSE_URI_HPP
 
 #include <http/Uri.hpp>
+#include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -50,7 +51,7 @@ private:
   BufferReader _buffReader;
   Uri _tmpUri;
 
-  SequenceRule* _sequence;
+  ft::unique_ptr<SequenceRule> _sequence;
   Rule::ResultMap _results;
   bool _initParser;
   Logger* _log;

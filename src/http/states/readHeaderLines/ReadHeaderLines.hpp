@@ -4,6 +4,7 @@
 
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
+#include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/logger/Logger.hpp>
@@ -25,12 +26,15 @@ private:
   void _init();
   void _readLines();
   void _setNextState();
+  bool _hasEndOfLine();
   std::string _extractPart(const Rule::RuleId& ruleId);
   void _addLineToHeaders(const std::string& line);
 
   Client* _client;
   ft::unique_ptr<SequenceRule> _fieldLine;
-  SequenceRule* _endOfLine;
+  // Could be unique_ptr, but gets assigned from a function returning
+  // shared_ptr.
+  ft::shared_ptr<LiteralRule> _endOfLine;
   BufferReader _buffReader;
   Rule::ResultMap _results;
   Logger* _log;
