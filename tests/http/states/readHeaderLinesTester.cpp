@@ -2,6 +2,8 @@
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
@@ -55,6 +57,24 @@ TEST(ReadHeaderLinesTester, HeaderList)
 
   EXPECT_NO_THROW(EXPECT_EQ(headers["Host"], "webserv"));
   EXPECT_NO_THROW(EXPECT_EQ(headers["sec-ch-ua"], headerValue));
+}
+
+/**
+ * obs-fold     = OWS CRLF RWS
+ * A server that receives an obs-fold in a request message that is not within a
+ * "message/http" container MUST either reject the message by sending a 400 (Bad
+ * Request), [...]
+ * https://datatracker.ietf.org/doc/html/rfc9112#name-obsolete-line-folding
+ */
+TEST(ReadRequestLineTester, ObsoleteLineFolding)
+{
+  std::string line("Host: webserv\r\n"
+                   " Content-Length: 7\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
 }
 
 // NOLINTEND
