@@ -3,7 +3,6 @@
 #include "config/ParsedConfig.hpp"
 #include "config/ParsedLocation.hpp"
 #include "config/ServerConfig.hpp"
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -18,19 +17,7 @@ LocationConfig LocationBuilder::build(const ParsedLocation& parsed,
        ++it) {
     const std::string& key = it->first;
     const std::vector<std::string>& values = it->second;
-    if (key == "root" && !values.empty()) {
-      location.setRoot(values[0]);
-    } else if (key == "index" && !values.empty()) {
-      location.setIndex(values[0]);
-    } else if (key == "allow_methods") {
-      for (std::vector<std::string>::const_iterator vit = values.begin();
-           vit != values.end();
-           ++vit) {
-        location.addAllowedMethod(*vit);
-      }
-    } else {
-      std::cerr << "Warning: unknown directive in location: " << key << "\n";
-    }
+    checkDirectiveHandler(key, value, location);
   }
 
   return location;

@@ -57,6 +57,10 @@ void ConfigParser::parseDirective(
   if (_token.getType() != SEMICOLON) {
     invalidToken("parse directive - missing ';'");
   }
+
+  /* TODO: check for duplicates before inserting, duplicates only allowed for
+   * certain keys */
+
   directive[key] = value;
 }
 

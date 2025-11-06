@@ -30,7 +30,7 @@ private:
   ParsedConfig _parsed;
 };
 
-/* DELETE */
+/* TODO: */
 void printParsedConfig(ParsedConfig& parsed);
 
 #endif
