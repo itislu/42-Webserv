@@ -265,6 +265,102 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_FALSE(runParser(":::", *alter));
   EXPECT_FALSE(runParser("2001:db8:::", *alter));
   EXPECT_FALSE(runParser("::ffff:999.999.999.999", *alter));
+
+  // 6( h16 ":" ) ls32
+  EXPECT_TRUE(runParser("aaaa:bbbb:cccc:dddd:eeee:ffff:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("aaaa:bbbb:cccc:dddd:eeee:ffff:1.2.3.4", *alter));
+
+  // "::" 5( h16 ":" ) ls32
+  EXPECT_TRUE(runParser("::aaaa:bbbb:cccc:dddd:eeee:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("::aaaa:bbbb:cccc:dddd:eeee:1.2.3.4", *alter));
+
+  // [ h16 ] "::" 4( h16 ":" ) ls32
+  EXPECT_TRUE(runParser("1111::aaaa:bbbb:cccc:dddd:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111::aaaa:bbbb:cccc:dddd:1.2.3.4", *alter));
+  EXPECT_TRUE(runParser("::aaaa:bbbb:cccc:dddd:AAAA:BBBB", *alter));
+
+  // [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+  EXPECT_TRUE(runParser("1111:2222::aaaa:bbbb:cccc:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111:2222::aaaa:bbbb:cccc:1.2.3.4", *alter));
+  EXPECT_TRUE(runParser("1111::aaaa:bbbb:cccc:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("::aaaa:bbbb:cccc:AAAA:BBBB", *alter));
+
+  // [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+  EXPECT_TRUE(runParser("1111:2222:3333::aaaa:bbbb:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333::aaaa:bbbb:1.2.3.4", *alter));
+  EXPECT_TRUE(runParser("1111:2222::aaaa:bbbb:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111::aaaa:bbbb:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("::aaaa:bbbb:AAAA:BBBB", *alter));
+
+  // [ *3( h16 ":" ) h16 ] "::" h16 ":" ls32
+  EXPECT_TRUE(runParser("1111:2222:3333:4444::aaaa:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444::aaaa:1.2.3.4", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333::aaaa:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111:2222::aaaa:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111::aaaa:AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("::aaaa:AAAA:BBBB", *alter));
+
+  // [ *4( h16 ":" ) h16 ] "::" ls32
+  EXPECT_TRUE(runParser("1111:2222:3333:4444:5555::AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444:5555::1.2.3.4", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444::AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333::AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111:2222::AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("1111::AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("::AAAA:BBBB", *alter));
+  EXPECT_TRUE(runParser("::1.2.3.4", *alter));
+
+  // [ *5( h16 ":" ) h16 ] "::" h16
+  EXPECT_TRUE(runParser("1111:2222:3333:4444:5555:6666::aaaa", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444:5555::aaaa", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444::aaaa", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333::aaaa", *alter));
+  EXPECT_TRUE(runParser("1111:2222::aaaa", *alter));
+  EXPECT_TRUE(runParser("1111::aaaa", *alter));
+  EXPECT_TRUE(runParser("::aaaa", *alter));
+
+  // [ *6( h16 ":" ) h16 ] "::"
+  EXPECT_TRUE(runParser("1111:2222:3333:4444:5555:6666:7777::", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444:5555:6666::", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444:5555::", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333:4444::", *alter));
+  EXPECT_TRUE(runParser("1111:2222:3333::", *alter));
+  EXPECT_TRUE(runParser("1111:2222::", *alter));
+  EXPECT_TRUE(runParser("1111::", *alter));
+
+  // --- Invalid Tests ---
+  // More than 8 h16 groups.
+  EXPECT_FALSE(runParser("0:1:2:3:4:5:6:7:8", *alter));
+  // Multiple "::".
+  EXPECT_FALSE(runParser("2001:db8:85a3::8a2e::7334", *alter));
+  EXPECT_FALSE(runParser("2001:db8::85a3:8a2e::7334", *alter));
+  // Invalid character.
+  EXPECT_FALSE(runParser("2001:db8:85a3:z:0:8a2e:370:7334", *alter));
+  // Invalid IPv4 part.
+  EXPECT_FALSE(runParser("::ffff:999.999.999.999", *alter));
+  EXPECT_FALSE(runParser("2001:db8:85a3::192.168.1.1.5", *alter));
+  // Invalid separators or endings.
+  EXPECT_FALSE(runParser(":::", *alter));
+  EXPECT_FALSE(runParser("2001:db8:::", *alter));
+  EXPECT_FALSE(runParser("2001:db8:85a3 ", *alter));
+  EXPECT_FALSE(runParser("2001::1: ", *alter));
+  EXPECT_FALSE(runParser("1:2: ", *alter));
+  EXPECT_FALSE(runParser("0:1:2:3:4:5:6:7:", *alter));
+  EXPECT_FALSE(runParser(":2001::1", *alter));
+  EXPECT_FALSE(runParser(":2001:1", *alter));
+  EXPECT_FALSE(runParser(":0", *alter));
+  // Too many h16 groups with "::".
+  EXPECT_FALSE(runParser("1:2:3:4:5:6:7:8::", *alter));
+  EXPECT_FALSE(runParser("1:2:3:4:5:6:7::8", *alter));
+  EXPECT_FALSE(runParser("1:2:3:4:5:6::7:8", *alter));
+  EXPECT_FALSE(runParser("1:2:3:4:5::6:7:8", *alter));
+  EXPECT_FALSE(runParser("1:2:3:4::5:6:7:8", *alter));
+  EXPECT_FALSE(runParser("1:2:3::4:5:6:7:8", *alter));
+  EXPECT_FALSE(runParser("1:2::3:4:5:6:7:8", *alter));
+  EXPECT_FALSE(runParser("1::2:3:4:5:6:7:8", *alter));
+  EXPECT_FALSE(runParser("::1:2:3:4:5:6:7:8", *alter));
+  // h16 group too long.
+  EXPECT_FALSE(runParser("01234::", *alter));
 }
 
 /**
