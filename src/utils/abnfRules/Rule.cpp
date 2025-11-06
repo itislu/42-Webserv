@@ -68,6 +68,11 @@ void Rule::setDebugTag(const char* str)
   _debugTag = str;
 }
 
+const char* Rule::getDebugTag() const
+{
+  return _debugTag;
+}
+
 void Rule::setDebugPrintIndent(int value)
 {
   _debugPrintIndent = value;
