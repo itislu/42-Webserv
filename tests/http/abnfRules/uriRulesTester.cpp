@@ -244,11 +244,7 @@ TEST(UriAbnfTest, IPv6address)
 {
   ft::shared_ptr<AlternativeRule> alter = ipv6AddressRule();
 
-  // Todo
-  // EXPECT_TRUE(runParser("2001:db8::1", *alter));
-  // this fails because *5( h16 ":" ) matches twice
-  // if it would match once and then try the rest it would work
-  // Fix could be to manualy configure each combination
+  EXPECT_TRUE(runParser("2001:db8::1", *alter));
 
   EXPECT_TRUE(runParser("2001:0db8:0000:0000:0000:ff00:0042:8329", *alter));
   EXPECT_TRUE(runParser("::0db8:0000:0000:0000:ff00:0042:8329", *alter));

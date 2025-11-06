@@ -263,6 +263,24 @@ static ft::shared_ptr<RepetitionRule> h16_colon(int min, int max)
 }
 
 /**
+ * ipv6AddressRule helper function for repeating "h16 ':'" followed by "::"
+ *
+ * '1*(max+1)( h16 ":" ) ":" / "::"' == '[ *max( h16 ":" ) h16 ] "::"'
+ */
+static ft::shared_ptr<AlternativeRule> h16_colon_dcolon(int max)
+{
+  ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
+  seq->addRule(h16_colon(1, max));
+  seq->addRule(ft::make_shared<LiteralRule>(":"));
+
+  const ft::shared_ptr<AlternativeRule> alt =
+    ft::make_shared<AlternativeRule>();
+  alt->addRule(ft::move(seq));
+  alt->addRule(ft::make_shared<LiteralRule>("::"));
+  return alt;
+}
+
+/**
  *                                          6( h16 ":" ) ls32
  */
 static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt1()
@@ -312,15 +330,7 @@ static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt3()
 static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt4()
 {
   const ft::shared_ptr<SequenceRule> rule = ft::make_shared<SequenceRule>();
-  ft::shared_ptr<SequenceRule> opt = ft::make_shared<SequenceRule>();
-  opt->addRule(h16_colon(0, 1));
-  opt->addRule(h16Rule());
-  ft::shared_ptr<RepetitionRule> optWrap =
-    ft::make_shared<RepetitionRule>(ft::move(opt));
-  optWrap->setMin(0);
-  optWrap->setMax(1);
-  rule->addRule(ft::move(optWrap));
-  rule->addRule(ft::make_shared<LiteralRule>("::"));
+  rule->addRule(h16_colon_dcolon(2));
   rule->addRule(h16_colon(3, 3));
   rule->addRule(ls32Rule());
   return rule;
@@ -332,15 +342,7 @@ static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt4()
 static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt5()
 {
   const ft::shared_ptr<SequenceRule> rule = ft::make_shared<SequenceRule>();
-  ft::shared_ptr<SequenceRule> opt = ft::make_shared<SequenceRule>();
-  opt->addRule(h16_colon(0, 2));
-  opt->addRule(h16Rule());
-  ft::shared_ptr<RepetitionRule> optWrap =
-    ft::make_shared<RepetitionRule>(ft::move(opt));
-  optWrap->setMin(0);
-  optWrap->setMax(1);
-  rule->addRule(ft::move(optWrap));
-  rule->addRule(ft::make_shared<LiteralRule>("::"));
+  rule->addRule(h16_colon_dcolon(3));
   rule->addRule(h16_colon(2, 2));
   rule->addRule(ls32Rule());
   return rule;
@@ -352,15 +354,7 @@ static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt5()
 static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt6()
 {
   const ft::shared_ptr<SequenceRule> rule = ft::make_shared<SequenceRule>();
-  ft::shared_ptr<SequenceRule> opt = ft::make_shared<SequenceRule>();
-  opt->addRule(h16_colon(0, 3));
-  opt->addRule(h16Rule());
-  ft::shared_ptr<RepetitionRule> optWrap =
-    ft::make_shared<RepetitionRule>(ft::move(opt));
-  optWrap->setMin(0);
-  optWrap->setMax(1);
-  rule->addRule(ft::move(optWrap));
-  rule->addRule(ft::make_shared<LiteralRule>("::"));
+  rule->addRule(h16_colon_dcolon(4));
   rule->addRule(h16Rule());
   rule->addRule(ft::make_shared<LiteralRule>(":"));
   rule->addRule(ls32Rule());
@@ -372,16 +366,9 @@ static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt6()
  */
 static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt7()
 {
+  const int max = 5;
   const ft::shared_ptr<SequenceRule> rule = ft::make_shared<SequenceRule>();
-  ft::shared_ptr<SequenceRule> opt = ft::make_shared<SequenceRule>();
-  opt->addRule(h16_colon(0, 4));
-  opt->addRule(h16Rule());
-  ft::shared_ptr<RepetitionRule> optWrap =
-    ft::make_shared<RepetitionRule>(ft::move(opt));
-  optWrap->setMin(0);
-  optWrap->setMax(1);
-  rule->addRule(ft::move(optWrap));
-  rule->addRule(ft::make_shared<LiteralRule>("::"));
+  rule->addRule(h16_colon_dcolon(max));
   rule->addRule(ls32Rule());
   return rule;
 }
@@ -391,18 +378,9 @@ static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt7()
  */
 static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt8()
 {
-  const int min = 0;
-  const int max = 5;
+  const int max = 6;
   const ft::shared_ptr<SequenceRule> rule = ft::make_shared<SequenceRule>();
-  ft::shared_ptr<SequenceRule> opt = ft::make_shared<SequenceRule>();
-  opt->addRule(h16_colon(min, max));
-  opt->addRule(h16Rule());
-  ft::shared_ptr<RepetitionRule> optWrap =
-    ft::make_shared<RepetitionRule>(ft::move(opt));
-  optWrap->setMin(0);
-  optWrap->setMax(1);
-  rule->addRule(ft::move(optWrap));
-  rule->addRule(ft::make_shared<LiteralRule>("::"));
+  rule->addRule(h16_colon_dcolon(max));
   rule->addRule(h16Rule());
   return rule;
 }
@@ -412,18 +390,9 @@ static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt8()
  */
 static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt9()
 {
-  const int min = 0;
-  const int max = 6;
+  const int max = 7;
   const ft::shared_ptr<SequenceRule> rule = ft::make_shared<SequenceRule>();
-  ft::shared_ptr<SequenceRule> opt = ft::make_shared<SequenceRule>();
-  opt->addRule(h16_colon(min, max));
-  opt->addRule(h16Rule());
-  ft::shared_ptr<RepetitionRule> optWrap =
-    ft::make_shared<RepetitionRule>(ft::move(opt));
-  optWrap->setMin(0);
-  optWrap->setMax(1);
-  rule->addRule(ft::move(optWrap));
-  rule->addRule(ft::make_shared<LiteralRule>("::"));
+  rule->addRule(h16_colon_dcolon(max));
   return rule;
 }
 
