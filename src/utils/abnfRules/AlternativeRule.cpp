@@ -96,11 +96,11 @@ bool AlternativeRule::_greedyMode()
     _rules[i]->setDebugPrintIndent(getDebugPrintIndent() + 2);
 
     if (_rules[i]->matches()) {
-      somethingMatched = true;
-      if (getBuffReader()->getPosInBuff() > getEndPos()) {
+      if (!somethingMatched || getBuffReader()->getPosInBuff() > getEndPos()) {
         setReachedEnd(_rules[i]->reachedEnd());
         setEndPos(getBuffReader()->getPosInBuff());
       }
+      somethingMatched = true;
     }
     rewindToStartPos();
   }

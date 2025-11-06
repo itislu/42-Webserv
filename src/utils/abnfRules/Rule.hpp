@@ -26,6 +26,7 @@ public:
   void setRuleId(RuleId ruleId);
 
   void setDebugTag(const char* str);
+  const char* getDebugTag() const;
   void setDebugPrintIndent(int value);
   int getDebugPrintIndent() const;
   void setDebugMatchReason(const char* reason);

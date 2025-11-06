@@ -435,6 +435,9 @@ TEST(UriAbnfTest, Path)
   EXPECT_TRUE(runParser(":abc", *alter));
   EXPECT_TRUE(runParser("a:b/c", *alter));
   EXPECT_TRUE(runParser("@user", *alter));
+
+  // Invalid
+  EXPECT_FALSE(runParser("?pub", *alter));
 }
 
 /**
@@ -490,6 +493,9 @@ TEST(UriAbnfTest, PathNoScheme)
   EXPECT_FALSE(runParser("//abc", *sequence));
   EXPECT_FALSE(runParser("///", *sequence));
   EXPECT_FALSE(runParser("//abc/", *sequence));
+  EXPECT_FALSE(runParser("?pub", *sequence));
+  EXPECT_FALSE(runParser("/a/?pub", *sequence));
+  EXPECT_FALSE(runParser("/a/pub?", *sequence));
 }
 
 /**
@@ -593,10 +599,13 @@ TEST(UriAbnfTest, SegmentNzNc)
   // Invalid
   // valid until : so cout is 3
   EXPECT_FALSE(runParser("foo:bar", sequence));
-  // EXPECT_TRUE(rep->getReps(), 3);
+  EXPECT_EQ(rep->getReps(), 3);
   EXPECT_FALSE(runParser("a:b", sequence));
-  // EXPECT_TRUE(rep->getReps(), 1);
+  EXPECT_EQ(rep->getReps(), 1);
   EXPECT_FALSE(runParser(":", sequence));
+  EXPECT_EQ(rep->getReps(), 0);
+  EXPECT_FALSE(runParser("?", sequence));
+  EXPECT_EQ(rep->getReps(), 0);
 }
 
 /**
@@ -634,6 +643,8 @@ TEST(UriAbnfTest, Query)
   SequenceRule sequence;
   sequence.addRule(queryRule());
   EXPECT_TRUE(runParser("abc%0F!ac/abc/?", sequence));
+  EXPECT_TRUE(runParser("?abc%0F!ac/abc/?", sequence));
+  EXPECT_TRUE(runParser("???", sequence));
 }
 
 /**
