@@ -3,6 +3,8 @@
 #include <client/Client.hpp>
 #include <gtest/gtest.h>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <string>
 #include <utils/state/IState.hpp>
@@ -193,26 +195,26 @@ TEST(ReadRequestLineTester, PathQuery)
   EXPECT_EQ(request.getVersion(), "HTTP/1.1");
 }
 
-TEST(ReadRequestLineTester, BadPath)
+TEST(ReadRequestLineTester, PathBadRequest)
 {
   std::string line("GET "
                    "//www.example.org "
                    "HTTP/1.1\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
-  Request& request = client->getRequest();
-  (void)request;
-  // TODO Don't know what to test for in a bad request.
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
 }
 
-TEST(ReadRequestLineTester, BadQuery)
+TEST(ReadRequestLineTester, QueryBadRequest)
 {
   std::string line("GET "
                    "?query//www.example.org "
                    "HTTP/1.1\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
-  Request& request = client->getRequest();
-  (void)request;
-  // TODO Don't know what to test for in a bad request.
+  Response& request = client->getResponse();
+
+  EXPECT_EQ(request.getStatusCode().getCode(), StatusCode::BadRequest);
 }
 
 // NOLINTEND
