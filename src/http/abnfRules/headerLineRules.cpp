@@ -48,10 +48,17 @@ SequenceRule* fieldLineRule()
  */
 RepetitionRule* fieldNameRule()
 {
-  RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isTchar));
-  rep->setMin(1);
+  RepetitionRule* rep = tokenRule();
 
   rep->setDebugTag("fieldNameRule");
+  return rep;
+}
+
+RepetitionRule* tokenRule()
+{
+  RepetitionRule* rep = new RepetitionRule(new RangeRule(http::isTchar));
+  rep->setMin(1);
+  rep->setDebugTag("tokenRule");
   return rep;
 }
 
@@ -76,12 +83,10 @@ SequenceRule* fieldContentRule()
   // leading field-vchar
   seq->addRule(fieldVcharRule());
 
-  // optional trailing group
+  // 1*( SP / HTAB / field-vchar )
   AlternativeRule* spaceTabVchar = new AlternativeRule();
-  spaceTabVchar->addRule(new LiteralRule(" "));  // SP
-  spaceTabVchar->addRule(new LiteralRule("\t")); // HTAB
+  spaceTabVchar->addRule(new RangeRule(" \t"));  // SP, HTAB
   spaceTabVchar->addRule(fieldVcharRule());
-
   RepetitionRule* repeatPart = new RepetitionRule(spaceTabVchar);
   repeatPart->setMin(1);
 
@@ -104,14 +109,14 @@ SequenceRule* fieldContentRule()
 AlternativeRule* fieldVcharRule()
 {
   AlternativeRule* alter = new AlternativeRule();
-  alter->addRule(new RangeRule(::isprint));
+  alter->addRule(new RangeRule(http::isVchar));
   alter->addRule(obsTextRule());
   alter->setDebugTag("fieldVcharRule");
   return alter;
 }
 
 /**
- * RFC 9110 §5.5
+ * https://datatracker.ietf.org/doc/html/rfc9110/#name-field-values
  *
  * obs-text = %x80-FF
  */

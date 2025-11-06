@@ -84,11 +84,11 @@ Buffer& Request::getBody()
 std::string Request::toString()
 {
   std::stringstream oss;
-  oss << "\n{\n";
+  oss << "{\n";
   oss << "  \"method\": \"" << _methodToString() << "\",\n";
   oss << "  \"uri\": \n" << _uri.toString() << ",\n";
   oss << "  \"version\": \"" << _version << "\",\n";
-  oss << "  \"headers\": {\n";
+  oss << "  \"headers\": \n{\n";
   oss << _headers.toLogString();
   oss << "  }\n";
   oss << "}\n";

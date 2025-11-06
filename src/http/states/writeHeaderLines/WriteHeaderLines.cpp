@@ -25,7 +25,6 @@ void WriteHeaderLines::run()
   Headers& headers = _client->getResponse().getHeaders();
   headers.addHeader("Date", "Wed, 29 Oct 2025 12:00:00 GMT"); // TODO
   headers.addHeader("Server", "webserv"); // TODO from config probaly
-  headers.addHeader("Content-Type", "text/html");
   headers.addHeader("Connection", "close");
 
   Buffer& outBuffer = _client->getOutBuff();

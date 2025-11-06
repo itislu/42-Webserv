@@ -9,10 +9,10 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <sys/stat.h>
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <sys/stat.h>
 
 /* ************************************************************************** */
 // PUBLIC
@@ -29,6 +29,7 @@ HandleGet::HandleGet(PrepareResponse* context)
 void HandleGet::run()
 {
   _addContentLengthHeader();
+  _addContentType();
   _openFile();
   getContext()->getStateHandler().setDone();
 }
@@ -42,6 +43,7 @@ void HandleGet::_addContentLengthHeader()
 
   const std::string& path = _client->getRequest().getUri().getPath();
 
+  // todo just for testing
   if (ft::contains_subrange(path, std::string("get"))) {
     stat("./assets/testWebsite/get.html", &info);
   } else if (ft::contains_subrange(path, std::string("post"))) {
@@ -59,10 +61,17 @@ void HandleGet::_addContentLengthHeader()
   headers.addHeader("Content-Length", contentLength);
 }
 
+void HandleGet::_addContentType()
+{
+  Headers& headers = _client->getResponse().getHeaders();
+  headers.addHeader("Content-Type", "text/html");
+}
+
 void HandleGet::_openFile()
 {
   const std::string& path = _client->getRequest().getUri().getPath();
 
+  // todo just for testing
   std::string file;
   if (ft::contains_subrange(path, std::string("get"))) {
     file = "./assets/testWebsite/get.html";
@@ -74,6 +83,6 @@ void HandleGet::_openFile()
     file = "./assets/testWebsite/index.html";
   }
 
-  std::ifstream& body = _client->getResponse().getInputFileStream();
+  std::ifstream& body = _client->getResponse().getBody();
   body.open(file.c_str());
 }

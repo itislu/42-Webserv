@@ -15,7 +15,6 @@
 
 ReadRequestLine::ReadRequestLine(Client* context)
   : IState(context)
-  , _client(context)
   , _stateHandler(this)
   , _log(Logger::getInstance(logFiles::http))
 {
@@ -37,8 +36,11 @@ void ReadRequestLine::run()
   }
 
   if (_stateHandler.isDone()) {
-    _log.info() << getContext()->getRequest().toString() << "\n";
-    if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+    _log.info() << "ReadRequestLine result\n"
+                << getContext()->getRequest().toString() << "\n"
+                << "buffer: \n"
+                << getContext()->getInBuff().toString() << "\n";
+    if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
       getContext()->getStateHandler().setState<ReadHeaderLines>();
     } else {
       getContext()->getStateHandler().setState<PrepareResponse>();

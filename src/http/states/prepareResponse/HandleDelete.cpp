@@ -18,6 +18,7 @@ HandleDelete::HandleDelete(PrepareResponse* context)
 
 void HandleDelete::run()
 {
+  // todo
   getContext()->getStateHandler().setDone();
 }
 

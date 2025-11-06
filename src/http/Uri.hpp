@@ -19,7 +19,7 @@ public:
   const std::string& getFragment() const;
   void setFragment(const std::string& str);
 
-  std::string toString();
+  std::string toString() const;
 
 private:
   std::string _scheme;

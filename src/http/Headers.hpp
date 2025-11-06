@@ -14,14 +14,13 @@ public:
   std::string toString() const;
   std::string toLogString() const;
 
-  const std::string& operator[](const std::string& key);
+  const std::string& operator[](const std::string& key) const;
   bool contains(const std::string& key) const;
 
 private:
   typedef std::map<std::string, std::string> HeaderMap;
 
   static void _formatInput(std::string& key, std::string& value);
-  static bool _isValidInput(const std::string& key, const std::string& value);
   void _addNew(const std::string& key, const std::string& value);
   void _addExisting(const std::string& key, const std::string& value);
 

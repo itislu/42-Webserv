@@ -20,13 +20,13 @@ public:
 
   Headers& getHeaders();
 
-  std::ifstream& getInputFileStream();
+  std::ifstream& getBody();
 
 private:
   std::string _version;
   StatusCode _statuscode;
   Headers _headers;
-  std::ifstream _inputFileStream;
+  std::ifstream _body; // todo convert to Buffer type
 };
 
 #endif

@@ -22,10 +22,12 @@ WriteBody::WriteBody(Client* context)
 
 void WriteBody::run()
 {
-  const std::ifstream& ifs = _client->getResponse().getInputFileStream();
+  std::ifstream& ifs = _client->getResponse().getBody();
 
   if (!ifs.is_open()) {
     _log.error() << "Failed to open file\n";
+    _client->getStateHandler().setDone();
+    return;
   }
 
   std::ostringstream oss;

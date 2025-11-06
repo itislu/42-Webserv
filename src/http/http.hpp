@@ -20,6 +20,7 @@ int isDigit04(int chr);
 int isDigit05(int chr);
 int isWhitespace(int chr);
 int isObsText(int chr);
+int isVchar(int chr);
 }
 
 #endif

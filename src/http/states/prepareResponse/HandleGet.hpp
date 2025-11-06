@@ -18,6 +18,7 @@ public:
 
 private:
   void _addContentLengthHeader();
+  void _addContentType();
   void _openFile();
 
   PrepareResponse* _prepareResponse;

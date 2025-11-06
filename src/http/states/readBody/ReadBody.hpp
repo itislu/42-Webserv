@@ -19,6 +19,9 @@ public:
 
 private:
   void _determineBodyFraming();
+  bool _isValidContentLength();
+  bool _isValidTransferEncoding();
+
   void _readFixedLengthBody();
   void _readChunkedBody();
 
@@ -26,7 +29,10 @@ private:
   Logger* _log;
   bool _initialized;
   bool _fixedLengthBody;
-  std::size_t _bodyLength;
+  bool _chunked;
+  long _bodyLength;
+  long _consumed;
+  bool _done;
 };
 
 #endif

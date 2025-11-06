@@ -11,6 +11,7 @@
 ft::unique_ptr<SequenceRule> fieldLinePartRule();
 SequenceRule* fieldLineRule();
 RepetitionRule* fieldNameRule();
+RepetitionRule* tokenRule();
 RepetitionRule* fieldValueRule();
 SequenceRule* fieldContentRule();
 AlternativeRule* fieldVcharRule();

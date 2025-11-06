@@ -1,6 +1,9 @@
 #include "ReadBody.hpp"
+#include "libftpp/string.hpp"
 
+#include <algorithm>
 #include <client/Client.hpp>
+#include <cstddef>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
@@ -22,7 +25,10 @@ ReadBody::ReadBody(Client* context)
   , _log(&Logger::getInstance(logFiles::http))
   , _initialized(false)
   , _fixedLengthBody(false)
+  , _chunked(false)
   , _bodyLength(0)
+  , _consumed(0)
+  , _done(false)
 {
   _log->info() << "ReadBody\n";
 }
@@ -33,10 +39,17 @@ void ReadBody::run()
     _initialized = true;
     _determineBodyFraming();
   }
+
   if (_fixedLengthBody) {
     _readFixedLengthBody();
-  } else {
+  } else if (_chunked) {
     _readChunkedBody();
+  } else {
+    getContext()->getStateHandler().setState<PrepareResponse>();
+  }
+
+  if (_done) {
+    getContext()->getStateHandler().setState<PrepareResponse>();
   }
 }
 
@@ -45,29 +58,25 @@ void ReadBody::run()
 
 void ReadBody::_determineBodyFraming()
 {
-  Headers& headers = _client->getRequest().getHeaders();
+  const Headers& headers = _client->getRequest().getHeaders();
   const bool hasTransferEncoding = headers.contains("Transfer-Encoding");
   const bool hasContentLength = headers.contains("Content-Length");
-  // todo add grama rules for these headers
+  // todo add grammar rules for these headers
   if (hasContentLength && hasTransferEncoding) {
     _log->error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
   } else if (hasContentLength) {
-    _fixedLengthBody = true;
-    std::stringstream strBodyLen(headers["Content-Length"]);
-    strBodyLen >> _bodyLength;
-    if (!strBodyLen.fail()) {
+    if (_isValidContentLength()) {
       return;
     }
-    _log->error() << "ReadBody: failed to read content length\n";
+    _log->error() << "ReadBody: invalid Content-Length\n";
   } else if (hasTransferEncoding) {
-    const std::string& value = headers["Transfer-Encoding"];
-    if (ft::contains_subrange(value, "chunked")) {
+    if (_isValidTransferEncoding()) {
       return;
     }
     _log->error() << "ReadBody: transfer encoding unsupported\n";
   } else {
     _log->info() << "ReadBody: no body framing defined\n";
-    return;
+    return; // OK no body
   }
 
   // Error case
@@ -75,15 +84,55 @@ void ReadBody::_determineBodyFraming()
   _client->getStateHandler().setState<PrepareResponse>();
 }
 
+bool ReadBody::_isValidContentLength()
+{
+  const Headers& headers = _client->getRequest().getHeaders();
+  std::stringstream strBodyLen(headers["Content-Length"]);
+  strBodyLen >> _bodyLength;
+  if (strBodyLen.fail()) {
+    return false;
+  }
+  _fixedLengthBody = true;
+  return true;
+}
+
+bool ReadBody::_isValidTransferEncoding()
+{
+  const Headers& headers = _client->getRequest().getHeaders();
+  const std::string& value = headers["Transfer-Encoding"];
+  if (ft::contains_subrange(ft::to_lower(value), "chunked")) {
+    return true;
+  }
+  _chunked = true;
+  return false;
+}
+
 void ReadBody::_readFixedLengthBody()
 {
-  // todo for large bodies, write to file
-  // or make buffer smart so the buffer writes to a file
-  // when it gets to big
+  // TODO: For large bodies, write to file or use a smart buffer that flushes to
+  // file.
   Buffer& inBuffer = _client->getInBuff();
   Request& request = _client->getRequest();
+
   const long size = static_cast<long>(inBuffer.getSize());
-  request.getBody().add(inBuffer.consume(size));
+  if (size <= 0 || _done) {
+    return;
+  }
+
+  const long chunkSize = 1024;
+  long toConsume = std::min<long>(chunkSize, _bodyLength - _consumed);
+  toConsume = std::min<long>(toConsume, size);
+
+  if (toConsume <= 0) {
+    return;
+  }
+
+  request.getBody().add(inBuffer.consume(toConsume));
+  _consumed += toConsume;
+
+  if (_consumed >= _bodyLength) {
+    _done = true;
+  }
 }
 
 void ReadBody::_readChunkedBody()

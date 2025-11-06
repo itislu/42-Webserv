@@ -1,8 +1,8 @@
 #include "Headers.hpp"
-#include "http/http.hpp"
-#include "libftpp/string.hpp"
 
-#include <exception>
+#include <http/http.hpp>
+#include <libftpp/string.hpp>
+
 #include <sstream>
 #include <string>
 
@@ -15,7 +15,7 @@ void Headers::addHeader(const std::string& key, const std::string& value)
   std::string valueFormated = value;
   _formatInput(keyFormated, valueFormated);
 
-  if (!_isValidInput(keyFormated, valueFormated)) {
+  if (key.empty()) {
     return;
   }
 
@@ -53,19 +53,14 @@ std::string Headers::toLogString() const
   return oss.str();
 }
 
-const std::string& Headers::operator[](const std::string& key)
+const std::string& Headers::operator[](const std::string& key) const
 {
-  return _headers[key];
+  return _headers.at(ft::to_lower(key));
 }
 
 bool Headers::contains(const std::string& key) const
 {
-  try {
-    _headers.at(key);
-    return true;
-  } catch (const std::exception& e) {
-    return false;
-  }
+  return _headers.find(ft::to_lower(key)) != _headers.end();
 }
 
 /* ************************************************************************** */
@@ -75,12 +70,8 @@ void Headers::_formatInput(std::string& key, std::string& value)
 {
   ft::trim(key);
   ft::trim(value);
-}
 
-bool Headers::_isValidInput(const std::string& key, const std::string& value)
-{
-  (void)value;
-  return (!key.empty());
+  ft::to_lower(key);
 }
 
 void Headers::_addNew(const std::string& key, const std::string& value)

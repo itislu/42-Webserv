@@ -73,6 +73,10 @@ add_my_test(utilsTester
 # http
 
 # http/parser
+add_my_test(headerLineRulesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerLineRulesTester.cpp
+)
+
 add_my_test(uriRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/uriRulesTester.cpp
 )

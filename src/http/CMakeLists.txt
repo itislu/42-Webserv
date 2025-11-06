@@ -19,6 +19,7 @@ add_library(${LIB_NAME} STATIC
   states/readRequestLine/ParseUri.cpp
   states/readRequestLine/ParseVersion.cpp
   states/readRequestLine/ReadRequestLine.cpp
+  states/readRequestLine/ValidateRequest.cpp
   states/readHeaderLines/ReadHeaderLines.cpp
   states/writeBody/WriteBody.cpp
   states/writeHeaderLines/WriteHeaderLines.cpp

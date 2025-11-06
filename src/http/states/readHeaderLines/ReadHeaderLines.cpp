@@ -79,6 +79,7 @@ void ReadHeaderLines::_readLines()
     if (_fieldLine->matches()) {
       if (_fieldLine->end()) {
         const std::string fieldLine = _extractPart(FieldLinePart);
+        // todo parse each field value
         _addLineToHeaders(fieldLine);
       }
     } else if (_endOfLine->matches()) {
@@ -99,14 +100,7 @@ void ReadHeaderLines::_readLines()
 
 void ReadHeaderLines::_setNextState()
 {
-  // TODO always body ??
-  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
-    if (_client->getRequest().getMethod() == Request::POST) {
-      _client->getStateHandler().setState<ReadBody>();
-      return;
-    }
-  }
-  _client->getStateHandler().setState<PrepareResponse>();
+  _client->getStateHandler().setState<ReadBody>();
 }
 
 std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)

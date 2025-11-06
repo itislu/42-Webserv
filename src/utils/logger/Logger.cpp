@@ -17,15 +17,13 @@
 
 Logger& Logger::getInstance(const char* filename)
 {
-  const static Logger singelton; // necessary for cleanup
-
-  try {
-    return *_instances().at(filename);
-  } catch (const std::exception& e) {
-    const ft::shared_ptr<Logger> LoggerPtr(new Logger(filename));
-    _instances()[filename] = LoggerPtr;
-    return *LoggerPtr;
+  const InstanceMap::iterator iter = _instances().find(filename);
+  if (iter != _instances().end()) {
+    return *iter->second;
   }
+  const ft::shared_ptr<Logger> loggerPtr(new Logger(filename));
+  _instances()[filename] = loggerPtr;
+  return *loggerPtr;
 }
 
 std::ostream& Logger::info()
@@ -94,6 +92,7 @@ Logger::InstanceMap& Logger::_instances()
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 std::string Logger::_currentTime()
 {
+  //todo replace with lukas timestamp class
   std::time_t const now = std::time(FT_NULLPTR);
   const int bufSize = 32;
   char buff[bufSize];

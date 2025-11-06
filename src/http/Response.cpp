@@ -34,9 +34,9 @@ Headers& Response::getHeaders()
   return _headers;
 }
 
-std::ifstream& Response::getInputFileStream()
+std::ifstream& Response::getBody()
 {
-  return _inputFileStream;
+  return _body;
 }
 
 /* ************************************************************************** */

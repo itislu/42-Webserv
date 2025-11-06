@@ -1,4 +1,5 @@
 #include "ParseVersion.hpp"
+#include "http/states/readRequestLine/ValidateRequest.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
@@ -52,7 +53,7 @@ void ParseVersion::run()
 
   if (_sequence.end()) {
     _extractVersion();
-    getContext()->getStateHandler().setDone();
+    getContext()->getStateHandler().setState<ValidateRequest>();
     return;
   }
 }

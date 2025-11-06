@@ -56,7 +56,7 @@ void Uri::setFragment(const std::string& str)
   _fragment = str;
 }
 
-std::string Uri::toString()
+std::string Uri::toString() const
 {
   std::stringstream oss;
 

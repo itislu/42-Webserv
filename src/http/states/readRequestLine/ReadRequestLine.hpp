@@ -19,7 +19,6 @@ public:
   StateHandler<ReadRequestLine>& getStateHandler();
 
 private:
-  Client* _client;
   StateHandler<ReadRequestLine> _stateHandler;
   Logger& _log; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
