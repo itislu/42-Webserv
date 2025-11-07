@@ -28,12 +28,12 @@ public:
   Logger& warning();
   Logger& error();
 
-  ~Logger();
+  ~Logger() {}
 
 private:
   typedef std::map<const char*, ft::shared_ptr<Logger> > InstanceMap;
 
-  Logger() throw();
+  Logger() throw() {}
   explicit Logger(const char* filename);
   Logger(const Logger& other);
   Logger& operator=(const Logger& other);

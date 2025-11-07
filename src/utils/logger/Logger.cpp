@@ -16,7 +16,7 @@
 
 Logger& Logger::getInstance(const char* filename) throw()
 {
-  static Logger _loggersafety;
+  static Logger emptyLogger;
 
   try {
     // Existing Logger
@@ -30,7 +30,7 @@ Logger& Logger::getInstance(const char* filename) throw()
     _instances()[filename] = loggerPtr;
     return *loggerPtr;
   } catch (...) {
-    return _loggersafety;
+    return emptyLogger;
   }
 }
 
@@ -49,8 +49,6 @@ Logger& Logger::error()
 
 /* ***************************************************************************/
 // PRIVATE
-Logger::Logger() throw() {}
-
 Logger::Logger(const char* filename)
 {
   _file.open(filename, std::ios::out | std::ios::trunc);
@@ -60,14 +58,6 @@ Logger::Logger(const char* filename)
   }
 }
 
-Logger::~Logger()
-{
-  if (_file.is_open()) {
-    _file.close();
-  }
-}
-
-// NOLINTBEGIN(performance-avoid-endl)
 Logger& Logger::_log(LogLevel level)
 {
   if (!_file.is_open()) {
@@ -85,11 +75,10 @@ Logger& Logger::_log(LogLevel level)
       levelStr = "ERROR";
       break;
   }
-  _file << "[" << _currentTime() << "] [";
-  _file << std::setw(_widthLevelStr) << levelStr << "] ";
+  _file << "[" << _currentTime() << "] [" << std::setw(_widthLevelStr)
+        << levelStr << "] ";
   return *this;
 }
-// NOLINTEND(performance-avoid-endl)
 
 Logger::InstanceMap& Logger::_instances()
 {
