@@ -577,6 +577,7 @@ ft::shared_ptr<RepetitionRule> pathAbEmptyRule()
   ft::shared_ptr<SequenceRule> sequence = ft::make_shared<SequenceRule>();
   sequence->addRule(ft::make_shared<LiteralRule>("/"));
   sequence->addRule(segmentRule());
+  sequence->setDebugTag("\"/\" segment");
 
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::move(sequence));

@@ -6,6 +6,7 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
+#include <utils/abnfRules/EndRule.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
@@ -101,7 +102,10 @@ ft::shared_ptr<SequenceRule> fieldContentRule()
   ft::shared_ptr<SequenceRule> optSeq = ft::make_shared<SequenceRule>();
   optSeq->setDebugTag("[1*(SP/HTAB/field-vchar)field-vchar]");
   optSeq->addRule(ft::move(repeatPart));
-  // optSeq->addRule(fieldVcharRule()); // todo issue #58
+
+  ft::shared_ptr<EndRule> endVchar = ft::make_shared<EndRule>(fieldVcharRule());
+  endVchar->setDebugTag("endVchar");
+  optSeq->addRule(ft::move(endVchar));
 
   ft::shared_ptr<RepetitionRule> optWrap =
     ft::make_shared<RepetitionRule>(ft::move(optSeq));
@@ -120,8 +124,10 @@ ft::shared_ptr<AlternativeRule> fieldVcharRule()
 {
   const ft::shared_ptr<AlternativeRule> alter =
     ft::make_shared<AlternativeRule>();
+
   alter->addRule(ft::make_shared<RangeRule>(http::isVchar));
   alter->addRule(obsTextRule());
+
   alter->setDebugTag("VCHAR/obs-text");
   return alter;
 }

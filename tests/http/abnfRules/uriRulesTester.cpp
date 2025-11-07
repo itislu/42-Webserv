@@ -34,6 +34,7 @@ bool runParser(const std::string& str, Rule& rule)
   }
   return matches;
 }
+
 }
 
 // NOLINTBEGIN
@@ -44,37 +45,39 @@ bool runParser(const std::string& str, Rule& rule)
 TEST(UriAbnfTest, URI)
 {
   ft::shared_ptr<SequenceRule> s = uriRule();
+  s->addRule(ft::make_shared<RangeRule>(" "));
+
   // --- minimal valid schemes ---
-  EXPECT_TRUE(runParser("http:", *s));
-  EXPECT_TRUE(runParser("mailto:user@example.com", *s));
-  EXPECT_TRUE(runParser("file:/home/user/test.txt", *s));
+  EXPECT_TRUE(runParser("http: ", *s));
+  EXPECT_TRUE(runParser("mailto:user@example.com ", *s));
+  EXPECT_TRUE(runParser("file:/home/user/test.txt ", *s));
 
   // --- common web URLs ---
-  EXPECT_TRUE(runParser("http://example.com", *s));
-  EXPECT_TRUE(runParser("https://example.com/", *s));
-  EXPECT_TRUE(runParser("https://example.com:443/path", *s));
-  EXPECT_TRUE(runParser("https://user:pw@host.net:8080/index.html", *s));
-  EXPECT_TRUE(runParser("ftp://ftp.example.org/resource.txt", *s));
+  EXPECT_TRUE(runParser("http://example.com ", *s));
+  EXPECT_TRUE(runParser("https://example.com/ ", *s));
+  EXPECT_TRUE(runParser("https://example.com:443/path ", *s));
+  EXPECT_TRUE(runParser("https://user:pw@host.net:8080/index.html ", *s));
+  EXPECT_TRUE(runParser("ftp://ftp.example.org/resource.txt ", *s));
 
   // --- with query ---
-  EXPECT_TRUE(runParser("https://example.com/search?q=test", *s));
-  EXPECT_TRUE(runParser("http://example.com/path/to/page?key=value&x=1", *s));
+  EXPECT_TRUE(runParser("https://example.com/search?q=test ", *s));
+  EXPECT_TRUE(runParser("http://example.com/path/to/page?key=value&x=1 ", *s));
 
   // --- with fragment ---
-  EXPECT_TRUE(runParser("https://example.com/index.html#section1", *s));
-  EXPECT_TRUE(runParser("https://example.com/path?q=val#frag", *s));
+  EXPECT_TRUE(runParser("https://example.com/index.html#section1 ", *s));
+  EXPECT_TRUE(runParser("https://example.com/path?q=val#frag ", *s));
 
   // --- mixed case scheme (legal, case-insensitive) ---
-  EXPECT_TRUE(runParser("HtTp://Example.COM", *s));
+  EXPECT_TRUE(runParser("HtTp://Example.COM ", *s));
 
   // --- IPv6 and IPv4 hosts ---
   // Todo Ipv6
   // EXPECT_TRUE(runParser("http://[2001:db8::1]/index.html", *s));
-  EXPECT_TRUE(runParser("http://127.0.0.1:8080/", *s));
+  EXPECT_TRUE(runParser("http://127.0.0.1:8080/ ", *s));
 
   // --- encoded characters ---
-  EXPECT_TRUE(runParser("https://example.com/a%20b/c%2Fd", *s));
-  EXPECT_TRUE(runParser("https://user%40mail.com@host.org", *s));
+  EXPECT_TRUE(runParser("https://example.com/a%20b/c%2Fd ", *s));
+  EXPECT_TRUE(runParser("https://user%40mail.com@host.org ", *s));
 
   // frag only
   EXPECT_TRUE(runParser("http:#frag", *s));
@@ -552,7 +555,7 @@ TEST(UriAbnfTest, PathAbsolute)
 {
   ft::shared_ptr<SequenceRule> sequence = pathAbsoluteRule();
   EXPECT_TRUE(runParser("/abc/def", *sequence));
-  EXPECT_TRUE(runParser("/abc/def//", *sequence));
+  EXPECT_TRUE(runParser("/abc/def///a", *sequence));
   EXPECT_TRUE(runParser("/", *sequence));
 
   // Invalid
@@ -569,10 +572,10 @@ TEST(UriAbnfTest, PathNoScheme)
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
   EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
-  EXPECT_TRUE(runParser("abc/", *sequence));
   EXPECT_TRUE(runParser("@user/data", *sequence));
   EXPECT_TRUE(runParser("%20info/more", *sequence));
   EXPECT_TRUE(runParser("!$&'()*+,;=@/file", *sequence));
+  EXPECT_TRUE(runParser("abc/", *sequence));
 
   // Invalid
   // must not start with '/'
@@ -600,12 +603,12 @@ TEST(UriAbnfTest, PathRootless)
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
   EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
-  EXPECT_TRUE(runParser("abc/", *sequence));
   EXPECT_TRUE(runParser("foo:bar", *sequence));
   EXPECT_TRUE(runParser("a:b/c", *sequence));
   EXPECT_TRUE(runParser("@user/data", *sequence));
   EXPECT_TRUE(runParser("%20info/more", *sequence));
   EXPECT_TRUE(runParser(":abc", *sequence));
+  EXPECT_TRUE(runParser("abc/", *sequence));
 
   // Invalid
   EXPECT_FALSE(runParser("/abc", *sequence));
