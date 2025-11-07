@@ -30,9 +30,9 @@ public:
   void setRoot(const std::string& root);
   void setMaxBodySize(std::size_t bytes);
   void setTimeout(std::size_t seconds);
-  void setErrorLogPath(const std::string& path);
-  void setAccessLogPath(const std::string& path);
   void setErrorPages(std::map<int, std::string>& errorPages);
+  void addErrorPage(int code, const std::string& path);
+
   void setDefaultTimeout();
 
   static int getDefaultTimeout();
@@ -49,10 +49,6 @@ private:
   std::vector<ServerConfig> _servers;
   static int _defaultTimeout;
   std::size_t _timeout;
-
-  // for Logging
-  std::string _errorLogPath;
-  std::string _accessLogPath;
 };
 
 std::ostream& operator<<(std::ostream& out, const Config& config);

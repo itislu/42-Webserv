@@ -1,12 +1,10 @@
 #include "ServerBuilder.hpp"
-#include "config/ConfigBuilder.hpp"
+#include "config/DirectiveHandler.hpp"
 #include "config/LocationBuilder.hpp"
-#include "config/ParsedConfig.hpp"
 #include "config/ParsedLocation.hpp"
 #include "config/ParsedServer.hpp"
 #include "config/ServerConfig.hpp"
 #include <cstring>
-#include <string>
 #include <vector>
 
 void ServerBuilder::buildLocations(const std::vector<ParsedLocation>& locations,
@@ -24,11 +22,9 @@ ServerConfig ServerBuilder::build(const ParsedServer& parsed,
 {
   ServerConfig server(config);
 
-  const ParsedConfig::Directive& directives = parsed.getDirective();
-  for (ParsedConfig::Directive::const_iterator it = directives.begin();
-       it != directives.end();
-       ++it) {
-  }
+  DirectiveHandler<ServerConfig>::buildDirectives(parsed.getDirective(),
+                                                  server);
+
   buildLocations(parsed.getLocations(), server);
 
   return server;

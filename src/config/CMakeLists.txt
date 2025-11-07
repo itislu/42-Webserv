@@ -9,6 +9,7 @@ add_library(${LIB_NAME} STATIC
    ConfigBuilder.cpp
    ConfigParser.cpp
    Converters.cpp
+   DirectiveHandler.cpp
    FileUtils.cpp
    Lexer.cpp
    LocationBuilder.cpp

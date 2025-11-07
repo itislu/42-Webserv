@@ -1,57 +1,10 @@
-#include "config/Config.hpp"
 #include "config/DirectiveHandler.hpp"
-#include "config/LocationConfig.hpp"
 #include "config/ParsedConfig.hpp"
-#include "config/ServerConfig.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-// ==================== Config ====================
-template<>
-const DirectiveHandler<Config>::Entry DirectiveHandler<Config>::_entries[] = {
-  { "root", &DirectiveHandler<Config>::setRoot },
-  { "keepalive_timeout", &DirectiveHandler<Config>::setTimeout },
-  { 0, 0 }
-};
-
-// ==================== ServerConfig ====================
-template<>
-const DirectiveHandler<ServerConfig>::Entry
-  DirectiveHandler<ServerConfig>::_entries[] = {
-    { "listen", &DirectiveHandler<ServerConfig>::setPorts },
-    { "server_name", &DirectiveHandler<ServerConfig>::setHostnames },
-    { "root", &DirectiveHandler<ServerConfig>::setRoot },
-    { "index", &DirectiveHandler<ServerConfig>::setIndex },
-    { "error_page", &DirectiveHandler<ServerConfig>::setErrorPage },
-    { "max_body_size", &DirectiveHandler<ServerConfig>::setMaxBodySize },
-    { "allowed_methods", &DirectiveHandler<ServerConfig>::setAllowedMethods },
-    { "keepalive_timeout", &DirectiveHandler<ServerConfig>::setTimeout },
-    { 0, 0 }
-  };
-
-// ==================== LocationConfig ====================
-template<>
-const DirectiveHandler<LocationConfig>::Entry
-  DirectiveHandler<LocationConfig>::_entries[] = {
-    { "root", &DirectiveHandler<LocationConfig>::setRoot },
-    { "index", &DirectiveHandler<LocationConfig>::setIndex },
-    { "error_page", &DirectiveHandler<LocationConfig>::setErrorPage },
-    { "max_body_size", &DirectiveHandler<LocationConfig>::setMaxBodySize },
-    { "allowed_methods", &DirectiveHandler<LocationConfig>::setAllowedMethods },
-    { "autoindex", &DirectiveHandler<LocationConfig>::setTimeout },
-    { "cgi_enabled", &DirectiveHandler<LocationConfig>::setTimeout },
-    { "cgi_pass", &DirectiveHandler<LocationConfig>::setTimeout },
-    { "cgi_extension", &DirectiveHandler<LocationConfig>::setTimeout },
-    { "redirect", &DirectiveHandler<LocationConfig>::setTimeout },
-    { "redirect_url", &DirectiveHandler<LocationConfig>::setTimeout },
-    { "redirect_code", &DirectiveHandler<LocationConfig>::setTimeout },
-    { 0, 0 }
-  };
-
-// =================================================
 
 template<typename ConfigType>
 void DirectiveHandler<ConfigType>::checkDirectiveHandler(
@@ -73,7 +26,7 @@ void DirectiveHandler<ConfigType>::buildDirectives(
   const ParsedConfig::Directive& directives,
   ConfigType& config)
 {
-  for (typename ConfigType::Directive::const_iterator it = directives.begin();
+  for (ParsedConfig::Directive::const_iterator it = directives.begin();
        it != directives.end();
        ++it) {
     const std::string& key = it->first;
@@ -123,8 +76,9 @@ void DirectiveHandler<ConfigType>::setMaxBodySize(
   const std::vector<std::string>& values,
   ConfigType& config)
 {
-  if (values.size() != 1)
+  if (values.size() != 1) {
     throw std::invalid_argument("max_body_size: invalid number of arguments");
+  }
   std::size_t size = std::strtoul(values[0].c_str(), 0, 10);
   config.setMaxBodySize(size);
 }
@@ -134,9 +88,10 @@ void DirectiveHandler<ConfigType>::setErrorPage(
   const std::vector<std::string>& values,
   ConfigType& config)
 {
-  if (values.size() != 2)
+  if (values.size() != 2) {
     throw std::invalid_argument("error_page: invalid number of arguments");
-  int code = std::atoi(values[0].c_str());
+  }
+  int code = std::strtoul(values[0].c_str(), 0, 10);
   config.addErrorPage(code, values[1]);
 }
 
@@ -146,7 +101,7 @@ void DirectiveHandler<ConfigType>::setPorts(
   ConfigType& config)
 {
   for (std::size_t i = 0; i < values.size(); ++i) {
-    config.addPort(std::strtol(values[i].c_str()));
+    config.addPort(std::strtol(values[i].c_str(), 0, 10));
   }
 }
 

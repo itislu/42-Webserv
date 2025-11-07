@@ -31,11 +31,13 @@ public:
   // SETTERS
 
   void setPath(const std::string& path);
+
   void setRoot(const std::string& root);
-  void setAutoindex(bool autoindex);
+  void setIndex(const std::string& index);
+  void addErrorPage(int code, const std::string& path);
+  void setAutoIndex(bool autoindex);
   void setAllowedMethods(const std::string& method);
   void addAllowedMethod(const std::string& method);
-  void setIndex(const std::string& index);
   void setMaxSize(std::size_t size);
 
   void setCgi(bool cgi);

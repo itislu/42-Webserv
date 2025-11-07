@@ -42,16 +42,6 @@ const std::map<int, std::string>& Config::getErrorPages() const
   return _errorPages;
 }
 
-const std::string& Config::getErrorLogPath() const
-{
-  return _errorLogPath;
-}
-
-const std::string& Config::getAccessLogPath() const
-{
-  return _accessLogPath;
-}
-
 void Config::addServer(const ServerConfig& server)
 {
   _servers.push_back(server);
@@ -70,16 +60,6 @@ void Config::setMaxBodySize(std::size_t bytes)
 void Config::setTimeout(std::size_t seconds)
 {
   _timeout = seconds;
-}
-
-void Config::setErrorLogPath(const std::string& path)
-{
-  _errorLogPath = path;
-}
-
-void Config::setAccessLogPath(const std::string& path)
-{
-  _accessLogPath = path;
 }
 
 void Config::setDefaultTimeout()

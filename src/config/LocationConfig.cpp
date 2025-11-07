@@ -88,7 +88,7 @@ void LocationConfig::setRoot(const std::string& root)
   _root = root;
 }
 
-void LocationConfig::setAutoindex(bool autoindex)
+void LocationConfig::setAutoIndex(bool autoindex)
 {
   _autoindex = autoindex;
 }
