@@ -17,7 +17,7 @@ ValidateRequest::ValidateRequest(ReadRequestLine* context)
 
 void ValidateRequest::run()
 {
-  //todo
+  // todo
   /*
     - check if target is available
     - check if method is available for target

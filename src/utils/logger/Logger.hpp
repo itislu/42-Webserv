@@ -2,7 +2,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-#include "libftpp/memory.hpp"
+#include <libftpp/memory.hpp>
 
 #include <fstream>
 #include <map>
