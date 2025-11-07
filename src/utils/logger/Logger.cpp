@@ -36,15 +36,15 @@ Logger& Logger::getInstance(const char* filename) throw()
   }
 }
 
-Logger::FileStream& Logger::info()
+std::ostream& Logger::info()
 {
   return _log(INFO);
 }
-Logger::FileStream& Logger::warning()
+std::ostream& Logger::warning()
 {
   return _log(WARNING);
 }
-Logger::FileStream& Logger::error()
+std::ostream& Logger::error()
 {
   return _log(ERROR);
 }
@@ -53,16 +53,16 @@ Logger::FileStream& Logger::error()
 // PRIVATE
 Logger::Logger(const std::string& filename)
 {
-  _file._stream.open(filename.c_str(), std::ios::out | std::ios::trunc);
+  _file.open(filename.c_str(), std::ios::out | std::ios::trunc);
   _file << std::unitbuf; // enables automatic flush
-  if (!_file._stream) {
+  if (!_file) {
     std::cerr << "Failed to open log file: " << filename << '\n';
   }
 }
 
-Logger::FileStream& Logger::_log(LogLevel level)
+std::ostream& Logger::_log(LogLevel level)
 {
-  if (!_file._stream.is_open()) {
+  if (!_file.is_open()) {
     return _file;
   }
   std::string levelStr;
