@@ -18,14 +18,14 @@ Logger& Logger::getInstance(const char* filename) throw()
 {
   static Logger _loggersafety;
 
-  // Existing Logger
-  const InstanceMap::iterator iter = _instances().find(filename);
-  if (iter != _instances().end()) {
-    return *iter->second;
-  }
-
-  // New Logger
   try {
+    // Existing Logger
+    const InstanceMap::iterator iter = _instances().find(filename);
+    if (iter != _instances().end()) {
+      return *iter->second;
+    }
+
+    // New Logger
     const ft::shared_ptr<Logger> loggerPtr(new Logger(filename));
     _instances()[filename] = loggerPtr;
     return *loggerPtr;
@@ -49,7 +49,7 @@ std::ostream& Logger::error()
 
 /* ***************************************************************************/
 // PRIVATE
-Logger::Logger() {}
+Logger::Logger() throw() {}
 
 Logger::Logger(const char* filename)
 {

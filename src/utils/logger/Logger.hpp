@@ -34,7 +34,7 @@ public:
 private:
   typedef std::map<const char*, ft::shared_ptr<Logger> > InstanceMap;
 
-  Logger();
+  Logger() throw();
   explicit Logger(const char* filename);
   Logger(const Logger& other);
   Logger& operator=(const Logger& other);
