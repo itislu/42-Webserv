@@ -19,15 +19,17 @@ Logger& Logger::getInstance(const char* filename) throw()
   static Logger emptyLogger;
 
   try {
+    const std::string filenameStr(filename);
+
     // Existing Logger
-    const InstanceMap::iterator iter = _instances().find(filename);
+    const InstanceMap::iterator iter = _instances().find(filenameStr);
     if (iter != _instances().end()) {
       return *iter->second;
     }
 
     // New Logger
-    const ft::shared_ptr<Logger> loggerPtr(new Logger(filename));
-    _instances()[filename] = loggerPtr;
+    const ft::shared_ptr<Logger> loggerPtr(new Logger(filenameStr));
+    _instances()[filenameStr] = loggerPtr;
     return *loggerPtr;
   } catch (...) {
     return emptyLogger;
@@ -49,9 +51,9 @@ Logger::FileStream& Logger::error()
 
 /* ***************************************************************************/
 // PRIVATE
-Logger::Logger(const char* filename)
+Logger::Logger(const std::string& filename)
 {
-  _file._stream.open(filename, std::ios::out | std::ios::trunc);
+  _file._stream.open(filename.c_str(), std::ios::out | std::ios::trunc);
   _file << std::unitbuf; // enables automatic flush
   if (!_file._stream) {
     std::cerr << "Failed to open log file: " << filename << '\n';

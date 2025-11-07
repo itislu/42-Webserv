@@ -27,7 +27,7 @@ public:
   ~Logger() {}
 
 private:
-  typedef std::map<const char*, ft::shared_ptr<Logger> > InstanceMap;
+  typedef std::map<std::string, ft::shared_ptr<Logger> > InstanceMap;
 
   enum LogLevel
   {
@@ -48,7 +48,7 @@ private:
   };
 
   Logger() throw() {}
-  explicit Logger(const char* filename);
+  explicit Logger(const std::string& filename);
   Logger(const Logger& other);
   Logger& operator=(const Logger& other);
 
