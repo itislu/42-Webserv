@@ -64,6 +64,7 @@ Token Lexer::next()
   }
 
   const char chr = _input[_pos];
+  /* TODO: remove print */
   std::cout << "Char: " << chr << "\n";
 
   if (chr == '{') {
@@ -84,11 +85,10 @@ Token Lexer::next()
     return token;
   }
 
-  // if (chr == '#') {
-  //   skipComments();
-  //   token.setType(e_type type);
-  //   return token;
-  // }
+  if (chr == '#') {
+    token.setType(COMMENT);
+    return token;
+  }
 
   if (isspace(static_cast<unsigned char>(chr)) == 0) {
     std::size_t idx = _pos;
@@ -104,6 +104,7 @@ Token Lexer::next()
     token.setValue(value);
     token.setType(IDENT);
     _pos = idx;
+    /* TODO: remove print */
     std::cout << token;
     return token;
   }
@@ -120,7 +121,7 @@ void Lexer::skipWhiteSpaces()
   }
 }
 
-void Lexer::skipComments()
+void Lexer::skipComment()
 {
   while (_pos < _input.size()) {
     if (_input[_pos] == '\n') {

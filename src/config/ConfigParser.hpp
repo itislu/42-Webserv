@@ -23,6 +23,7 @@ private:
   bool isExpectedNext(e_type type);
   void invalidToken(const std::string& err) const;
   void validateParsedConfig() const;
+  void skipComments();
 
   std::string _filepath;
   Lexer _lexer;

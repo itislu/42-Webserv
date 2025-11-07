@@ -14,11 +14,11 @@ public:
   void init();
   Token next();
   std::size_t getLine() const;
+  void skipComment();
 
 private:
   void validateInputFile();
   void skipWhiteSpaces();
-  void skipComments();
 
   std::ifstream _file;
   std::string _filepath;

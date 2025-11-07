@@ -41,10 +41,8 @@ Config ConfigBuilder::build(const ParsedConfig& parsed)
   Config config;
 
   DirectiveHandler<Config>::buildDirectives(parsed.getDirective(), config);
-  // buildServers(parsed.getServers(), config);
+  buildServers(parsed.getServers(), config);
   config.setDefaultTimeout();
-
-  std::cout << config;
 
   return config;
 }

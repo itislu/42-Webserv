@@ -8,6 +8,7 @@ LocationConfig LocationBuilder::build(const ParsedLocation& parsed,
                                       const ServerConfig& config)
 {
   LocationConfig location(config);
+  location.setPath(parsed.getPath());
   DirectiveHandler<LocationConfig>::buildDirectives(parsed.getDirective(),
                                                     location);
 

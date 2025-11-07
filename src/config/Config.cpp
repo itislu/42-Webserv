@@ -109,9 +109,8 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
   out << "==============================" << "\n";
 
   out << "Root: " << config.getRoot() << "\n";
-  out << "Timeout: " << config.getTimeout() << "\n";
+  out << "Timeout: " << config.getTimeout() << "s\n";
   out << "BodySize: " << config.getMaxBodySize() << "\n";
-  out << "Default: " << Config::getDefaultTimeout() << "\n";
 
   const std::vector<ServerConfig>& servers = config.getServers();
   if (servers.empty()) {
@@ -144,9 +143,10 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
     for (std::vector<LocationConfig>::const_iterator locIt = locations.begin();
          locIt != locations.end();
          ++locIt) {
-      out << "  Location: " << locIt->getPath()
-          << ", root: " << locIt->getRoot()
-          << ", autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n";
+      out << "  Location: " << locIt->getPath() << "\n"
+          << "    root: " << locIt->getRoot() << "\n"
+          << "    autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n"
+          << "    cgi: " << (locIt->isCgi() ? "on" : "off") << "\n";
     }
   }
   out << "Lowest Timeout(Default): " << Config::getDefaultTimeout() << "s\n";

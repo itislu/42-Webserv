@@ -12,6 +12,7 @@ enum e_type
   SEMICOLON,
   LBRACE,
   RBRACE,
+  COMMENT,
   END
 };
 

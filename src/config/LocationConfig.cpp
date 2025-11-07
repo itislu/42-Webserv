@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <set>
 #include <string>
-#include <vector>
 
 LocationConfig::LocationConfig(const ServerConfig& serverConfig)
   : _root(serverConfig.getRoot())
@@ -101,7 +100,7 @@ void LocationConfig::setAllowedMethod(const std::string& method)
 
 void LocationConfig::addErrorPage(int code, const std::string& path)
 {
-  /* TODO: check this */
+  /* TODO: check this - duplicates and so on*/
   _errorPages[code] = path;
 }
 
