@@ -14,7 +14,21 @@
 /* ************************************************************************** */
 class Logger
 {
+private:
+  class FileStream;
+
 public:
+  static Logger& getInstance(const char* filename) throw();
+
+  FileStream& info();
+  FileStream& warning();
+  FileStream& error();
+
+  ~Logger() {}
+
+private:
+  typedef std::map<const char*, ft::shared_ptr<Logger> > InstanceMap;
+
   enum LogLevel
   {
     INFO,
@@ -22,39 +36,36 @@ public:
     ERROR
   };
 
-  static Logger& getInstance(const char* filename) throw();
+  class FileStream
+  {
+  public:
+    template<typename T>
+    FileStream& operator<<(const T& msg);
 
-  Logger& info();
-  Logger& warning();
-  Logger& error();
-
-  ~Logger() {}
-
-private:
-  typedef std::map<const char*, ft::shared_ptr<Logger> > InstanceMap;
+  private:
+    friend class Logger;
+    std::ofstream _stream;
+  };
 
   Logger() throw() {}
   explicit Logger(const char* filename);
   Logger(const Logger& other);
   Logger& operator=(const Logger& other);
 
-  Logger& _log(LogLevel level);
+  FileStream& _log(LogLevel level);
   static InstanceMap& _instances();
   static std::string _currentTime();
 
-  template<typename T>
-  friend Logger& operator<<(Logger& logger, const T& msg);
-
   static const int _widthLevelStr = 7;
 
-  std::ofstream _file;
+  FileStream _file;
 };
 
 template<typename T>
-Logger& operator<<(Logger& logger, const T& msg)
+Logger::FileStream& Logger::FileStream::operator<<(const T& msg)
 {
-  logger._file << msg;
-  return logger;
+  _stream << msg;
+  return *this;
 }
 
 #endif
