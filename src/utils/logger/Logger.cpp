@@ -1,10 +1,9 @@
 #include "Logger.hpp"
 
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 
 #include <ctime>
-#include <exception>
 #include <fstream>
 #include <iomanip>
 #include <ios>
@@ -92,7 +91,7 @@ Logger::InstanceMap& Logger::_instances()
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 std::string Logger::_currentTime()
 {
-  //todo replace with lukas timestamp class
+  // todo replace with lukas timestamp class
   std::time_t const now = std::time(FT_NULLPTR);
   const int bufSize = 32;
   char buff[bufSize];

@@ -44,9 +44,7 @@ TEST(HeaderLinesTester, FieldLineRule)
 {
   const ft::shared_ptr<SequenceRule> rule = fieldLineRule();
 
-  Rule::debugPrint = true;
   EXPECT_TRUE(runParser("host: test, hallo", *rule));
-  Rule::debugPrint = false;
 }
 
 TEST(HeaderLinesTester, FieldLinePartRule)
