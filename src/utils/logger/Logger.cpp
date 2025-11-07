@@ -34,15 +34,15 @@ Logger& Logger::getInstance(const char* filename) throw()
   }
 }
 
-std::ostream& Logger::info()
+Logger& Logger::info()
 {
   return _log(INFO);
 }
-std::ostream& Logger::warning()
+Logger& Logger::warning()
 {
   return _log(WARNING);
 }
-std::ostream& Logger::error()
+Logger& Logger::error()
 {
   return _log(ERROR);
 }
@@ -68,10 +68,10 @@ Logger::~Logger()
 }
 
 // NOLINTBEGIN(performance-avoid-endl)
-std::ostream& Logger::_log(LogLevel level)
+Logger& Logger::_log(LogLevel level)
 {
   if (!_file.is_open()) {
-    return _file;
+    return *this;
   }
   std::string levelStr;
   switch (level) {
@@ -87,7 +87,7 @@ std::ostream& Logger::_log(LogLevel level)
   }
   _file << "[" << _currentTime() << "] [";
   _file << std::setw(_widthLevelStr) << levelStr << "] ";
-  return _file;
+  return *this;
 }
 // NOLINTEND(performance-avoid-endl)
 

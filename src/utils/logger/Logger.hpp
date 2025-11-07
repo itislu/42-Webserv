@@ -6,7 +6,6 @@
 
 #include <fstream>
 #include <map>
-#include <ostream>
 #include <string>
 
 #define LOG_GENERAL "./log/general.log"
@@ -25,9 +24,9 @@ public:
 
   static Logger& getInstance(const char* filename) throw();
 
-  std::ostream& info();
-  std::ostream& warning();
-  std::ostream& error();
+  Logger& info();
+  Logger& warning();
+  Logger& error();
 
   ~Logger();
 
@@ -39,13 +38,23 @@ private:
   Logger(const Logger& other);
   Logger& operator=(const Logger& other);
 
-  std::ostream& _log(LogLevel level);
+  Logger& _log(LogLevel level);
   static InstanceMap& _instances();
   static std::string _currentTime();
+
+  template<typename T>
+  friend Logger& operator<<(Logger& logger, const T& msg);
 
   static const int _widthLevelStr = 7;
 
   std::ofstream _file;
 };
+
+template<typename T>
+Logger& operator<<(Logger& logger, const T& msg)
+{
+  logger._file << msg;
+  return logger;
+}
 
 #endif
