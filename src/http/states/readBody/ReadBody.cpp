@@ -16,12 +16,16 @@
 #include <string>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& ReadBody::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 ReadBody::ReadBody(Client* context)
   : IState<Client>(context)
   , _client(context)
-  , _log(&Logger::getInstance(logFiles::http))
   , _initialized(false)
   , _fixedLengthBody(false)
   , _chunked(false)
@@ -29,7 +33,7 @@ ReadBody::ReadBody(Client* context)
   , _consumed(0)
   , _done(false)
 {
-  _log->info() << "ReadBody\n";
+  _log.info() << "ReadBody\n";
 }
 
 void ReadBody::run()
@@ -60,19 +64,19 @@ void ReadBody::_determineBodyFraming()
   const bool hasContentLength = headers.contains("Content-Length");
   // todo add grammar rules for these headers
   if (hasContentLength && hasTransferEncoding) {
-    _log->error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
+    _log.error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
   } else if (hasContentLength) {
     if (_isValidContentLength()) {
       return;
     }
-    _log->error() << "ReadBody: invalid Content-Length\n";
+    _log.error() << "ReadBody: invalid Content-Length\n";
   } else if (hasTransferEncoding) {
     if (_isValidTransferEncoding()) {
       return;
     }
-    _log->error() << "ReadBody: transfer encoding unsupported\n";
+    _log.error() << "ReadBody: transfer encoding unsupported\n";
   } else {
-    _log->info() << "ReadBody: no body framing defined\n";
+    _log.info() << "ReadBody: no body framing defined\n";
     _done = true;
     return; // OK no body
   }

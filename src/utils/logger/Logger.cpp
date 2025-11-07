@@ -14,15 +14,24 @@
 /* ************************************************************************** */
 // PUBLIC
 
-Logger& Logger::getInstance(const char* filename)
+Logger& Logger::getInstance(const char* filename) throw()
 {
+  static Logger _loggersafety;
+
+  // Existing Logger
   const InstanceMap::iterator iter = _instances().find(filename);
   if (iter != _instances().end()) {
     return *iter->second;
   }
-  const ft::shared_ptr<Logger> loggerPtr(new Logger(filename));
-  _instances()[filename] = loggerPtr;
-  return *loggerPtr;
+
+  // New Logger
+  try {
+    const ft::shared_ptr<Logger> loggerPtr(new Logger(filename));
+    _instances()[filename] = loggerPtr;
+    return *loggerPtr;
+  } catch (...) {
+    return _loggersafety;
+  }
 }
 
 std::ostream& Logger::info()

@@ -22,7 +22,7 @@ private:
   void _init();
 
   Client* _client;
-  Logger* _log;
+  static Logger& _log;
   StateHandler<PrepareResponse> _stateHandler;
   bool _initialized;
 };

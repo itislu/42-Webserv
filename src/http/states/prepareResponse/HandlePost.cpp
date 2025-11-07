@@ -5,15 +5,19 @@
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& HandlePost::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 HandlePost::HandlePost(PrepareResponse* context)
   : IState<PrepareResponse>(context)
   , _prepareResponse(context)
   , _client(_prepareResponse->getContext())
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "HandlePost\n";
+  _log.info() << "HandlePost\n";
 }
 
 void HandlePost::run()

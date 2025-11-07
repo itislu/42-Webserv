@@ -25,7 +25,7 @@ private:
   Client* _client;
   BufferReader _buffReader;
   SequenceRule _sequence;
-  Logger* _log;
+  static Logger& _log;
 };
 
 #endif

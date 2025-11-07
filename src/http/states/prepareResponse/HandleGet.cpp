@@ -15,15 +15,19 @@
 #include <sys/stat.h>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& HandleGet::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 HandleGet::HandleGet(PrepareResponse* context)
   : IState<PrepareResponse>(context)
   , _prepareResponse(context)
   , _client(_prepareResponse->getContext())
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "HandleGet\n";
+  _log.info() << "HandleGet\n";
 }
 
 void HandleGet::run()

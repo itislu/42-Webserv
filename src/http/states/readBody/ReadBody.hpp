@@ -24,7 +24,7 @@ private:
   void _readChunkedBody();
 
   Client* _client;
-  Logger* _log;
+  static Logger& _log;
   bool _initialized;
   bool _fixedLengthBody;
   bool _chunked;

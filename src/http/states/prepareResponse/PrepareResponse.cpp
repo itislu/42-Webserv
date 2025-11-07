@@ -13,16 +13,20 @@
 #include <utils/state/StateHandler.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& PrepareResponse::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 PrepareResponse::PrepareResponse(Client* context)
   : IState<Client>(context)
   , _client(context)
-  , _log(&Logger::getInstance(logFiles::http))
   , _stateHandler(this)
   , _initialized(false)
 {
-  _log->info() << "Prepare response\n";
+  _log.info() << "Prepare response\n";
 }
 
 void PrepareResponse::run()
