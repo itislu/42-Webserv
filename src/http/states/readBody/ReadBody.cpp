@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <client/Client.hpp>
-#include <cstddef>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
@@ -44,8 +43,6 @@ void ReadBody::run()
     _readFixedLengthBody();
   } else if (_chunked) {
     _readChunkedBody();
-  } else {
-    getContext()->getStateHandler().setState<PrepareResponse>();
   }
 
   if (_done) {
@@ -76,6 +73,7 @@ void ReadBody::_determineBodyFraming()
     _log->error() << "ReadBody: transfer encoding unsupported\n";
   } else {
     _log->info() << "ReadBody: no body framing defined\n";
+    _done = true;
     return; // OK no body
   }
 

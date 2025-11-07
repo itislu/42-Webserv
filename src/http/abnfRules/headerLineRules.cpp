@@ -91,13 +91,17 @@ ft::shared_ptr<SequenceRule> fieldContentRule()
     ft::make_shared<AlternativeRule>();
   spaceTabVchar->addRule(ft::make_shared<RangeRule>(" \t")); // SP, HTAB
   spaceTabVchar->addRule(fieldVcharRule());
+  spaceTabVchar->setDebugTag("SP/HTAB/field-vchar");
+
   ft::shared_ptr<RepetitionRule> repeatPart =
     ft::make_shared<RepetitionRule>(ft::move(spaceTabVchar));
+  repeatPart->setDebugTag("1*(SP/HTAB/field-vchar)");
   repeatPart->setMin(1);
 
   ft::shared_ptr<SequenceRule> optSeq = ft::make_shared<SequenceRule>();
+  optSeq->setDebugTag("[1*(SP/HTAB/field-vchar)field-vchar]");
   optSeq->addRule(ft::move(repeatPart));
-  optSeq->addRule(fieldVcharRule());
+  // optSeq->addRule(fieldVcharRule()); // todo issue #58
 
   ft::shared_ptr<RepetitionRule> optWrap =
     ft::make_shared<RepetitionRule>(ft::move(optSeq));
@@ -118,7 +122,7 @@ ft::shared_ptr<AlternativeRule> fieldVcharRule()
     ft::make_shared<AlternativeRule>();
   alter->addRule(ft::make_shared<RangeRule>(http::isVchar));
   alter->addRule(obsTextRule());
-  alter->setDebugTag("fieldVcharRule");
+  alter->setDebugTag("VCHAR/obs-text");
   return alter;
 }
 
@@ -131,6 +135,6 @@ ft::shared_ptr<RangeRule> obsTextRule()
 {
   const ft::shared_ptr<RangeRule> range =
     ft::make_shared<RangeRule>(http::isObsText);
-  range->setDebugTag("obsTextRule");
+  range->setDebugTag("obsText");
   return range;
 }

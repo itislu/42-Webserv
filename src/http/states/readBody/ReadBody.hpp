@@ -5,8 +5,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cstddef>
-
 class Client;
 
 /* ************************************************************************** */
