@@ -25,6 +25,7 @@
 void ConfigBuilder::buildServers(const std::vector<ParsedServer>& servers,
                                  Config& config)
 {
+  /* Nginx uses default server - sure if we want that too */
   if (servers.empty()) {
     throw std::invalid_argument("No server in config");
   }

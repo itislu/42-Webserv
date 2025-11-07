@@ -1,51 +1,256 @@
 #include "config/DirectiveHandler.hpp"
 #include "config/Config.hpp"
+#include "config/Converters.hpp"
 #include "config/LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
+#include <cstddef>
+#include <exception>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 // ==================== Config ====================
-template<>
-const DirectiveHandler<Config>::Entry (&DirectiveHandler<Config>::_getEntries())[5] {
-  static Entry entries[] = {{ "root", &DirectiveHandler<Config>::setRoot },
-  { "keepalive_timeout", &DirectiveHandler<Config>::setTimeout },
-  { "max_body_size", &DirectiveHandler<Config>::setMaxBodySize },
-  { "error_page", &DirectiveHandler<Config>::setErrorPage },
-  { 0, 0 }};
-  return entries;
-}
+
+Entries<Config>::Entry Entries<Config>::entries[] = {
+  { "root", setRoot },
+  { "keepalive_timeout", setTimeout },
+  { "max_body_size", setMaxBodySize },
+  { "error_page", setErrorPage },
+  { 0, 0 }
+};
 
 // ==================== ServerConfig ====================
-template<>
-const DirectiveHandler<ServerConfig>::Entry
-  DirectiveHandler<ServerConfig>::_entries[] = {
-    { "listen", &DirectiveHandler<ServerConfig>::setPorts },
-    { "server_name", &DirectiveHandler<ServerConfig>::setHostnames },
-    { "root", &DirectiveHandler<ServerConfig>::setRoot },
-    { "index", &DirectiveHandler<ServerConfig>::setIndex },
-    { "error_page", &DirectiveHandler<ServerConfig>::setErrorPage },
-    { "max_body_size", &DirectiveHandler<ServerConfig>::setMaxBodySize },
-    { "allowed_methods", &DirectiveHandler<ServerConfig>::setAllowedMethods },
-    { "keepalive_timeout", &DirectiveHandler<ServerConfig>::setTimeout },
-    { 0, 0 }
-  };
+
+Entries<ServerConfig>::Entry Entries<ServerConfig>::entries[] = {
+  { "listen", setPorts },
+  { "server_name", setHostnames },
+  { "root", setRoot },
+  { "index", setIndex },
+  { "error_page", setErrorPage },
+  { "max_body_size", setMaxBodySize },
+  { "allowed_methods", setAllowedMethods },
+  { "keepalive_timeout", setTimeout },
+  { 0, 0 }
+};
 
 // ==================== LocationConfig ====================
 
-template<>
-const DirectiveHandler<LocationConfig>::Entry
-  DirectiveHandler<LocationConfig>::_entries[] = {
-    { "root", &DirectiveHandler<LocationConfig>::setRoot },
-    { "index", &DirectiveHandler<LocationConfig>::setIndex },
-    { "error_page", &DirectiveHandler<LocationConfig>::setErrorPage },
-    { "allowed_methods", &DirectiveHandler<LocationConfig>::setAllowedMethods },
-    { "autoindex", &DirectiveHandler<LocationConfig>::setAutoIndex },
-    { "cgi_enabled", &DirectiveHandler<LocationConfig>::setCgi },
-    { "cgi_pass", &DirectiveHandler<LocationConfig>::setCgiPass },
-    { "cgi_extension", &DirectiveHandler<LocationConfig>::setCgiExtension },
-    { "redirect", &DirectiveHandler<LocationConfig>::setRedirect },
-    { "redirect_url", &DirectiveHandler<LocationConfig>::setRedirection },
-    { "redirect_code", &DirectiveHandler<LocationConfig>::setRedirectCode },
-    { 0, 0 }
-  };
+Entries<LocationConfig>::Entry Entries<LocationConfig>::entries[] = {
+  { "root", setRoot },
+  { "index", setIndex },
+  { "error_page", setErrorPage },
+  { "allowed_methods", setAllowedMethods },
+  { "autoindex", setAutoIndex },
+  { "cgi_enabled", setCgi },
+  { "cgi_pass", setCgiPass },
+  { "cgi_extension", setCgiExtension },
+  { "redirect", setRedirect },
+  { "redirect_url", setRedirection },
+  { "redirect_code", setRedirectCode },
+  { 0, 0 }
+};
 
 // =================================================
+
+// ============== Config - Setters ====================
+void Entries<Config>::setTimeout(const std::vector<std::string>& values,
+                                 Config& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument(
+      "keepalive_timeout: invalid number of arguments");
+  }
+  size_t timeout = 0;
+  try {
+    timeout = toSizeT(values[0]);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument(
+      std::string("keepalive_timeout: invalid argument: ") + e.what());
+  }
+  config.setTimeout(timeout);
+}
+
+// ============== Server - Setters ====================
+void Entries<ServerConfig>::setTimeout(const std::vector<std::string>& values,
+                                       ServerConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument(
+      "keepalive_timeout: invalid number of arguments");
+  }
+  size_t timeout = 0;
+  try {
+    timeout = toSizeT(values[0]);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument(
+      std::string("keepalive_timeout: invalid argument: ") + e.what());
+  }
+  config.setTimeout(timeout);
+}
+
+void Entries<ServerConfig>::setIndex(const std::vector<std::string>& values,
+                                     ServerConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("index: invalid number of arguments");
+  }
+  config.setIndex(values[0]);
+}
+
+void Entries<ServerConfig>::setAllowedMethods(
+  const std::vector<std::string>& values,
+  ServerConfig& config)
+{
+  for (std::size_t i = 0; i < values.size(); ++i) {
+    if (!isMethod(values[i])) {
+      throw std::invalid_argument("allowed_methods: invalid method: " +
+                                  values[i]);
+    }
+    config.setAllowedMethod(values[i]);
+  }
+}
+
+void Entries<ServerConfig>::setPorts(const std::vector<std::string>& values,
+                                     ServerConfig& config)
+{
+  for (std::size_t i = 0; i < values.size(); ++i) {
+    int port = 0;
+    try {
+      port = toPort(values[i]);
+    } catch (const std::exception& e) {
+      throw std::invalid_argument(std::string("listen: invalid argument: ") +
+                                  e.what());
+    }
+    config.addPort(port);
+  }
+}
+
+void Entries<ServerConfig>::setHostnames(const std::vector<std::string>& values,
+                                         ServerConfig& config)
+{
+  for (std::size_t i = 0; i < values.size(); ++i) {
+    config.addHostName(values[i]);
+  }
+}
+
+// ============== Location - Setters ====================
+
+void Entries<LocationConfig>::setIndex(const std::vector<std::string>& values,
+                                       LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("index: invalid number of arguments");
+  }
+  config.setIndex(values[0]);
+}
+
+void Entries<LocationConfig>::setAllowedMethods(
+  const std::vector<std::string>& values,
+  LocationConfig& config)
+{
+  for (std::size_t i = 0; i < values.size(); ++i) {
+    if (!isMethod(values[i])) {
+      throw std::invalid_argument("allowed_methods: invalid method: " +
+                                  values[i]);
+    }
+    config.setAllowedMethod(values[i]);
+  }
+}
+
+void Entries<LocationConfig>::setAutoIndex(
+  const std::vector<std::string>& values,
+  LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("autoindex: invalid number of arguments");
+  }
+
+  bool enabled = false;
+  try {
+    enabled = toBool(values[0]);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument(std::string("autoindex: invalid argument: ") +
+                                e.what());
+  }
+  config.setAutoIndex(enabled);
+}
+
+void Entries<LocationConfig>::setCgi(const std::vector<std::string>& values,
+                                     LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("autoindex: invalid number of arguments");
+  }
+
+  bool enabled = false;
+  try {
+    enabled = toBool(values[0]);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument(std::string("autoindex: invalid argument: ") +
+                                e.what());
+  }
+  config.setCgi(enabled);
+}
+
+void Entries<LocationConfig>::setCgiPass(const std::vector<std::string>& values,
+                                         LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("cgi_pass: invalid number of arguments");
+  }
+  config.setCgiPass(values[0]);
+}
+
+void Entries<LocationConfig>::setCgiExtension(
+  const std::vector<std::string>& values,
+  LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("cgi_extension: invalid number of arguments");
+  }
+  config.setCgiExtension(values[0]);
+}
+
+void Entries<LocationConfig>::setRedirect(
+  const std::vector<std::string>& values,
+  LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("redirect: invalid number of arguments");
+  }
+  bool enabled = false;
+  try {
+    enabled = toBool(values[0]);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument(std::string("redirect: invalid argument: ") +
+                                e.what());
+  }
+  config.setRedirect(enabled);
+}
+
+void Entries<LocationConfig>::setRedirection(
+  const std::vector<std::string>& values,
+  LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("redirection: invalid number of arguments");
+  }
+  config.setRedirection(values[0]);
+}
+
+void Entries<LocationConfig>::setRedirectCode(
+  const std::vector<std::string>& values,
+  LocationConfig& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("redirect_code: invalid number of arguments");
+  }
+  int code = 0;
+  try {
+    code = toCode(values[0]);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument(
+      std::string("redirect_code: invalid argument: ") + e.what());
+  }
+  config.setRedirectCode(code);
+}

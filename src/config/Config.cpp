@@ -37,6 +37,17 @@ std::size_t Config::getTimeout() const
   return _timeout;
 }
 
+const std::string& Config::getErrorPage(int code) const
+{
+  const std::map<int, std::string>::const_iterator iter =
+    _errorPages.find(code);
+  if (iter != _errorPages.end()) {
+    return iter->second;
+  }
+  static const std::string empty;
+  return empty;
+}
+
 const std::map<int, std::string>& Config::getErrorPages() const
 {
   return _errorPages;
@@ -78,6 +89,12 @@ void Config::setDefaultTimeout()
 void Config::setErrorPages(std::map<int, std::string>& errorPages)
 {
   _errorPages = errorPages;
+}
+
+void Config::addErrorPage(int code, const std::string& path)
+{
+  /* TODO: check this */
+  _errorPages[code] = path;
 }
 
 int Config::getDefaultTimeout()

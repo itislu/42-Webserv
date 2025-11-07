@@ -3,6 +3,7 @@
 #include "LocationConfig.hpp"
 #include <cstddef>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -39,7 +40,7 @@ const std::map<int, std::string>& ServerConfig::getErrorPages() const
   return _errorPages;
 }
 
-const std::vector<std::string>& ServerConfig::getAllowedMethods() const
+const std::set<std::string>& ServerConfig::getAllowedMethods() const
 {
   return _allowedMethods;
 }
@@ -91,9 +92,9 @@ void ServerConfig::setMaxBodySize(std::size_t size)
   _maxBodySize = size;
 }
 
-void ServerConfig::addAllowedMethod(const std::string& method)
+void ServerConfig::setAllowedMethod(const std::string& method)
 {
-  _allowedMethods.push_back(method);
+  _allowedMethods.insert(method);
 }
 
 void ServerConfig::setTimeout(std::size_t time)

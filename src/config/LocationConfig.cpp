@@ -1,6 +1,7 @@
 #include "LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
 #include <cstddef>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -32,7 +33,7 @@ bool LocationConfig::isAutoindex() const
   return _autoindex;
 }
 
-const std::vector<std::string>& LocationConfig::getAllowedMethods() const
+const std::set<std::string>& LocationConfig::getAllowedMethods() const
 {
   return _allowedMethods;
 }
@@ -93,15 +94,15 @@ void LocationConfig::setAutoIndex(bool autoindex)
   _autoindex = autoindex;
 }
 
-void LocationConfig::setAllowedMethods(const std::string& method)
+void LocationConfig::setAllowedMethod(const std::string& method)
 {
-  _allowedMethods.clear();
-  _allowedMethods.push_back(method);
+  _allowedMethods.insert(method);
 }
 
-void LocationConfig::addAllowedMethod(const std::string& method)
+void LocationConfig::addErrorPage(int code, const std::string& path)
 {
-  _allowedMethods.push_back(method);
+  /* TODO: check this */
+  _errorPages[code] = path;
 }
 
 void LocationConfig::setIndex(const std::string& index)
@@ -109,7 +110,7 @@ void LocationConfig::setIndex(const std::string& index)
   _index = index;
 }
 
-void LocationConfig::setMaxSize(std::size_t size)
+void LocationConfig::setMaxBodySize(std::size_t size)
 {
   _maxBodysize = size;
 }

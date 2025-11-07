@@ -2,6 +2,8 @@
 #define LOCATIONCONFIG_HPP
 
 #include <cstddef>
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -14,11 +16,12 @@ public:
 
   // GETTERS
   const std::string& getPath() const;
+
   const std::string& getRoot() const;
-  bool isAutoindex() const;
-  const std::vector<std::string>& getAllowedMethods() const;
-  const std::string& getIndex() const;
   std::size_t getMaxBodySize() const;
+  bool isAutoindex() const;
+  const std::set<std::string>& getAllowedMethods() const;
+  const std::string& getIndex() const;
 
   bool isCgi() const;
   const std::string& getCgiPass() const;
@@ -33,12 +36,11 @@ public:
   void setPath(const std::string& path);
 
   void setRoot(const std::string& root);
+  void setMaxBodySize(std::size_t size);
   void setIndex(const std::string& index);
   void addErrorPage(int code, const std::string& path);
   void setAutoIndex(bool autoindex);
-  void setAllowedMethods(const std::string& method);
-  void addAllowedMethod(const std::string& method);
-  void setMaxSize(std::size_t size);
+  void setAllowedMethod(const std::string& method);
 
   void setCgi(bool cgi);
   void setCgiPass(const std::string& cgiPass);
@@ -53,10 +55,11 @@ private:
   std::string _root; // Filesystem path, allows overriding server root,
                      // e.g. /images can be somewhere else than rest
   bool _autoindex;   // true = enable directory listing
-  std::vector<std::string> _allowedMethods; // e.g. {"GET", "POST", "DELETE"}
-  std::string _index;                       // override default index (optional)
+  std::set<std::string> _allowedMethods; // e.g. {"GET", "POST", "DELETE"}
+  std::string _index;                    // override default index (optional)
   std::size_t
     _maxBodysize; // optional: override maxuploadsize for this location
+  std::map<int, std::string> _errorPages;
 
   // CGI
   bool _cgiEnabled;

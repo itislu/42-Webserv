@@ -23,6 +23,7 @@ public:
   const std::string& getRoot() const;
   const std::string& getErrorLogPath() const;
   const std::string& getAccessLogPath() const;
+  const std::string& getErrorPage(int code) const;
   const std::map<int, std::string>& getErrorPages() const;
 
   // Setters

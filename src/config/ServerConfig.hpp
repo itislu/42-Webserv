@@ -4,6 +4,7 @@
 #include "config/LocationConfig.hpp"
 #include <cstddef>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -21,19 +22,19 @@ public:
   const std::string& getIndex() const;
   const std::map<int, std::string>& getErrorPages() const;
   std::size_t getMaxBodySize() const;
-  const std::vector<std::string>& getAllowedMethods() const;
+  const std::set<std::string>& getAllowedMethods() const;
   std::size_t getTimeout() const;
   const std::vector<LocationConfig>& getLocations() const;
 
   // SETTERS
+  void setRoot(const std::string& root);
+  void setMaxBodySize(std::size_t size);
+  void setTimeout(std::size_t time);
+  void addErrorPage(int code, const std::string& path);
+  void setIndex(const std::string& index);
   void addPort(int port);
   void addHostName(const std::string& hostName);
-  void setRoot(const std::string& root);
-  void setIndex(const std::string& index);
-  void addErrorPage(int code, const std::string& path);
-  void setMaxBodySize(std::size_t size);
-  void addAllowedMethod(const std::string& method);
-  void setTimeout(std::size_t time);
+  void setAllowedMethod(const std::string& method);
   void addLocation(const LocationConfig& location);
 
   const LocationConfig& getLocationForPath(const std::string& uri) const;
@@ -44,10 +45,10 @@ private:
                                        //    - same port but different hostname
   std::string _root;                   // root dir
   std::string _index;                  // index.html
-  std::map<int, std::string> _errorPages;   // map for different Error codes
-  std::size_t _maxBodySize;                 // limit upload size (POST)
-  std::vector<std::string> _allowedMethods; // usually per location
-  std::size_t _timeOut;                            // timeout
+  std::map<int, std::string> _errorPages; // map for different Error codes
+  std::size_t _maxBodySize;               // limit upload size (POST)
+  std::set<std::string> _allowedMethods;  // usually per location
+  std::size_t _timeOut;                   // timeout
 
   std::vector<LocationConfig> _locations;
 };
