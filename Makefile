@@ -6,7 +6,6 @@ NAME := webserv
 BUILD_DIR := build
 
 
-
 # **************************************************************************** #
 PRESET ?= default
 BUILD_DIR_PRESET := build/$(PRESET)
@@ -22,7 +21,7 @@ $(NAME): all
 
 .PHONY: build
 build:
-	@MAKEFLAGS=-s cmake --build --preset=$(PRESET) 
+	@cmake --build --preset=$(PRESET) -- -s -j
 
 .PHONY: re
 re: fclean all

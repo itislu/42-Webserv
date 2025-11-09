@@ -1,8 +1,9 @@
-#include "client/Client.hpp"
-#include "http/Request.hpp"
-#include "http/states/readRequestLine/ReadRequestLine.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
+#include <client/Client.hpp>
+#include <http/Headers.hpp>
+#include <http/Request.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 
 #include <cstddef>
 #include <gtest/gtest.h>
@@ -52,7 +53,7 @@ TEST(RequestTester, PartialBufferTest)
 {
   std::string line("GET http://www.example.com/test/index.html HTTP/1.0\r\n"
                    "Host: webserv\r\n"
-                   "Content-Length: 7\r\n"
+                   "TestHeader: 7\r\n"
                    "\r\n");
   ft::unique_ptr<Client> client = requestTestCharByChar(line);
   Request& request = client->getRequest();
@@ -63,16 +64,16 @@ TEST(RequestTester, PartialBufferTest)
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
-  Request::HeaderMap& headers = request.getHeaders();
+  Headers& headers = request.getHeaders();
   EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["Content-Length"], "7");
+  EXPECT_EQ(headers["TestHeader"], "7");
 }
 
 TEST(RequestTester, CompleteBufferTest)
 {
   std::string line("GET http://www.example.com/test/index.html HTTP/1.0\r\n"
                    "Host: webserv\r\n"
-                   "Content-Length: 7\r\n"
+                   "TestHeader: 7\r\n"
                    "\r\n");
   ft::unique_ptr<Client> client = requestTest(line);
   Request& request = client->getRequest();
@@ -83,9 +84,9 @@ TEST(RequestTester, CompleteBufferTest)
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
-  Request::HeaderMap& headers = request.getHeaders();
+  Headers& headers = request.getHeaders();
   EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["Content-Length"], "7");
+  EXPECT_EQ(headers["TestHeader"], "7");
 }
 
 // NOLINTEND

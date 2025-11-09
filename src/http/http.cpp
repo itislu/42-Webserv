@@ -6,6 +6,8 @@
 
 namespace http {
 
+const char* const CRLF = "\r\n";
+
 int isSchemeChar(int chr)
 {
   if (::isalnum(chr) != 0) {
@@ -150,6 +152,31 @@ int isDigit05(int chr)
 int isWhitespace(int chr)
 {
   return static_cast<int>(chr == ' ' || chr == '\t');
+}
+
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9110/#name-field-values
+ *
+ * obs-text = %x80-FF
+ */
+int isObsText(int chr)
+{
+  const int begin = 0x80;
+  const int end = 0xFF;
+  return static_cast<int>(chr >= begin && chr <= end);
+}
+
+/**
+ * https://datatracker.ietf.org/doc/html/rfc5234#autoid-25
+ *
+ * VCHAR =  %x21-7E
+ *          ; visible (printing) characters
+ */
+int isVchar(int chr)
+{
+  const char begin = 0x21;
+  const char end = 0x7E;
+  return static_cast<int>(chr >= begin && chr <= end);
 }
 
 }

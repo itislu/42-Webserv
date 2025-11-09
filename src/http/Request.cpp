@@ -1,11 +1,14 @@
 #include "Request.hpp"
 
+#include <http/Headers.hpp>
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
+#include <utils/Buffer.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <sstream>
 #include <string>
 
 /* ************************************************************************** */
@@ -67,9 +70,28 @@ Request::Method Request::strToMethod(const std::string& strMethod)
   return Request::UNDEFINED;
 }
 
-Request::HeaderMap& Request::getHeaders()
+Headers& Request::getHeaders()
 {
   return _headers;
+}
+
+Buffer& Request::getBody()
+{
+  return _body;
+}
+
+std::string Request::toString()
+{
+  std::stringstream oss;
+  oss << "{\n";
+  oss << "  \"method\": \"" << _methodToString() << "\",\n";
+  oss << "  \"uri\": \n" << _uri.toString() << ",\n";
+  oss << "  \"version\": \"" << _version << "\",\n";
+  oss << "  \"headers\": \n{\n";
+  oss << _headers.toLogString();
+  oss << "  }\n";
+  oss << "}\n";
+  return oss.str();
 }
 
 /* ************************************************************************** */
@@ -82,4 +104,18 @@ std::size_t Request::_getMaxMethodLen() throw()
     maxLen = std::max(maxLen, std::strlen(_methodMap[i].methodStr));
   }
   return maxLen;
+}
+
+std::string Request::_methodToString() const
+{
+  switch (_method) {
+    case UNDEFINED:
+      return "UNDEFINED";
+    case GET:
+      return "GET";
+    case POST:
+      return "POST";
+    case DELETE:
+      return "DELETE";
+  }
 }

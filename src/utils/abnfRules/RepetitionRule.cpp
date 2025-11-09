@@ -26,8 +26,6 @@ bool RepetitionRule::matches()
 {
   debugPrintRuleEntry();
 
-  _rule->setDebugPrintIndent(getDebugPrintIndent() + 2);
-
   while (!getBuffReader()->reachedEnd()) {
 
     setStartPos(getBuffReader()->getPosInBuff());

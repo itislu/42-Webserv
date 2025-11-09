@@ -27,8 +27,6 @@ public:
 
   void setDebugTag(const char* str);
   const char* getDebugTag() const;
-  void setDebugPrintIndent(int value);
-  int getDebugPrintIndent() const;
   void setDebugMatchReason(const char* reason);
   static bool debugPrint;
 
@@ -64,7 +62,6 @@ private:
   ResultMap* _results;
 
   static const int _debugInitPrintIndent = 20;
-  int _debugPrintIndent;
   const char* _debugTag;
   const char* _debugMatchReason;
 };

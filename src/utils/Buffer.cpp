@@ -90,3 +90,8 @@ std::string Buffer::consume(long bytes)
   remove(bytes);
   return newStr;
 }
+
+std::string Buffer::toString()
+{
+  return std::string(_buff.begin(), _buff.end());
+}

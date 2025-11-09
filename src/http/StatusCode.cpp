@@ -40,6 +40,16 @@ StatusCode& StatusCode::operator=(Code code)
   return *this;
 }
 
+bool StatusCode::operator==(Code code) const
+{
+  return code == getCode();
+}
+
+bool StatusCode::operator!=(Code code) const
+{
+  return code != getCode();
+}
+
 StatusCode::Code StatusCode::getCode() const
 {
   return _code;

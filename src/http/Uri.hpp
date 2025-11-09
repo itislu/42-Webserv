@@ -8,9 +8,6 @@
 class Uri
 {
 public:
-  std::string getRaw() const;
-  void setRaw(const std::string& rawUri);
-
   const std::string& getScheme() const;
   void setScheme(const std::string& str);
   const std::string& getAuthority() const;
@@ -22,8 +19,9 @@ public:
   const std::string& getFragment() const;
   void setFragment(const std::string& str);
 
+  std::string toString() const;
+
 private:
-  std::string _raw;
   std::string _scheme;
   std::string _authority;
   std::string _path;

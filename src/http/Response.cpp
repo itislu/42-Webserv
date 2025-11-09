@@ -1,5 +1,7 @@
 #include "Response.hpp"
 
+#include <fstream>
+#include <http/Headers.hpp>
 #include <http/StatusCode.hpp>
 
 #include <string>
@@ -25,6 +27,16 @@ void Response::setStatusCode(StatusCode::Code code)
 const StatusCode& Response::getStatusCode() const
 {
   return _statuscode;
+}
+
+Headers& Response::getHeaders()
+{
+  return _headers;
+}
+
+std::ifstream& Response::getBody()
+{
+  return _body;
 }
 
 /* ************************************************************************** */
