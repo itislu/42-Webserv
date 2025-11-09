@@ -75,11 +75,11 @@ runv: build
 # **************************************************************************** #
 .PHONY: test
 test: all
-	(cd $(BUILD_DIR_PRESET) && ctest)
+	ctest --test-dir $(BUILD_DIR_PRESET) $(ARGS)
 
 .PHONY: testv
 testv: all
-	(cd $(BUILD_DIR_PRESET) && ctest -T memcheck)
+	ctest --test-dir $(BUILD_DIR_PRESET) -T memcheck $(ARGS)
 
 
 
