@@ -8,14 +8,18 @@
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& WriteStatusLine::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 WriteStatusLine::WriteStatusLine(Client* context)
   : IState(context)
   , _client(context)
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "WriteStatusLine\n";
+  _log.info() << "WriteStatusLine\n";
 }
 
 /**

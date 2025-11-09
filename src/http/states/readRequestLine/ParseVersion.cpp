@@ -1,11 +1,11 @@
 #include "ParseVersion.hpp"
-#include "http/states/readRequestLine/ValidateRequest.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/readRequestLine/ValidateRequest.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/Buffer.hpp>
@@ -19,15 +19,19 @@
 #include <string>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& ParseVersion::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 ParseVersion::ParseVersion(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
   , _buffReader()
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "ParseVersion\n";
+  _log.info() << "ParseVersion\n";
   _init();
 }
 

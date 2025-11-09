@@ -6,6 +6,8 @@
 
 namespace http {
 
+const char* const CRLF = "\r\n";
+
 int isSchemeChar(int chr)
 {
   if (::isalnum(chr) != 0) {

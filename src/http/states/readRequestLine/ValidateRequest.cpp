@@ -5,19 +5,23 @@
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& ValidateRequest::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 ValidateRequest::ValidateRequest(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "ValidateRequest\n";
+  _log.info() << "ValidateRequest\n";
 }
 
 void ValidateRequest::run()
 {
-  //todo
+  // todo
   /*
     - check if target is available
     - check if method is available for target

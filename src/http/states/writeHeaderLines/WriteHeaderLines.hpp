@@ -5,8 +5,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cstddef>
-
 class Client;
 
 /* ************************************************************************** */
@@ -19,7 +17,7 @@ public:
 
 private:
   Client* _client;
-  Logger* _log;
+  static Logger& _log;
 };
 
 #endif

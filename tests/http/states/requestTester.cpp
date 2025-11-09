@@ -53,7 +53,7 @@ TEST(RequestTester, PartialBufferTest)
 {
   std::string line("GET http://www.example.com/test/index.html HTTP/1.0\r\n"
                    "Host: webserv\r\n"
-                   "Content-Length: 7\r\n"
+                   "TestHeader: 7\r\n"
                    "\r\n");
   ft::unique_ptr<Client> client = requestTestCharByChar(line);
   Request& request = client->getRequest();
@@ -66,14 +66,14 @@ TEST(RequestTester, PartialBufferTest)
 
   Headers& headers = request.getHeaders();
   EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["Content-Length"], "7");
+  EXPECT_EQ(headers["TestHeader"], "7");
 }
 
 TEST(RequestTester, CompleteBufferTest)
 {
   std::string line("GET http://www.example.com/test/index.html HTTP/1.0\r\n"
                    "Host: webserv\r\n"
-                   "Content-Length: 7\r\n"
+                   "TestHeader: 7\r\n"
                    "\r\n");
   ft::unique_ptr<Client> client = requestTest(line);
   Request& request = client->getRequest();
@@ -86,7 +86,7 @@ TEST(RequestTester, CompleteBufferTest)
 
   Headers& headers = request.getHeaders();
   EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["Content-Length"], "7");
+  EXPECT_EQ(headers["TestHeader"], "7");
 }
 
 // NOLINTEND

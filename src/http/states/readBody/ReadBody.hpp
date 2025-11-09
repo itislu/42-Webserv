@@ -5,8 +5,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cstddef>
-
 class Client;
 
 /* ************************************************************************** */
@@ -26,12 +24,12 @@ private:
   void _readChunkedBody();
 
   Client* _client;
-  Logger* _log;
+  static Logger& _log;
+  long _bodyLength;
+  long _consumed;
   bool _initialized;
   bool _fixedLengthBody;
   bool _chunked;
-  long _bodyLength;
-  long _consumed;
   bool _done;
 };
 

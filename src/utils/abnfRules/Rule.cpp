@@ -7,7 +7,6 @@
 
 #include <iomanip>
 #include <iostream>
-#include <string>
 
 /* ************************************************************************** */
 // INIT
@@ -24,7 +23,6 @@ Rule::Rule()
   , _endPos()
   , _ruleId(_ruleIdUndefined)
   , _results(FT_NULLPTR)
-  , _debugPrintIndent(_debugInitPrintIndent)
   , _debugTag(FT_NULLPTR)
   , _debugMatchReason(FT_NULLPTR)
 {
@@ -71,16 +69,6 @@ void Rule::setDebugTag(const char* str)
 const char* Rule::getDebugTag() const
 {
   return _debugTag;
-}
-
-void Rule::setDebugPrintIndent(int value)
-{
-  _debugPrintIndent = value;
-}
-
-int Rule::getDebugPrintIndent() const
-{
-  return _debugPrintIndent;
 }
 
 void Rule::setDebugMatchReason(const char* reason)
@@ -147,10 +135,8 @@ void Rule::debugPrintRuleEntry()
   if (!debugPrint) {
     return;
   }
-  const int indent = 20;
-  _debugPrintIndent += 2;
-  std::cout << std::setw(indent) << _debugTag << ": entry "
-            << std::string(_debugPrintIndent, '-') << ">\n";
+  const int indent = 40;
+  std::cout << std::setw(indent) << _debugTag << ": entry " << ">\n";
 }
 
 void Rule::debugPrintMatchStatus(bool matches)
@@ -158,13 +144,11 @@ void Rule::debugPrintMatchStatus(bool matches)
   if (!debugPrint) {
     return;
   }
-  const int indent = 20;
+  const int indent = 40;
   std::cout << std::setw(indent) << _debugTag << ":       ";
   if (matches) {
-    std::cout << std::string(_debugPrintIndent, ' ');
-    std::cout << ft::green("match");
+    std::cout << ft::green("match   ");
   } else {
-    std::cout << std::string(_debugPrintIndent, ' ');
     std::cout << ft::red("no match");
   }
 

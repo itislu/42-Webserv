@@ -18,7 +18,7 @@ public:
 
 private:
   Client* _client;
-  Logger* _log;
+  static Logger& _log;
 };
 
 #endif

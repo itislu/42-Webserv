@@ -5,15 +5,19 @@
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& HandleDelete::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 HandleDelete::HandleDelete(PrepareResponse* context)
   : IState<PrepareResponse>(context)
   , _prepareResponse(context)
   , _client(_prepareResponse->getContext())
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "HandleDelete\n";
+  _log.info() << "HandleDelete\n";
 }
 
 void HandleDelete::run()

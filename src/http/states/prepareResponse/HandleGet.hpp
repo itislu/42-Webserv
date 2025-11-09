@@ -23,7 +23,7 @@ private:
 
   PrepareResponse* _prepareResponse;
   Client* _client;
-  Logger* _log;
+  static Logger& _log;
 };
 
 #endif

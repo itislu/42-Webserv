@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <client/Client.hpp>
-#include <cstddef>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
@@ -17,20 +16,24 @@
 #include <string>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& ReadBody::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 ReadBody::ReadBody(Client* context)
   : IState<Client>(context)
   , _client(context)
-  , _log(&Logger::getInstance(logFiles::http))
+  , _bodyLength(0)
+  , _consumed(0)
   , _initialized(false)
   , _fixedLengthBody(false)
   , _chunked(false)
-  , _bodyLength(0)
-  , _consumed(0)
   , _done(false)
 {
-  _log->info() << "ReadBody\n";
+  _log.info() << "ReadBody\n";
 }
 
 void ReadBody::run()
@@ -44,8 +47,6 @@ void ReadBody::run()
     _readFixedLengthBody();
   } else if (_chunked) {
     _readChunkedBody();
-  } else {
-    getContext()->getStateHandler().setState<PrepareResponse>();
   }
 
   if (_done) {
@@ -63,19 +64,20 @@ void ReadBody::_determineBodyFraming()
   const bool hasContentLength = headers.contains("Content-Length");
   // todo add grammar rules for these headers
   if (hasContentLength && hasTransferEncoding) {
-    _log->error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
+    _log.error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
   } else if (hasContentLength) {
     if (_isValidContentLength()) {
       return;
     }
-    _log->error() << "ReadBody: invalid Content-Length\n";
+    _log.error() << "ReadBody: invalid Content-Length\n";
   } else if (hasTransferEncoding) {
     if (_isValidTransferEncoding()) {
       return;
     }
-    _log->error() << "ReadBody: transfer encoding unsupported\n";
+    _log.error() << "ReadBody: transfer encoding unsupported\n";
   } else {
-    _log->info() << "ReadBody: no body framing defined\n";
+    _log.info() << "ReadBody: no body framing defined\n";
+    _done = true;
     return; // OK no body
   }
 
@@ -87,7 +89,7 @@ void ReadBody::_determineBodyFraming()
 bool ReadBody::_isValidContentLength()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  std::stringstream strBodyLen(headers["Content-Length"]);
+  std::istringstream strBodyLen(headers["Content-Length"]);
   strBodyLen >> _bodyLength;
   if (strBodyLen.fail()) {
     return false;
@@ -100,11 +102,11 @@ bool ReadBody::_isValidTransferEncoding()
 {
   const Headers& headers = _client->getRequest().getHeaders();
   const std::string& value = headers["Transfer-Encoding"];
-  if (ft::contains_subrange(ft::to_lower(value), "chunked")) {
-    return true;
+  if (!ft::contains_subrange(ft::to_lower(value), "chunked")) {
+    return false;
   }
   _chunked = true;
-  return false;
+  return true;
 }
 
 void ReadBody::_readFixedLengthBody()

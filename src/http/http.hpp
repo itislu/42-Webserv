@@ -3,7 +3,7 @@
 #define HTTP_HPP
 
 namespace http {
-const char* const CRLF = "\r\n";
+extern const char* const CRLF;
 
 int isSchemeChar(int chr);
 int isAuthChar(int chr);
