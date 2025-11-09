@@ -44,10 +44,8 @@ clean:
 	rm -rf .cache
 
 .PHONY: fclean
-fclean:
-	rm -rf $(BUILD_DIR)
+fclean: clean
 	rm -rf $(NAME)
-	rm -rf .cache
 
 
 
