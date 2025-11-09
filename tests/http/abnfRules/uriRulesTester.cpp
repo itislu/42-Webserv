@@ -285,10 +285,11 @@ TEST(UriAbnfTest, IPvFuture)
   EXPECT_FALSE(runParser("v1.fe80/", *sequence));
   EXPECT_FALSE(runParser("v1.#:", *sequence));
 
-  sequence->addRule(ft::make_shared<RangeRule>("\n"));
+  ft::shared_ptr<SequenceRule> seqWithEnd = ipvFutureRule();
+  seqWithEnd->addRule(ft::make_shared<RangeRule>("\n"));
 
-  // Missing '1*( unreserved / sub-delims / ":" )'.
-  EXPECT_FALSE(runParser("v1.\n", *sequence));
+  // Missing last part of sequence.
+  EXPECT_FALSE(runParser("v1.\n", *seqWithEnd));
 }
 
 /**
