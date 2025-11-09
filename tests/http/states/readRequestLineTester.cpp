@@ -212,9 +212,9 @@ TEST(ReadRequestLineTester, QueryBadRequest)
                    "?query//www.example.org "
                    "HTTP/1.1\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
-  Response& request = client->getResponse();
+  Response& response = client->getResponse();
 
-  EXPECT_EQ(request.getStatusCode().getCode(), StatusCode::BadRequest);
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
 }
 
 // NOLINTEND
