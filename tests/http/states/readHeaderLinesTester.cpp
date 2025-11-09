@@ -66,7 +66,7 @@ TEST(ReadHeaderLinesTester, HeaderList)
  * Request), [...]
  * https://datatracker.ietf.org/doc/html/rfc9112#name-obsolete-line-folding
  */
-TEST(ReadRequestLineTester, ObsoleteLineFolding)
+TEST(ReadHeaderLinesTester, ObsoleteLineFolding)
 {
   std::string line("Host: webserv\r\n"
                    " Foo: bar\r\n"
