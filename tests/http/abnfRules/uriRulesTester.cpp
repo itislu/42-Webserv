@@ -390,17 +390,21 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_TRUE(runParser("1111:2222::", *alter));
   EXPECT_TRUE(runParser("1111::", *alter));
 
-  // --- Invalid Tests ---
+  // --- Invalid ---
   // More than 8 h16 groups.
   EXPECT_FALSE(runParser("0:1:2:3:4:5:6:7:8", *alter));
+
   // Multiple "::".
   EXPECT_FALSE(runParser("2001:db8:85a3::8a2e::7334", *alter));
   EXPECT_FALSE(runParser("2001:db8::85a3:8a2e::7334", *alter));
+
   // Invalid character.
   EXPECT_FALSE(runParser("2001:db8:85a3:z:0:8a2e:370:7334", *alter));
+
   // Invalid IPv4 part.
   EXPECT_FALSE(runParser("::ffff:999.999.999.999", *alter));
   EXPECT_FALSE(runParser("2001:db8:85a3::192.168.1.1.5", *alter));
+
   // Invalid separators or endings.
   EXPECT_FALSE(runParser(":::", *alter));
   EXPECT_FALSE(runParser("2001:db8:::", *alter));
@@ -411,6 +415,7 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_FALSE(runParser(":2001::1", *alter));
   EXPECT_FALSE(runParser(":2001:1", *alter));
   EXPECT_FALSE(runParser(":0", *alter));
+
   // Too many h16 groups with "::".
   EXPECT_FALSE(runParser("1:2:3:4:5:6:7:8::", *alter));
   EXPECT_FALSE(runParser("1:2:3:4:5:6:7::8", *alter));
@@ -421,6 +426,7 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_FALSE(runParser("1:2::3:4:5:6:7:8", *alter));
   EXPECT_FALSE(runParser("1::2:3:4:5:6:7:8", *alter));
   EXPECT_FALSE(runParser("::1:2:3:4:5:6:7:8", *alter));
+
   // h16 group too long.
   EXPECT_FALSE(runParser("01234::", *alter));
 }
