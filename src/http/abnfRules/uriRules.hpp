@@ -9,6 +9,7 @@
 
 ft::shared_ptr<SequenceRule> uriRule();
 ft::shared_ptr<AlternativeRule> hierPartRule();
+ft::shared_ptr<SequenceRule> absoluteUriRule();
 ft::shared_ptr<SequenceRule> schemeRule();
 ft::shared_ptr<SequenceRule> authorityRule();
 ft::shared_ptr<RepetitionRule> userinfoRule();

@@ -12,6 +12,7 @@ int isSubDelim(int chr);
 int isPchar(int chr);
 int isTchar(int chr);
 int isHexDigit(int chr);
+int isQueryChar(int chr);
 int isFragmentChar(int chr);
 int isDigit19(int chr);
 int isDigit04(int chr);

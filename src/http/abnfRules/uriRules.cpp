@@ -87,6 +87,32 @@ ft::shared_ptr<AlternativeRule> hierPartRule()
   return alter;
 }
 
+/*
+ * absolute-URI  = scheme ":" hier-part [ "?" query ]
+ */
+ft::shared_ptr<SequenceRule> absoluteUriRule()
+{
+  // Optional part: "?" query
+  ft::shared_ptr<SequenceRule> optSeq = ft::make_shared<SequenceRule>();
+  optSeq->addRule(ft::make_shared<LiteralRule>("?"));
+  optSeq->addRule(queryRule());
+
+  ft::shared_ptr<RepetitionRule> optional =
+    ft::make_shared<RepetitionRule>(ft::move(optSeq));
+  optional->setMin(0);
+  optional->setMax(1);
+
+  // Main sequence: scheme ":" hier-part [ "?" query ]
+  const ft::shared_ptr<SequenceRule> sequence = ft::make_shared<SequenceRule>();
+  sequence->addRule(schemeRule());
+  sequence->addRule(ft::make_shared<LiteralRule>(":"));
+  sequence->addRule(hierPartRule());
+  sequence->addRule(ft::move(optional));
+
+  sequence->setDebugTag("absoluteUriRule");
+  return sequence;
+}
+
 /**
  * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
  */
@@ -711,7 +737,7 @@ ft::shared_ptr<RepetitionRule> queryRule()
 {
   ft::shared_ptr<AlternativeRule> alter = ft::make_shared<AlternativeRule>();
   alter->addRule(pcharRule());
-  alter->addRule(ft::make_shared<RangeRule>(http::isFragmentChar));
+  alter->addRule(ft::make_shared<RangeRule>(http::isQueryChar));
 
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::move(alter));

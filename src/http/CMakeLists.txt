@@ -6,9 +6,10 @@ set(LIB_NAME http)
 
 add_library(${LIB_NAME} STATIC
   abnfRules/generalRules.cpp
+  abnfRules/headerLineRules.cpp
+  abnfRules/http11Rules.cpp
   abnfRules/requestLineRules.cpp
   abnfRules/uriRules.cpp
-  abnfRules/headerLineRules.cpp
   states/readRequestLine/ParseMethod.cpp
   states/readRequestLine/ParseUri.cpp
   states/readRequestLine/ParseVersion.cpp
