@@ -37,7 +37,7 @@ private:
   ft::shared_ptr<LiteralRule> _endOfLine;
   BufferReader _buffReader;
   Rule::ResultMap _results;
-  Logger* _log;
+  static Logger& _log;
   bool _done;
 };
 

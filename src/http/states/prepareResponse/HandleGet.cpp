@@ -15,15 +15,19 @@
 #include <sys/stat.h>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& HandleGet::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 HandleGet::HandleGet(PrepareResponse* context)
   : IState<PrepareResponse>(context)
   , _prepareResponse(context)
   , _client(_prepareResponse->getContext())
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "HandleGet\n";
+  _log.info() << "HandleGet\n";
 }
 
 void HandleGet::run()
@@ -54,9 +58,9 @@ void HandleGet::_addContentLengthHeader()
     stat("./assets/testWebsite/index.html", &info);
   }
 
-  std::stringstream iss;
-  iss << info.st_size;
-  const std::string contentLength = iss.str();
+  std::ostringstream oss;
+  oss << info.st_size;
+  const std::string contentLength = oss.str();
   Headers& headers = _client->getResponse().getHeaders();
   headers.addHeader("Content-Length", contentLength);
 }

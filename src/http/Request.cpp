@@ -109,13 +109,13 @@ std::size_t Request::_getMaxMethodLen() throw()
 std::string Request::_methodToString() const
 {
   switch (_method) {
+    case UNDEFINED:
+      return "UNDEFINED";
     case GET:
       return "GET";
     case POST:
       return "POST";
     case DELETE:
       return "DELETE";
-    case UNDEFINED:
-      return "UNDEFINED";
   }
 }

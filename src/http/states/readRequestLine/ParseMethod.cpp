@@ -21,15 +21,19 @@
 #include <string>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& ParseMethod::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 ParseMethod::ParseMethod(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
   , _buffReader()
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "ParseMethod\n";
+  _log.info() << "ParseMethod\n";
   _init();
 }
 
@@ -43,7 +47,7 @@ void ParseMethod::run()
   _sequence.reset();
   _buffReader.resetPosInBuff();
   if (!_sequence.matches()) {
-    _log->error() << "Bad Request\n";
+    _log.error() << "Bad Request\n";
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     getContext()->getStateHandler().setDone();
     return;

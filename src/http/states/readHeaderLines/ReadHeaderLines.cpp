@@ -7,7 +7,6 @@
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
-#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readBody/ReadBody.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
@@ -21,16 +20,20 @@
 #include <string>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 ReadHeaderLines::ReadHeaderLines(Client* context)
   : IState(context)
   , _client(context)
   , _buffReader()
-  , _log(&Logger::getInstance(logFiles::http))
   , _done(false)
 {
-  _log->info() << "ReadHeaderLines\n";
+  _log.info() << "ReadHeaderLines\n";
   _init();
 }
 
@@ -88,8 +91,8 @@ void ReadHeaderLines::_readLines()
         return;
       }
     } else {
-      _log->error() << "ReadHeaderLines: Bad Request: Headers:\n";
-      _log->error() << _client->getRequest().getHeaders().toString() << '\n';
+      _log.error() << "ReadHeaderLines: Bad Request: Headers:\n";
+      _log.error() << _client->getRequest().getHeaders().toString() << '\n';
       _client->getResponse().setStatusCode(StatusCode::BadRequest);
       _done = true;
       return;

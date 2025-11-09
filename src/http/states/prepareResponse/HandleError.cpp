@@ -5,15 +5,19 @@
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& HandleError::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 HandleError::HandleError(PrepareResponse* context)
   : IState<PrepareResponse>(context)
   , _prepareResponse(context)
   , _client(_prepareResponse->getContext())
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "HandleError\n";
+  _log.info() << "HandleError\n";
 }
 
 void HandleError::run()

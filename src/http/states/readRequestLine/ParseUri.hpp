@@ -54,7 +54,7 @@ private:
   ft::unique_ptr<SequenceRule> _sequence;
   Rule::ResultMap _results;
   bool _initParser;
-  Logger* _log;
+  static Logger& _log;
 };
 
 #endif

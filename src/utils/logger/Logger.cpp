@@ -14,15 +14,26 @@
 /* ************************************************************************** */
 // PUBLIC
 
-Logger& Logger::getInstance(const char* filename)
+Logger& Logger::getInstance(const char* filename) throw()
 {
-  const InstanceMap::iterator iter = _instances().find(filename);
-  if (iter != _instances().end()) {
-    return *iter->second;
+  static Logger emptyLogger;
+
+  try {
+    const std::string filenameStr(filename);
+
+    // Existing Logger
+    const InstanceMap::iterator iter = _instances().find(filenameStr);
+    if (iter != _instances().end()) {
+      return *iter->second;
+    }
+
+    // New Logger
+    const ft::shared_ptr<Logger> loggerPtr(new Logger(filenameStr));
+    _instances()[filenameStr] = loggerPtr;
+    return *loggerPtr;
+  } catch (...) {
+    return emptyLogger;
   }
-  const ft::shared_ptr<Logger> loggerPtr(new Logger(filename));
-  _instances()[filename] = loggerPtr;
-  return *loggerPtr;
 }
 
 std::ostream& Logger::info()
@@ -40,25 +51,15 @@ std::ostream& Logger::error()
 
 /* ***************************************************************************/
 // PRIVATE
-Logger::Logger() {}
-
-Logger::Logger(const char* filename)
+Logger::Logger(const std::string& filename)
 {
-  _file.open(filename, std::ios::out | std::ios::trunc);
+  _file.open(filename.c_str(), std::ios::out | std::ios::trunc);
   _file << std::unitbuf; // enables automatic flush
   if (!_file) {
     std::cerr << "Failed to open log file: " << filename << '\n';
   }
 }
 
-Logger::~Logger()
-{
-  if (_file.is_open()) {
-    _file.close();
-  }
-}
-
-// NOLINTBEGIN(performance-avoid-endl)
 std::ostream& Logger::_log(LogLevel level)
 {
   if (!_file.is_open()) {
@@ -76,11 +77,10 @@ std::ostream& Logger::_log(LogLevel level)
       levelStr = "ERROR";
       break;
   }
-  _file << "[" << _currentTime() << "] [";
-  _file << std::setw(_widthLevelStr) << levelStr << "] ";
+  _file << "[" << _currentTime() << "] [" << std::setw(_widthLevelStr)
+        << levelStr << "] ";
   return _file;
 }
-// NOLINTEND(performance-avoid-endl)
 
 Logger::InstanceMap& Logger::_instances()
 {

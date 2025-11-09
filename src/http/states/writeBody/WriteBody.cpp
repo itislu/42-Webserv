@@ -9,12 +9,16 @@
 #include <sstream>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& WriteBody::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 WriteBody::WriteBody(Client* context)
   : IState<Client>(context)
   , _client(context)
-  , _log(Logger::getInstance(logFiles::http))
 {
   _log.info() << "WriteBody\n";
   _log.info() << getContext()->getRequest().toString() << "\n";

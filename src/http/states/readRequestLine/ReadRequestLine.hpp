@@ -20,7 +20,7 @@ public:
 
 private:
   StateHandler<ReadRequestLine> _stateHandler;
-  Logger& _log; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+  static Logger& _log;
 };
 
 #endif

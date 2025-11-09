@@ -10,14 +10,18 @@
 #include <utils/state/IState.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& WriteHeaderLines::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 WriteHeaderLines::WriteHeaderLines(Client* context)
   : IState<Client>(context)
   , _client(context)
-  , _log(&Logger::getInstance(logFiles::http))
 {
-  _log->info() << "WriteHeaderLines\n";
+  _log.info() << "WriteHeaderLines\n";
 }
 
 void WriteHeaderLines::run()

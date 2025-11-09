@@ -11,12 +11,16 @@
 #include <utils/state/StateHandler.hpp>
 
 /* ************************************************************************** */
+// INIT
+
+Logger& ReadRequestLine::_log = Logger::getInstance(LOG_HTTP);
+
+/* ************************************************************************** */
 // PUBLIC
 
 ReadRequestLine::ReadRequestLine(Client* context)
   : IState(context)
   , _stateHandler(this)
-  , _log(Logger::getInstance(logFiles::http))
 {
   _log.info() << "ReadRequestLine\n";
   _stateHandler.setState<ParseMethod>();

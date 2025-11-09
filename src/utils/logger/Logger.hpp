@@ -9,15 +9,24 @@
 #include <ostream>
 #include <string>
 
-namespace logFiles {
-const char* const general = "./log/general.log";
-const char* const http = "./log/http.log";
-}
+#define LOG_GENERAL "./log/general.log"
+#define LOG_HTTP "./log/http.log"
 
 /* ************************************************************************** */
 class Logger
 {
 public:
+  static Logger& getInstance(const char* filename) throw();
+
+  std::ostream& info();
+  std::ostream& warning();
+  std::ostream& error();
+
+  ~Logger() {}
+
+private:
+  typedef std::map<std::string, ft::shared_ptr<Logger> > InstanceMap;
+
   enum LogLevel
   {
     INFO,
@@ -25,19 +34,8 @@ public:
     ERROR
   };
 
-  static Logger& getInstance(const char* filename);
-
-  std::ostream& info();
-  std::ostream& warning();
-  std::ostream& error();
-
-  ~Logger();
-
-private:
-  typedef std::map<const char*, ft::shared_ptr<Logger> > InstanceMap;
-
-  Logger();
-  explicit Logger(const char* filename);
+  Logger() throw() {}
+  explicit Logger(const std::string& filename);
   Logger(const Logger& other);
   Logger& operator=(const Logger& other);
 

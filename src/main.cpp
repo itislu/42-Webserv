@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
   }
 
   try {
-    Logger::getInstance(logFiles::general).info() << "webserv started\n";
+    Logger::getInstance(LOG_GENERAL).info() << "webserv started\n";
     const Config config = TestConfigSetup::createTestConfig();
     std::cout << config;
     ServerManager serverManager(config);
