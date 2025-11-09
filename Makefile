@@ -14,15 +14,15 @@ BUILD_DIR_PRESET := build/$(PRESET)
 .PHONY: all
 all:
 	@if [ ! -d $(BUILD_DIR_PRESET) ]; then \
-		$(MAKE) -s config; \
+		$(MAKE) --no-print-directory config; \
 	fi
-	@$(MAKE) -s build
+	@$(MAKE) --no-print-directory build
 
 $(NAME): all
 
 .PHONY: build
 build:
-	@cmake --build --preset=$(PRESET) -- -s -j
+	cmake --build --preset=$(PRESET) -- -j
 
 .PHONY: re
 re: fclean all
@@ -33,7 +33,7 @@ re: fclean all
 .PHONY: config
 config:
 	cmake --preset=$(PRESET)
-	@$(MAKE) -s copy-compile-commands
+	@$(MAKE) --no-print-directory copy-compile-commands
 
 
 
