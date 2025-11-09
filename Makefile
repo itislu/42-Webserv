@@ -61,12 +61,12 @@ VALGRINDFLAGS	=	--errors-for-leak-kinds=all \
 								--track-fds=all
 
 .PHONY: run
-run: build
+run: all
 	@printf "$(SEPARATOR)\n"
 	./$(NAME) $(ARGS)
 
 .PHONY: runv
-runv: build
+runv: all
 	@printf "$(SEPARATOR)\n"
 	valgrind $(VALGRINDFLAGS) ./$(NAME) $(ARGS)
 
