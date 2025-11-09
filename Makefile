@@ -52,13 +52,13 @@ fclean: clean
 # **************************************************************************** #
 ARGS ?= "assets/config.json"
 
-VALGRINDFLAGS	=	--errors-for-leak-kinds=all \
-								--leak-check=full \
-								--show-error-list=yes \
-								--show-leak-kinds=all \
-								--trace-children=yes \
-								--track-origins=yes \
-								--track-fds=all
+VALGRINDFLAGS := --errors-for-leak-kinds=all \
+									--leak-check=full \
+									--show-error-list=yes \
+									--show-leak-kinds=all \
+									--trace-children=yes \
+									--track-origins=yes \
+									--track-fds=all
 
 .PHONY: run
 run: all
