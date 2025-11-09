@@ -69,7 +69,7 @@ TEST(ReadHeaderLinesTester, HeaderList)
 TEST(ReadRequestLineTester, ObsoleteLineFolding)
 {
   std::string line("Host: webserv\r\n"
-                   " Content-Length: 7\r\n"
+                   " Foo: bar\r\n"
                    "\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
   Response& response = client->getResponse();
