@@ -58,9 +58,9 @@ void HandleGet::_addContentLengthHeader()
     stat("./assets/testWebsite/index.html", &info);
   }
 
-  std::stringstream iss;
-  iss << info.st_size;
-  const std::string contentLength = iss.str();
+  std::ostringstream oss;
+  oss << info.st_size;
+  const std::string contentLength = oss.str();
   Headers& headers = _client->getResponse().getHeaders();
   headers.addHeader("Content-Length", contentLength);
 }

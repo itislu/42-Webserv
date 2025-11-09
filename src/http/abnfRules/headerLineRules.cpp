@@ -11,8 +11,6 @@
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
-#include <cctype>
-
 /**
  * field-line CRLF
  */

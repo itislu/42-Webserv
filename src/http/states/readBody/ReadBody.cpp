@@ -26,11 +26,11 @@ Logger& ReadBody::_log = Logger::getInstance(LOG_HTTP);
 ReadBody::ReadBody(Client* context)
   : IState<Client>(context)
   , _client(context)
+  , _bodyLength(0)
+  , _consumed(0)
   , _initialized(false)
   , _fixedLengthBody(false)
   , _chunked(false)
-  , _bodyLength(0)
-  , _consumed(0)
   , _done(false)
 {
   _log.info() << "ReadBody\n";
@@ -89,7 +89,7 @@ void ReadBody::_determineBodyFraming()
 bool ReadBody::_isValidContentLength()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  std::stringstream strBodyLen(headers["Content-Length"]);
+  std::istringstream strBodyLen(headers["Content-Length"]);
   strBodyLen >> _bodyLength;
   if (strBodyLen.fail()) {
     return false;
@@ -102,11 +102,11 @@ bool ReadBody::_isValidTransferEncoding()
 {
   const Headers& headers = _client->getRequest().getHeaders();
   const std::string& value = headers["Transfer-Encoding"];
-  if (ft::contains_subrange(ft::to_lower(value), "chunked")) {
-    return true;
+  if (!ft::contains_subrange(ft::to_lower(value), "chunked")) {
+    return false;
   }
   _chunked = true;
-  return false;
+  return true;
 }
 
 void ReadBody::_readFixedLengthBody()

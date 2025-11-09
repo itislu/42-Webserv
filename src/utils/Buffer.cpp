@@ -1,7 +1,6 @@
 #include "Buffer.hpp"
 #include <algorithm>
 #include <cstddef>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <sys/types.h>
@@ -94,9 +93,5 @@ std::string Buffer::consume(long bytes)
 
 std::string Buffer::toString()
 {
-  std::stringstream oss;
-  for (std::size_t i = 0; i < _buff.size(); ++i) {
-    oss << static_cast<char>(_buff[i]);
-  }
-  return oss.str();
+  return std::string(_buff.begin(), _buff.end());
 }

@@ -25,11 +25,11 @@ private:
 
   Client* _client;
   static Logger& _log;
+  long _bodyLength;
+  long _consumed;
   bool _initialized;
   bool _fixedLengthBody;
   bool _chunked;
-  long _bodyLength;
-  long _consumed;
   bool _done;
 };
 
