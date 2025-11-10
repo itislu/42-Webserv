@@ -3,7 +3,6 @@
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
-#include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
@@ -36,7 +35,7 @@ bool runParser(const std::string& str, Rule& rule)
 
 /**
  * field-content = field-vchar
- *                 [ 1*( SP / HTAB / field-vchar ) field-vchar ]
+ *                 [ 1*( SP / HTAB / field-vchar ) ]
  */
 TEST(HeaderLinesTester, FieldContentRule)
 {
@@ -44,25 +43,24 @@ TEST(HeaderLinesTester, FieldContentRule)
   rule->addRule(ft::make_shared<RangeRule>("\n"));
 
   EXPECT_TRUE(runParser("tes t\n", *rule));
-
-  // Invalid
-  EXPECT_FALSE(runParser("test  \n", *rule)); // must end with vchar
-  EXPECT_FALSE(rule->reachedEnd());
+  EXPECT_TRUE(runParser("test  \n", *rule));
 }
 
+/**
+ * field-value = *field-content
+ */
 TEST(HeaderLinesTester, FieldValueRule)
 {
   const ft::shared_ptr<SequenceRule> seqRule = ft::make_shared<SequenceRule>();
-  const ft::shared_ptr<RepetitionRule> rule = fieldValueRule();
   seqRule->addRule(fieldValueRule());
   seqRule->addRule(ft::make_shared<RangeRule>("\n"));
 
   EXPECT_TRUE(runParser("test, hallo\n", *seqRule));
-
-  // Invalid
-  EXPECT_FALSE(runParser("test, hallo \n", *seqRule)); // must end with vchar
 }
 
+/**
+ * field-line   = field-name ":" OWS field-value OWS
+ */
 TEST(HeaderLinesTester, FieldLineRule)
 {
   const ft::shared_ptr<SequenceRule> seqRule = ft::make_shared<SequenceRule>();
@@ -70,21 +68,21 @@ TEST(HeaderLinesTester, FieldLineRule)
   seqRule->addRule(ft::make_shared<RangeRule>("\n"));
 
   EXPECT_TRUE(runParser("host: test, hallo\n", *seqRule));
+  EXPECT_TRUE(runParser("host: test, hallo \n", *seqRule));
+  EXPECT_TRUE(runParser("host:test, hallo \n", *seqRule));
 
   // Invalid
-  EXPECT_FALSE(
-    runParser("host: test, hallo \n", *seqRule)); // must end with vchar
+  EXPECT_FALSE(runParser("host :test, hallo \n", *seqRule));
 }
 
+/**
+ * field-line CRLF
+ */
 TEST(HeaderLinesTester, FieldLinePartRule)
 {
   const ft::unique_ptr<SequenceRule> rule = fieldLinePartRule();
 
   EXPECT_TRUE(runParser("host: test, hallo\r\n", *rule));
-
-  // Invalid
-  EXPECT_FALSE(
-    runParser("host: test, hallo \r\n", *rule)); // must end with vchar
 }
 
 // Main function to run all tests

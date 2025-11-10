@@ -14,7 +14,7 @@ public:
   std::string toString() const;
   std::string toLogString() const;
 
-  const std::string& operator[](const std::string& key) const;
+  const std::string& at(const std::string& key) const;
   bool contains(const std::string& key) const;
 
 private:

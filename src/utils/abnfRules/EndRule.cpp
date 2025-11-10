@@ -31,7 +31,7 @@ bool EndRule::matches()
     if (matches && getEndPos() == getBuffReader()->getPosInBuff()) {
       break;
     }
-    getBuffReader()->setPosInBuff(getEndPos());
+    moveToEndPos();
     rewindCount++;
     matches = false;
   }

@@ -6,7 +6,6 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
-#include <utils/abnfRules/EndRule.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
@@ -77,6 +76,15 @@ ft::shared_ptr<RepetitionRule> fieldValueRule()
 /**
  * field-content = field-vchar
  *                 [ 1*( SP / HTAB / field-vchar ) field-vchar ]
+ *
+ * ! Rule changed because:
+ * Messages are parsed using a generic algorithm, independent of the
+ * individual field names. The contents within a given field line value
+ * are not parsed until a later stage of message interpretation (usually
+ * after the message's entire field section has been processed).
+ *
+ * field-content = field-vchar
+ *                 [ 1*( SP / HTAB / field-vchar ) ]
  */
 ft::shared_ptr<SequenceRule> fieldContentRule()
 {
@@ -101,9 +109,10 @@ ft::shared_ptr<SequenceRule> fieldContentRule()
   optSeq->setDebugTag("[1*(SP/HTAB/field-vchar)field-vchar]");
   optSeq->addRule(ft::move(repeatPart));
 
-  ft::shared_ptr<EndRule> endVchar = ft::make_shared<EndRule>(fieldVcharRule());
-  endVchar->setDebugTag("endVchar");
-  optSeq->addRule(ft::move(endVchar));
+  // ft::shared_ptr<EndRule> endVchar =
+  // ft::make_shared<EndRule>(fieldVcharRule());
+  // endVchar->setDebugTag("endVchar");
+  // optSeq->addRule(ft::move(endVchar));
 
   ft::shared_ptr<RepetitionRule> optWrap =
     ft::make_shared<RepetitionRule>(ft::move(optSeq));

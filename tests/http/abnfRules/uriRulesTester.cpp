@@ -80,7 +80,7 @@ TEST(UriAbnfTest, URI)
   EXPECT_TRUE(runParser("https://user%40mail.com@host.org ", *s));
 
   // frag only
-  EXPECT_TRUE(runParser("http:#frag", *s));
+  EXPECT_TRUE(runParser("http:#frag ", *s));
 }
 
 /**

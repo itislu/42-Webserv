@@ -3,8 +3,6 @@
 #include <client/Client.hpp>
 #include <gtest/gtest.h>
 #include <http/Request.hpp>
-#include <http/Response.hpp>
-#include <http/StatusCode.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <string>
 #include <utils/state/IState.hpp>

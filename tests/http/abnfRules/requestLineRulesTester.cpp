@@ -37,9 +37,7 @@ TEST(RequestLineRulesTester, PathPartRule)
   const ft::unique_ptr<SequenceRule> rule = pathPartRule();
 
   EXPECT_TRUE(runParser("/test/ ", *rule));
-  Rule::debugPrint = true;
   EXPECT_TRUE(runParser("/t/", *rule));
-  Rule::debugPrint = false;
 }
 
 // Main function to run all tests
@@ -48,5 +46,3 @@ int main(int argc, char** argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-
-// abac

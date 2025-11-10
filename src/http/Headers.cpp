@@ -32,8 +32,8 @@ std::string Headers::toString() const
   for (HeaderMap::const_iterator iter = _headers.begin();
        iter != _headers.end();
        ++iter) {
-    oss.append(iter->first + ": ");
-    oss.append(iter->second + http::CRLF);
+    oss.append(iter->first).append(": ");
+    oss.append(iter->second).append(http::CRLF);
   }
   return oss;
 }
@@ -45,14 +45,14 @@ std::string Headers::toLogString() const
        iter != _headers.end();
        ++iter) {
     oss.append("  \"");
-    oss.append(iter->first + ": ");
+    oss.append(iter->first).append(": ");
     oss.append(iter->second);
     oss.append("\"\n");
   }
   return oss;
 }
 
-const std::string& Headers::operator[](const std::string& key) const
+const std::string& Headers::at(const std::string& key) const
 {
   return _headers.at(ft::to_lower(key));
 }
@@ -80,5 +80,5 @@ void Headers::_addNew(const std::string& key, const std::string& value)
 
 void Headers::_addExisting(const std::string& key, const std::string& value)
 {
-  _headers[key].append(", " + value);
+  _headers[key].append(", ").append(value);
 }
