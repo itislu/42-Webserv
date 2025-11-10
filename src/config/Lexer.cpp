@@ -48,7 +48,7 @@ void Lexer::validateInputFile()
   }
 }
 
-std::size_t Lexer::getLine() const
+std::size_t Lexer::getLineNum() const
 {
   return _line;
 }
@@ -94,8 +94,7 @@ Token Lexer::next()
     std::size_t idx = _pos;
     while (idx < _input.size()) {
       const unsigned char curr = _input[idx];
-      if ((isspace(curr) != 0) || curr == '{' || curr == '}' || curr == ';' ||
-          curr == '#') {
+      if ((isspace(curr) != 0) || curr == '{' || curr == '}' || curr == ';') {
         break;
       }
       ++idx;
@@ -125,9 +124,11 @@ void Lexer::skipComment()
 {
   while (_pos < _input.size()) {
     if (_input[_pos] == '\n') {
+      ++_pos;
       ++_line;
       break;
     }
+    std::cout << _input[_pos];
     ++_pos;
   }
 }

@@ -47,8 +47,8 @@ void ConfigParser::skipComments()
 void ConfigParser::invalidToken(const std::string& err) const
 {
   std::ostringstream oss;
-  oss << "invalid token in " << err << " at line " << _lexer.getLine() << ": '"
-      << _token.getValue() << "'";
+  oss << "invalid token in " << err << " at line " << _lexer.getLineNum()
+      << ": '" << _token.getValue() << "'";
   throw std::runtime_error(oss.str());
 }
 
@@ -77,6 +77,7 @@ void ConfigParser::parseLocationConfig(ParsedServer& server)
   skipComments();
 
   if (!isExpectedNext(IDENT)) {
+    std::cout << "here!\n";
     invalidToken("location config");
   }
 
@@ -142,6 +143,7 @@ void ConfigParser::parse()
   for (_token = _lexer.next(); _token.getType() != END;
        _token = _lexer.next()) {
     if (_token.getType() == COMMENT) {
+      std::cout << "parse - skip comment!\n";
       _lexer.skipComment();
     } else if (_token.getType() == IDENT && _token.getValue() == "server") {
       parseServerConfig();
@@ -163,4 +165,5 @@ void ConfigParser::readConfig()
   const Config conf = ConfigBuilder::build(_parsed);
   std::cout << conf;
   std::cout << "END BUILD!\n";
+  // return ConfigBuilder::build(_parsed);
 }

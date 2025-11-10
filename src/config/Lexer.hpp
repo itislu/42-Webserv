@@ -13,7 +13,7 @@ public:
 
   void init();
   Token next();
-  std::size_t getLine() const;
+  std::size_t getLineNum() const;
   void skipComment();
 
 private:
