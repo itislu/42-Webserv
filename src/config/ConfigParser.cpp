@@ -1,11 +1,15 @@
 #include "ConfigParser.hpp"
 #include "config/Config.hpp"
 #include "config/ConfigBuilder.hpp"
+#include "config/ConfigTypes.hpp"
+#include "config/Converters.hpp"
 #include "config/Lexer.hpp"
 #include "config/ParsedConfig.hpp"
 #include "config/ParsedLocation.hpp"
 #include "config/ParsedServer.hpp"
 #include "config/Token.hpp"
+#include <cstddef>
+#include <exception>
 #include <iostream>
 #include <map>
 #include <ostream>
@@ -52,8 +56,47 @@ void ConfigParser::invalidToken(const std::string& err) const
   throw std::runtime_error(oss.str());
 }
 
-void ConfigParser::parseDirective(
-  std::map<std::string, std::vector<std::string> >& directive)
+bool ConfigParser::isRepeatableDirective(const std::string& key)
+{
+  return (key == "listen" || key == "server_name" || key == "error_page");
+}
+
+void ConfigParser::validateErrorPages(const std::vector<std::string>& value)
+{
+  if (value.size() < 2) {
+    throw std::invalid_argument("invalid number of arguments");
+  }
+
+  for (std::size_t i = 0; i < value.size() - 1; ++i) {
+    toCode(value[i]);
+  }
+}
+
+void ConfigParser::addToDirective(DirectiveMap& directive,
+                                  const std::string& key,
+                                  const std::vector<std::string>& value)
+{
+  if (key == "error_page") {
+    try {
+      validateErrorPages(value);
+    } catch (const std::exception& e) {
+      throw std::invalid_argument("error_page: " + std::string(e.what()));
+    }
+  }
+
+  const DirectiveMap::iterator iter = directive.find(key);
+  if (iter != directive.end()) {
+    if (isRepeatableDirective(key)) {
+      iter->second.insert(iter->second.end(), value.begin(), value.end());
+    } else {
+      throw std::invalid_argument("duplicate directive: " + key);
+    }
+  } else {
+    directive[key] = value;
+  }
+}
+
+void ConfigParser::parseDirective(DirectiveMap& directive)
 {
   const std::string key = _token.getValue();
   std::vector<std::string> value;
@@ -65,11 +108,7 @@ void ConfigParser::parseDirective(
   if (_token.getType() != SEMICOLON) {
     invalidToken("parse directive - missing ';'");
   }
-
-  /* TODO: check for duplicates before inserting, duplicates only allowed for
-   * certain keys */
-
-  directive[key] = value;
+  addToDirective(directive, key, value);
 }
 
 void ConfigParser::parseLocationConfig(ParsedServer& server)
@@ -77,7 +116,6 @@ void ConfigParser::parseLocationConfig(ParsedServer& server)
   skipComments();
 
   if (!isExpectedNext(IDENT)) {
-    std::cout << "here!\n";
     invalidToken("location config");
   }
 
@@ -160,6 +198,7 @@ void ConfigParser::readConfig()
   _lexer.init();
   parse();
   std::cout << _parsed;
+  /* TODO: validate and check for duplicates */
 
   std::cout << "BUILD!\n";
   const Config conf = ConfigBuilder::build(_parsed);
@@ -167,3 +206,6 @@ void ConfigParser::readConfig()
   std::cout << "END BUILD!\n";
   // return ConfigBuilder::build(_parsed);
 }
+
+// error_page 505 505.html
+// error_page 404 403 402 401 40x.html

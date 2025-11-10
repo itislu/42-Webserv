@@ -31,7 +31,7 @@ public:
   void setRoot(const std::string& root);
   void setMaxBodySize(std::size_t bytes);
   void setTimeout(std::size_t seconds);
-  void setErrorPages(std::map<int, std::string>& errorPages);
+  void setErrorPages(std::vector<int> codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
 
   void setDefaultTimeout();

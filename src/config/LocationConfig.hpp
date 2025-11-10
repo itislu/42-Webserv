@@ -38,6 +38,7 @@ public:
   void setRoot(const std::string& root);
   void setMaxBodySize(std::size_t size);
   void setIndex(const std::string& index);
+  void setErrorPages(std::vector<int> codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
   void setAutoIndex(bool autoindex);
   void setAllowedMethod(const std::string& method);

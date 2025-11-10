@@ -30,12 +30,15 @@ public:
   void setRoot(const std::string& root);
   void setMaxBodySize(std::size_t size);
   void setTimeout(std::size_t time);
+  void setErrorPages(std::vector<int> codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
   void setIndex(const std::string& index);
   void addPort(int port);
   void addHostName(const std::string& hostName);
   void setAllowedMethod(const std::string& method);
   void addLocation(const LocationConfig& location);
+
+  void checkPortDuplicate(int port);
 
   const LocationConfig& getLocationForPath(const std::string& uri) const;
 

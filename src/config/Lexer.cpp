@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
@@ -27,9 +28,8 @@ void Lexer::init()
 {
   validateInputFile();
 
-  std::stringstream buffer;
-  buffer << _file.rdbuf();
-  _input = buffer.str();
+  _input.assign((std::istreambuf_iterator<char>(_file)),
+                std::istreambuf_iterator<char>());
 }
 
 void Lexer::validateInputFile()
@@ -65,7 +65,7 @@ Token Lexer::next()
 
   const char chr = _input[_pos];
   /* TODO: remove print */
-  std::cout << "Char: " << chr << "\n";
+  // std::cout << "Char: " << chr << "\n";
 
   if (chr == '{') {
     ++_pos;
@@ -104,7 +104,7 @@ Token Lexer::next()
     token.setType(IDENT);
     _pos = idx;
     /* TODO: remove print */
-    std::cout << token;
+    // std::cout << token;
     return token;
   }
   return token;
@@ -128,7 +128,6 @@ void Lexer::skipComment()
       ++_line;
       break;
     }
-    std::cout << _input[_pos];
     ++_pos;
   }
 }

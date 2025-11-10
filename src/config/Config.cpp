@@ -86,14 +86,15 @@ void Config::setDefaultTimeout()
   Config::_defaultTimeout = static_cast<int>(timeout);
 }
 
-void Config::setErrorPages(std::map<int, std::string>& errorPages)
+void Config::setErrorPages(std::vector<int> codes, const std::string& path)
 {
-  _errorPages = errorPages;
+  for (std::size_t i = 0; i < codes.size(); ++i) {
+    addErrorPage(codes[i], path);
+  }
 }
 
 void Config::addErrorPage(int code, const std::string& path)
 {
-  /* TODO: check this */
   _errorPages[code] = path;
 }
 
@@ -111,6 +112,15 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
   out << "Root: " << config.getRoot() << "\n";
   out << "Timeout: " << config.getTimeout() << "s\n";
   out << "BodySize: " << config.getMaxBodySize() << "\n";
+  if (!config.getErrorPages().empty()) {
+    out << "Error Page:" << "\n";
+    for (std::map<int, std::string>::const_iterator it =
+           config.getErrorPages().begin();
+         it != config.getErrorPages().end();
+         ++it) {
+      out << "  " << it->first << " : " << it->second << "\n";
+    }
+  }
 
   const std::vector<ServerConfig>& servers = config.getServers();
   if (servers.empty()) {

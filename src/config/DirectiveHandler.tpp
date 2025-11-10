@@ -1,11 +1,9 @@
+#include "config/ConfigTypes.hpp"
 #include "config/Converters.hpp"
 #include "config/DirectiveHandler.hpp"
-#include "config/LocationConfig.hpp"
-#include "config/ParsedConfig.hpp"
-#include "config/ServerConfig.hpp"
 #include <cstdlib>
 #include <cstring>
-#include <exception>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -27,10 +25,10 @@ void DirectiveHandler<ConfigType>::checkDirectiveHandler(
 
 template<typename ConfigType>
 void DirectiveHandler<ConfigType>::buildDirectives(
-  const ParsedConfig::Directive& directives,
+  const DirectiveMap& directives,
   ConfigType& config)
 {
-  for (ParsedConfig::Directive::const_iterator it = directives.begin();
+  for (DirectiveMap::const_iterator it = directives.begin();
        it != directives.end();
        ++it) {
     const std::string& key = it->first;
@@ -48,7 +46,6 @@ void DirectiveHandlerBase<ConfigType>::setRoot(
   if (values.size() != 1) {
     throw std::invalid_argument("root: invalid number of arguments");
   }
-  /* TODO: validate root? */
   config.setRoot(values[0]);
 }
 
@@ -64,15 +61,23 @@ void DirectiveHandlerBase<ConfigType>::setMaxBodySize(
   config.setMaxBodySize(size);
 }
 
+// error_page 505 504 50x.html 404 404.html
 template<typename ConfigType>
 void DirectiveHandlerBase<ConfigType>::setErrorPage(
   const std::vector<std::string>& values,
   ConfigType& config)
 {
-  if (values.size() != 2) {
-    throw std::invalid_argument("error_page: invalid number of arguments");
+  std::vector<int> codes;
+  for (std::size_t i = 0; i < values.size(); ++i) {
+    std::stringstream sstream(values[i]);
+    int value = 0;
+    sstream >> value;
+
+    if (sstream.fail() || !sstream.eof()) {
+      config.setErrorPages(codes, values[i]);
+      codes.clear();
+    } else {
+      codes.push_back(value);
+    }
   }
-  /* TODO: Converter for error pages */
-  int code = std::strtoul(values[0].c_str(), 0, 10);
-  config.addErrorPage(code, values[1]);
 }

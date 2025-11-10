@@ -2,8 +2,8 @@
 #define DIRECTIVEHANDLER_HPP
 
 #include "config/Config.hpp"
+#include "config/ConfigTypes.hpp"
 #include "config/LocationConfig.hpp"
-#include "config/ParsedConfig.hpp"
 #include "config/ServerConfig.hpp"
 #include <string>
 #include <vector>
@@ -101,7 +101,7 @@ public:
                                     const std::vector<std::string>& values,
                                     ConfigType& config);
 
-  static void buildDirectives(const ParsedConfig::Directive& directives,
+  static void buildDirectives(const DirectiveMap& directives,
                               ConfigType& config);
 };
 

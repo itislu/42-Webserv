@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <set>
 #include <string>
+#include <vector>
 
 LocationConfig::LocationConfig(const ServerConfig& serverConfig)
   : _root(serverConfig.getRoot())
@@ -96,6 +97,14 @@ void LocationConfig::setAutoIndex(bool autoindex)
 void LocationConfig::setAllowedMethod(const std::string& method)
 {
   _allowedMethods.insert(method);
+}
+
+void LocationConfig::setErrorPages(std::vector<int> codes,
+                                   const std::string& path)
+{
+  for (std::size_t i = 0; i < codes.size(); ++i) {
+    addErrorPage(codes[i], path);
+  }
 }
 
 void LocationConfig::addErrorPage(int code, const std::string& path)

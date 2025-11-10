@@ -1,5 +1,5 @@
 #include "ParsedConfig.hpp"
-#include "config/Config.hpp"
+#include "config/ConfigTypes.hpp"
 #include "config/ParsedLocation.hpp"
 #include "config/ParsedServer.hpp"
 #include <map>
@@ -7,13 +7,12 @@
 #include <string>
 #include <vector>
 
-std::map<std::string, std::vector<std::string> >& ParsedConfig::getDirective()
+DirectiveMap& ParsedConfig::getDirective()
 {
   return _directives;
 }
 
-const std::map<std::string, std::vector<std::string> >&
-ParsedConfig::getDirective() const
+const DirectiveMap& ParsedConfig::getDirective() const
 {
   return _directives;
 }
@@ -33,14 +32,12 @@ void ParsedConfig::addServer(const ParsedServer& server)
   _servers.push_back(server);
 }
 
-void ParsedConfig::addDirective(
-  const std::map<std::string, std::vector<std::string> >& directive)
+void ParsedConfig::addDirective(const DirectiveMap& directive)
 {
-  std::map<std::string, std::vector<std::string> >::const_iterator it =
-    directive.begin();
-  for (; it != directive.end(); ++it) {
-    const std::string& key = it->first;
-    const std::vector<std::string>& values = it->second;
+  DirectiveMap::const_iterator iter = directive.begin();
+  for (; iter != directive.end(); ++iter) {
+    const std::string& key = iter->first;
+    const std::vector<std::string>& values = iter->second;
 
     // if key already exists -> append
     if (_directives.find(key) != _directives.end()) {
@@ -54,7 +51,6 @@ void ParsedConfig::addDirective(
 }
 
 /* DELETE */
-
 static void printIndent(int level, std::ostream& out)
 {
   for (int i = 0; i < level; ++i) {
@@ -62,16 +58,15 @@ static void printIndent(int level, std::ostream& out)
   }
 }
 
-static void printDirectiveMap(
-  const std::map<std::string, std::vector<std::string> >& directives,
-  int indent,
-  std::ostream& out)
+static void printDirectiveMap(const DirectiveMap& directives,
+                              int indent,
+                              std::ostream& out)
 {
-  std::map<std::string, std::vector<std::string> >::const_iterator it;
-  for (it = directives.begin(); it != directives.end(); ++it) {
+  DirectiveMap::const_iterator iter;
+  for (iter = directives.begin(); iter != directives.end(); ++iter) {
     printIndent(indent, out);
-    out << it->first;
-    const std::vector<std::string>& values = it->second;
+    out << iter->first;
+    const std::vector<std::string>& values = iter->second;
     for (std::vector<std::string>::const_iterator v = values.begin();
          v != values.end();
          ++v) {

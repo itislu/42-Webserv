@@ -1,7 +1,6 @@
 #include "ParsedLocation.hpp"
-#include <map>
+#include "config/ConfigTypes.hpp"
 #include <string>
-#include <vector>
 
 ParsedLocation::ParsedLocation(const std::string& path)
   : _path(path)
@@ -13,13 +12,12 @@ void ParsedLocation::setPath(const std::string& path)
   _path = path;
 }
 
-std::map<std::string, std::vector<std::string> >& ParsedLocation::getDirective()
+DirectiveMap& ParsedLocation::getDirective()
 {
   return _directives;
 }
 
-const std::map<std::string, std::vector<std::string> >&
-ParsedLocation::getDirective() const
+const DirectiveMap& ParsedLocation::getDirective() const
 {
   return _directives;
 }

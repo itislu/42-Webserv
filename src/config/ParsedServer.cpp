@@ -1,16 +1,14 @@
 #include "ParsedServer.hpp"
+#include "config/ConfigTypes.hpp"
 #include "config/ParsedLocation.hpp"
-#include <map>
-#include <string>
 #include <vector>
 
-std::map<std::string, std::vector<std::string> >& ParsedServer::getDirective()
+DirectiveMap& ParsedServer::getDirective()
 {
   return _directives;
 }
 
-const std::map<std::string, std::vector<std::string> >&
-ParsedServer::getDirective() const
+const DirectiveMap& ParsedServer::getDirective() const
 {
   return _directives;
 }

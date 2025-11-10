@@ -1,13 +1,14 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
+#include "config/ConfigTypes.hpp"
 #include "config/Lexer.hpp"
 #include "config/ParsedConfig.hpp"
 #include "config/ParsedServer.hpp"
 #include "config/Token.hpp"
-#include <map>
 #include <string>
 #include <vector>
+
 class ConfigParser
 {
 public:
@@ -18,8 +19,15 @@ private:
   void parse();
   void parseServerConfig();
   void parseLocationConfig(ParsedServer& server);
-  void parseDirective(
-    std::map<std::string, std::vector<std::string> >& directives);
+  void parseDirective(DirectiveMap& directives);
+
+
+  static void validateErrorPages(const std::vector<std::string>& value);
+  static void addToDirective(DirectiveMap& directive,
+                      const std::string& key,
+                      const std::vector<std::string>& value);
+  static bool isRepeatableDirective(const std::string& key);
+
   bool isExpectedNext(e_type type);
   void invalidToken(const std::string& err) const;
   void validateParsedConfig() const;
@@ -30,8 +38,5 @@ private:
   Token _token;
   ParsedConfig _parsed;
 };
-
-/* TODO: */
-void printParsedConfig(ParsedConfig& parsed);
 
 #endif

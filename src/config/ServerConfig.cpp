@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <map>
 #include <set>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -63,6 +65,7 @@ std::size_t ServerConfig::getTimeout() const
 // SETTERS
 void ServerConfig::addPort(int port)
 {
+  checkPortDuplicate(port);
   _ports.push_back(port);
 }
 
@@ -81,7 +84,14 @@ void ServerConfig::setIndex(const std::string& index)
   _index = index;
 }
 
-// overrides if errorpage already exists
+void ServerConfig::setErrorPages(std::vector<int> codes,
+                                 const std::string& path)
+{
+  for (std::size_t i = 0; i < codes.size(); ++i) {
+    addErrorPage(codes[i], path);
+  }
+}
+
 void ServerConfig::addErrorPage(int code, const std::string& path)
 {
   _errorPages[code] = path;
@@ -105,6 +115,18 @@ void ServerConfig::setTimeout(std::size_t time)
 void ServerConfig::addLocation(const LocationConfig& location)
 {
   _locations.push_back(location);
+}
+
+void ServerConfig::checkPortDuplicate(int port)
+{
+  for (std::vector<int>::const_iterator it = _ports.begin(); it != _ports.end();
+       ++it) {
+    if (port == *it) {
+      std::ostringstream oss;
+      oss << port;
+      throw std::invalid_argument("duplicated port " + oss.str());
+    }
+  }
 }
 
 /* const LocationConfig& ServerConfig::getLocationForPath(const std::string&

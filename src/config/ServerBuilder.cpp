@@ -20,6 +20,7 @@ void ServerBuilder::buildLocations(const std::vector<ParsedLocation>& locations,
 ServerConfig ServerBuilder::build(const ParsedServer& parsed,
                                   const Config& config)
 {
+  /* TODO: maybe add a check if any server/port combination is duplicated */
   ServerConfig server(config);
 
   DirectiveHandler<ServerConfig>::buildDirectives(parsed.getDirective(),

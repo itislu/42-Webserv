@@ -117,11 +117,11 @@ void Entries<ServerConfig>::setPorts(const std::vector<std::string>& values,
     int port = 0;
     try {
       port = toPort(values[i]);
+      config.addPort(port);
     } catch (const std::exception& e) {
       throw std::invalid_argument(std::string("listen: invalid argument: ") +
                                   e.what());
     }
-    config.addPort(port);
   }
 }
 

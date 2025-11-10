@@ -1,9 +1,8 @@
 #ifndef PARSEDLOCATION_HPP
 #define PARSEDLOCATION_HPP
 
-#include <map>
+#include "config/ConfigTypes.hpp"
 #include <string>
-#include <vector>
 
 class ParsedLocation
 {
@@ -12,13 +11,13 @@ public:
 
   void setPath(const std::string& path);
 
-  std::map<std::string, std::vector<std::string> >& getDirective();
-  const std::map<std::string, std::vector<std::string> >& getDirective() const;
+  DirectiveMap& getDirective();
+  const DirectiveMap& getDirective() const;
   const std::string& getPath() const;
 
 private:
   std::string _path;
-  std::map<std::string, std::vector<std::string> > _directives;
+  DirectiveMap _directives;
 };
 
 #endif

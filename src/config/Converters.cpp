@@ -30,7 +30,9 @@ std::size_t toMaxBodySize(const std::string& str)
   if (std::isdigit(suffix) != 0) {
     number = str;
   } else {
-    if (suffix == 'k' || suffix == 'K') {
+    if (suffix == 'b' || suffix == 'B') {
+      multiplier = 1;
+    } else if (suffix == 'k' || suffix == 'K') {
       multiplier = multi;
     } else if (suffix == 'm' || suffix == 'M') {
       multiplier = multi * multi;
@@ -89,7 +91,8 @@ int toCode(const std::string& str)
   if (code >= minCode && code <= maxCode) {
     return code;
   }
-  throw std::invalid_argument("invalid errorcode: " + str);
+  throw std::invalid_argument("invalid errorcode: " + str +
+                              " (must be between 300 and 599)");
 }
 
 bool toBool(const std::string& str)
