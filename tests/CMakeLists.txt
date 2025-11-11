@@ -49,7 +49,12 @@ function(add_my_test test_name)
     GTest::gtest
     pthread
     ftpp
+    client
+    socket
+    config
+    event
     http
+    server
     utils
     config
   )
@@ -61,16 +66,35 @@ endfunction()
 # **************************************************************************** #
 # Tester
 
-# add_my_test(utilsTester
-#   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
-# )
+# utils
+add_my_test(utilsTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
+)
 
 # # http
 
-# # http/parser
-# add_my_test(uriRulesTester
-#   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/uriRulesTester.cpp
-# )
+# http/parser
+add_my_test(headerLineRulesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerLineRulesTester.cpp
+)
+
+add_my_test(uriRulesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/uriRulesTester.cpp
+)
+
+# http/states
+
+add_my_test(readHeaderLinesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readHeaderLinesTester.cpp
+)
+
+add_my_test(readRequestLineTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readRequestLineTester.cpp
+)
+
+add_my_test(requestTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
+)
 
 # config parser
 add_my_test(configParserTester

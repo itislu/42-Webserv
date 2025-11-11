@@ -1,5 +1,3 @@
-
-
 #pragma once
 #ifndef BUFFER_READER_HPP
 #define BUFFER_READER_HPP

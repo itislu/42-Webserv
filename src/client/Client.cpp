@@ -1,10 +1,14 @@
 #include "Client.hpp"
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
+#include "http/Request.hpp"
+#include "http/Response.hpp"
+#include "http/states/readRequestLine/ReadRequestLine.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
+#include "utils/state/StateHandler.hpp"
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>
@@ -17,21 +21,26 @@
 
 Client::Client()
   : _fd(-1)
-  //, _state(0)
   , _server()
+  , _stateHandler(this)
 {
+  _stateHandler.setState<ReadRequestLine>();
 }
 
 Client::Client(int fdes)
   : _fd(fdes)
   , _server()
+  , _stateHandler(this)
 {
+  _stateHandler.setState<ReadRequestLine>();
 }
 
 Client::Client(int fdes, const Server* server)
   : _fd(fdes)
   , _server(server)
+  , _stateHandler(this)
 {
+  _stateHandler.setState<ReadRequestLine>();
 }
 
 int Client::getFd() const
@@ -44,14 +53,29 @@ const std::string& Client::getHost() const
   return _host;
 }
 
-Buffer Client::getInBuff() const
+Buffer& Client::getInBuff()
 {
   return _inBuff;
 }
 
-Buffer Client::getOutBuff() const
+Buffer& Client::getOutBuff()
 {
   return _outBuff;
+}
+
+StateHandler<Client>& Client::getStateHandler()
+{
+  return _stateHandler;
+}
+
+Request& Client::getRequest()
+{
+  return _request;
+}
+
+Response& Client::getResponse()
+{
+  return _response;
 }
 
 long Client::getTimeout() const
@@ -83,8 +107,12 @@ bool Client::receive()
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
     _inBuff.add(buffer, bytes);
-
     // TODO: STATEMACHINE/PARSING
+    _stateHandler.setStateHasChanged(true);
+    while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
+      _stateHandler.setStateHasChanged(false);
+      _stateHandler.getState()->run();
+    }
   } else if (bytes == 0) {
     std::cout << "[CLIENT] wants to disconnect\n";
     return false;
@@ -109,7 +137,7 @@ bool Client::sendTo()
     std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
   } else {
     std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
-              << strerror(errno) << "\n";
+              << std::strerror(errno) << "\n";
     return false;
   }
   updateLastActivity();

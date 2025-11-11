@@ -12,11 +12,10 @@
 
 class Config
 {
-  typedef std::vector<ServerConfig>::iterator servConfIt;
-  typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
-
 public:
   explicit Config();
+  typedef std::vector<ServerConfig>::iterator ServConfIter;
+  typedef std::vector<ServerConfig>::const_iterator const_ServConfIter;
 
   // Getters
   const std::vector<ServerConfig>& getServers() const;

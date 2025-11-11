@@ -1,9 +1,11 @@
 #include "ServerManager.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
+#include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/Socket.hpp"
+#include "socket/SocketManager.hpp"
 #include <cerrno>
 #include <csignal>
 #include <cstring>
@@ -12,11 +14,11 @@
 #include <string>
 #include <vector>
 
-static volatile sig_atomic_t g_running = 0;
+static volatile std::sig_atomic_t g_running = 0;
 
 static void error(const std::string& msg)
 {
-  std::cerr << "Error: " << msg << " (" << strerror(errno) << ")\n";
+  std::cerr << "Error: " << msg << " (" << std::strerror(errno) << ")\n";
 }
 
 extern "C" void sigIntHandler(int /*sigNum*/)
@@ -29,24 +31,16 @@ ServerManager::ServerManager(const Config& config)
   , _socketManager(config)
   , _eventManager(_clientManager, _socketManager, *this)
 {
-  if (signal(SIGINT, sigIntHandler) == SIG_ERR) {
+  if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
   }
   createServers(_config->getServers());
 }
 
-ServerManager::~ServerManager()
-{
-  for (size_t i = 0; i < _servers.size(); ++i) {
-    delete _servers[i];
-  }
-}
-
 void ServerManager::createServers(const std::vector<ServerConfig>& configs)
 {
   _servers.reserve(configs.size());
-  for (std::vector<ServerConfig>::const_iterator it = configs.begin();
-       it != configs.end();
+  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     const std::vector<const Socket*> listeners =
       createListeners(it->getPorts());
@@ -71,19 +65,20 @@ std::vector<const Socket*> ServerManager::createListeners(
 void ServerManager::addServer(const ServerConfig& config,
                               const std::vector<const Socket*>& listeners)
 {
-  const Server* const server = new Server(config, listeners);
+  const ft::shared_ptr<const Server> server =
+    ft::make_shared<const Server>(config, listeners);
   _servers.push_back(server);
-  mapServerToSocket(server, listeners);
+  mapServerToSocket(*server, listeners);
 }
 
 void ServerManager::mapServerToSocket(
-  const Server* server,
+  const Server& server,
   const std::vector<const Socket*>& listeners)
 {
   for (std::vector<const Socket*>::const_iterator it = listeners.begin();
        it != listeners.end();
        ++it) {
-    _socketToServers[*it].push_back(server);
+    _socketToServers[*it].push_back(&server);
   }
 }
 
@@ -92,7 +87,7 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
   if (socket == FT_NULLPTR) {
     return FT_NULLPTR;
   }
-  const const_sockToServIter iter = _socketToServers.find(socket);
+  const const_SockToServIter iter = _socketToServers.find(socket);
   if (iter == _socketToServers.end()) {
     return FT_NULLPTR;
   }
@@ -113,7 +108,7 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
 const Server* ServerManager::getInitServer(int fdes) const
 {
   const Socket& socket = _socketManager.getSocket(fdes);
-  const const_sockToServIter iter = _socketToServers.find(&socket);
+  const const_SockToServIter iter = _socketToServers.find(&socket);
   if (iter != _socketToServers.end() && iter->second.size() == 1) {
     return iter->second[0];
   }
@@ -125,7 +120,8 @@ std::size_t ServerManager::serverCount() const
   return _servers.size();
 }
 
-const std::vector<const Server*>& ServerManager::getServers() const
+const std::vector<ft::shared_ptr<const Server> >& ServerManager::getServers()
+  const
 {
   return _servers;
 }

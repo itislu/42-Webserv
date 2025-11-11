@@ -7,7 +7,6 @@
 
 #include <iomanip>
 #include <iostream>
-#include <string>
 
 /* ************************************************************************** */
 // INIT
@@ -18,13 +17,12 @@ bool Rule::debugPrint = false;
 // PUBLIC
 
 Rule::Rule()
-  : _endOfRule(false)
+  : _reachedEnd(false)
   , _buffReader()
   , _startPos()
   , _endPos()
   , _ruleId(_ruleIdUndefined)
   , _results(FT_NULLPTR)
-  , _debugPrintIndent(_debugInitPrintIndent)
   , _debugTag(FT_NULLPTR)
   , _debugMatchReason(FT_NULLPTR)
 {
@@ -40,7 +38,7 @@ bool Rule::matches()
 
 void Rule::reset()
 {
-  _endOfRule = false;
+  _reachedEnd = false;
 }
 
 void Rule::setBufferReader(BufferReader* bufferReader)
@@ -53,9 +51,9 @@ void Rule::setResultMap(ResultMap* results)
   _results = results;
 }
 
-bool Rule::end() const
+bool Rule::reachedEnd() const
 {
-  return _endOfRule;
+  return _reachedEnd;
 }
 
 void Rule::setRuleId(RuleId ruleId)
@@ -68,14 +66,9 @@ void Rule::setDebugTag(const char* str)
   _debugTag = str;
 }
 
-void Rule::setDebugPrintIndent(int value)
+const char* Rule::getDebugTag() const
 {
-  _debugPrintIndent = value;
-}
-
-int Rule::getDebugPrintIndent() const
-{
-  return _debugPrintIndent;
+  return _debugTag;
 }
 
 void Rule::setDebugMatchReason(const char* reason)
@@ -86,9 +79,9 @@ void Rule::setDebugMatchReason(const char* reason)
 /* ************************************************************************** */
 // PROTECTED
 
-void Rule::setEndOfRule(bool value)
+void Rule::setReachedEnd(bool value)
 {
-  _endOfRule = value;
+  _reachedEnd = value;
 }
 
 BufferReader* Rule::getBuffReader()
@@ -142,10 +135,8 @@ void Rule::debugPrintRuleEntry()
   if (!debugPrint) {
     return;
   }
-  const int indent = 20;
-  _debugPrintIndent += 2;
-  std::cout << std::setw(indent) << _debugTag << ": entry "
-            << std::string(_debugPrintIndent, '-') << ">\n";
+  const int indent = 40;
+  std::cout << std::setw(indent) << _debugTag << ": entry " << ">\n";
 }
 
 void Rule::debugPrintMatchStatus(bool matches)
@@ -153,13 +144,11 @@ void Rule::debugPrintMatchStatus(bool matches)
   if (!debugPrint) {
     return;
   }
-  const int indent = 20;
+  const int indent = 40;
   std::cout << std::setw(indent) << _debugTag << ":       ";
   if (matches) {
-    std::cout << std::string(_debugPrintIndent, ' ');
-    std::cout << ft::green("match");
+    std::cout << ft::green("match   ");
   } else {
-    std::cout << std::string(_debugPrintIndent, ' ');
     std::cout << ft::red("no match");
   }
 

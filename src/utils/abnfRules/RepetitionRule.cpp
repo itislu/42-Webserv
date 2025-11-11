@@ -16,7 +16,7 @@ RepetitionRule::RepetitionRule(ft::shared_ptr<Rule> rule)
   , _reachedMin(_currReps >= _minReps)
   , _rule(ft::move(rule))
 {
-  setEndOfRule(false);
+  setReachedEnd(false);
   setDebugTag("Repetition");
 }
 
@@ -25,8 +25,6 @@ RepetitionRule::~RepetitionRule() {}
 bool RepetitionRule::matches()
 {
   debugPrintRuleEntry();
-
-  _rule->setDebugPrintIndent(getDebugPrintIndent() + 2);
 
   while (!getBuffReader()->reachedEnd()) {
 
@@ -52,6 +50,7 @@ bool RepetitionRule::matches()
     setDebugMatchReason("_minReps == 0");
     _reachedMin = true;
   }
+  setReachedEnd(_reachedMin);
   addRuleResult(_reachedMin);
   debugPrintMatchStatus(_reachedMin);
   return _reachedMin;
@@ -61,7 +60,7 @@ void RepetitionRule::reset()
 {
   _reachedMin = false;
   _currReps = 0;
-  setEndOfRule(false);
+  setReachedEnd(false);
   _rule->reset();
 }
 

@@ -81,7 +81,7 @@ void Config::setDefaultTimeout()
 {
   std::size_t timeout = _timeout;
 
-  for (const_servConfIt it = _servers.begin(); it != _servers.end(); ++it) {
+  for (const_ServConfIter it = _servers.begin(); it != _servers.end(); ++it) {
     timeout = std::min(timeout, it->getTimeout());
   }
   timeout = std::min(timeout, static_cast<size_t>(INT_MAX));
@@ -131,7 +131,7 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
     out << "no servers";
     return out;
   }
-  for (std::vector<ServerConfig>::const_iterator serverIt = servers.begin();
+  for (Config::const_ServConfIter serverIt = servers.begin();
        serverIt != servers.end();
        ++serverIt) {
     out << "Server ports: ";

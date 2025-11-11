@@ -7,6 +7,8 @@
 !*.mk
 !*.tpp
 !*.yaml
+!*.html
+!*.sh
 !.clang-format
 !.clang-tidy
 !.clang-uml
