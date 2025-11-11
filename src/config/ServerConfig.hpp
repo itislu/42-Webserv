@@ -16,33 +16,37 @@ public:
   explicit ServerConfig(const Config& global);
 
   // GETTERS
+  const std::vector<LocationConfig>& getLocations() const;
+
   const std::vector<int>& getPorts() const;
   const std::vector<std::string>& getHostnames() const;
+
   const std::string& getRoot() const;
   const std::string& getIndex() const;
   const std::map<int, std::string>& getErrorPages() const;
   std::size_t getMaxBodySize() const;
   const std::set<std::string>& getAllowedMethods() const;
   std::size_t getTimeout() const;
-  const std::vector<LocationConfig>& getLocations() const;
 
   // SETTERS
-  void setRoot(const std::string& root);
-  void setMaxBodySize(std::size_t size);
-  void setTimeout(std::size_t time);
-  void setErrorPages(std::vector<int> codes, const std::string& path);
-  void addErrorPage(int code, const std::string& path);
-  void setIndex(const std::string& index);
-  void addPort(int port);
-  void addHostName(const std::string& hostName);
-  void setAllowedMethod(const std::string& method);
   void addLocation(const LocationConfig& location);
 
-  void checkPortDuplicate(int port);
+  void addPort(int port);
+  void addHostName(const std::string& hostName);
+
+  void setRoot(const std::string& root);
+  void setIndex(const std::string& index);
+  void setTimeout(std::size_t time);
+  void setMaxBodySize(std::size_t size);
+  void setErrorPages(std::vector<int> codes, const std::string& path);
+  void addErrorPage(int code, const std::string& path);
+  void setAllowedMethod(const std::string& method);
 
   const LocationConfig& getLocationForPath(const std::string& uri) const;
 
 private:
+  void checkPortDuplicate(int port);
+
   std::vector<int> _ports;             // listeners
   std::vector<std::string> _hostnames; // names for virtual hosting?
                                        //    - same port but different hostname

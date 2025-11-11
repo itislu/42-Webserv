@@ -10,12 +10,16 @@
 #include <vector>
 
 int Config::_defaultTimeout = 0;
+const char* const Config::DEFAULT_ROOT = "/www";
+const std::size_t Config::DEFAULT_BODY_SIZE = 1024L * 1024;
+const int Config::DEFAULT_TIMEOUT = 60;
 
-// Config::Config()
-//   : _maxBodySize()
-//   , _timeout()
-// {
-// }
+Config::Config()
+  : _root(DEFAULT_ROOT)
+  , _maxBodySize(DEFAULT_BODY_SIZE)
+  , _timeout(DEFAULT_TIMEOUT)
+{
+}
 
 const std::vector<ServerConfig>& Config::getServers() const
 {

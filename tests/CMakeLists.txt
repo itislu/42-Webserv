@@ -51,6 +51,7 @@ function(add_my_test test_name)
     ftpp
     http
     utils
+    config
   )
 
   add_test(NAME ${PROJECT_NAME}_${test_name} COMMAND ${test_name})
@@ -60,13 +61,18 @@ endfunction()
 # **************************************************************************** #
 # Tester
 
-add_my_test(utilsTester
-  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
-)
+# add_my_test(utilsTester
+#   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
+# )
 
-# http
+# # http
 
-# http/parser
-add_my_test(uriRulesTester
-  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/uriRulesTester.cpp
+# # http/parser
+# add_my_test(uriRulesTester
+#   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/uriRulesTester.cpp
+# )
+
+# config parser
+add_my_test(configParserTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/config/configParserTester.cpp
 )

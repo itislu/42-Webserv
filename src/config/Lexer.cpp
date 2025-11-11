@@ -86,6 +86,7 @@ Token Lexer::next()
   }
 
   if (chr == '#') {
+    ++_pos;
     token.setType(COMMENT);
     return token;
   }

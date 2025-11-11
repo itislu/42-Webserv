@@ -53,7 +53,7 @@ void ConfigParser::invalidToken(const std::string& err) const
   std::ostringstream oss;
   oss << "invalid token in " << err << " at line " << _lexer.getLineNum()
       << ": '" << _token.getValue() << "'";
-  throw std::runtime_error(oss.str());
+  throw std::invalid_argument(oss.str());
 }
 
 bool ConfigParser::isRepeatableDirective(const std::string& key)
@@ -102,7 +102,11 @@ void ConfigParser::parseDirective(DirectiveMap& directive)
   std::vector<std::string> value;
   _token = _lexer.next();
   while (_token.getType() != SEMICOLON && _token.getType() != END) {
-    value.push_back(_token.getValue());
+    if (_token.getType() == COMMENT) {
+      _lexer.skipComment();
+    } else {
+      value.push_back(_token.getValue());
+    }
     _token = _lexer.next();
   }
   if (_token.getType() != SEMICOLON) {
@@ -181,7 +185,6 @@ void ConfigParser::parse()
   for (_token = _lexer.next(); _token.getType() != END;
        _token = _lexer.next()) {
     if (_token.getType() == COMMENT) {
-      std::cout << "parse - skip comment!\n";
       _lexer.skipComment();
     } else if (_token.getType() == IDENT && _token.getValue() == "server") {
       parseServerConfig();
@@ -193,17 +196,15 @@ void ConfigParser::parse()
   }
 }
 
-void ConfigParser::readConfig()
+Config ConfigParser::parseConfig()
 {
   _lexer.init();
   parse();
-  std::cout << _parsed;
-  /* TODO: validate and check for duplicates */
 
-  std::cout << "BUILD!\n";
   const Config conf = ConfigBuilder::build(_parsed);
-  std::cout << conf;
-  std::cout << "END BUILD!\n";
+  // std::cout << conf;
+  return conf;
+  /* TODO:  */
   // return ConfigBuilder::build(_parsed);
 }
 

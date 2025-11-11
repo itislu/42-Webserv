@@ -1,7 +1,9 @@
 #include "LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
 #include <cstddef>
+#include <map>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -78,6 +80,22 @@ int LocationConfig::getRedirectCode() const
   return _redirectCode;
 }
 
+const std::map<int, std::string>& LocationConfig::getErrorPages() const
+{
+  return _errorPages;
+}
+
+const std::string& LocationConfig::getErrorPage(int code) const
+{
+  const std::map<int, std::string>::const_iterator iter =
+    _errorPages.find(code);
+  if (iter != _errorPages.end()) {
+    return iter->second;
+  }
+  static const std::string empty;
+  return empty;
+}
+
 // SETTERS
 void LocationConfig::setPath(const std::string& path)
 {
@@ -109,7 +127,6 @@ void LocationConfig::setErrorPages(std::vector<int> codes,
 
 void LocationConfig::addErrorPage(int code, const std::string& path)
 {
-  /* TODO: check this - duplicates and so on*/
   _errorPages[code] = path;
 }
 

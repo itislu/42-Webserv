@@ -18,10 +18,13 @@ public:
   const std::string& getPath() const;
 
   const std::string& getRoot() const;
-  std::size_t getMaxBodySize() const;
-  bool isAutoindex() const;
-  const std::set<std::string>& getAllowedMethods() const;
   const std::string& getIndex() const;
+  std::size_t getMaxBodySize() const;
+  const std::map<int, std::string>& getErrorPages() const;
+  const std::string& getErrorPage(int code) const;
+  const std::set<std::string>& getAllowedMethods() const;
+
+  bool isAutoindex() const;
 
   bool isCgi() const;
   const std::string& getCgiPass() const;
@@ -36,12 +39,13 @@ public:
   void setPath(const std::string& path);
 
   void setRoot(const std::string& root);
-  void setMaxBodySize(std::size_t size);
   void setIndex(const std::string& index);
+  void setMaxBodySize(std::size_t size);
   void setErrorPages(std::vector<int> codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
-  void setAutoIndex(bool autoindex);
   void setAllowedMethod(const std::string& method);
+
+  void setAutoIndex(bool autoindex);
 
   void setCgi(bool cgi);
   void setCgiPass(const std::string& cgiPass);

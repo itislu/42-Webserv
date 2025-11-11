@@ -26,10 +26,10 @@ Entries<ServerConfig>::Entry Entries<ServerConfig>::entries[] = {
   { "server_name", setHostnames },
   { "root", setRoot },
   { "index", setIndex },
-  { "error_page", setErrorPage },
-  { "max_body_size", setMaxBodySize },
-  { "allowed_methods", setAllowedMethods },
   { "keepalive_timeout", setTimeout },
+  { "max_body_size", setMaxBodySize },
+  { "error_page", setErrorPage },
+  { "allowed_methods", setAllowedMethods },
   { 0, 0 }
 };
 
@@ -38,6 +38,7 @@ Entries<ServerConfig>::Entry Entries<ServerConfig>::entries[] = {
 Entries<LocationConfig>::Entry Entries<LocationConfig>::entries[] = {
   { "root", setRoot },
   { "index", setIndex },
+  { "max_body_size", setMaxBodySize },
   { "error_page", setErrorPage },
   { "allowed_methods", setAllowedMethods },
   { "autoindex", setAutoIndex },
@@ -101,6 +102,10 @@ void Entries<ServerConfig>::setAllowedMethods(
   const std::vector<std::string>& values,
   ServerConfig& config)
 {
+  if (values.empty()) {
+    throw std::invalid_argument("allowed_methods: invalid number of arguments");
+  }
+
   for (std::size_t i = 0; i < values.size(); ++i) {
     if (!isMethod(values[i])) {
       throw std::invalid_argument("allowed_methods: invalid method: " +
@@ -148,6 +153,10 @@ void Entries<LocationConfig>::setAllowedMethods(
   const std::vector<std::string>& values,
   LocationConfig& config)
 {
+  if (values.empty()) {
+    throw std::invalid_argument("allowed_methods: invalid number of arguments");
+  }
+
   for (std::size_t i = 0; i < values.size(); ++i) {
     if (!isMethod(values[i])) {
       throw std::invalid_argument("allowed_methods: invalid method: " +

@@ -16,27 +16,29 @@ class Config
   typedef std::vector<ServerConfig>::const_iterator const_servConfIt;
 
 public:
+  explicit Config();
+
   // Getters
   const std::vector<ServerConfig>& getServers() const;
-  std::size_t getMaxBodySize() const;
-  std::size_t getTimeout() const;
+
   const std::string& getRoot() const;
-  const std::string& getErrorLogPath() const;
-  const std::string& getAccessLogPath() const;
+  std::size_t getTimeout() const;
+  std::size_t getMaxBodySize() const;
   const std::string& getErrorPage(int code) const;
   const std::map<int, std::string>& getErrorPages() const;
 
   // Setters
   void addServer(const ServerConfig& server);
+
   void setRoot(const std::string& root);
-  void setMaxBodySize(std::size_t bytes);
   void setTimeout(std::size_t seconds);
+  void setMaxBodySize(std::size_t bytes);
   void setErrorPages(std::vector<int> codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
 
-  void setDefaultTimeout();
-
+  // Default Timeout
   static int getDefaultTimeout();
+  void setDefaultTimeout();
 
   const ServerConfig* getServerForRequest(const std::string& host,
                                           int port) const;
@@ -44,6 +46,10 @@ public:
                                            const std::string& path) const;
 
 private:
+  static const char* const DEFAULT_ROOT;
+  static const std::size_t DEFAULT_BODY_SIZE;
+  static const int DEFAULT_TIMEOUT;
+
   std::string _root;
   std::size_t _maxBodySize;
   std::map<int, std::string> _errorPages;
