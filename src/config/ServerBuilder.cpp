@@ -6,7 +6,9 @@
 #include "config/ParsedServer.hpp"
 #include "config/ServerConfig.hpp"
 #include <cstring>
+#include <set>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 void ServerBuilder::validateMandatoryDirectives(const DirectiveMap& directives)
@@ -24,9 +26,27 @@ void ServerBuilder::validateMandatoryDirectives(const DirectiveMap& directives)
   }
 }
 
+/* checks if any location is duplicated in that server */
+void ServerBuilder::validateLocations(
+  const std::vector<ParsedLocation>& locations)
+{
+  std::set<std::string> checked;
+  for (std::vector<ParsedLocation>::const_iterator it = locations.begin();
+       it != locations.end();
+       ++it) {
+    const std::string& path = it->getPath();
+    if (!checked.insert(path).second) {
+      throw std::invalid_argument("server - duplicated location directive " +
+                                  path);
+    }
+  }
+}
+
 void ServerBuilder::buildLocations(const std::vector<ParsedLocation>& locations,
                                    ServerConfig& server)
 {
+  validateLocations(locations);
+
   for (std::vector<ParsedLocation>::const_iterator it = locations.begin();
        it != locations.end();
        ++it) {

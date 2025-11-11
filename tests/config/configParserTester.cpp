@@ -6,7 +6,7 @@
 /*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/11 15:43:47 by lstefane         ###   ########.fr       */
+/*   Updated: 2025/11/11 16:21:58 by lstefane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -618,6 +618,186 @@ TEST(ConfigParserTest, DuplicatedPort02)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "054_duplicated_port02.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 055 */
+TEST(ConfigParserTest, GlobalRoot)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "055_global_root.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
+/* TEST - 056 */
+TEST(ConfigParserTest, DoubleBracers)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "056_double_bracers.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 057 */
+TEST(ConfigParserTest, EmptyServerBlock)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "057_empty_server.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 058 */
+TEST(ConfigParserTest, EmptyLocationBlock)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "058_empty_location.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
+/* TEST - 059 */
+TEST(ConfigParserTest, OverlappingPorts)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "059_overlapping_ports.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
+/* TEST - 060 */
+TEST(ConfigParserTest, OverlappingHostnames)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "060_overlapping_hostnames.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
+/* TEST - 061 */
+TEST(ConfigParserTest, DuplicateLocations)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "061_duplicate_locations.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 062 */
+TEST(ConfigParserTest, SemicolonBeforeDirective)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "062_semicolon_before.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 063 */
+TEST(ConfigParserTest, NewlinesInDirectives)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "063_newlines_in_directives.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
+/* TEST - 064 */
+TEST(ConfigParserTest, NegativeBodySize)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "064_negative_body_size.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 065 */
+TEST(ConfigParserTest, NotAllowedMethod)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "065_not_allowed_method.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 066 */
+TEST(ConfigParserTest, NotAllowedMethod02)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "066_not_allowed_method02.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 067 */
+TEST(ConfigParserTest, InvalidErrorCode04)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "067_invalid_errorcode04.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 068 */
+TEST(ConfigParserTest, InvalidPorts03)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "068_invalid_ports03.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 069 */
+TEST(ConfigParserTest, DuplicatedMethods)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "069_duplicated_methods.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
+/* TEST - 070 */
+TEST(ConfigParserTest, InvalidDirective00)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "070_invalid_directive00.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 071 */
+TEST(ConfigParserTest, InvalidDirective01)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "071_invalid_directive01.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 072 */
+TEST(ConfigParserTest, InvalidDirective02)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "072_invalid_directive02.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

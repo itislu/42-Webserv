@@ -202,7 +202,7 @@ Config ConfigParser::parseConfig()
   parse();
 
   const Config conf = ConfigBuilder::build(_parsed);
-  // std::cout << conf;
+  std::cout << conf;
   return conf;
   /* TODO:  */
   // return ConfigBuilder::build(_parsed);

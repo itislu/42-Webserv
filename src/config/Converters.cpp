@@ -47,7 +47,7 @@ std::size_t toMaxBodySize(const std::string& str)
   std::stringstream sstream(number);
   sstream >> value;
 
-  if (sstream.fail() || !sstream.eof()) {
+  if (sstream.fail() || !sstream.eof() || number[0] == '-') {
     throw std::invalid_argument("max_body_size: invalid number: " + number);
   }
 
