@@ -78,10 +78,11 @@ ft::shared_ptr<RepetitionRule> fieldValueRule()
  *                 [ 1*( SP / HTAB / field-vchar ) field-vchar ]
  *
  * ! Rule changed because:
- * Messages are parsed using a generic algorithm, independent of the
- * individual field names. The contents within a given field line value
- * are not parsed until a later stage of message interpretation (usually
- * after the message's entire field section has been processed).
+ * Last 'field-vchar' can be removed because 'field-content' is only ever used
+ * in 'field-line' which allows 'OWS' after field content.
+ *
+ * field-value = *field-content
+ * field-line   = field-name ":" OWS field-value OWS
  *
  * field-content = field-vchar
  *                 [ 1*( SP / HTAB / field-vchar ) ]
