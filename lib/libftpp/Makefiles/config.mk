@@ -44,7 +44,7 @@ IS_CLANG		:=	$(if $(findstring clang,$(CXX_VERSION)),true)
 IS_GCC			:=	$(if $(findstring g++,$(CXX_VERSION)),true)
 CXXFLAGS_STD	:=	-Wall -Wextra -Werror -Wpedantic -Wshadow -std=c++98
 CXXFLAGS_DBG	:=	-ggdb3
-CXXFLAGS_SAN	:=	-fsanitize=address,undefined,bounds,float-divide-by-zero
+CXXFLAGS_SAN	:=	-fsanitize=address,undefined,bounds,float-divide-by-zero,vptr
 CXXFLAGS_OPT	:=	-O3 -flto$(if $(IS_GCC),=auto) -march=native -mtune=native
 CXXFLAGS_CLANG	:=	-Wdocumentation	# Only supported by clang
 CXXFLAGS		?=	$(CXXFLAGS_STD) $(CXXFLAGS_DBG) $(if $(IS_CLANG),$(CXXFLAGS_CLANG))
