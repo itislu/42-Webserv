@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # **************************************************************************** #
 # PROJECT
-project(webserv VERSION 1.0)
+project(webserv VERSION 1.0 LANGUAGES CXX)
 
 add_executable(${PROJECT_NAME}
   src/main.cpp
