@@ -1,0 +1,121 @@
+# Build and test the project on multiple OS and compiler configurations.
+# Tests are run by 'make test' and 'make testv'.
+# Valgrind and sanitizers are used in some configurations.
+
+name: Build and Test
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  push:
+    branches: [main, master]
+    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**/CMake*', '**.cmake', '**/Makefile', '**.mk', '**/.clang-*', '**/build-and-test.yaml']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} - ${{ matrix.compiler }} - ${{ matrix.test }}-${{ matrix.preset }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Campus environment:
+        # - ubuntu-22.04
+        # - clang++ 12.0.1
+        # - g++ 10.5
+        # - cmake 3.22.1
+        # - make 4.3
+        # - valgrind 3.18.1
+        include:
+          - os: ubuntu-22.04
+            compiler: clang++-12
+            compiler-package: clang-12
+            cmake-version: 3.22.1
+            preset: debug
+            test: testv
+          - os: ubuntu-latest
+            compiler: clang++-20
+            compiler-package: clang-20
+            preset: san
+            test: test
+          - os: ubuntu-22.04
+            compiler: g++-10
+            cmake-version: 3.22.1
+            preset: debug
+            test: test
+          - os: ubuntu-latest
+            compiler: g++-14
+            preset: default
+            test: test
+          - os: macos-latest
+            compiler: c++
+            preset: san
+            test: test
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install compiler
+        if: matrix.compiler-package
+        run: sudo apt-get install ${{ matrix.compiler-package }} -y
+      - name: Install CMake ${{ matrix.cmake-version }}
+        if: matrix.cmake-version
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: ${{ matrix.cmake-version }}
+      - name: Install Valgrind
+        if: matrix.test == 'testv'
+        run: sudo apt-get install valgrind -y
+      - name: Print versions
+        run: |
+          echo -e "--- Compiler ---"
+          ${{ matrix.compiler }} --version
+          echo -e "\n--- CMake ---"
+          cmake --version
+          echo -e "\n--- Make ---"
+          make --version
+          if [ ${{ matrix.test }} = testv ]; then
+            echo -e "\n--- Valgrind ---"
+            valgrind --version
+          fi
+      - name: Build project
+        run: make CXX=${{ matrix.compiler }} PRESET=${{ matrix.preset }}
+      - name: Run tests
+        run: |
+          set +e
+          make ${{ matrix.test }} PRESET=${{ matrix.preset }}
+          if [ $? -ne 0 ]; then
+            echo "::error::Test failed."
+            EXIT_CODE=1
+          fi
+          set -e
+          if [ ${{ matrix.test }} = testv ]; then
+            cat build/${{ matrix.preset }}/Testing/Temporary/LastDynamicAnalysis_*.log
+            LOGS=$(cat build/${{ matrix.preset }}/Testing/Temporary/MemoryChecker.*.log)
+            if [ -n "$LOGS" ]; then
+              echo "$LOGS"
+              echo "::error::Valgrind detected issues."
+              EXIT_CODE=$((EXIT_CODE | 2))
+            fi
+          else
+            LOGS=$(cat build/${{ matrix.preset }}/Testing/Temporary/LastTest.log)
+            echo "$LOGS"
+            if [ ${{ matrix.preset }} = san ]; then
+              if echo "$LOGS" | grep --ignore-case --color=always "Sanitizer"; then
+                echo "::error::Sanitizers detected issues."
+                EXIT_CODE=$((EXIT_CODE | 2))
+              fi
+            fi
+          fi
+          exit $EXIT_CODE
+
+  build-and-test-result:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Consolidate job results
+        run: echo "All build and test jobs completed successfully."
