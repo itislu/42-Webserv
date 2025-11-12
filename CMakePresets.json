@@ -22,8 +22,8 @@
     },
     {
       "name": "san",
-      "displayName": "Debug with Sanitizers",
-      "description": "Build with sanitizers",
+      "displayName": "Debug with ASan and UBSan",
+      "description": "Build with AddressSanitizer and UndefinedBehaviorSanitizer",
       "binaryDir": "${sourceDir}/build/san",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
