@@ -40,16 +40,21 @@ jobs:
             compiler: clang++-12
             compiler-pkgs: clang-12 llvm-12-dev
             cmake-version: 3.22.1
+            preset-sanitizers: san
           - os: ubuntu-22.04
             compiler: g++-10
             cmake-version: 3.22.1
+            preset-sanitizers: san
           - os: ubuntu-latest
             compiler: clang++-20
-            compiler-pkgs: clang-20 libclang-rt-20-dev llvm-20-dev
+            compiler-pkgs: clang-20 libc++-20-dev libclang-rt-20-dev llvm-20-dev
+            preset-sanitizers: san-libc++
           - os: ubuntu-latest
-            compiler: g++-14
+            compiler: g++-13 # libstdc++-14 bugged: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=118493
+            preset-sanitizers: san
           - os: macos-latest
             compiler: c++
+            preset-sanitizers: san
 
     steps:
       - uses: actions/checkout@v5
@@ -107,10 +112,10 @@ jobs:
             echo "No Valgrind issues detected."
           fi
 
-      - name: Build with 'san' preset
+      - name: Build with '${{ matrix.preset-sanitizers }}' preset
         id: build-san
         if: ${{ !cancelled() && steps.build-normal.outcome == 'success' }}
-        run: make CXX=${{ matrix.compiler }} PRESET=san
+        run: make CXX=${{ matrix.compiler }} PRESET=${{ matrix.preset-sanitizers }}
       - name: Run tests with ASan and UBSan
         if: ${{ !cancelled() && steps.build-san.outcome == 'success' }}
         env:
@@ -118,11 +123,11 @@ jobs:
           UBSAN_OPTIONS: print_stacktrace=1:print_summary=1
         run: |
           set -o pipefail
-          make test PRESET=san ARGS=-VV | grep --color=always --line-buffered -E "FAILED|$"
+          make test PRESET=${{ matrix.preset-sanitizers }} ARGS=-VV | grep --color=always --line-buffered -E "FAILED|$"
       - name: Check ASan and UBSan logs
         if: ${{ !cancelled() && steps.build-san.outcome == 'success' }}
         run: |
-          LOG_FILE=build/san/Testing/Temporary/LastTest.log
+          LOG_FILE=build/${{ matrix.preset-sanitizers }}/Testing/Temporary/LastTest.log
           if grep -qE "\w+Sanitizer:|runtime error:" "$LOG_FILE"; then
             grep --color=always -E "\w+Sanitizer:|runtime error:|$" "$LOG_FILE"
             exit 1
