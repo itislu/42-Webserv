@@ -119,8 +119,7 @@ jobs:
       - name: Run tests with ASan and UBSan
         if: ${{ !cancelled() && steps.build-san.outcome == 'success' }}
         env:
-          ASAN_OPTIONS: check_initialization_order=1:detect_stack_use_after_return=1:exitcode=0:print_stats=1:print_summary=1
-          UBSAN_OPTIONS: print_stacktrace=1:print_summary=1
+          ASAN_OPTIONS: exitcode=0
         run: |
           set -o pipefail
           make test PRESET=${{ matrix.preset-sanitizers }} ARGS=-VV | grep --color=always --line-buffered -E "FAILED|$"

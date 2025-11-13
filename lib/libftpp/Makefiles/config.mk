@@ -63,11 +63,26 @@ SRC_EXTENSION	:=	.cpp
 SRC				:=	$(shell find $(SRC_DIR) -type f -name "*$(SRC_EXTENSION)")
 
 
+#	Sanitizers
+
+export ASAN_OPTIONS := \
+					check_initialization_order=1: \
+					detect_stack_use_after_return=1: \
+					print_stats=1: \
+					print_summary=1: \
+					$(ASAN_OPTIONS)
+
+export UBSAN_OPTIONS := \
+					print_stacktrace=1: \
+					print_summary=1: \
+					$(UBSAN_OPTIONS)
+
+
 #	Valgrind
 
 VALGRIND		:=	$(shell which valgrind 2>/dev/null || echo "valgrind")
 
-VALGRINDFLAGS	=	--errors-for-leak-kinds=all \
+VALGRINDFLAGS	:=	--errors-for-leak-kinds=all \
 					--leak-check=full \
 					--show-error-list=yes \
 					--show-leak-kinds=all \
