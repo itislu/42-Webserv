@@ -53,22 +53,25 @@ std::ostream& operator<<(std::ostream& out, const Token& token)
   out << "\tType: ";
   switch (token.getType()) {
     case INVALID:
-      out << "Invalid" << "\n";
+      out << "Invalid\n";
       break;
     case IDENT:
-      out << "Identifier" << "\n";
+      out << "Identifier\n";
       break;
     case SEMICOLON:
-      out << "Semicolon (;)" << "\n";
+      out << "Semicolon (;)\n";
       break;
     case LBRACE:
-      out << "Left Brace ({)" << "\n";
+      out << "Left Brace ({)\n";
       break;
     case RBRACE:
-      out << "Right Brace (})" << "\n";
+      out << "Right Brace (})\n";
+      break;
+    case COMMENT:
+      out << "Comment (#)\n";
       break;
     case END:
-      out << "END" << "\n";
+      out << "END\n";
       break;
     default:
       out << "Error: unknown type\n";

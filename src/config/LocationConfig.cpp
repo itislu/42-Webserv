@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <map>
 #include <set>
-#include <stdexcept>
 #include <string>
 #include <vector>
 

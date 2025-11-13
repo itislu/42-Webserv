@@ -50,7 +50,7 @@ void ParsedConfig::addDirective(const DirectiveMap& directive)
   }
 }
 
-/* DELETE */
+/* Print functions - delete later */
 static void printIndent(int level, std::ostream& out)
 {
   for (int i = 0; i < level; ++i) {
@@ -112,16 +112,3 @@ std::ostream& operator<<(std::ostream& out, ParsedConfig& parsed)
   out << "End of configuration" << "\n";
   return out;
 }
-
-/*
-  VALID KEYS
-
-  root
-  client_max_body_size
-  error_page
-  keepalive_timeout
-  server
-  index
-
-  error_log
-*/
