@@ -36,7 +36,7 @@ std::size_t Config::getMaxBodySize() const
   return _maxBodySize;
 }
 
-std::size_t Config::getTimeout() const
+long Config::getTimeout() const
 {
   return _timeout;
 }
@@ -72,20 +72,20 @@ void Config::setMaxBodySize(std::size_t bytes)
   _maxBodySize = bytes;
 }
 
-void Config::setTimeout(std::size_t seconds)
+void Config::setTimeout(long time)
 {
-  _timeout = seconds;
+  _timeout = time;
 }
 
 void Config::setDefaultTimeout()
 {
-  std::size_t timeout = _timeout;
+  long timeout = _timeout;
 
   for (const_ServConfIter it = _servers.begin(); it != _servers.end(); ++it) {
     timeout = std::min(timeout, it->getTimeout());
   }
-  timeout = std::min(timeout, static_cast<size_t>(INT_MAX));
-  timeout = std::max(timeout, std::size_t(0));
+  timeout = std::min(timeout, static_cast<long>(INT_MAX));
+  timeout = std::max(timeout, 0L);
 
   Config::_defaultTimeout = static_cast<int>(timeout);
 }

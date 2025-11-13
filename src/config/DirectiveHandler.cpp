@@ -61,9 +61,9 @@ void Entries<Config>::setTimeout(const std::vector<std::string>& values,
     throw std::invalid_argument(
       "keepalive_timeout: invalid number of arguments");
   }
-  size_t timeout = 0;
+  long timeout = 0;
   try {
-    timeout = toSizeT(values[0]);
+    timeout = toLong(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
@@ -79,9 +79,9 @@ void Entries<ServerConfig>::setTimeout(const std::vector<std::string>& values,
     throw std::invalid_argument(
       "keepalive_timeout: invalid number of arguments");
   }
-  size_t timeout = 0;
+  long timeout = 0;
   try {
-    timeout = toSizeT(values[0]);
+    timeout = toLong(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());

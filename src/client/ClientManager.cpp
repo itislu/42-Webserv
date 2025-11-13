@@ -66,7 +66,7 @@ void ClientManager::getTimedOutClients(
 {
   const TimeStamp now;
   for (const_FdToClientIter it = _clients.begin(); it != _clients.end(); ++it) {
-    const long timeout = it->second->getTimeout();
+    const long timeout = static_cast<long>(it->second->getTimeout());
     if (now - it->second->getLastActivity() >= timeout) {
       timedOut.push_back(it->second);
     }

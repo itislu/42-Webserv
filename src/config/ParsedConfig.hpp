@@ -9,7 +9,6 @@
 class ParsedConfig
 {
 public:
-
   DirectiveMap& getDirective();
   const DirectiveMap& getDirective() const;
 

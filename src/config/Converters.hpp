@@ -5,6 +5,7 @@
 #include <string>
 
 std::size_t toSizeT(const std::string& str);
+long toLong(const std::string& str);
 std::size_t toMaxBodySize(const std::string& str);
 int toInt(const std::string& str);
 int toPort(const std::string& str);

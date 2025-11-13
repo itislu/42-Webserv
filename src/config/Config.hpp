@@ -21,7 +21,7 @@ public:
   const std::vector<ServerConfig>& getServers() const;
 
   const std::string& getRoot() const;
-  std::size_t getTimeout() const;
+  long getTimeout() const;
   std::size_t getMaxBodySize() const;
   const std::string& getErrorPage(int code) const;
   const std::map<int, std::string>& getErrorPages() const;
@@ -30,7 +30,7 @@ public:
   void addServer(const ServerConfig& server);
 
   void setRoot(const std::string& root);
-  void setTimeout(std::size_t seconds);
+  void setTimeout(long time);
   void setMaxBodySize(std::size_t bytes);
   void setErrorPages(std::vector<int> codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
@@ -54,7 +54,7 @@ private:
   std::map<int, std::string> _errorPages;
   std::vector<ServerConfig> _servers;
   static int _defaultTimeout;
-  std::size_t _timeout;
+  long _timeout;
 };
 
 std::ostream& operator<<(std::ostream& out, const Config& config);

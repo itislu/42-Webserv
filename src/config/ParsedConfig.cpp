@@ -67,10 +67,10 @@ static void printDirectiveMap(const DirectiveMap& directives,
     printIndent(indent, out);
     out << iter->first;
     const std::vector<std::string>& values = iter->second;
-    for (std::vector<std::string>::const_iterator v = values.begin();
-         v != values.end();
-         ++v) {
-      out << " " << *v;
+    for (std::vector<std::string>::const_iterator val = values.begin();
+         val != values.end();
+         ++val) {
+      out << " " << *val;
     }
     out << ";" << "\n";
   }

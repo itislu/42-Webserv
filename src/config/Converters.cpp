@@ -19,6 +19,19 @@ std::size_t toSizeT(const std::string& str)
   return value;
 }
 
+long toLong(const std::string& str)
+{
+  std::stringstream sstream(str);
+  long value = 0;
+  sstream >> value;
+
+  if (sstream.fail() || !sstream.eof()) {
+    throw std::invalid_argument("invalid long: " + str);
+  }
+
+  return value;
+}
+
 std::size_t toMaxBodySize(const std::string& str)
 {
   std::size_t const len = str.length();

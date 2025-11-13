@@ -26,7 +26,7 @@ public:
   const std::map<int, std::string>& getErrorPages() const;
   std::size_t getMaxBodySize() const;
   const std::set<std::string>& getAllowedMethods() const;
-  std::size_t getTimeout() const;
+  long getTimeout() const;
 
   // SETTERS
   void addLocation(const LocationConfig& location);
@@ -36,7 +36,7 @@ public:
 
   void setRoot(const std::string& root);
   void setIndex(const std::string& index);
-  void setTimeout(std::size_t time);
+  void setTimeout(long time);
   void setMaxBodySize(std::size_t size);
   void setErrorPages(std::vector<int> codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
@@ -55,7 +55,7 @@ private:
   std::map<int, std::string> _errorPages; // map for different Error codes
   std::size_t _maxBodySize;               // limit upload size (POST)
   std::set<std::string> _allowedMethods;  // usually per location
-  std::size_t _timeOut;                   // timeout
+  long _timeOut;                          // timeout
 
   std::vector<LocationConfig> _locations;
 };

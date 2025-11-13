@@ -8,6 +8,7 @@
 #include "socket/AutoFd.hpp"
 #include "utils/Buffer.hpp"
 #include "utils/state/StateHandler.hpp"
+#include <cstddef>
 #include <string>
 
 #ifndef MAX_CHUNK
@@ -33,7 +34,7 @@ public:
   void setServer(const Server* server);
 
   const TimeStamp& getLastActivity() const;
-  long getTimeout() const;
+  std::size_t getTimeout() const;
 
   bool hasDataToSend() const;
   bool sendTo();
