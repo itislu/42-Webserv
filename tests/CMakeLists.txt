@@ -70,6 +70,10 @@ add_my_test(utilsTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
 )
 
+add_my_test(fileBufferTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/fileBufferTester.cpp
+)
+
 # http
 
 # http/parser
