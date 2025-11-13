@@ -77,6 +77,14 @@ add_my_test(http11RulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/http11RulesTester.cpp
 )
 
+add_my_test(headerLineRulesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerLineRulesTester.cpp
+)
+
+add_my_test(requestLineRulesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/requestLineRulesTester.cpp
+)
+
 add_my_test(uriRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/uriRulesTester.cpp
 )

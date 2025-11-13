@@ -4,7 +4,7 @@
 
 NAME := webserv
 BUILD_DIR := build
-
+export CXX := c++
 
 
 # **************************************************************************** #
@@ -14,15 +14,15 @@ BUILD_DIR_PRESET := build/$(PRESET)
 .PHONY: all
 all:
 	@if [ ! -d $(BUILD_DIR_PRESET) ]; then \
-		$(MAKE) -s config; \
+		$(MAKE) --no-print-directory config; \
 	fi
-	@$(MAKE) -s build
+	@$(MAKE) --no-print-directory build
 
 $(NAME): all
 
 .PHONY: build
 build:
-	@MAKEFLAGS=-s cmake --build --preset=$(PRESET) 
+	cmake --build --preset=$(PRESET) -j
 
 .PHONY: re
 re: fclean all
@@ -33,7 +33,7 @@ re: fclean all
 .PHONY: config
 config:
 	cmake --preset=$(PRESET)
-	@$(MAKE) -s copy-compile-commands
+	@$(MAKE) --no-print-directory copy-compile-commands
 
 
 
@@ -44,31 +44,39 @@ clean:
 	rm -rf .cache
 
 .PHONY: fclean
-fclean:
-	rm -rf $(BUILD_DIR)
+fclean: clean
 	rm -rf $(NAME)
-	rm -rf .cache
 
 
 
 # **************************************************************************** #
 ARGS ?= "assets/config.json"
 
-VALGRINDFLAGS	=	--errors-for-leak-kinds=all \
-								--leak-check=full \
-								--show-error-list=yes \
-								--show-leak-kinds=all \
-								--trace-children=yes \
-								--track-origins=yes \
-								--track-fds=all
+export ASAN_OPTIONS := check_initialization_order=1: \
+												detect_stack_use_after_return=1: \
+												print_stats=1: \
+												print_summary=1: \
+												$(ASAN_OPTIONS)
+
+export UBSAN_OPTIONS := print_stacktrace=1: \
+												print_summary=1: \
+												$(UBSAN_OPTIONS)
+
+VALGRINDFLAGS := --errors-for-leak-kinds=all \
+									--leak-check=full \
+									--show-error-list=yes \
+									--show-leak-kinds=all \
+									--trace-children=yes \
+									--track-origins=yes \
+									--track-fds=all
 
 .PHONY: run
-run: build
+run: all
 	@printf "$(SEPARATOR)\n"
 	./$(NAME) $(ARGS)
 
 .PHONY: runv
-runv: build
+runv: all
 	@printf "$(SEPARATOR)\n"
 	valgrind $(VALGRINDFLAGS) ./$(NAME) $(ARGS)
 
@@ -77,11 +85,11 @@ runv: build
 # **************************************************************************** #
 .PHONY: test
 test: all
-	(cd $(BUILD_DIR_PRESET) && ctest)
+	ctest --test-dir $(BUILD_DIR_PRESET) $(ARGS)
 
 .PHONY: testv
 testv: all
-	(cd $(BUILD_DIR_PRESET) && ctest -T memcheck)
+	ctest --test-dir $(BUILD_DIR_PRESET) -T memcheck $(ARGS)
 
 
 

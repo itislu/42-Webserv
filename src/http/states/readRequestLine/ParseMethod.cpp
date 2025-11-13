@@ -13,11 +13,17 @@
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
 
 #include <ctype.h>
 #include <string>
+
+/* ************************************************************************** */
+// INIT
+
+Logger& ParseMethod::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC
@@ -27,6 +33,7 @@ ParseMethod::ParseMethod(ReadRequestLine* context)
   , _client(context->getContext())
   , _buffReader()
 {
+  _log.info() << "ParseMethod\n";
   _init();
 }
 
@@ -40,6 +47,7 @@ void ParseMethod::run()
   _sequence.reset();
   _buffReader.resetPosInBuff();
   if (!_sequence.matches()) {
+    _log.error() << "Bad Request\n";
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     getContext()->getStateHandler().setDone();
     return;

@@ -2,9 +2,12 @@
 #ifndef WRITE_STATUS_LINE_HPP
 #define WRITE_STATUS_LINE_HPP
 
-#include "client/Client.hpp"
-#include "utils/state/IState.hpp"
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
 
+class Client;
+
+/* ************************************************************************** */
 class WriteStatusLine : public IState<Client>
 {
 public:
@@ -14,6 +17,7 @@ public:
 
 private:
   Client* _client;
+  static Logger& _log;
 };
 
 #endif

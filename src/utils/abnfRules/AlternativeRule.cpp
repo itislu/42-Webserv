@@ -74,9 +74,6 @@ bool AlternativeRule::_firstMatchMode()
   setStartPos(getBuffReader()->getPosInBuff());
   bool matches = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
-
-    _rules[i]->setDebugPrintIndent(getDebugPrintIndent() + 2);
-
     matches = _rules[i]->matches();
     if (matches) {
       break;
@@ -92,9 +89,6 @@ bool AlternativeRule::_greedyMode()
   setEndPos(-1);
   bool somethingMatched = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
-
-    _rules[i]->setDebugPrintIndent(getDebugPrintIndent() + 2);
-
     if (_rules[i]->matches()) {
       if (!somethingMatched || getBuffReader()->getPosInBuff() > getEndPos()) {
         setReachedEnd(_rules[i]->reachedEnd());

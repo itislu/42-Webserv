@@ -14,9 +14,15 @@
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <string>
+
+/* ************************************************************************** */
+// INIT
+
+Logger& ParseUri::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC
@@ -28,6 +34,7 @@ ParseUri::ParseUri(ReadRequestLine* context)
   , _buffReader()
   , _initParser(true)
 {
+  _log.info() << "ParseUri\n";
   _buffReader.init(&_client->getInBuff());
 }
 
@@ -92,6 +99,7 @@ void ParseUri::_parseScheme()
   }
 
   if (!_sequence->matches()) {
+    _log.info() << "No scheme found\n";
     _updateState(ParseAuthority);
     return;
   }
@@ -117,6 +125,7 @@ void ParseUri::_parseAuthority()
   }
 
   if (!_sequence->matches()) {
+    _log.info() << "No authority found\n";
     _updateState(ParsePath);
     return;
   }
@@ -139,6 +148,7 @@ void ParseUri::_parsePath()
   }
 
   if (!_sequence->matches()) {
+    _log.info() << "Bad Request invalid path\n";
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     _updateState(ParseDone);
     return;
@@ -162,8 +172,8 @@ void ParseUri::_parseQuery()
   }
 
   if (!_sequence->matches()) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _updateState(ParseDone);
+    _log.info() << "No query found\n";
+    _updateState(ParseFragment);
     return;
   }
   if (_sequence->reachedEnd()) {
@@ -185,7 +195,7 @@ void ParseUri::_parseFragment()
   }
 
   if (!_sequence->matches()) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _log.info() << "No fragment found\n";
     _updateState(ParseDone);
     return;
   }

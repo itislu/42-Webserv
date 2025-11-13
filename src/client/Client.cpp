@@ -3,6 +3,7 @@
 #include "config/Config.hpp"
 #include "http/Request.hpp"
 #include "http/Response.hpp"
+#include "http/states/readRequestLine/ReadRequestLine.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
@@ -23,6 +24,7 @@ Client::Client()
   , _server()
   , _stateHandler(this)
 {
+  _stateHandler.setState<ReadRequestLine>();
 }
 
 Client::Client(int fdes)
@@ -30,6 +32,7 @@ Client::Client(int fdes)
   , _server()
   , _stateHandler(this)
 {
+  _stateHandler.setState<ReadRequestLine>();
 }
 
 Client::Client(int fdes, const Server* server)
@@ -37,6 +40,7 @@ Client::Client(int fdes, const Server* server)
   , _server(server)
   , _stateHandler(this)
 {
+  _stateHandler.setState<ReadRequestLine>();
 }
 
 int Client::getFd() const
@@ -103,8 +107,12 @@ bool Client::receive()
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
     _inBuff.add(buffer, bytes);
-
     // TODO: STATEMACHINE/PARSING
+    _stateHandler.setStateHasChanged(true);
+    while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
+      _stateHandler.setStateHasChanged(false);
+      _stateHandler.getState()->run();
+    }
   } else if (bytes == 0) {
     std::cout << "[CLIENT] wants to disconnect\n";
     return false;

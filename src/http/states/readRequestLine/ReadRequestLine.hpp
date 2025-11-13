@@ -2,6 +2,7 @@
 #ifndef READ_REQUEST_LINE_HPP
 #define READ_REQUEST_LINE_HPP
 
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
 
@@ -19,6 +20,7 @@ public:
 
 private:
   StateHandler<ReadRequestLine> _stateHandler;
+  static Logger& _log;
 };
 
 #endif

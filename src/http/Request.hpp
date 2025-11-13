@@ -2,19 +2,18 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
+#include <http/Headers.hpp>
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
+#include <utils/Buffer.hpp>
 
 #include <cstddef>
-#include <map>
 #include <string>
 
 /* ************************************************************************** */
 class Request
 {
 public:
-  typedef std::map<std::string, std::string> HeaderMap;
-
   enum Method
   {
     UNDEFINED,
@@ -37,18 +36,24 @@ public:
   const std::string& getVersion() const;
   void setVersion(const std::string& version);
 
-  HeaderMap& getHeaders();
+  Headers& getHeaders();
+
+  Buffer& getBody();
+
+  std::string toString();
 
 private:
   struct MethodMap;
   static const int _methods = 3;
   static const ft::array<MethodMap, _methods> _methodMap;
   static std::size_t _getMaxMethodLen() throw();
+  std::string _methodToString() const;
 
   Method _method;
   Uri _uri;
   std::string _version;
-  HeaderMap _headers;
+  Headers _headers;
+  Buffer _body;
 };
 
 struct Request::MethodMap

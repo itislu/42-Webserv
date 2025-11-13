@@ -3,6 +3,8 @@
 #define HTTP_HPP
 
 namespace http {
+extern const char* const CRLF;
+
 int isSchemeChar(int chr);
 int isAuthChar(int chr);
 int isReserved(int chr);
@@ -18,6 +20,8 @@ int isDigit19(int chr);
 int isDigit04(int chr);
 int isDigit05(int chr);
 int isWhitespace(int chr);
+int isObsText(int chr);
+int isVchar(int chr);
 }
 
 #endif

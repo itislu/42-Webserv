@@ -1,0 +1,23 @@
+#pragma once
+#ifndef WRITE_HEADER_LINES_HPP
+#define WRITE_HEADER_LINES_HPP
+
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+
+class Client;
+
+/* ************************************************************************** */
+class WriteHeaderLines : public IState<Client>
+{
+public:
+  explicit WriteHeaderLines(Client* context);
+
+  void run();
+
+private:
+  Client* _client;
+  static Logger& _log;
+};
+
+#endif

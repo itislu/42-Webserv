@@ -7,6 +7,7 @@
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <string>
@@ -24,6 +25,7 @@ public:
 private:
   void _init();
   void _readLines();
+  void _setNextState();
   bool _hasEndOfLine();
   std::string _extractPart(const Rule::RuleId& ruleId);
   void _addLineToHeaders(const std::string& line);
@@ -35,6 +37,8 @@ private:
   ft::shared_ptr<LiteralRule> _endOfLine;
   BufferReader _buffReader;
   Rule::ResultMap _results;
+  static Logger& _log;
+  bool _done;
 };
 
 #endif

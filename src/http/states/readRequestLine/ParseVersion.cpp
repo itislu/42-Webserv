@@ -5,16 +5,23 @@
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/readRequestLine/ValidateRequest.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <ctype.h>
 #include <string>
+
+/* ************************************************************************** */
+// INIT
+
+Logger& ParseVersion::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC
@@ -24,6 +31,7 @@ ParseVersion::ParseVersion(ReadRequestLine* context)
   , _client(context->getContext())
   , _buffReader()
 {
+  _log.info() << "ParseVersion\n";
   _init();
 }
 
@@ -50,7 +58,7 @@ void ParseVersion::run()
 
   if (_sequence.reachedEnd()) {
     _extractVersion();
-    getContext()->getStateHandler().setDone();
+    getContext()->getStateHandler().setState<ValidateRequest>();
     return;
   }
 }
