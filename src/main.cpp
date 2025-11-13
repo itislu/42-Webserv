@@ -26,7 +26,10 @@ int main(int argc, char* argv[])
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     ConfigParser parser(argv[1]);
+
     const Config config = parser.parseConfig();
+    std::cout << config;
+
     ServerManager serverManager(config);
     serverManager.run();
 

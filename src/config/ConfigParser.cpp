@@ -29,11 +29,6 @@ ConfigParser::ConfigParser(const char* path)
 {
 }
 
-void ConfigParser::validateParsedConfig() const
-{
-  // TODO: implement
-}
-
 bool ConfigParser::isExpectedNext(e_type type)
 {
   return _token.getType() == type;
@@ -200,12 +195,7 @@ Config ConfigParser::parseConfig()
 {
   _lexer.init();
   parse();
-
-  const Config conf = ConfigBuilder::build(_parsed);
-  std::cout << conf;
-  return conf;
-  /* TODO:  */
-  // return ConfigBuilder::build(_parsed);
+  return ConfigBuilder::build(_parsed);
 }
 
 // error_page 505 505.html
