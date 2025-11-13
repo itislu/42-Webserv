@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Create compilation database
-        run: cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake -B build -D CMAKE_EXPORT_COMPILE_COMMANDS=ON
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:

@@ -76,6 +76,16 @@ ft::shared_ptr<RepetitionRule> fieldValueRule()
 /**
  * field-content = field-vchar
  *                 [ 1*( SP / HTAB / field-vchar ) field-vchar ]
+ *
+ * ! Rule changed because:
+ * Last 'field-vchar' can be removed because 'field-content' is only ever used
+ * in 'field-line' which allows 'OWS' after field content.
+ *
+ * field-value = *field-content
+ * field-line   = field-name ":" OWS field-value OWS
+ *
+ * field-content = field-vchar
+ *                 [ 1*( SP / HTAB / field-vchar ) ]
  */
 ft::shared_ptr<SequenceRule> fieldContentRule()
 {
@@ -99,7 +109,11 @@ ft::shared_ptr<SequenceRule> fieldContentRule()
   ft::shared_ptr<SequenceRule> optSeq = ft::make_shared<SequenceRule>();
   optSeq->setDebugTag("[1*(SP/HTAB/field-vchar)field-vchar]");
   optSeq->addRule(ft::move(repeatPart));
-  // optSeq->addRule(fieldVcharRule()); // todo issue #58
+
+  // ft::shared_ptr<EndRule> endVchar =
+  // ft::make_shared<EndRule>(fieldVcharRule());
+  // endVchar->setDebugTag("endVchar");
+  // optSeq->addRule(ft::move(endVchar));
 
   ft::shared_ptr<RepetitionRule> optWrap =
     ft::make_shared<RepetitionRule>(ft::move(optSeq));
@@ -118,8 +132,10 @@ ft::shared_ptr<AlternativeRule> fieldVcharRule()
 {
   const ft::shared_ptr<AlternativeRule> alter =
     ft::make_shared<AlternativeRule>();
+
   alter->addRule(ft::make_shared<RangeRule>(http::isVchar));
   alter->addRule(obsTextRule());
+
   alter->setDebugTag("VCHAR/obs-text");
   return alter;
 }

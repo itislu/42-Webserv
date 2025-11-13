@@ -388,12 +388,10 @@ static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt8()
 /**
  *             / [ *6( h16 ":" ) h16 ] "::"
  */
-static ft::shared_ptr<SequenceRule> ipv6AddressRuleAlt9()
+static ft::shared_ptr<AlternativeRule> ipv6AddressRuleAlt9()
 {
   const int max = 7;
-  const ft::shared_ptr<SequenceRule> rule = ft::make_shared<SequenceRule>();
-  rule->addRule(h16ColonDcolon(max));
-  return rule;
+  return h16ColonDcolon(max);
 }
 
 /**
@@ -577,6 +575,7 @@ ft::shared_ptr<RepetitionRule> pathAbEmptyRule()
   ft::shared_ptr<SequenceRule> sequence = ft::make_shared<SequenceRule>();
   sequence->addRule(ft::make_shared<LiteralRule>("/"));
   sequence->addRule(segmentRule());
+  sequence->setDebugTag("\"/\" segment");
 
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::move(sequence));

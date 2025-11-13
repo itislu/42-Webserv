@@ -1,10 +1,10 @@
-#include "libftpp/memory.hpp"
-#include "utils/abnfRules/SequenceRule.hpp"
 #include <http/abnfRules/headerLineRules.hpp>
+#include <libftpp/memory.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
-#include <utils/abnfRules/RepetitionRule.hpp>
+#include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/abnfRules/SequenceRule.hpp>
 
 #include <cctype>
 #include <gtest/gtest.h>
@@ -33,20 +33,51 @@ bool runParser(const std::string& str, Rule& rule)
 }
 }
 
+/**
+ * field-content = field-vchar
+ *                 [ 1*( SP / HTAB / field-vchar ) ]
+ */
+TEST(HeaderLinesTester, FieldContentRule)
+{
+  const ft::shared_ptr<SequenceRule> rule = fieldContentRule();
+  rule->addRule(ft::make_shared<RangeRule>("\n"));
+
+  EXPECT_TRUE(runParser("tes t\n", *rule));
+  EXPECT_TRUE(runParser("test  \n", *rule));
+}
+
+/**
+ * field-value = *field-content
+ */
 TEST(HeaderLinesTester, FieldValueRule)
 {
-  const ft::shared_ptr<RepetitionRule> rule = fieldValueRule();
+  const ft::shared_ptr<SequenceRule> seqRule = ft::make_shared<SequenceRule>();
+  seqRule->addRule(fieldValueRule());
+  seqRule->addRule(ft::make_shared<RangeRule>("\n"));
 
-  EXPECT_TRUE(runParser("test, hallo", *rule));
+  EXPECT_TRUE(runParser("test, hallo\n", *seqRule));
 }
 
+/**
+ * field-line   = field-name ":" OWS field-value OWS
+ */
 TEST(HeaderLinesTester, FieldLineRule)
 {
-  const ft::shared_ptr<SequenceRule> rule = fieldLineRule();
+  const ft::shared_ptr<SequenceRule> seqRule = ft::make_shared<SequenceRule>();
+  seqRule->addRule(fieldLineRule());
+  seqRule->addRule(ft::make_shared<RangeRule>("\n"));
 
-  EXPECT_TRUE(runParser("host: test, hallo", *rule));
+  EXPECT_TRUE(runParser("host: test, hallo\n", *seqRule));
+  EXPECT_TRUE(runParser("host: test, hallo \n", *seqRule));
+  EXPECT_TRUE(runParser("host:test, hallo \n", *seqRule));
+
+  // Invalid
+  EXPECT_FALSE(runParser("host :test, hallo \n", *seqRule));
 }
 
+/**
+ * field-line CRLF
+ */
 TEST(HeaderLinesTester, FieldLinePartRule)
 {
   const ft::unique_ptr<SequenceRule> rule = fieldLinePartRule();
