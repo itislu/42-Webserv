@@ -51,11 +51,10 @@ Entries<LocationConfig>::Entry Entries<LocationConfig>::entries[] = {
   { 0, 0 }
 };
 
-// =================================================
+// =========== Shared - Implementations ============
 
-// ============== Config - Setters ====================
-void Entries<Config>::setTimeout(const std::vector<std::string>& values,
-                                 Config& config)
+template<typename ConfigType>
+void setTimeoutImpl(const std::vector<std::string>& values, ConfigType& config)
 {
   if (values.size() != 1) {
     throw std::invalid_argument(
@@ -71,36 +70,8 @@ void Entries<Config>::setTimeout(const std::vector<std::string>& values,
   config.setTimeout(timeout);
 }
 
-// ============== Server - Setters ====================
-void Entries<ServerConfig>::setTimeout(const std::vector<std::string>& values,
-                                       ServerConfig& config)
-{
-  if (values.size() != 1) {
-    throw std::invalid_argument(
-      "keepalive_timeout: invalid number of arguments");
-  }
-  long timeout = 0;
-  try {
-    timeout = convert::toLong(values[0]);
-  } catch (const std::exception& e) {
-    throw std::invalid_argument(
-      std::string("keepalive_timeout: invalid argument: ") + e.what());
-  }
-  config.setTimeout(timeout);
-}
-
-void Entries<ServerConfig>::setIndex(const std::vector<std::string>& values,
-                                     ServerConfig& config)
-{
-  if (values.size() != 1) {
-    throw std::invalid_argument("index: invalid number of arguments");
-  }
-  config.setIndex(values[0]);
-}
-
-void Entries<ServerConfig>::setAllowedMethods(
-  const std::vector<std::string>& values,
-  ServerConfig& config)
+template<typename ConfigType>
+void setAllowedImpl(const std::vector<std::string>& values, ConfigType& config)
 {
   if (values.empty()) {
     throw std::invalid_argument("allowed_methods: invalid number of arguments");
@@ -115,6 +86,43 @@ void Entries<ServerConfig>::setAllowedMethods(
   }
 }
 
+template<typename ConfigType>
+void setIndexImpl(const std::vector<std::string>& values, ConfigType& config)
+{
+  if (values.size() != 1) {
+    throw std::invalid_argument("index: invalid number of arguments");
+  }
+  config.setIndex(values[0]);
+}
+
+// ============== Config - Shared ====================
+void Entries<Config>::setTimeout(const std::vector<std::string>& values,
+                                 Config& config)
+{
+  setTimeoutImpl(values, config);
+}
+
+// ============== Server - Shared =====================
+void Entries<ServerConfig>::setTimeout(const std::vector<std::string>& values,
+                                       ServerConfig& config)
+{
+  setTimeoutImpl(values, config);
+}
+
+void Entries<ServerConfig>::setIndex(const std::vector<std::string>& values,
+                                     ServerConfig& config)
+{
+  setIndexImpl(values, config);
+}
+
+void Entries<ServerConfig>::setAllowedMethods(
+  const std::vector<std::string>& values,
+  ServerConfig& config)
+{
+  setAllowedImpl(values, config);
+}
+
+// ============== Server - Unique =====================
 void Entries<ServerConfig>::setPorts(const std::vector<std::string>& values,
                                      ServerConfig& config)
 {
@@ -138,34 +146,22 @@ void Entries<ServerConfig>::setHostnames(const std::vector<std::string>& values,
   }
 }
 
-// ============== Location - Setters ====================
+// ============== Location - Shared ====================
 
 void Entries<LocationConfig>::setIndex(const std::vector<std::string>& values,
                                        LocationConfig& config)
 {
-  if (values.size() != 1) {
-    throw std::invalid_argument("index: invalid number of arguments");
-  }
-  config.setIndex(values[0]);
+  setIndexImpl(values, config);
 }
 
 void Entries<LocationConfig>::setAllowedMethods(
   const std::vector<std::string>& values,
   LocationConfig& config)
 {
-  if (values.empty()) {
-    throw std::invalid_argument("allowed_methods: invalid number of arguments");
-  }
-
-  for (std::size_t i = 0; i < values.size(); ++i) {
-    if (!convert::isMethod(values[i])) {
-      throw std::invalid_argument("allowed_methods: invalid method: " +
-                                  values[i]);
-    }
-    config.setAllowedMethod(values[i]);
-  }
+  setAllowedImpl(values, config);
 }
 
+// ============== Location - Unique ====================
 void Entries<LocationConfig>::setAutoIndex(
   const std::vector<std::string>& values,
   LocationConfig& config)
