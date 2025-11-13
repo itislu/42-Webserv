@@ -22,7 +22,7 @@ $(NAME): all
 
 .PHONY: build
 build:
-	cmake --build --preset=$(PRESET) -- -j
+	cmake --build --preset=$(PRESET) -j
 
 .PHONY: re
 re: fclean all
