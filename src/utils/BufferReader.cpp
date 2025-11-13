@@ -17,7 +17,7 @@ bool BufferReader::reachedEnd() const
   if (_buffer == FT_NULLPTR) {
     return true;
   }
-  return (_buffer->begin() + _posInBuff + 1) == _buffer->end();
+  return (_buffer->begin() + (_posInBuff + 1)) == _buffer->end();
 }
 
 char BufferReader::getNextChar()

@@ -53,6 +53,12 @@ help-opt opt-help:
 help-san san-help:
 					echo -e "Rebuild the project with the following sanitizer flags:"
 					echo -e "  $(CXXFLAGS_SAN)"
+					echo
+					echo -e "The following runtime environment variables are always exported:"
+					echo -e "  ASAN_OPTIONS:"
+					echo -e "$(ASAN_OPTIONS)" | tr -d ' ' | tr ':' '\n' | sed 's/^/    /'
+					echo -e "  UBSAN_OPTIONS:"
+					echo -e "$(UBSAN_OPTIONS)" | tr -d ' ' | tr ':' '\n' | sed 's/^/    /'
 
 help-val val-help:
 					echo -e "Build the project and run the executable with valgrind."

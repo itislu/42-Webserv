@@ -1,0 +1,142 @@
+# Build and test the project on multiple OS and compiler configurations.
+# Tests are run three times via 'make test/testv': normally, with Valgrind
+# (Linux only), and with ASan+UBSan.
+# Test steps fail only if a test failed; Valgrind and sanitizer issues are only
+# reported when checking the logs in subsequent steps.
+# Failed tests do not stop a job to allow all configurations to run. In the end,
+# the workflow reports failure if any step in any job failed.
+
+name: Build and Test
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  push:
+    branches: [main, master]
+    paths: ['**.c', '**.cpp', '**.h', '**.hpp', '**.ipp', '**.tpp', '**/CMake*', '**.cmake', '**/Makefile', '**.mk', '**/.clang-*', '**/build-and-test.yaml']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} - ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Campus environment:
+        # - ubuntu-22.04
+        # - clang++ 12.0.1
+        # - g++ 10.5
+        # - cmake 3.22.1
+        # - make 4.3
+        # - valgrind 3.18.1
+        include:
+          - os: ubuntu-22.04
+            compiler: clang++-12
+            compiler-pkgs: clang-12 llvm-12-dev
+            cmake-version: 3.22.1
+            preset-sanitizers: san
+          - os: ubuntu-22.04
+            compiler: g++-10
+            cmake-version: 3.22.1
+            preset-sanitizers: san
+          - os: ubuntu-latest
+            compiler: clang++-20
+            compiler-pkgs: clang-20 libc++-20-dev libclang-rt-20-dev llvm-20-dev
+            preset-sanitizers: san-libc++
+          - os: ubuntu-latest
+            compiler: g++-13 # libstdc++-14 bugged: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=118493
+            preset-sanitizers: san
+          - os: macos-latest
+            compiler: c++
+            preset-sanitizers: san
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install compiler
+        if: matrix.compiler-pkgs
+        run: |
+          sudo apt-get install --no-install-recommends -y ${{ matrix.compiler-pkgs }}
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{ matrix.compiler }} 100
+      - name: Install CMake ${{ matrix.cmake-version }}
+        if: matrix.cmake-version
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: ${{ matrix.cmake-version }}
+      - name: Install Valgrind (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install --no-install-recommends -y valgrind
+      - name: Print versions
+        run: |
+          echo -e "--- Compiler ---"
+          ${{ matrix.compiler }} --version
+          echo -e "\n--- CMake ---"
+          cmake --version
+          echo -e "\n--- Make ---"
+          make --version
+          if [ ${{ runner.os }} = Linux ]; then
+            echo -e "\n--- Valgrind ---"
+            valgrind --version
+          fi
+
+      - name: Build normally
+        id: build-normal
+        run: make CXX=${{ matrix.compiler }}
+      - name: Run tests normally
+        run: |
+          set -o pipefail
+          make test ARGS=-VV | grep --color=always --line-buffered -E "FAILED|$"
+
+      - name: Build with 'debug' preset
+        id: build-debug
+        if: ${{ !cancelled() && steps.build-normal.outcome == 'success' }}
+        run: make CXX=${{ matrix.compiler }} PRESET=debug
+      - name: Run tests with Valgrind (Linux)
+        if: ${{ runner.os == 'Linux' && !cancelled() && steps.build-debug.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          make testv PRESET=debug ARGS=-VV | grep --color=always --line-buffered -E "FAILED|$"
+      - name: Check Valgrind logs (Linux)
+        if: ${{ runner.os == 'Linux' && !cancelled() && steps.build-debug.outcome == 'success' }}
+        run: |
+          LOGS=$(cat build/debug/Testing/Temporary/MemoryChecker.*.log)
+          if [ -n "$LOGS" ]; then
+            echo "$LOGS"
+            exit 1
+          else
+            echo "No Valgrind issues detected."
+          fi
+
+      - name: Build with '${{ matrix.preset-sanitizers }}' preset
+        id: build-san
+        if: ${{ !cancelled() && steps.build-normal.outcome == 'success' }}
+        run: make CXX=${{ matrix.compiler }} PRESET=${{ matrix.preset-sanitizers }}
+      - name: Run tests with ASan and UBSan
+        if: ${{ !cancelled() && steps.build-san.outcome == 'success' }}
+        env:
+          ASAN_OPTIONS: exitcode=0
+        run: |
+          set -o pipefail
+          make test PRESET=${{ matrix.preset-sanitizers }} ARGS=-VV | grep --color=always --line-buffered -E "FAILED|$"
+      - name: Check ASan and UBSan logs
+        if: ${{ !cancelled() && steps.build-san.outcome == 'success' }}
+        run: |
+          LOG_FILE=build/${{ matrix.preset-sanitizers }}/Testing/Temporary/LastTest.log
+          if grep -qE "\w+Sanitizer:|runtime error:" "$LOG_FILE"; then
+            grep --color=always -E "\w+Sanitizer:|runtime error:|$" "$LOG_FILE"
+            exit 1
+          else
+            echo "No ASan or UBSan issues detected."
+          fi
+
+  build-and-test-result:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Consolidate job results
+        run: echo "All build and test jobs completed successfully."
