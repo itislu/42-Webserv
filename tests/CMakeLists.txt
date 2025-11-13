@@ -21,22 +21,21 @@ FetchContent_MakeAvailable(googletest)
 
 
 # **************************************************************************** #
-# Download & add googletest
-include(CTest)
-set(MEMORYCHECK_COMMAND valgrind)
-set(MEMORYCHECK_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
-                                 --leak-check=full \
-                                 --show-error-list=yes \
-                                 --show-leak-kinds=all \
-                                 --trace-children=yes \
-                                 --track-origins=yes \
-                                 --track-fds=all"
+# Set valgrind options
+set(VALGRIND_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
+                              --leak-check=full \
+                              --show-error-list=yes \
+                              --show-leak-kinds=all \
+                              --trace-children=yes \
+                              --track-origins=yes \
+                              --track-fds=all"
 )
+include(CTest)
 
 
 
 # **************************************************************************** #
-# function to add test
+# Function to add test
 function(add_my_test test_name)
   add_executable(${test_name} ${ARGN})
 
