@@ -1,6 +1,10 @@
+#pragma once
+#ifndef DIRECTIVEHANDLER_HPP
+#include "config/DirectiveHandler.hpp"
+#endif
+
 #include "config/ConfigTypes.hpp"
 #include "config/Converters.hpp"
-#include "config/DirectiveHandler.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
