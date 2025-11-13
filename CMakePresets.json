@@ -11,6 +11,16 @@
       }
     },
     {
+      "name": "default-libc++",
+      "displayName": "Default with libc++",
+      "description": "Build default and use libc++ as standard library (Clang only)",
+      "binaryDir": "${sourceDir}/build/default-libc++",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic -stdlib=libc++",
+        "CMAKE_CXX_LINK_FLAGS": "-stdlib=libc++"
+      }
+    },
+    {
       "name": "debug",
       "displayName": "Debug",
       "description": "Build with -g",
@@ -21,14 +31,36 @@
       }
     },
     {
+      "name": "debug-libc++",
+      "displayName": "Debug with libc++",
+      "description": "Build with -g and use libc++ as standard library (Clang only)",
+      "binaryDir": "${sourceDir}/build/debug-libc++",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic -stdlib=libc++",
+        "CMAKE_CXX_LINK_FLAGS": "-stdlib=libc++"
+      }
+    },
+    {
       "name": "san",
-      "displayName": "Debug with Sanitizers",
-      "description": "Build with sanitizers",
+      "displayName": "Debug with ASan+UBSan",
+      "description": "Build with AddressSanitizer and UndefinedBehaviorSanitizer",
       "binaryDir": "${sourceDir}/build/san",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic -fsanitize=undefined,address,bounds,float-divide-by-zero",
-        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=undefined,address,bounds,float-divide-by-zero"
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic -fsanitize=address,undefined,bounds,float-divide-by-zero,vptr",
+        "CMAKE_CXX_LINK_FLAGS": "-fsanitize=address,undefined,bounds,float-divide-by-zero,vptr"
+      }
+    },
+    {
+      "name": "san-libc++",
+      "displayName": "Debug with ASan+UBSan and libc++",
+      "description": "Build with AddressSanitizer and UndefinedBehaviorSanitizer and use libc++ as standard library (Clang only)",
+      "binaryDir": "${sourceDir}/build/san-libc++",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic -fsanitize=address,undefined,bounds,float-divide-by-zero,vptr -stdlib=libc++",
+        "CMAKE_CXX_LINK_FLAGS": "-fsanitize=address,undefined,bounds,float-divide-by-zero,vptr -stdlib=libc++"
       }
     }
   ],
@@ -38,12 +70,24 @@
       "configurePreset": "default"
     },
     {
+      "name": "default-libc++",
+      "configurePreset": "default-libc++"
+    },
+    {
       "name": "debug",
       "configurePreset": "debug"
     },
     {
+      "name": "debug-libc++",
+      "configurePreset": "debug-libc++"
+    },
+    {
       "name": "san",
       "configurePreset": "san"
+    },
+    {
+      "name": "san-libc++",
+      "configurePreset": "san-libc++"
     }
   ]
 }

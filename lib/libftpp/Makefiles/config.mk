@@ -44,7 +44,7 @@ IS_CLANG		:=	$(if $(findstring clang,$(CXX_VERSION)),true)
 IS_GCC			:=	$(if $(findstring g++,$(CXX_VERSION)),true)
 CXXFLAGS_STD	:=	-Wall -Wextra -Werror -Wpedantic -Wshadow -std=c++98
 CXXFLAGS_DBG	:=	-ggdb3
-CXXFLAGS_SAN	:=	-fsanitize=address,undefined,bounds,float-divide-by-zero
+CXXFLAGS_SAN	:=	-fsanitize=address,undefined,bounds,float-divide-by-zero,vptr
 CXXFLAGS_OPT	:=	-O3 -flto$(if $(IS_GCC),=auto) -march=native -mtune=native
 CXXFLAGS_CLANG	:=	-Wdocumentation	# Only supported by clang
 CXXFLAGS		?=	$(CXXFLAGS_STD) $(CXXFLAGS_DBG) $(if $(IS_CLANG),$(CXXFLAGS_CLANG))
@@ -63,11 +63,26 @@ SRC_EXTENSION	:=	.cpp
 SRC				:=	$(shell find $(SRC_DIR) -type f -name "*$(SRC_EXTENSION)")
 
 
+#	Sanitizers
+
+export ASAN_OPTIONS := \
+					check_initialization_order=1: \
+					detect_stack_use_after_return=1: \
+					print_stats=1: \
+					print_summary=1: \
+					$(ASAN_OPTIONS)
+
+export UBSAN_OPTIONS := \
+					print_stacktrace=1: \
+					print_summary=1: \
+					$(UBSAN_OPTIONS)
+
+
 #	Valgrind
 
 VALGRIND		:=	$(shell which valgrind 2>/dev/null || echo "valgrind")
 
-VALGRINDFLAGS	=	--errors-for-leak-kinds=all \
+VALGRINDFLAGS	:=	--errors-for-leak-kinds=all \
 					--leak-check=full \
 					--show-error-list=yes \
 					--show-leak-kinds=all \
