@@ -34,6 +34,7 @@ bool runParser(const std::string& str, Rule& rule)
   }
   return matches;
 }
+
 }
 
 // NOLINTBEGIN
@@ -44,40 +45,41 @@ bool runParser(const std::string& str, Rule& rule)
 TEST(UriAbnfTest, URI)
 {
   ft::shared_ptr<SequenceRule> s = uriRule();
+  s->addRule(ft::make_shared<RangeRule>(" "));
+
   // --- minimal valid schemes ---
-  EXPECT_TRUE(runParser("http:", *s));
-  EXPECT_TRUE(runParser("mailto:user@example.com", *s));
-  EXPECT_TRUE(runParser("file:/home/user/test.txt", *s));
+  EXPECT_TRUE(runParser("http: ", *s));
+  EXPECT_TRUE(runParser("mailto:user@example.com ", *s));
+  EXPECT_TRUE(runParser("file:/home/user/test.txt ", *s));
 
   // --- common web URLs ---
-  EXPECT_TRUE(runParser("http://example.com", *s));
-  EXPECT_TRUE(runParser("https://example.com/", *s));
-  EXPECT_TRUE(runParser("https://example.com:443/path", *s));
-  EXPECT_TRUE(runParser("https://user:pw@host.net:8080/index.html", *s));
-  EXPECT_TRUE(runParser("ftp://ftp.example.org/resource.txt", *s));
+  EXPECT_TRUE(runParser("http://example.com ", *s));
+  EXPECT_TRUE(runParser("https://example.com/ ", *s));
+  EXPECT_TRUE(runParser("https://example.com:443/path ", *s));
+  EXPECT_TRUE(runParser("https://user:pw@host.net:8080/index.html ", *s));
+  EXPECT_TRUE(runParser("ftp://ftp.example.org/resource.txt ", *s));
 
   // --- with query ---
-  EXPECT_TRUE(runParser("https://example.com/search?q=test", *s));
-  EXPECT_TRUE(runParser("http://example.com/path/to/page?key=value&x=1", *s));
+  EXPECT_TRUE(runParser("https://example.com/search?q=test ", *s));
+  EXPECT_TRUE(runParser("http://example.com/path/to/page?key=value&x=1 ", *s));
 
   // --- with fragment ---
-  EXPECT_TRUE(runParser("https://example.com/index.html#section1", *s));
-  EXPECT_TRUE(runParser("https://example.com/path?q=val#frag", *s));
+  EXPECT_TRUE(runParser("https://example.com/index.html#section1 ", *s));
+  EXPECT_TRUE(runParser("https://example.com/path?q=val#frag ", *s));
 
   // --- mixed case scheme (legal, case-insensitive) ---
-  EXPECT_TRUE(runParser("HtTp://Example.COM", *s));
+  EXPECT_TRUE(runParser("HtTp://Example.COM ", *s));
 
   // --- IPv6 and IPv4 hosts ---
-  // Todo Ipv6
-  // EXPECT_TRUE(runParser("http://[2001:db8::1]/index.html", *s));
-  EXPECT_TRUE(runParser("http://127.0.0.1:8080/", *s));
+  EXPECT_TRUE(runParser("http://[2001:db8::1]/index.html ", *s));
+  EXPECT_TRUE(runParser("http://127.0.0.1:8080/ ", *s));
 
   // --- encoded characters ---
-  EXPECT_TRUE(runParser("https://example.com/a%20b/c%2Fd", *s));
-  EXPECT_TRUE(runParser("https://user%40mail.com@host.org", *s));
+  EXPECT_TRUE(runParser("https://example.com/a%20b/c%2Fd ", *s));
+  EXPECT_TRUE(runParser("https://user%40mail.com@host.org ", *s));
 
   // frag only
-  EXPECT_TRUE(runParser("http:#frag", *s));
+  EXPECT_TRUE(runParser("http:#frag ", *s));
 }
 
 /**
@@ -152,26 +154,30 @@ TEST(UriAbnfTest, Authority)
   EXPECT_TRUE(runParser("example.com", *sequence));
   EXPECT_TRUE(runParser("localhost", *sequence));
   EXPECT_TRUE(runParser("192.168.0.1", *sequence));
-  // EXPECT_TRUE(runParser("[2001:db8::1]", *sequence)); // Todo Ipv6
+  EXPECT_TRUE(runParser("[2001:db8::1]", *sequence));
+  EXPECT_TRUE(runParser("[v1.fe80]", *sequence));
   EXPECT_TRUE(runParser("sub.domain.co.uk", *sequence));
 
   // --- host + port ---
   EXPECT_TRUE(runParser("example.com:80", *sequence));
   EXPECT_TRUE(runParser("localhost:8080", *sequence));
   EXPECT_TRUE(runParser("192.168.0.1:65535", *sequence));
-  // EXPECT_TRUE(runParser("[2001:db8::1]:443", *sequence)); // Todo Ipv6
+  EXPECT_TRUE(runParser("[2001:db8::1]:443", *sequence));
+  EXPECT_TRUE(runParser("[v1.fe80]:443", *sequence));
 
   // --- userinfo + host ---
   EXPECT_TRUE(runParser("@example.com", *sequence));
   EXPECT_TRUE(runParser("user@example.com", *sequence));
   EXPECT_TRUE(runParser("user:pass@example.com", *sequence));
   EXPECT_TRUE(runParser("admin@127.0.0.1", *sequence));
-  // EXPECT_TRUE(runParser("root@[::1]", *sequence));  // Todo Ipv6
+  EXPECT_TRUE(runParser("root@[::1]", *sequence));
+  EXPECT_TRUE(runParser("root@[v4.2]", *sequence));
 
   // --- userinfo + host + port ---
   EXPECT_TRUE(runParser("user@example.com:80", *sequence));
   EXPECT_TRUE(runParser("user:pw@host.net:8080", *sequence));
-  // EXPECT_TRUE(runParser("me@[2001:db8::2]:443", *sequence));  // Todo Ipv6
+  EXPECT_TRUE(runParser("me@[2001:db8::2]:443", *sequence));
+  EXPECT_TRUE(runParser("me@[vFa.:]:443", *sequence));
 
   // Other
   EXPECT_TRUE(runParser("user@", *sequence));
@@ -218,7 +224,42 @@ TEST(UriAbnfTest, Port)
  */
 TEST(UriAbnfTest, IP_literal)
 {
-  // TODO if needed
+  ft::shared_ptr<SequenceRule> sequence = ipLiteralRule();
+
+  // IPv6address
+  EXPECT_TRUE(runParser("[::1]", *sequence));
+  EXPECT_TRUE(runParser("[2001:db8::1]", *sequence));
+  EXPECT_TRUE(runParser("[::ffff:192.0.2.128]", *sequence));
+  EXPECT_TRUE(runParser("[::]", *sequence));
+
+  // IPvFuture
+  EXPECT_TRUE(runParser("[v1.fe80]", *sequence));
+  EXPECT_TRUE(runParser("[vF.aBc123-._~!$&'()*+,;=:0XyZ]", *sequence));
+
+  // --- Invalid ---
+  // Too many brackets.
+  EXPECT_FALSE(runParser("[v1.fe80]]", *sequence));
+  EXPECT_FALSE(runParser("[[v1.fe80]", *sequence));
+  EXPECT_FALSE(runParser("[[v1.fe80]]", *sequence));
+
+  // Chars outside brackets.
+  EXPECT_FALSE(runParser("1[v1.fe80]", *sequence));
+  EXPECT_FALSE(runParser("[v1.fe80]1", *sequence));
+
+  // 'IPv6address / IPvFuture' not finished.
+  EXPECT_FALSE(runParser("[2001:db8:1]", *sequence));
+  EXPECT_FALSE(runParser("[1:2:3:4:5:6:7]", *sequence));
+  EXPECT_FALSE(runParser("[v1.]", *sequence));
+  EXPECT_FALSE(runParser("[]", *sequence));
+
+  // Trailing colon.
+  EXPECT_FALSE(runParser("[2001:db8::1:]", *sequence));
+  EXPECT_FALSE(runParser("[1:2:]", *sequence));
+  EXPECT_FALSE(runParser("[:]", *sequence));
+
+  // Missing brackets.
+  EXPECT_FALSE(runParser("2001:db8::1", *sequence));
+  EXPECT_FALSE(runParser("v1.fe80", *sequence));
 }
 
 /**
@@ -226,7 +267,32 @@ TEST(UriAbnfTest, IP_literal)
  */
 TEST(UriAbnfTest, IPvFuture)
 {
-  // TODO if needed
+  ft::shared_ptr<SequenceRule> sequence = ipvFutureRule();
+
+  EXPECT_TRUE(runParser("v1.fe80", *sequence));
+  EXPECT_TRUE(runParser("v0123456789abcdefABCDEF.fe80", *sequence));
+  EXPECT_TRUE(runParser("vFa16F.00", *sequence));
+  EXPECT_TRUE(runParser("vF.aBc123-._~!$&'()*+,;=:0XyZ", *sequence));
+  EXPECT_TRUE(runParser("v1.:", *sequence));
+
+  // --- Invalid ---
+  // Missing part of sequence.
+  EXPECT_FALSE(runParser("1.fe80", *sequence));
+  EXPECT_FALSE(runParser("v.fe80", *sequence));
+  EXPECT_FALSE(runParser("v1-fe80", *sequence));
+  EXPECT_FALSE(runParser("v1:", *sequence));
+
+  // Invalid chars.
+  EXPECT_FALSE(runParser("vG.fe80", *sequence));
+  EXPECT_FALSE(runParser("v1.fe 80", *sequence));
+  EXPECT_FALSE(runParser("v1.fe80/", *sequence));
+  EXPECT_FALSE(runParser("v1.#:", *sequence));
+
+  ft::shared_ptr<SequenceRule> seqWithEnd = ipvFutureRule();
+  seqWithEnd->addRule(ft::make_shared<RangeRule>("\n"));
+
+  // Missing last part of sequence.
+  EXPECT_FALSE(runParser("v1.\n", *seqWithEnd));
 }
 
 /**
@@ -328,17 +394,21 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_TRUE(runParser("1111:2222::", *alter));
   EXPECT_TRUE(runParser("1111::", *alter));
 
-  // --- Invalid Tests ---
+  // --- Invalid ---
   // More than 8 h16 groups.
   EXPECT_FALSE(runParser("0:1:2:3:4:5:6:7:8", *alter));
+
   // Multiple "::".
   EXPECT_FALSE(runParser("2001:db8:85a3::8a2e::7334", *alter));
   EXPECT_FALSE(runParser("2001:db8::85a3:8a2e::7334", *alter));
+
   // Invalid character.
   EXPECT_FALSE(runParser("2001:db8:85a3:z:0:8a2e:370:7334", *alter));
+
   // Invalid IPv4 part.
   EXPECT_FALSE(runParser("::ffff:999.999.999.999", *alter));
   EXPECT_FALSE(runParser("2001:db8:85a3::192.168.1.1.5", *alter));
+
   // Invalid separators or endings.
   EXPECT_FALSE(runParser(":::", *alter));
   EXPECT_FALSE(runParser("2001:db8:::", *alter));
@@ -349,6 +419,7 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_FALSE(runParser(":2001::1", *alter));
   EXPECT_FALSE(runParser(":2001:1", *alter));
   EXPECT_FALSE(runParser(":0", *alter));
+
   // Too many h16 groups with "::".
   EXPECT_FALSE(runParser("1:2:3:4:5:6:7:8::", *alter));
   EXPECT_FALSE(runParser("1:2:3:4:5:6:7::8", *alter));
@@ -359,6 +430,7 @@ TEST(UriAbnfTest, IPv6address)
   EXPECT_FALSE(runParser("1:2::3:4:5:6:7:8", *alter));
   EXPECT_FALSE(runParser("1::2:3:4:5:6:7:8", *alter));
   EXPECT_FALSE(runParser("::1:2:3:4:5:6:7:8", *alter));
+
   // h16 group too long.
   EXPECT_FALSE(runParser("01234::", *alter));
 }
@@ -552,7 +624,7 @@ TEST(UriAbnfTest, PathAbsolute)
 {
   ft::shared_ptr<SequenceRule> sequence = pathAbsoluteRule();
   EXPECT_TRUE(runParser("/abc/def", *sequence));
-  EXPECT_TRUE(runParser("/abc/def//", *sequence));
+  EXPECT_TRUE(runParser("/abc/def///a", *sequence));
   EXPECT_TRUE(runParser("/", *sequence));
 
   // Invalid
@@ -569,10 +641,10 @@ TEST(UriAbnfTest, PathNoScheme)
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
   EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
-  EXPECT_TRUE(runParser("abc/", *sequence));
   EXPECT_TRUE(runParser("@user/data", *sequence));
   EXPECT_TRUE(runParser("%20info/more", *sequence));
   EXPECT_TRUE(runParser("!$&'()*+,;=@/file", *sequence));
+  EXPECT_TRUE(runParser("abc/", *sequence));
 
   // Invalid
   // must not start with '/'
@@ -600,12 +672,12 @@ TEST(UriAbnfTest, PathRootless)
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
   EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
-  EXPECT_TRUE(runParser("abc/", *sequence));
   EXPECT_TRUE(runParser("foo:bar", *sequence));
   EXPECT_TRUE(runParser("a:b/c", *sequence));
   EXPECT_TRUE(runParser("@user/data", *sequence));
   EXPECT_TRUE(runParser("%20info/more", *sequence));
   EXPECT_TRUE(runParser(":abc", *sequence));
+  EXPECT_TRUE(runParser("abc/", *sequence));
 
   // Invalid
   EXPECT_FALSE(runParser("/abc", *sequence));

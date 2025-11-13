@@ -65,8 +65,8 @@ TEST(RequestTester, PartialBufferTest)
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
   Headers& headers = request.getHeaders();
-  EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["TestHeader"], "7");
+  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
+  EXPECT_NO_THROW(EXPECT_EQ(headers.at("TestHeader"), "7"));
 }
 
 TEST(RequestTester, CompleteBufferTest)
@@ -85,8 +85,8 @@ TEST(RequestTester, CompleteBufferTest)
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
   Headers& headers = request.getHeaders();
-  EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["TestHeader"], "7");
+  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
+  EXPECT_NO_THROW(EXPECT_EQ(headers.at("TestHeader"), "7"));
 }
 
 // NOLINTEND
