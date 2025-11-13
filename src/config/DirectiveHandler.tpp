@@ -61,7 +61,7 @@ void DirectiveHandlerBase<ConfigType>::setMaxBodySize(
   if (values.size() != 1) {
     throw std::invalid_argument("max_body_size: invalid number of arguments");
   }
-  std::size_t size = toMaxBodySize(values[0]);
+  std::size_t size = convert::toMaxBodySize(values[0]);
   config.setMaxBodySize(size);
 }
 

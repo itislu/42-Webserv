@@ -63,7 +63,7 @@ void ConfigParser::validateErrorPages(const std::vector<std::string>& value)
   }
 
   for (std::size_t i = 0; i < value.size() - 1; ++i) {
-    toCode(value[i]);
+    convert::toCode(value[i]);
   }
 }
 

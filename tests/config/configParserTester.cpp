@@ -6,7 +6,7 @@
 /*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/11 16:21:58 by lstefane         ###   ########.fr       */
+/*   Updated: 2025/11/13 12:33:32 by lstefane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,7 +300,7 @@ TEST(ConfigParserTest, NegativePort)
 TEST(ConfigParserTest, ZeroPort)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "026_zero_port.conf";
+    std::string(ASSETS_PATH) + "027_zero_port.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

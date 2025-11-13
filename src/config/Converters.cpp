@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <string>
 
-std::size_t toSizeT(const std::string& str)
+std::size_t convert::toSizeT(const std::string& str)
 {
   std::stringstream sstream(str);
   std::size_t value = 0;
@@ -19,7 +19,7 @@ std::size_t toSizeT(const std::string& str)
   return value;
 }
 
-long toLong(const std::string& str)
+long convert::toLong(const std::string& str)
 {
   std::stringstream sstream(str);
   long value = 0;
@@ -32,7 +32,7 @@ long toLong(const std::string& str)
   return value;
 }
 
-std::size_t toMaxBodySize(const std::string& str)
+std::size_t convert::toMaxBodySize(const std::string& str)
 {
   std::size_t const len = str.length();
   char const suffix = str[len - 1];
@@ -71,7 +71,7 @@ std::size_t toMaxBodySize(const std::string& str)
   return value * multiplier;
 }
 
-int toInt(const std::string& str)
+int convert::toInt(const std::string& str)
 {
   std::stringstream sstream(str);
   int value = 0;
@@ -85,7 +85,7 @@ int toInt(const std::string& str)
 }
 
 // 65535
-int toPort(const std::string& str)
+int convert::toPort(const std::string& str)
 {
   const int port = toInt(str);
   const int maxPort = 65535;
@@ -96,7 +96,7 @@ int toPort(const std::string& str)
 }
 
 // 300 - 599
-int toCode(const std::string& str)
+int convert::toCode(const std::string& str)
 {
   const int code = toInt(str);
   const int minCode = 300;
@@ -108,7 +108,7 @@ int toCode(const std::string& str)
                               " (must be between 300 and 599)");
 }
 
-bool toBool(const std::string& str)
+bool convert::toBool(const std::string& str)
 {
   if (str == "1" || str == "true" || str == "yes" || str == "on") {
     return true;
@@ -119,7 +119,7 @@ bool toBool(const std::string& str)
   throw std::runtime_error("invalid bool: " + str);
 }
 
-bool isMethod(const std::string& str)
+bool convert::isMethod(const std::string& str)
 {
   return (str == "GET" || str == "POST" || str == "DELETE");
 }

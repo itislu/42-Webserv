@@ -63,7 +63,7 @@ void Entries<Config>::setTimeout(const std::vector<std::string>& values,
   }
   long timeout = 0;
   try {
-    timeout = toLong(values[0]);
+    timeout = convert::toLong(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
@@ -81,7 +81,7 @@ void Entries<ServerConfig>::setTimeout(const std::vector<std::string>& values,
   }
   long timeout = 0;
   try {
-    timeout = toLong(values[0]);
+    timeout = convert::toLong(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
@@ -107,7 +107,7 @@ void Entries<ServerConfig>::setAllowedMethods(
   }
 
   for (std::size_t i = 0; i < values.size(); ++i) {
-    if (!isMethod(values[i])) {
+    if (!convert::isMethod(values[i])) {
       throw std::invalid_argument("allowed_methods: invalid method: " +
                                   values[i]);
     }
@@ -121,7 +121,7 @@ void Entries<ServerConfig>::setPorts(const std::vector<std::string>& values,
   for (std::size_t i = 0; i < values.size(); ++i) {
     int port = 0;
     try {
-      port = toPort(values[i]);
+      port = convert::toPort(values[i]);
       config.addPort(port);
     } catch (const std::exception& e) {
       throw std::invalid_argument(std::string("listen: invalid argument: ") +
@@ -158,7 +158,7 @@ void Entries<LocationConfig>::setAllowedMethods(
   }
 
   for (std::size_t i = 0; i < values.size(); ++i) {
-    if (!isMethod(values[i])) {
+    if (!convert::isMethod(values[i])) {
       throw std::invalid_argument("allowed_methods: invalid method: " +
                                   values[i]);
     }
@@ -176,7 +176,7 @@ void Entries<LocationConfig>::setAutoIndex(
 
   bool enabled = false;
   try {
-    enabled = toBool(values[0]);
+    enabled = convert::toBool(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(std::string("autoindex: invalid argument: ") +
                                 e.what());
@@ -193,7 +193,7 @@ void Entries<LocationConfig>::setCgi(const std::vector<std::string>& values,
 
   bool enabled = false;
   try {
-    enabled = toBool(values[0]);
+    enabled = convert::toBool(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(std::string("autoindex: invalid argument: ") +
                                 e.what());
@@ -229,7 +229,7 @@ void Entries<LocationConfig>::setRedirect(
   }
   bool enabled = false;
   try {
-    enabled = toBool(values[0]);
+    enabled = convert::toBool(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(std::string("redirect: invalid argument: ") +
                                 e.what());
@@ -256,7 +256,7 @@ void Entries<LocationConfig>::setRedirectCode(
   }
   int code = 0;
   try {
-    code = toCode(values[0]);
+    code = convert::toCode(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("redirect_code: invalid argument: ") + e.what());
