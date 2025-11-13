@@ -24,7 +24,6 @@ FetchContent_MakeAvailable(googletest)
 # Set valgrind options
 set(VALGRIND_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
                               --leak-check=full \
-                              --show-error-list=yes \
                               --show-leak-kinds=all \
                               --trace-children=yes \
                               --track-origins=yes \
