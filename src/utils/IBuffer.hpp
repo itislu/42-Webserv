@@ -44,7 +44,7 @@ class IBuffer::BufferException : public std::exception
 {
 public:
   explicit BufferException(const char* message);
-  ~BufferException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW {};
+  ~BufferException() throw() {};
   BufferException(const BufferException& other);
   BufferException& operator=(const BufferException& other);
   const char* what() const throw();

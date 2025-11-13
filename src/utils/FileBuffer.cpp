@@ -1,7 +1,9 @@
 #include "FileBuffer.hpp"
 
+#include <cstdlib>
+#include <ctime>
 #include <libftpp/expected.hpp>
-#include <libftpp/utility.hpp>
+#include <libftpp/string.hpp>
 #include <utils/IBuffer.hpp>
 
 #include <cstddef>
@@ -168,26 +170,50 @@ std::size_t FileBuffer::size() const
   return _size;
 }
 
+// NOLINTBEGIN(cert-msc30-c, cert-msc30-cpp, cert-msc32-c, cert-msc50-cpp,
+// cert-msc51-cpp)
+std::string FileBuffer::_getRandomeFileName()
+{
+  static bool seeded = false;
+
+  if (!seeded) {
+    seeded = true;
+    std::srand(std::time(0));
+  }
+
+  std::string filename;
+  filename.append("tmpfile_");
+  filename.append(ft::to_string(std::rand()));
+  filename.append(ft::to_string(std::rand()));
+  return filename;
+}
+// NOLINTEND(cert-msc30-c, cert-msc30-cpp, cert-msc32-c, cert-msc50-cpp,
+// cert-msc51-cpp)
+
 IBuffer::ExpectVoid FileBuffer::openTmpFile()
 {
-  _fileName = std::tmpnam(FT_NULLPTR);
-
-  // remove /tmp/
-  const std::string::size_type pos = _fileName.find("/tmp/");
-  const int replaceSize = 5;
-  if (pos != std::string::npos) {
-    _fileName.replace(pos, replaceSize, "");
+  const std::size_t countMax = 100;
+  std::size_t count = 0;
+  while (count < countMax) {
+    _fileName = _getRandomeFileName();
+    _fs.open(_fileName.c_str(), std::ios::in);
+    // check if file does not exit
+    if (!_fs.is_open()) {
+      // create file
+      _fs.open(_fileName.c_str(),
+               std::ios::in | std::ios::out | std::ios::binary |
+                 std::ios::trunc);
+      if (_fs.is_open()) {
+        _size = 0;
+        return ExpectVoid();
+      }
+    } else {
+      _fs.close();
+    }
+    ++count;
   }
-
-  // open file
-  _fs.open(_fileName.c_str(),
-           std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
-  if (!_fs.is_open()) {
-    return ft::unexpected<BufferException>(errOpen);
-  }
-
-  _size = 0;
-  return ExpectVoid();
+  // tried to open 100 randome files
+  return ft::unexpected<BufferException>(errOpen);
 }
 
 /* ************************************************************************** */
