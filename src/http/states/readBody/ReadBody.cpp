@@ -89,7 +89,7 @@ void ReadBody::_determineBodyFraming()
 bool ReadBody::_isValidContentLength()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  std::istringstream strBodyLen(headers["Content-Length"]);
+  std::istringstream strBodyLen(headers.at("Content-Length"));
   strBodyLen >> _bodyLength;
   if (strBodyLen.fail()) {
     return false;
@@ -101,7 +101,7 @@ bool ReadBody::_isValidContentLength()
 bool ReadBody::_isValidTransferEncoding()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  const std::string& value = headers["Transfer-Encoding"];
+  const std::string& value = headers.at("Transfer-Encoding");
   if (!ft::contains_subrange(ft::to_lower(value), "chunked")) {
     return false;
   }
