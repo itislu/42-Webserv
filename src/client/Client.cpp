@@ -78,7 +78,7 @@ Response& Client::getResponse()
   return _response;
 }
 
-std::size_t Client::getTimeout() const
+long Client::getTimeout() const
 {
   if (_server != FT_NULLPTR) {
     return _server->getTimeout();
