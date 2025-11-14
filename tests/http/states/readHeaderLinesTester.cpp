@@ -33,8 +33,8 @@ TEST(ReadHeaderLinesTester, BasicHeaders)
   Request& request = client->getRequest();
   Headers& headers = request.getHeaders();
 
-  EXPECT_EQ(headers["Host"], "webserv");
-  EXPECT_EQ(headers["Content-Length"], "7");
+  EXPECT_EQ(headers.at("Host"), "webserv");
+  EXPECT_EQ(headers.at("Content-Length"), "7");
 }
 
 TEST(ReadHeaderLinesTester, HeaderList)
@@ -53,8 +53,8 @@ TEST(ReadHeaderLinesTester, HeaderList)
   Request& request = client->getRequest();
   Headers& headers = request.getHeaders();
 
-  EXPECT_NO_THROW(EXPECT_EQ(headers["Host"], "webserv"));
-  EXPECT_NO_THROW(EXPECT_EQ(headers["sec-ch-ua"], headerValue));
+  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
+  EXPECT_NO_THROW(EXPECT_EQ(headers.at("sec-ch-ua"), headerValue));
 }
 
 // NOLINTEND

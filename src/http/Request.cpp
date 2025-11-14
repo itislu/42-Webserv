@@ -3,6 +3,7 @@
 #include <http/Headers.hpp>
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/Buffer.hpp>
 
 #include <algorithm>
@@ -118,4 +119,5 @@ std::string Request::_methodToString() const
     case DELETE:
       return "DELETE";
   }
+  FT_UNREACHABLE();
 }
