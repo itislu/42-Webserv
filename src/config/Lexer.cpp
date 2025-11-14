@@ -19,6 +19,7 @@ Lexer::Lexer(const std::string& file)
   , _pos(0)
   , _line(1)
 {
+  init();
 }
 
 void Lexer::init()
@@ -31,11 +32,11 @@ void Lexer::init()
 
 void Lexer::validateInputFile()
 {
-  if (!checkFileExtension(_filepath, ".conf")) {
+  if (!fileutils::checkFileExtension(_filepath, ".conf")) {
     throw std::invalid_argument("invalid file extension: " + _filepath);
   }
 
-  if (!isFile(_filepath)) {
+  if (!fileutils::isFile(_filepath)) {
     throw std::invalid_argument("invalid file: " + _filepath);
   }
 

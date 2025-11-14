@@ -6,7 +6,7 @@
 /*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/13 12:33:32 by lstefane         ###   ########.fr       */
+/*   Updated: 2025/11/13 13:08:14 by lstefane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -527,7 +527,7 @@ TEST(ConfigParserTest, MinimalConfig)
 TEST(ConfigParserTest, AdditionalLBrace)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "045_additonal_lbrace.conf";
+    std::string(ASSETS_PATH) + "045_additional_lbrace.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -537,7 +537,7 @@ TEST(ConfigParserTest, AdditionalLBrace)
 TEST(ConfigParserTest, AdditionalRBrace)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "046_additonal_rbrace.conf";
+    std::string(ASSETS_PATH) + "046_additional_rbrace.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

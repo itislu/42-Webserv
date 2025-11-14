@@ -184,14 +184,14 @@ void Entries<LocationConfig>::setCgi(const std::vector<std::string>& values,
                                      LocationConfig& config)
 {
   if (values.size() != 1) {
-    throw std::invalid_argument("autoindex: invalid number of arguments");
+    throw std::invalid_argument("cgi_enabled: invalid number of arguments");
   }
 
   bool enabled = false;
   try {
     enabled = convert::toBool(values[0]);
   } catch (const std::exception& e) {
-    throw std::invalid_argument(std::string("autoindex: invalid argument: ") +
+    throw std::invalid_argument(std::string("cgi_enabled: invalid argument: ") +
                                 e.what());
   }
   config.setCgi(enabled);

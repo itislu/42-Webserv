@@ -3,7 +3,8 @@
 #include <string>
 #include <sys/stat.h> // for stat(), struct stat, and S_ISREG
 
-bool checkFileExtension(const std::string& filepath, const std::string& ext)
+bool fileutils::checkFileExtension(const std::string& filepath,
+                                   const std::string& ext)
 {
   if (filepath.size() <= ext.size()) {
     return false;
@@ -17,7 +18,7 @@ bool checkFileExtension(const std::string& filepath, const std::string& ext)
   return false;
 }
 
-bool isFile(const std::string& filepath)
+bool fileutils::isFile(const std::string& filepath)
 {
   const char* const path = filepath.c_str();
   struct stat path_stat = {};

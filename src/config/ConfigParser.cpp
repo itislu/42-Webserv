@@ -193,8 +193,10 @@ void ConfigParser::parse()
 
 Config ConfigParser::parseConfig()
 {
-  _lexer.init();
+  // parse
   parse();
+
+  // build
   return ConfigBuilder::build(_parsed);
 }
 

@@ -11,12 +11,12 @@ class Lexer
 public:
   explicit Lexer(const std::string& file);
 
-  void init();
   Token next();
   std::size_t getLineNum() const;
   void skipComment();
 
 private:
+  void init();
   void validateInputFile();
   void skipWhiteSpaces();
 
