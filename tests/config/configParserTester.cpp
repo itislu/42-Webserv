@@ -6,7 +6,7 @@
 /*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/14 11:53:30 by lstefane         ###   ########.fr       */
+/*   Updated: 2025/11/14 12:40:28 by lstefane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -796,6 +796,56 @@ TEST(ConfigParserTest, InvalidDirective02)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "072_invalid_directive02.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 073 */
+TEST(ConfigParserTest, ErrorCodes00)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "073_errorcodes00.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 074 */
+TEST(ConfigParserTest, ErrorCodes01)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "074_errorcodes01.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 075 */
+TEST(ConfigParserTest, ErrorCodes02)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "075_errorcodes02.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 076 */
+TEST(ConfigParserTest, ErrorCodes03)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "076_errorcodes03.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
+/* TEST - 077 */
+TEST(ConfigParserTest, ErrorCodes04)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "077_errorcodes04.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

@@ -62,8 +62,20 @@ void ConfigParser::validateErrorPages(const std::vector<std::string>& value)
     throw std::invalid_argument("invalid number of arguments");
   }
 
+  // Validate all but last are codes
   for (std::size_t i = 0; i < value.size() - 1; ++i) {
     convert::toCode(value[i]);
+  }
+
+  // Validate last one is NOT a code
+  bool isCode = true;
+  try {
+    convert::toCode(value.back());
+  } catch (const std::exception& e) {
+    isCode = false;
+  }
+  if (isCode) {
+    throw std::invalid_argument("last argument must be a path, not a code");
   }
 }
 
