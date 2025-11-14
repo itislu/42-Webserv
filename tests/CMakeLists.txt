@@ -55,6 +55,7 @@ function(add_my_test test_name)
     http
     server
     utils
+    config
   )
 
   add_test(NAME ${PROJECT_NAME}_${test_name} COMMAND ${test_name})
@@ -69,7 +70,7 @@ add_my_test(utilsTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
 )
 
-# http
+# # http
 
 # http/parser
 add_my_test(headerLineRulesTester
@@ -96,4 +97,9 @@ add_my_test(readRequestLineTester
 
 add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
+)
+
+# config parser
+add_my_test(configParserTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/config/configParserTester.cpp
 )

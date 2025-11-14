@@ -3,6 +3,9 @@
 #include "LocationConfig.hpp"
 #include <cstddef>
 #include <map>
+#include <set>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -39,7 +42,7 @@ const std::map<int, std::string>& ServerConfig::getErrorPages() const
   return _errorPages;
 }
 
-const std::vector<std::string>& ServerConfig::getAllowedMethods() const
+const std::set<std::string>& ServerConfig::getAllowedMethods() const
 {
   return _allowedMethods;
 }
@@ -62,6 +65,7 @@ long ServerConfig::getTimeout() const
 // SETTERS
 void ServerConfig::addPort(int port)
 {
+  checkPortDuplicate(port);
   _ports.push_back(port);
 }
 
@@ -80,7 +84,14 @@ void ServerConfig::setIndex(const std::string& index)
   _index = index;
 }
 
-// overrides if errorpage already exists
+void ServerConfig::setErrorPages(const std::vector<int>& codes,
+                                 const std::string& path)
+{
+  for (std::size_t i = 0; i < codes.size(); ++i) {
+    addErrorPage(codes[i], path);
+  }
+}
+
 void ServerConfig::addErrorPage(int code, const std::string& path)
 {
   _errorPages[code] = path;
@@ -93,7 +104,7 @@ void ServerConfig::setMaxBodySize(std::size_t size)
 
 void ServerConfig::addAllowedMethod(const std::string& method)
 {
-  _allowedMethods.push_back(method);
+  _allowedMethods.insert(method);
 }
 
 void ServerConfig::setTimeout(long time)
@@ -104,6 +115,18 @@ void ServerConfig::setTimeout(long time)
 void ServerConfig::addLocation(const LocationConfig& location)
 {
   _locations.push_back(location);
+}
+
+void ServerConfig::checkPortDuplicate(int port)
+{
+  for (std::vector<int>::const_iterator it = _ports.begin(); it != _ports.end();
+       ++it) {
+    if (port == *it) {
+      std::ostringstream oss;
+      oss << port;
+      throw std::invalid_argument("duplicated port " + oss.str());
+    }
+  }
 }
 
 /* const LocationConfig& ServerConfig::getLocationForPath(const std::string&
