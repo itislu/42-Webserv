@@ -22,6 +22,7 @@
 !docs/**/*.png
 !Doxyfile
 !Makefile
+!tests/assets/*
 .VSCodeCounter/
 build/
 latex/
