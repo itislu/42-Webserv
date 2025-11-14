@@ -105,6 +105,6 @@ public:
                               ConfigType& config);
 };
 
-#include "DirectiveHandler.tpp"
+#include "DirectiveHandler.tpp" // IWYU pragma: export
 
 #endif

@@ -54,7 +54,8 @@ Entries<LocationConfig>::Entry Entries<LocationConfig>::entries[] = {
 // =========== Shared - Implementations ============
 
 template<typename ConfigType>
-void setTimeoutImpl(const std::vector<std::string>& values, ConfigType& config)
+static void setTimeoutImpl(const std::vector<std::string>& values,
+                           ConfigType& config)
 {
   if (values.size() != 1) {
     throw std::invalid_argument(
@@ -71,7 +72,8 @@ void setTimeoutImpl(const std::vector<std::string>& values, ConfigType& config)
 }
 
 template<typename ConfigType>
-void setAllowedImpl(const std::vector<std::string>& values, ConfigType& config)
+static void setAllowedImpl(const std::vector<std::string>& values,
+                           ConfigType& config)
 {
   if (values.empty()) {
     throw std::invalid_argument("allowed_methods: invalid number of arguments");
@@ -87,7 +89,8 @@ void setAllowedImpl(const std::vector<std::string>& values, ConfigType& config)
 }
 
 template<typename ConfigType>
-void setIndexImpl(const std::vector<std::string>& values, ConfigType& config)
+static void setIndexImpl(const std::vector<std::string>& values,
+                         ConfigType& config)
 {
   if (values.size() != 1) {
     throw std::invalid_argument("index: invalid number of arguments");
