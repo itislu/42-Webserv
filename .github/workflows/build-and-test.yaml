@@ -104,12 +104,13 @@ jobs:
       - name: Check Valgrind logs (Linux)
         if: ${{ runner.os == 'Linux' && !cancelled() && steps.build-debug.outcome == 'success' }}
         run: |
-          LOG_FILES=build/debug/Testing/Temporary/MemoryChecker.*.log
-          if grep -qE 'at 0x[0-9A-Fa-f]+:' $LOG_FILES; then
-            grep --color=always -E 'at 0x[0-9A-Fa-f]+:|$' $LOG_FILES
+          log_files=build/debug/Testing/Temporary/MemoryChecker.*.log
+          pattern='at 0x[[:xdigit:]]+:'
+          if grep --quiet -E "$pattern" $log_files; then
+            grep --color=always -E "$pattern|$" $log_files
             exit 1
           else
-            grep -A 4 'HEAP SUMMARY:' $LOG_FILES | sed 's|^.*/||'
+            grep --after-context=4 'HEAP SUMMARY:' $log_files | sed 's|^.*/||'
           fi
 
       - name: Build with '${{ matrix.preset-sanitizers }}' preset
@@ -126,9 +127,10 @@ jobs:
       - name: Check ASan and UBSan logs
         if: ${{ !cancelled() && steps.build-san.outcome == 'success' }}
         run: |
-          LOG_FILE=build/${{ matrix.preset-sanitizers }}/Testing/Temporary/LastTest.log
-          if grep -qE '\w+Sanitizer:|runtime error:' "$LOG_FILE"; then
-            grep --color=always -E '\w+Sanitizer:|runtime error:|$' "$LOG_FILE"
+          log_file=build/${{ matrix.preset-sanitizers }}/Testing/Temporary/LastTest.log
+          pattern='[[:alpha:]]+Sanitizer:|runtime error:'
+          if grep --quiet -E "$pattern" "$log_file"; then
+            grep --color=always -E "$pattern|$" "$log_file"
             exit 1
           else
             echo "No ASan or UBSan issues detected."
