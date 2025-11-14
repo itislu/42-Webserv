@@ -9,8 +9,8 @@
 class ParsedConfig
 {
 public:
-  DirectiveMap& getDirective();
-  const DirectiveMap& getDirective() const;
+  DirectiveMap& getDirectives();
+  const DirectiveMap& getDirectives() const;
 
   std::vector<ParsedServer>& getServers();
   const std::vector<ParsedServer>& getServers() const;

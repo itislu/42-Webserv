@@ -12,12 +12,12 @@ void ParsedLocation::setPath(const std::string& path)
   _path = path;
 }
 
-DirectiveMap& ParsedLocation::getDirective()
+DirectiveMap& ParsedLocation::getDirectives()
 {
   return _directives;
 }
 
-const DirectiveMap& ParsedLocation::getDirective() const
+const DirectiveMap& ParsedLocation::getDirectives() const
 {
   return _directives;
 }

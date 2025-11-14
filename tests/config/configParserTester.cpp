@@ -6,7 +6,7 @@
 /*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/14 12:40:28 by lstefane         ###   ########.fr       */
+/*   Updated: 2025/11/14 12:58:45 by lstefane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -479,7 +479,7 @@ TEST(ConfigParserTest, TestAllValues)
   const LocationConfig& loc1 = srv1.getLocations()[0];
   EXPECT_EQ(loc1.getPath(), "/");
   EXPECT_EQ(loc1.getRoot(), "/var/www/example/public/");
-  EXPECT_TRUE(loc1.isAutoindex());
+  EXPECT_TRUE(loc1.isAutoIndex());
   EXPECT_EQ(loc1.getIndex(), "index.html");
   EXPECT_EQ(loc1.getMaxBodySize(), 2048);
   EXPECT_EQ(loc1.getErrorPages().at(404), "/errors/custom_404.html");

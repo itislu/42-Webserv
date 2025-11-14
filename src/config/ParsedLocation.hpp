@@ -11,8 +11,8 @@ public:
 
   void setPath(const std::string& path);
 
-  DirectiveMap& getDirective();
-  const DirectiveMap& getDirective() const;
+  DirectiveMap& getDirectives();
+  const DirectiveMap& getDirectives() const;
   const std::string& getPath() const;
 
 private:

@@ -159,7 +159,7 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
          ++locIt) {
       out << "  Location: " << locIt->getPath() << "\n"
           << "    root: " << locIt->getRoot() << "\n"
-          << "    autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n"
+          << "    autoindex: " << (locIt->isAutoIndex() ? "on" : "off") << "\n"
           << "    cgi: " << (locIt->isCgi() ? "on" : "off") << "\n";
     }
   }

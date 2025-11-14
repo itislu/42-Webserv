@@ -24,7 +24,7 @@ public:
   const std::string& getErrorPage(int code) const;
   const std::set<std::string>& getAllowedMethods() const;
 
-  bool isAutoindex() const;
+  bool isAutoIndex() const;
 
   bool isCgi() const;
   const std::string& getCgiPass() const;

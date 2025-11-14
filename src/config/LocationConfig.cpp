@@ -29,7 +29,7 @@ const std::string& LocationConfig::getRoot() const
   return _root;
 }
 
-bool LocationConfig::isAutoindex() const
+bool LocationConfig::isAutoIndex() const
 {
   return _autoindex;
 }
@@ -84,6 +84,7 @@ const std::map<int, std::string>& LocationConfig::getErrorPages() const
   return _errorPages;
 }
 
+/* returns an empty string at the moment if not found */
 const std::string& LocationConfig::getErrorPage(int code) const
 {
   const std::map<int, std::string>::const_iterator iter =

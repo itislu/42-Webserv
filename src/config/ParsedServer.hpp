@@ -12,8 +12,8 @@ class ParsedServer
 public:
   typedef std::map<std::string, std::vector<std::string> > Directive;
 
-  DirectiveMap& getDirective();
-  const DirectiveMap& getDirective() const;
+  DirectiveMap& getDirectives();
+  const DirectiveMap& getDirectives() const;
 
   std::vector<ParsedLocation>& getLocations();
   const std::vector<ParsedLocation>& getLocations() const;

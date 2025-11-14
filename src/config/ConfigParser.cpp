@@ -144,7 +144,7 @@ void ConfigParser::parseLocationConfig(ParsedServer& server)
     if (_token.getType() == COMMENT) {
       _lexer.skipComment();
     } else if (_token.getType() == IDENT) {
-      parseDirective(location.getDirective());
+      parseDirective(location.getDirectives());
     } else {
       invalidToken("location config");
     }
@@ -175,7 +175,7 @@ void ConfigParser::parseServerConfig()
     } else if (_token.getType() == IDENT && _token.getValue() == "location") {
       parseLocationConfig(server);
     } else if (_token.getType() == IDENT) {
-      parseDirective(server.getDirective());
+      parseDirective(server.getDirectives());
     } else {
       invalidToken("server config");
     }
@@ -196,7 +196,7 @@ void ConfigParser::parse()
     } else if (_token.getType() == IDENT && _token.getValue() == "server") {
       parseServerConfig();
     } else if (_token.getType() == IDENT) {
-      parseDirective(_parsed.getDirective());
+      parseDirective(_parsed.getDirectives());
     } else {
       invalidToken("global config");
     }

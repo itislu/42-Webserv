@@ -59,10 +59,10 @@ ServerConfig ServerBuilder::build(const ParsedServer& parsed,
 {
   /* TODO: maybe add a check if any server/port combination is duplicated */
 
-  validateMandatoryDirectives(parsed.getDirective());
+  validateMandatoryDirectives(parsed.getDirectives());
 
   ServerConfig server(config);
-  DirectiveHandler<ServerConfig>::buildDirectives(parsed.getDirective(),
+  DirectiveHandler<ServerConfig>::buildDirectives(parsed.getDirectives(),
                                                   server);
   buildLocations(parsed.getLocations(), server);
 

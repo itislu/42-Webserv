@@ -4,6 +4,8 @@
 #include "config/LocationConfig.hpp"
 #include "config/ParsedLocation.hpp"
 
+class ServerConfig;
+
 class LocationBuilder
 {
 public:

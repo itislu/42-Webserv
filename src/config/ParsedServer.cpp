@@ -3,12 +3,12 @@
 #include "config/ParsedLocation.hpp"
 #include <vector>
 
-DirectiveMap& ParsedServer::getDirective()
+DirectiveMap& ParsedServer::getDirectives()
 {
   return _directives;
 }
 
-const DirectiveMap& ParsedServer::getDirective() const
+const DirectiveMap& ParsedServer::getDirectives() const
 {
   return _directives;
 }

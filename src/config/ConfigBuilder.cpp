@@ -39,7 +39,7 @@ Config ConfigBuilder::build(const ParsedConfig& parsed)
 {
   Config config;
 
-  DirectiveHandler<Config>::buildDirectives(parsed.getDirective(), config);
+  DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(), config);
   buildServers(parsed.getServers(), config);
   config.setDefaultTimeout();
 
