@@ -106,12 +106,17 @@ jobs:
         run: |
           log_files=build/debug/Testing/Temporary/MemoryChecker.*.log
           pattern='at 0x[[:xdigit:]]+:'
-          if grep --quiet -E "$pattern" $log_files; then
-            grep --color=always -E "$pattern|$" $log_files
-            exit 1
-          else
-            grep --after-context=4 'HEAP SUMMARY:' $log_files | sed 's|^.*/||'
-          fi
+          for file in $log_files; do
+            echo "--- $file ---"
+            if grep --quiet -E "$pattern" "$file"; then
+              grep --color=always --no-filename -E "$pattern|$" "$file"
+              num_errors=$(( num_errors + 1 ))
+            else
+              grep --after-context=4 'HEAP SUMMARY:' "$file" | sed 's|^.*/||'
+            fi
+            echo
+          done
+          exit $num_errors
 
       - name: Build with '${{ matrix.preset-sanitizers }}' preset
         id: build-san
