@@ -6,7 +6,7 @@
 /*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/13 13:08:14 by lstefane         ###   ########.fr       */
+/*   Updated: 2025/11/14 11:53:30 by lstefane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ TEST(ConfigParserTest, MissingLocationRBrace)
 TEST(ConfigParserTest, NoDirectiveBeforeSemicolon)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "019_nodirective_semicolon.conf";
+    std::string(ASSETS_PATH) + "019_missing_directive.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -241,9 +241,8 @@ TEST(ConfigParserTest, NoConfFile)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "021_no_conf_file.config";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(const ConfigParser parser(configPath.c_str()),
+               std::invalid_argument);
 }
 
 /* TEST - 022 */
@@ -251,9 +250,8 @@ TEST(ConfigParserTest, NoConfFile02)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "022_no_conf_file.txt";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(const ConfigParser parser(configPath.c_str()),
+               std::invalid_argument);
 }
 
 /* TEST - 023 */
