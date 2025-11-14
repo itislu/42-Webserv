@@ -1,5 +1,6 @@
 #include "http11Rules.hpp"
 
+#include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
@@ -10,7 +11,7 @@
 
 // https://datatracker.ietf.org/doc/html/rfc9112#name-collected-abnf
 
-/*
+/**
  * request-target = origin-form
  *                  / absolute-form
  *                  / authority-form
@@ -50,10 +51,11 @@ ft::shared_ptr<SequenceRule> originFormRule()
   sequence->addRule(ft::move(optional));
 
   sequence->setDebugTag("originFormRule");
+  sequence->setRuleId(OriginForm);
   return sequence;
 }
 
-/*
+/**
  * absolute-path = 1*( "/" segment )
  */
 ft::shared_ptr<RepetitionRule> absolutePathRule()
@@ -68,10 +70,11 @@ ft::shared_ptr<RepetitionRule> absolutePathRule()
     ft::make_shared<RepetitionRule>(ft::move(sequence));
   rep->setMin(1);
 
+  rep->setRuleId(AbsolutePath);
   return rep;
 }
 
-/*
+/**
  * absolute-form = absolute-URI
  *
  * Special parts of the uri will be handled later.
@@ -80,5 +83,7 @@ ft::shared_ptr<RepetitionRule> absolutePathRule()
  */
 ft::shared_ptr<SequenceRule> absoluteFormRule()
 {
-  return absoluteUriRule();
+  const ft::shared_ptr<SequenceRule> seq = absoluteUriRule();
+  seq->setRuleId(AbsoluteForm);
+  return seq;
 }

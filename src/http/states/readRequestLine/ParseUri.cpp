@@ -1,23 +1,25 @@
 #include "ParseUri.hpp"
 
 #include <client/Client.hpp>
+#include <http/Authority.hpp>
 #include <http/StatusCode.hpp>
 #include <http/Uri.hpp>
-#include <http/abnfRules/requestLineRules.hpp>
+#include <http/abnfRules/http11Rules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readRequestLine/ParseVersion.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
-#include <libftpp/string.hpp>
-#include <libftpp/utility.hpp>
+#include <libftpp/memory.hpp>
 #include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
+#include <utils/abnfRules/Extractor.hpp>
+#include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
-#include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <string>
+#include <cstddef>
 
 /* ************************************************************************** */
 // INIT
@@ -30,201 +32,108 @@ Logger& ParseUri::_log = Logger::getInstance(LOG_HTTP);
 ParseUri::ParseUri(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _parseState(ParseScheme)
   , _buffReader()
-  , _initParser(true)
 {
   _log.info() << "ParseUri\n";
   _buffReader.init(&_client->getInBuff());
 }
 
-/* ************************************************************************** */
-// PRIVATE
-
 void ParseUri::run()
 {
-  if (_sequence != FT_NULLPTR) {
-    _sequence->reset();
-  }
+  Rule::ResultMap results;
+
+  _sequence().reset();
+  _sequence().setBufferReader(&_buffReader);
+  _sequence().setResultMap(&results);
   _buffReader.resetPosInBuff();
-  if (_parseState == ParseScheme) {
-    _parseScheme();
+
+  if (!_sequence().matches()) {
+    _log.error() << "Invalid request target\n";
+    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    getContext()->getStateHandler().setDone();
+    return;
   }
-  if (_parseState == ParseAuthority) {
-    _parseAuthority();
-  }
-  if (_parseState == ParsePath) {
-    _parsePath();
-  }
-  if (_parseState == ParseQuery) {
-    _parseQuery();
-  }
-  if (_parseState == ParseFragment) {
-    _parseFragment();
-  }
-  if (_parseState == ParseDone) {
+
+  if (_sequence().reachedEnd()) {
+    _extractParts(results);
     _client->getRequest().setUri(_tmpUri);
     getContext()->getStateHandler().setState<ParseVersion>();
     return;
   }
 }
 
-void ParseUri::_updateState(ParseUriState nextState)
-{
-  _sequence = FT_NULLPTR;
-  _initParser = true;
-  _parseState = nextState;
-}
-
-void ParseUri::_initSequence()
-{
-  // Buffer
-  _buffReader.resetPosInBuff();
-  _sequence->setBufferReader(&_buffReader);
-
-  // Results
-  _results.clear();
-  _sequence->setResultMap(&_results);
-}
+/* ************************************************************************** */
+// PRIVATE
 
 /**
- * @brief Parse the scheme part of the uri
+ * sequence is: request-target SP
  */
-void ParseUri::_parseScheme()
+SequenceRule& ParseUri::_sequence()
 {
-  if (_initParser) {
-    _initParser = false;
-    _sequence = schemePartRule();
-    _initSequence();
+  static SequenceRule sequence;
+  static bool init = false;
+  if (!init) {
+    init = true;
+    sequence.addRule(requestTargetRule());
+    sequence.addRule(ft::make_shared<LiteralRule>(" "));
   }
-
-  if (!_sequence->matches()) {
-    _log.info() << "No scheme found\n";
-    _updateState(ParseAuthority);
-    return;
-  }
-  if (_sequence->reachedEnd()) {
-    if (_partFound(SchemePart)) {
-      std::string scheme = _extractPart(SchemePart);
-      scheme = scheme.substr(0, scheme.size() - 1); // remove "http:" -> "http"
-      _tmpUri.setScheme(scheme);
-    }
-    _updateState(ParseAuthority);
-  }
+  return sequence;
 }
 
-/**
- * @brief Parse the authority part of the uri
- */
-void ParseUri::_parseAuthority()
+bool ParseUri::_isAbsoluteForm(const Rule::ResultMap& results)
 {
-  if (_initParser) {
-    _initParser = false;
-    _sequence = authorityPartRule();
-    _initSequence();
-  }
-
-  if (!_sequence->matches()) {
-    _log.info() << "No authority found\n";
-    _updateState(ParsePath);
-    return;
-  }
-  if (_sequence->reachedEnd()) {
-    if (_partFound(AuthorityPart)) {
-      std::string auth = _extractPartWithoutCurrChar(AuthorityPart);
-      auth = auth.substr(2, auth.size()); // remove '//'
-      _tmpUri.setAuthority(auth);
-    }
-    _updateState(ParsePath);
-  }
+  const Rule::ResultMap::const_iterator iter = results.find(AbsoluteForm);
+  return iter != results.end();
 }
 
-void ParseUri::_parsePath()
+Extractor<Uri>& ParseUri::_uriExtractorOriginForm()
 {
-  if (_initParser) {
-    _initParser = false;
-    _sequence = pathPartRule();
-    _initSequence();
+  static Extractor<Uri> extractor;
+  static bool init = false;
+  if (!init) {
+    init = true;
+    extractor.addMapItem(AbsolutePath, &Uri::setPath);
+    extractor.addMapItem(Query, &Uri::setQuery);
   }
-
-  if (!_sequence->matches()) {
-    _log.info() << "Bad Request invalid path\n";
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _updateState(ParseDone);
-    return;
-  }
-  if (_sequence->reachedEnd()) {
-    if (_partFound(PathPart)) {
-      std::string path = _extractPartWithoutCurrChar(PathPart);
-      ft::trim(path);
-      _tmpUri.setPath(path);
-    }
-    _updateState(ParseQuery);
-  }
+  return extractor;
 }
 
-void ParseUri::_parseQuery()
+Extractor<Uri>& ParseUri::_uriExtractorAbsoluteForm()
 {
-  if (_initParser) {
-    _initParser = false;
-    _sequence = queryPartRule();
-    _initSequence();
+  static Extractor<Uri> extractor;
+  static bool init = false;
+  if (!init) {
+    init = true;
+    extractor.addMapItem(Scheme, &Uri::setScheme);
+    extractor.addMapItem(HierPartPathAbEmpty, &Uri::setPath);
+    extractor.addMapItem(Query, &Uri::setQuery);
   }
-
-  if (!_sequence->matches()) {
-    _log.info() << "No query found\n";
-    _updateState(ParseFragment);
-    return;
-  }
-  if (_sequence->reachedEnd()) {
-    if (_partFound(QueryPart)) {
-      std::string query = _extractPartWithoutCurrChar(QueryPart);
-      ft::trim(query);
-      _tmpUri.setQuery(query);
-    }
-    _updateState(ParseFragment);
-  }
+  return extractor;
 }
 
-void ParseUri::_parseFragment()
+Extractor<Authority>& ParseUri::_authExtractor()
 {
-  if (_initParser) {
-    _initParser = false;
-    _sequence = fragmentPartRule();
-    _initSequence();
+  static Extractor<Authority> extractor;
+  static bool init = false;
+  if (!init) {
+    init = true;
+    extractor.addMapItem(UserInfo, &Authority::setUserinfo);
+    extractor.addMapItem(Host, &Authority::setHost);
+    extractor.addMapItem(Port, &Authority::setPort);
   }
-
-  if (!_sequence->matches()) {
-    _log.info() << "No fragment found\n";
-    _updateState(ParseDone);
-    return;
-  }
-
-  if (_sequence->reachedEnd()) {
-    if (_partFound(FragmentPart)) {
-      std::string frag = _extractPartWithoutCurrChar(FragmentPart);
-      ft::trim(frag);
-      _tmpUri.setFragment(frag);
-    }
-    _updateState(ParseDone);
-  }
+  return extractor;
 }
 
-std::string ParseUri::_extractPart(const Rule::RuleId& ruleId)
+void ParseUri::_extractParts(const Rule::ResultMap& results)
 {
-  const RuleResult& result = _results[ruleId];
-  const long index = result.getEnd();
-  return _client->getInBuff().consume(index + 1);
-}
+  if (_isAbsoluteForm(results)) {
+    _uriExtractorAbsoluteForm().run(_tmpUri, results, _client->getInBuff());
+  } else {
+    _uriExtractorOriginForm().run(_tmpUri, results, _client->getInBuff());
+  }
+  _authExtractor().run(_tmpUri.getAuthority(), results, _client->getInBuff());
 
-std::string ParseUri::_extractPartWithoutCurrChar(const Rule::RuleId& ruleId)
-{
-  const RuleResult& result = _results[ruleId];
-  const long index = result.getEnd() - 1;
-  return _client->getInBuff().consume(index + 1);
-}
-
-bool ParseUri::_partFound(const Rule::RuleId& ruleId)
-{
-  return _results.find(ruleId) != _results.end();
+  // remove bytes from buffer
+  const std::size_t indexInBuff = _buffReader.getPosInBuff();
+  _client->getInBuff().remove(indexInBuff);
 }

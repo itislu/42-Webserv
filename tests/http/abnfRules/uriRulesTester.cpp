@@ -1,3 +1,4 @@
+#include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
@@ -610,7 +611,7 @@ TEST(UriAbnfTest, Path)
 TEST(UriAbnfTest, PathAbEmpty)
 {
   SequenceRule sequence;
-  ft::shared_ptr<RepetitionRule> rep = pathAbEmptyRule();
+  ft::shared_ptr<RepetitionRule> rep = pathAbEmptyRule(Undefined);
   sequence.addRule(rep);
   EXPECT_TRUE(runParser("/abc/def", sequence));
   EXPECT_TRUE(runParser("/abc/def//", sequence));
@@ -622,7 +623,7 @@ TEST(UriAbnfTest, PathAbEmpty)
  */
 TEST(UriAbnfTest, PathAbsolute)
 {
-  ft::shared_ptr<SequenceRule> sequence = pathAbsoluteRule();
+  ft::shared_ptr<SequenceRule> sequence = pathAbsoluteRule(Undefined);
   EXPECT_TRUE(runParser("/abc/def", *sequence));
   EXPECT_TRUE(runParser("/abc/def///a", *sequence));
   EXPECT_TRUE(runParser("/", *sequence));
@@ -637,7 +638,7 @@ TEST(UriAbnfTest, PathAbsolute)
  */
 TEST(UriAbnfTest, PathNoScheme)
 {
-  ft::shared_ptr<SequenceRule> sequence = pathNoSchemeRule();
+  ft::shared_ptr<SequenceRule> sequence = pathNoSchemeRule(Undefined);
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
   EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
@@ -667,7 +668,7 @@ TEST(UriAbnfTest, PathNoScheme)
  */
 TEST(UriAbnfTest, PathRootless)
 {
-  ft::shared_ptr<SequenceRule> sequence = pathRootlessRule();
+  ft::shared_ptr<SequenceRule> sequence = pathRootlessRule(Undefined);
 
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
