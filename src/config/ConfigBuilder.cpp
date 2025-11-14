@@ -13,18 +13,12 @@
 /*
   - no duplicates in global directive allowed
   - every directive must have only one value
-  - must have directives:
-    - timeout
-    - maxbodysize
-    -
-  - at least 1 server
-
+  - at least 1 server (nginx uses a default server if nothing is in the config)
 */
 
 void ConfigBuilder::buildServers(const std::vector<ParsedServer>& servers,
                                  Config& config)
 {
-  /* Nginx uses default server - sure if we want that too */
   if (servers.empty()) {
     throw std::invalid_argument("No server in config");
   }

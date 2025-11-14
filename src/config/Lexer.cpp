@@ -61,9 +61,7 @@ Token Lexer::next()
     return token;
   }
 
-  const char chr = _input[_pos];
-  /* TODO: remove print */
-  // std::cout << "Char: " << chr << "\n";
+  const unsigned char chr = static_cast<unsigned char>(_input[_pos]);
 
   if (chr == '{') {
     ++_pos;
@@ -89,10 +87,10 @@ Token Lexer::next()
     return token;
   }
 
-  if (isspace(static_cast<unsigned char>(chr)) == 0) {
+  if (isspace(chr) == 0) {
     std::size_t idx = _pos;
     while (idx < _input.size()) {
-      const unsigned char curr = _input[idx];
+      const unsigned char curr = static_cast<unsigned char>(_input[idx]);
       if ((isspace(curr) != 0) || curr == '{' || curr == '}' || curr == ';') {
         break;
       }
@@ -102,8 +100,6 @@ Token Lexer::next()
     token.setValue(value);
     token.setType(IDENT);
     _pos = idx;
-    /* TODO: remove print */
-    // std::cout << token;
     return token;
   }
   return token;
@@ -111,7 +107,8 @@ Token Lexer::next()
 
 void Lexer::skipWhiteSpaces()
 {
-  while (_pos < _input.size() && (isspace(_input[_pos]) != 0)) {
+  while (_pos < _input.size() &&
+         (isspace(static_cast<unsigned char>(_input[_pos])) != 0)) {
     if (_input[_pos] == '\n') {
       ++_line;
     }
