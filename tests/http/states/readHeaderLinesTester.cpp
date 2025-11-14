@@ -80,6 +80,7 @@ TEST(ReadHeaderLinesTester, HeaderList)
 TEST(ReadHeaderLinesTester, ObsoleteLineFolding)
 {
   std::string line("Host: webserv\r\n"
+                   "Content-Length: 0\r\n"
                    "Content-Type: message/http\r\n"
                    " Foo: bar\r\n"
                    "\r\n");
