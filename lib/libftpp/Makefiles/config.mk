@@ -84,6 +84,7 @@ VALGRIND		:=	$(shell which valgrind 2>/dev/null || echo "valgrind")
 
 VALGRINDFLAGS	:=	--errors-for-leak-kinds=all \
 					--leak-check=full \
+					--num-callers=50 \
 					--show-error-list=yes \
 					--show-leak-kinds=all \
 					--trace-children=yes \
