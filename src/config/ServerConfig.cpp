@@ -84,7 +84,7 @@ void ServerConfig::setIndex(const std::string& index)
   _index = index;
 }
 
-void ServerConfig::setErrorPages(std::vector<int> codes,
+void ServerConfig::setErrorPages(const std::vector<int>& codes,
                                  const std::string& path)
 {
   for (std::size_t i = 0; i < codes.size(); ++i) {
@@ -102,7 +102,7 @@ void ServerConfig::setMaxBodySize(std::size_t size)
   _maxBodySize = size;
 }
 
-void ServerConfig::setAllowedMethod(const std::string& method)
+void ServerConfig::addAllowedMethod(const std::string& method)
 {
   _allowedMethods.insert(method);
 }

@@ -112,12 +112,12 @@ void LocationConfig::setAutoIndex(bool autoindex)
   _autoindex = autoindex;
 }
 
-void LocationConfig::setAllowedMethod(const std::string& method)
+void LocationConfig::addAllowedMethod(const std::string& method)
 {
   _allowedMethods.insert(method);
 }
 
-void LocationConfig::setErrorPages(std::vector<int> codes,
+void LocationConfig::setErrorPages(const std::vector<int>& codes,
                                    const std::string& path)
 {
   for (std::size_t i = 0; i < codes.size(); ++i) {

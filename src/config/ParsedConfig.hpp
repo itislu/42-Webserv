@@ -23,6 +23,6 @@ private:
   DirectiveMap _directives;
 };
 
-std::ostream& operator<<(std::ostream& out, ParsedConfig& parsed);
+std::ostream& operator<<(std::ostream& out, const ParsedConfig& parsed);
 
 #endif

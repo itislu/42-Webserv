@@ -38,9 +38,9 @@ public:
   void setIndex(const std::string& index);
   void setTimeout(long time);
   void setMaxBodySize(std::size_t size);
-  void setErrorPages(std::vector<int> codes, const std::string& path);
+  void setErrorPages(const std::vector<int>& codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
-  void setAllowedMethod(const std::string& method);
+  void addAllowedMethod(const std::string& method);
 
   const LocationConfig& getLocationForPath(const std::string& uri) const;
 

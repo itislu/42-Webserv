@@ -10,8 +10,6 @@
 class ParsedServer
 {
 public:
-  typedef std::map<std::string, std::vector<std::string> > Directive;
-
   DirectiveMap& getDirectives();
   const DirectiveMap& getDirectives() const;
 

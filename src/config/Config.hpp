@@ -32,7 +32,7 @@ public:
   void setRoot(const std::string& root);
   void setTimeout(long time);
   void setMaxBodySize(std::size_t bytes);
-  void setErrorPages(std::vector<int> codes, const std::string& path);
+  void setErrorPages(const std::vector<int>& codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
 
   // Default Timeout

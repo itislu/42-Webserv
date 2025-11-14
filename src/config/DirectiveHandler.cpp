@@ -82,7 +82,7 @@ void setAllowedImpl(const std::vector<std::string>& values, ConfigType& config)
       throw std::invalid_argument("allowed_methods: invalid method: " +
                                   values[i]);
     }
-    config.setAllowedMethod(values[i]);
+    config.addAllowedMethod(values[i]);
   }
 }
 

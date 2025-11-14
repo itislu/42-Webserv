@@ -90,7 +90,8 @@ void Config::setDefaultTimeout()
   Config::_defaultTimeout = static_cast<int>(timeout);
 }
 
-void Config::setErrorPages(std::vector<int> codes, const std::string& path)
+void Config::setErrorPages(const std::vector<int>& codes,
+                           const std::string& path)
 {
   for (std::size_t i = 0; i < codes.size(); ++i) {
     addErrorPage(codes[i], path);

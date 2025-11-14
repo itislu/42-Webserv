@@ -6,7 +6,7 @@
 /*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/14 12:58:45 by lstefane         ###   ########.fr       */
+/*   Updated: 2025/11/14 13:08:39 by lstefane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ TEST(ConfigParserTest, ParsesSimpleServerBlock)
   const std::string configPath = std::string(ASSETS_PATH) + "000_simple.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
+  std::string(ASSETS_PATH) + "047_additional_semicolon.conf";
   EXPECT_NO_THROW(config = parser.parseConfig());
 
   EXPECT_EQ(config.getRoot(), "/var/www/");
@@ -545,7 +546,7 @@ TEST(ConfigParserTest, AdditionalRBrace)
 TEST(ConfigParserTest, AdditionalSemicolon)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "047_additonal_semicolon.conf";
+    std::string(ASSETS_PATH) + "047_additional_semicolon.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

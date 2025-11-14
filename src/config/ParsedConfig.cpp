@@ -76,15 +76,15 @@ static void printDirectiveMap(const DirectiveMap& directives,
   }
 }
 
-std::ostream& operator<<(std::ostream& out, ParsedConfig& parsed)
+std::ostream& operator<<(std::ostream& out, const ParsedConfig& parsed)
 {
   out << "==============================" << "\n";
   out << " Global Configuration" << "\n";
   out << "==============================" << "\n";
   printDirectiveMap(parsed.getDirectives(), 1, out);
 
-  std::vector<ParsedServer>& servers = parsed.getServers();
-  for (std::vector<ParsedServer>::iterator servIt = servers.begin();
+  const std::vector<ParsedServer>& servers = parsed.getServers();
+  for (std::vector<ParsedServer>::const_iterator servIt = servers.begin();
        servIt != servers.end();
        ++servIt) {
     out << "\n";
@@ -93,8 +93,8 @@ std::ostream& operator<<(std::ostream& out, ParsedConfig& parsed)
 
     printDirectiveMap(servIt->getDirectives(), 1, out);
 
-    std::vector<ParsedLocation>& locs = servIt->getLocations();
-    for (std::vector<ParsedLocation>::iterator locIt = locs.begin();
+    const std::vector<ParsedLocation>& locs = servIt->getLocations();
+    for (std::vector<ParsedLocation>::const_iterator locIt = locs.begin();
          locIt != locs.end();
          ++locIt) {
       printIndent(1, out);
