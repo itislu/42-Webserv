@@ -61,14 +61,26 @@ TEST(ReadHeaderLinesTester, HeaderList)
 
 /**
  * obs-fold     = OWS CRLF RWS
- * A server that receives an obs-fold in a request message that is not within a
- * "message/http" container MUST either reject the message by sending a 400 (Bad
- * Request), [...]
+ *
+ * > A server that receives an obs-fold in a request message that is not within
+ * > a "message/http" container MUST either reject the message by sending a 400
+ * > (Bad Request), preferably with a representation explaining that obsolete
+ * > line folding is unacceptable, or replace each received obs-fold with one or
+ * > more SP octets prior to interpreting the field value or forwarding the
+ * > message downstream.
  * https://datatracker.ietf.org/doc/html/rfc9112#name-obsolete-line-folding
+ *
+ * Line folding only MUST be supported within a "container" (i.e., in bodies of
+ * "message/http" requests).
+ * https://datatracker.ietf.org/doc/html/rfc9112#name-media-type-message-http
+ *
+ * To simplify parsing, and because line folding is deprecated since RFC 7230,
+ * we choose to reject requests with obs-folding instead of unfolding them.
  */
 TEST(ReadHeaderLinesTester, ObsoleteLineFolding)
 {
   std::string line("Host: webserv\r\n"
+                   "Content-Type: message/http\r\n"
                    " Foo: bar\r\n"
                    "\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
