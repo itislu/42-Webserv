@@ -115,6 +115,16 @@ int isHexDigit(int chr)
 /**
  * https://datatracker.ietf.org/doc/html/rfc3986#autoid-69
  *
+ * query = *( pchar / "/" / "?" )
+ */
+int isQueryChar(int chr)
+{
+  return static_cast<int>(chr == '/' || chr == '?');
+}
+
+/**
+ * https://datatracker.ietf.org/doc/html/rfc3986#autoid-69
+ *
  * fragment = *( pchar / "/" / "?" )
  */
 int isFragmentChar(int chr)

@@ -9,6 +9,8 @@
 class Headers
 {
 public:
+  bool operator==(const Headers& other) const;
+
   void addHeader(const std::string& key, const std::string& value);
 
   std::string toString() const;

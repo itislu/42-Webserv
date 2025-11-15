@@ -31,6 +31,15 @@ Request::Request()
 {
 }
 
+/**
+ * does not compare body
+ */
+bool Request::operator==(const Request& other) const
+{
+  return _method == other.getMethod() && _uri == other.getUri() &&
+         _version == other.getVersion() && _headers == other._headers;
+}
+
 Request::Method Request::getMethod() const
 {
   return _method;
@@ -42,6 +51,11 @@ void Request::setMethod(Request::Method method)
 }
 
 const Uri& Request::getUri() const
+{
+  return _uri;
+}
+
+Uri& Request::getUri()
 {
   return _uri;
 }

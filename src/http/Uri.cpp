@@ -1,10 +1,18 @@
 #include "Uri.hpp"
+#include "http/Authority.hpp"
 
 #include <sstream>
 #include <string>
 
 /* ************************************************************************** */
 // PUBLIC
+
+bool Uri::operator==(const Uri& other) const
+{
+  return _scheme == other.getScheme() && _authority == other.getAuthority() &&
+         _path == other.getPath() && _query == other.getQuery() &&
+         _fragment == other.getFragment();
+}
 
 const std::string& Uri::getScheme() const
 {
@@ -16,14 +24,14 @@ void Uri::setScheme(const std::string& str)
   _scheme = str;
 }
 
-const std::string& Uri::getAuthority() const
+const Authority& Uri::getAuthority() const
 {
   return _authority;
 }
 
-void Uri::setAuthority(const std::string& str)
+Authority& Uri::getAuthority()
 {
-  _authority = str;
+  return _authority;
 }
 
 const std::string& Uri::getPath() const
@@ -62,7 +70,7 @@ std::string Uri::toString() const
 
   oss << "{\n";
   oss << "  \"scheme\": \"" << _scheme << "\",\n";
-  oss << "  \"authority\": \"" << _authority << "\",\n";
+  oss << "  \"authority\": \n" << _authority.toString() << ",\n";
   oss << "  \"path\": \"" << _path << "\",\n";
   oss << "  \"query\": \"" << _query << "\",\n";
   oss << "  \"fragment\": \"" << _fragment << "\"\n";

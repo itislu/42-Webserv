@@ -8,6 +8,11 @@
 /* ************************************************************************** */
 // PUBLIC
 
+bool Headers::operator==(const Headers& other) const
+{
+  return _headers == other._headers;
+}
+
 void Headers::addHeader(const std::string& key, const std::string& value)
 {
   std::string keyFormated = key;

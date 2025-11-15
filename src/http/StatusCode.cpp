@@ -13,9 +13,13 @@
 // INIT
 
 const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
-  StatusCode::_codeMap = { { { Ok, "Ok" },
-                             { BadRequest, "Bad Request" },
-                             { Unauthorized, "Unauthorized" } } };
+  StatusCode::_codeMap = { {
+    { Ok, "Ok" },
+    { BadRequest, "Bad Request" },
+    { Unauthorized, "Unauthorized" },
+    { UriTooLong, "UriTooLong" },
+    { NotImplemented, "NotImplemented" },
+  } };
 
 /* ***************************************************************************/
 // PUBLIC
