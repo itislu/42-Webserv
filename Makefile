@@ -64,6 +64,7 @@ export UBSAN_OPTIONS := print_stacktrace=1: \
 
 VALGRINDFLAGS := --errors-for-leak-kinds=all \
 									--leak-check=full \
+									--num-callers=50 \
 									--show-error-list=yes \
 									--show-leak-kinds=all \
 									--trace-children=yes \
