@@ -1,5 +1,6 @@
 #include "uriRules.hpp"
 
+#include <http/abnfRules/ruleIds.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
@@ -7,6 +8,7 @@
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
+#include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
 #include <ctype.h>
@@ -66,28 +68,25 @@ ft::shared_ptr<AlternativeRule> hierPartRule()
 {
   const ft::shared_ptr<AlternativeRule> alter =
     ft::make_shared<AlternativeRule>();
+  alter->setMatchMode(AlternativeRule::FirstMatchWins);
 
   // "//" authority path-abempty
   ft::shared_ptr<SequenceRule> seq1 = ft::make_shared<SequenceRule>();
   seq1->addRule(ft::make_shared<LiteralRule>("//"));
   seq1->addRule(authorityRule());
-  seq1->addRule(pathAbEmptyRule());
+  seq1->addRule(pathAbEmptyRule(HierPartPathAbEmpty));
+
   alter->addRule(ft::move(seq1));
-
-  // path-absolute
-  alter->addRule(pathAbsoluteRule());
-
-  // path-rootless
-  alter->addRule(pathRootlessRule());
-
-  // path-empty
-  alter->addRule(pathEmptyRule());
+  alter->addRule(pathAbsoluteRule(HierPartPathAbsolute));
+  alter->addRule(pathRootlessRule(HierPartPathRootless));
+  alter->addRule(pathEmptyRule(HierPartPathEmpty));
 
   alter->setDebugTag("hierPartRule");
+  alter->setRuleId(HierPart);
   return alter;
 }
 
-/*
+/**
  * absolute-URI  = scheme ":" hier-part [ "?" query ]
  */
 ft::shared_ptr<SequenceRule> absoluteUriRule()
@@ -128,6 +127,7 @@ ft::shared_ptr<SequenceRule> schemeRule()
   seq->addRule(ft::move(rep));
 
   seq->setDebugTag("schemeRule");
+  seq->setRuleId(Scheme);
   return seq;
 }
 
@@ -143,6 +143,7 @@ ft::shared_ptr<SequenceRule> authorityRule()
   userinfoSeq->addRule(userinfoRule());
   userinfoSeq->addRule(ft::make_shared<LiteralRule>("@"));
   userinfoSeq->setDebugTag("userinfoSeq");
+  userinfoSeq->setRuleId(UserInfo);
 
   ft::shared_ptr<RepetitionRule> optUserinfo =
     ft::make_shared<RepetitionRule>(ft::move(userinfoSeq));
@@ -159,6 +160,7 @@ ft::shared_ptr<SequenceRule> authorityRule()
   ft::shared_ptr<SequenceRule> portSeq = ft::make_shared<SequenceRule>();
   portSeq->addRule(ft::make_shared<LiteralRule>(":"));
   portSeq->addRule(portRule());
+  portSeq->setRuleId(Port);
 
   ft::shared_ptr<RepetitionRule> optPort =
     ft::make_shared<RepetitionRule>(ft::move(portSeq));
@@ -201,6 +203,7 @@ ft::shared_ptr<AlternativeRule> hostRule()
   alter->addRule(regNameRule());
 
   alter->setDebugTag("hostRule");
+  alter->setRuleId(Host);
   return alter;
 }
 
@@ -583,11 +586,11 @@ ft::shared_ptr<AlternativeRule> pathRule()
 {
   const ft::shared_ptr<AlternativeRule> alter =
     ft::make_shared<AlternativeRule>();
-  alter->addRule(pathAbEmptyRule());
-  alter->addRule(pathAbsoluteRule());
-  alter->addRule(pathNoSchemeRule());
-  alter->addRule(pathRootlessRule());
-  alter->addRule(pathEmptyRule());
+  alter->addRule(pathAbEmptyRule(Undefined));
+  alter->addRule(pathAbsoluteRule(Undefined));
+  alter->addRule(pathNoSchemeRule(Undefined));
+  alter->addRule(pathRootlessRule(Undefined));
+  alter->addRule(pathEmptyRule(Undefined));
 
   alter->setDebugTag("pathRule");
   return alter;
@@ -596,7 +599,7 @@ ft::shared_ptr<AlternativeRule> pathRule()
 /**
  * path-abempty  = *( "/" segment )
  */
-ft::shared_ptr<RepetitionRule> pathAbEmptyRule()
+ft::shared_ptr<RepetitionRule> pathAbEmptyRule(Rule::RuleId ruleId)
 {
   ft::shared_ptr<SequenceRule> sequence = ft::make_shared<SequenceRule>();
   sequence->addRule(ft::make_shared<LiteralRule>("/"));
@@ -605,18 +608,20 @@ ft::shared_ptr<RepetitionRule> pathAbEmptyRule()
 
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::move(sequence));
+
   rep->setDebugTag("pathAbEmptyRule");
+  rep->setRuleId(ruleId);
   return rep;
 }
 
 /**
  * path-absolute = "/" [ segment-nz *( "/" segment ) ]
  */
-ft::shared_ptr<SequenceRule> pathAbsoluteRule()
+ft::shared_ptr<SequenceRule> pathAbsoluteRule(Rule::RuleId ruleId)
 {
   ft::shared_ptr<SequenceRule> optSeq = ft::make_shared<SequenceRule>();
   optSeq->addRule(segmentNzRule());
-  optSeq->addRule(pathAbEmptyRule());
+  optSeq->addRule(pathAbEmptyRule(Undefined));
 
   ft::shared_ptr<RepetitionRule> option =
     ft::make_shared<RepetitionRule>(ft::move(optSeq));
@@ -631,38 +636,42 @@ ft::shared_ptr<SequenceRule> pathAbsoluteRule()
   sequence->addRule(ft::move(option));
 
   sequence->setDebugTag("pathAbsoluteRule");
+  sequence->setRuleId(ruleId);
   return sequence;
 }
 
 /**
  * path-noscheme = segment-nz-nc *( "/" segment )
  */
-ft::shared_ptr<SequenceRule> pathNoSchemeRule()
+ft::shared_ptr<SequenceRule> pathNoSchemeRule(Rule::RuleId ruleId)
 {
   const ft::shared_ptr<SequenceRule> sequence = ft::make_shared<SequenceRule>();
   sequence->addRule(segmentNzNcRule());
-  sequence->addRule(pathAbEmptyRule());
+  sequence->addRule(pathAbEmptyRule(Undefined));
+
   sequence->setDebugTag("pathNoSchemeRule");
+  sequence->setRuleId(ruleId);
   return sequence;
 }
 
 /**
  * path-rootless = segment-nz *( "/" segment )
  */
-ft::shared_ptr<SequenceRule> pathRootlessRule()
+ft::shared_ptr<SequenceRule> pathRootlessRule(Rule::RuleId ruleId)
 {
   const ft::shared_ptr<SequenceRule> sequence = ft::make_shared<SequenceRule>();
   sequence->addRule(segmentNzRule());
-  sequence->addRule(pathAbEmptyRule());
+  sequence->addRule(pathAbEmptyRule(Undefined));
 
   sequence->setDebugTag("pathRootlessRule");
+  sequence->setRuleId(ruleId);
   return sequence;
 }
 
 /**
  * path-empty    = 0<pchar>
  */
-ft::shared_ptr<RepetitionRule> pathEmptyRule()
+ft::shared_ptr<RepetitionRule> pathEmptyRule(Rule::RuleId ruleId)
 {
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(pcharRule());
@@ -670,6 +679,7 @@ ft::shared_ptr<RepetitionRule> pathEmptyRule()
   rep->setMax(0);
 
   rep->setDebugTag("pathEmptyRule");
+  rep->setRuleId(ruleId);
   return rep;
 }
 
@@ -740,7 +750,9 @@ ft::shared_ptr<RepetitionRule> queryRule()
 
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::move(alter));
+
   rep->setDebugTag("queryRule");
+  rep->setRuleId(Query);
   return rep;
 }
 
@@ -755,7 +767,9 @@ ft::shared_ptr<RepetitionRule> fragmentRule()
 
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::move(alter));
+
   rep->setDebugTag("fragmentRule");
+  rep->setRuleId(Fragment);
   return rep;
 }
 

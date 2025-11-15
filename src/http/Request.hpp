@@ -27,10 +27,13 @@ public:
   static const std::size_t MaxMethodLen;
   static Method strToMethod(const std::string& strMethod);
 
+  bool operator==(const Request& other) const;
+
   Method getMethod() const;
   void setMethod(Method method);
 
   const Uri& getUri() const;
+  Uri& getUri();
   void setUri(const Uri& uri);
 
   const std::string& getVersion() const;

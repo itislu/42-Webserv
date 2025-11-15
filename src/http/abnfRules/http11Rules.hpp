@@ -11,5 +11,6 @@ ft::shared_ptr<AlternativeRule> requestTargetRule();
 ft::shared_ptr<SequenceRule> originFormRule();
 ft::shared_ptr<RepetitionRule> absolutePathRule();
 ft::shared_ptr<SequenceRule> absoluteFormRule();
-
+ft::shared_ptr<SequenceRule> absoluteUriRuleHttp();
+ft::shared_ptr<SequenceRule> hierPartRuleHttp();
 #endif

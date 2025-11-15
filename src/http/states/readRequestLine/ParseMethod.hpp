@@ -2,6 +2,7 @@
 #ifndef PARSE_METHOD_HPP
 #define PARSE_METHOD_HPP
 
+#include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/logger/Logger.hpp>
@@ -19,13 +20,15 @@ public:
   void run();
 
 private:
-  void _init();
+  static void _initSequence();
+  void _initState();
   void _extractMethod();
+
+  static Logger& _log;
+  static ft::shared_ptr<SequenceRule> _sequence;
 
   Client* _client;
   BufferReader _buffReader;
-  SequenceRule _sequence;
-  static Logger& _log;
 };
 
 #endif

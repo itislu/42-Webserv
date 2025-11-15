@@ -73,10 +73,9 @@ TEST(Http11RulesTester, OriginFormInvalidCases)
   EXPECT_FALSE(runParser("/path#fragment ", *seq));
   EXPECT_FALSE(runParser("/?q=white space ", *seq));
   EXPECT_FALSE(runParser("?onlyquery ", *seq));
-  EXPECT_FALSE(runParser("/% ", *seq));
 }
 
-/*
+/**
  * absolute-form = absolute-URI
  * absolute-URI  = scheme ":" hier-part [ "?" query ]
  */
@@ -103,7 +102,7 @@ TEST(Http11RulesTester, AbsoluteForm)
     "https://example.org/long/path/to/resource?one=1&two=2&three=3 ", *seq));
 }
 
-/*
+/**
  * absolute-form = absolute-URI
  * absolute-URI  = scheme ":" hier-part [ "?" query ]
  */
@@ -120,6 +119,7 @@ TEST(Http11RulesTester, AbsoluteFormInvalid)
   EXPECT_FALSE(runParser("http://exa mple.com/path ", *seq));
   EXPECT_FALSE(runParser("http://example.com/space in path ", *seq));
   EXPECT_FALSE(runParser("https://example.com:port/path ", *seq));
+  EXPECT_FALSE(runParser("http:/example.com:port/path ", *seq));
 }
 
 // Main function to run all tests

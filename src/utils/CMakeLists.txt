@@ -12,6 +12,7 @@ add_library(${LIB_NAME} STATIC
   abnfRules/RepetitionRule.cpp
   abnfRules/Rule.cpp
   abnfRules/RuleResult.cpp
+  abnfRules/ruleUtils.cpp
   abnfRules/SequenceRule.cpp
   logger/Logger.cpp
   Buffer.cpp
@@ -21,4 +22,5 @@ add_library(${LIB_NAME} STATIC
 target_link_libraries(${LIB_NAME} 
   PRIVATE
   ftpp
+  http
 )

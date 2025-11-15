@@ -60,7 +60,7 @@ TEST(RequestTester, PartialBufferTest)
 
   EXPECT_EQ(request.getMethod(), Request::GET);
   EXPECT_EQ(request.getUri().getScheme(), "http");
-  EXPECT_EQ(request.getUri().getAuthority(), "www.example.com");
+  EXPECT_EQ(request.getUri().getAuthority().getHost(), "www.example.com");
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
@@ -80,7 +80,7 @@ TEST(RequestTester, CompleteBufferTest)
 
   EXPECT_EQ(request.getMethod(), Request::GET);
   EXPECT_EQ(request.getUri().getScheme(), "http");
-  EXPECT_EQ(request.getUri().getAuthority(), "www.example.com");
+  EXPECT_EQ(request.getUri().getAuthority().getHost(), "www.example.com");
   EXPECT_EQ(request.getUri().getPath(), "/test/index.html");
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 

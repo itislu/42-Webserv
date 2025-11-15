@@ -15,7 +15,9 @@ public:
   {
     Ok = 200,
     BadRequest = 400,
-    Unauthorized = 401
+    Unauthorized = 401,
+    UriTooLong = 414,
+    NotImplemented = 501
   };
 
   StatusCode();
@@ -32,7 +34,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 3;
+  static const int _codes = 5;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;
