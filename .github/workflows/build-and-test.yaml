@@ -109,7 +109,7 @@ jobs:
           for file in $log_files; do
             echo "--- $file ---"
             if grep --quiet -E "$pattern" "$file"; then
-              grep --color=always --no-filename -E "$pattern|$" "$file"
+              grep --color=always -E "$pattern|$" "$file"
               num_errors=$(( num_errors + 1 ))
             else
               grep --after-context=4 'HEAP SUMMARY:' "$file" | sed 's|^.*/||'
