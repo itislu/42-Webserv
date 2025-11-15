@@ -91,10 +91,28 @@ test: all
 .PHONY: testv
 testv: all
 	ctest --test-dir $(BUILD_DIR_PRESET) -T memcheck $(ARGS)
+	@$(MAKE) --no-print-directory testv-logs
+
+.PHONY: testv-logs
+testv-logs:
+	@log_files=build/$(PRESET)/Testing/Temporary/MemoryChecker.*.log; \
+	pattern='at 0x[[:xdigit:]]+:'; \
+	num_errors=0; \
+	for file in $$log_files; do \
+		if grep --quiet -E "$$pattern" "$$file"; then \
+			printf "\n$(YELLOW)--- $$file ---$(RESET)\n"; \
+			grep --color=always --no-filename -E "$$pattern|$$" "$$file"; \
+			num_errors=$$(( num_errors + 1 )); \
+		fi; \
+	done; \
+	if [ $$num_errors -eq 0 ]; then \
+		printf "$(GREEN)No valgrind issues detected.$(RESET)\n"; \
+	fi
 
 
 
 # **************************************************************************** #
+.PHONY: copy-compile-commands
 COPY_TARGET := build/compile_commands.json
 copy-compile-commands:
 	@if [ -f $(BUILD_DIR_PRESET)/compile_commands.json ]; then \
