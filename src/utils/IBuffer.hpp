@@ -4,7 +4,6 @@
 
 #include <libftpp/expected.hpp>
 
-#include <bits/c++config.h>
 #include <cstdio>
 #include <exception>
 #include <string>
