@@ -16,6 +16,8 @@ add_library(${LIB_NAME} STATIC
   logger/Logger.cpp
   Buffer.cpp
   BufferReader.cpp
+  FileBuffer.cpp
+  IBuffer.cpp
 )
 
 target_link_libraries(${LIB_NAME} 
