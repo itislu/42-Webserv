@@ -66,7 +66,8 @@ TEST(RequestTester, PartialBufferTest)
 
   Headers& headers = request.getHeaders();
   EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("TestHeader"), "7"));
+  EXPECT_NO_THROW(EXPECT_EQ(headers.at("TestHeader"), "78"));
+  client.release();
 }
 
 TEST(RequestTester, CompleteBufferTest)

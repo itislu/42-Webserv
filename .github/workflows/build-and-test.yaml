@@ -90,7 +90,7 @@ jobs:
       - name: Run tests normally
         run: |
           set -o pipefail
-          make test ARGS=-VV | grep --color=always --line-buffered -E 'FAILED|$'
+          make test ARGS=-VV | grep --color=always --line-buffered -E ' FAILED |$'
 
       - name: Build with 'debug' preset
         id: build-debug
@@ -100,7 +100,7 @@ jobs:
         if: ${{ runner.os == 'Linux' && !cancelled() && steps.build-debug.outcome == 'success' }}
         run: |
           set -o pipefail
-          make testv PRESET=debug ARGS=-VV | grep --color=always --line-buffered -E 'FAILED|$'
+          make testv PRESET=debug ARGS=-VV | grep --color=always --line-buffered -E ' FAILED |$'
       - name: Check Valgrind logs (Linux)
         if: ${{ runner.os == 'Linux' && !cancelled() && steps.build-debug.outcome == 'success' }}
         run: |
@@ -128,7 +128,7 @@ jobs:
           ASAN_OPTIONS: exitcode=0
         run: |
           set -o pipefail
-          make test PRESET=${{ matrix.preset-sanitizers }} ARGS=-VV | grep --color=always --line-buffered -E 'FAILED|$'
+          make test PRESET=${{ matrix.preset-sanitizers }} ARGS=-VV | grep --color=always --line-buffered -E ' FAILED |$'
       - name: Check ASan and UBSan logs
         if: ${{ !cancelled() && steps.build-san.outcome == 'success' }}
         run: |

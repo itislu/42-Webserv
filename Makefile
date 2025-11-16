@@ -85,29 +85,31 @@ runv: all
 
 # **************************************************************************** #
 .PHONY: test
+LOG_FILE := $(BUILD_DIR_PRESET)/Testing/Temporary/LastTest.log
 test: all
-	ctest --test-dir $(BUILD_DIR_PRESET) $(ARGS)
+	ctest --test-dir $(BUILD_DIR_PRESET) $(ARGS) || true
+	@printf "$(SEPARATOR)\n"
+	@assets/print_failed_tests.sh "$(LOG_FILE)"
+
+.PHONY: test-logs
+test-logs:
+	@assets/print_failed_tests.sh "$(LOG_FILE)" || true
 
 .PHONY: testv
+LOG_FILES := $(BUILD_DIR_PRESET)/Testing/Temporary/MemoryChecker.*.log
+TESTV_LOG := $(BUILD_DIR_PRESET)/Testing/Temporary/LastDynamicAnalysis_*.log
 testv: all
-	ctest --test-dir $(BUILD_DIR_PRESET) -T memcheck $(ARGS)
-	@$(MAKE) --no-print-directory testv-logs
+	ctest --test-dir $(BUILD_DIR_PRESET) -T memcheck $(ARGS) || true
+	@printf "$(SEPARATOR)\n"
+	@assets/print_failed_tests.sh $(TESTV_LOG); \
+	exit_code=$$?; \
+	printf "$(SEPARATOR)\n"; \
+	assets/print_valgrind_errors.sh $(LOG_FILES); \
+	exit $$exit_code
 
 .PHONY: testv-logs
 testv-logs:
-	@log_files=build/$(PRESET)/Testing/Temporary/MemoryChecker.*.log; \
-	pattern='at 0x[[:xdigit:]]+:'; \
-	num_errors=0; \
-	for file in $$log_files; do \
-		if grep --quiet -E "$$pattern" "$$file"; then \
-			printf "\n$(YELLOW)--- $$file ---$(RESET)\n"; \
-			grep --color=always --no-filename -E "$$pattern|$$" "$$file"; \
-			num_errors=$$(( num_errors + 1 )); \
-		fi; \
-	done; \
-	if [ $$num_errors -eq 0 ]; then \
-		printf "$(GREEN)No valgrind issues detected.$(RESET)\n"; \
-	fi
+	@assets/print_valgrind_errors.sh $(LOG_FILES) || true
 
 
 
