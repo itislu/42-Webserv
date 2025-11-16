@@ -852,6 +852,156 @@ TEST(ConfigParserTest, ErrorCodes04)
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
 }
 
+/* TEST - 078 */
+TEST(ConfigParserTest, OverflowBodySize)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "078_overflow_bodysize.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 079 */
+TEST(ConfigParserTest, OverflowBodySizeMultiplier_B)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "079_overflow_bodysize_multiplier_B.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 080 */
+TEST(ConfigParserTest, OverflowBodySizeMultiplier_K)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "080_overflow_bodysize_multiplier_K.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::overflow_error);
+}
+
+/* TEST - 081 */
+TEST(ConfigParserTest, OverflowBodySizeMultiplier_M)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "081_overflow_bodysize_multiplier_M.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::overflow_error);
+}
+
+/* TEST - 082 */
+TEST(ConfigParserTest, OverflowBodySizeMultiplier_G)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "082_overflow_bodysize_multiplier_G.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::overflow_error);
+}
+
+/* TEST - 083 */
+TEST(ConfigParserTest, OverflowServerBodySize)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "083_overflow_server_bodysize.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 084 */
+TEST(ConfigParserTest, OverflowLocationBodySize)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "084_overflow_location_bodysize.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 085 */
+TEST(ConfigParserTest, OverflowTimeout)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "085_overflow_timeout.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 086 */
+TEST(ConfigParserTest, OverflowServerTimeout)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "086_overflow_server_timeout.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 087 */
+TEST(ConfigParserTest, OverflowErrorCode)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "087_overflow_errorcode.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 088 */
+TEST(ConfigParserTest, OverflowRedirectCode)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "088_overflow_redirect_code.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 089 */
+TEST(ConfigParserTest, OverflowPort)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "089_overflow_port.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 090 */
+TEST(ConfigParserTest, OverflowIntMax)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "090_overflow_int_max.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 091 */
+TEST(ConfigParserTest, OverflowLongMax)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "091_overflow_long_max.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 092 */
+TEST(ConfigParserTest, OverflowSizeTMax)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "092_overflow_sizet_max.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
 int main(int argc, char* argv[])
 {
   ::testing::InitGoogleTest(&argc, argv);
