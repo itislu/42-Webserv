@@ -813,6 +813,29 @@ TEST(ValidConfigTester, LargeValues)
   EXPECT_NO_THROW(config = parser.parseConfig());
 }
 
+TEST(ValidConfigTester, LeadingZeros)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "valid/leading_zeros.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+
+  EXPECT_EQ(config.getMaxBodySize(), 1024);
+  EXPECT_EQ(config.getTimeout(), 42);
+  EXPECT_EQ(config.getErrorPages().at(500), "/errors/500.html");
+
+  EXPECT_EQ(config.getServers().size(), 1);
+  const ServerConfig& srv = config.getServers()[0];
+  EXPECT_EQ(srv.getPorts().size(), 1);
+  EXPECT_EQ(srv.getPorts()[0], 8080);
+
+  EXPECT_EQ(srv.getLocations().size(), 1);
+  const LocationConfig& loc = srv.getLocations()[0];
+  EXPECT_TRUE(loc.isRedirect());
+  EXPECT_EQ(loc.getRedirectCode(), 301);
+}
+
 TEST(ValidConfigTester, Minimal)
 {
   const std::string configPath =
