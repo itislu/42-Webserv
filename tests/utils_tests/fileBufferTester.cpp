@@ -24,10 +24,9 @@ TEST(FileBufferTester, AppendString)
     return;
   }
 
-  // Move position to start
   std::string result;
   while (filebuffer.size() > 0) {
-    FileBuffer::ExpectStr str = filebuffer.consumFront(1);
+    FileBuffer::ExpectStr str = filebuffer.consumeFront(1);
     EXPECT_TRUE(str.has_value());
     if (!str.has_value()) {
       std::cout << str.error().what() << "\n";
@@ -58,10 +57,9 @@ TEST(FileBufferTester, AppendVector)
     return;
   }
 
-  // Move position to start
   std::string result;
   while (filebuffer.size() > 0) {
-    FileBuffer::ExpectStr str = filebuffer.consumFront(1);
+    FileBuffer::ExpectStr str = filebuffer.consumeFront(1);
     EXPECT_TRUE(str.has_value());
     if (!str.has_value()) {
       std::cout << str.error().what() << "\n";

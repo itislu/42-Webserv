@@ -5,21 +5,6 @@
 
 IBuffer::IBuffer() {}
 
-IBuffer::~IBuffer() {}
-
-IBuffer::IBuffer(const IBuffer& other)
-{
-  *this = other;
-}
-
-IBuffer& IBuffer::operator=(const IBuffer& other)
-{
-  if (this != &other) {
-    // copy logic
-  }
-  return *this;
-}
-
 /* ************************************************************************** */
 // Exceptions
 

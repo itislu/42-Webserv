@@ -14,7 +14,7 @@ class IBuffer
 {
 public:
   IBuffer();
-  virtual ~IBuffer();
+  virtual ~IBuffer() {};
 
   class BufferException;
 
@@ -29,7 +29,7 @@ public:
   virtual ExpectVoid append(const std::string& data) = 0;
   virtual ExpectVoid append(const Container& buffer, long bytes) = 0;
   virtual ExpectVoid removeFront(std::size_t bytes) = 0;
-  virtual ExpectStr consumFront(std::size_t bytes) = 0;
+  virtual ExpectStr consumeFront(std::size_t bytes) = 0;
   virtual std::size_t size() const = 0;
 
 private:

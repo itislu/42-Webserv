@@ -19,6 +19,7 @@ public:
   static const char* const errEof;
   static const char* const errRead;
   static const char* const errWrite;
+  static const char* const errTellp;
 
   FileBuffer();
   ~FileBuffer();
@@ -30,7 +31,7 @@ public:
   ExpectVoid append(const std::string& data);
   ExpectVoid append(const Container& buffer, long bytes);
   ExpectVoid removeFront(std::size_t bytes);
-  ExpectStr consumFront(std::size_t bytes);
+  ExpectStr consumeFront(std::size_t bytes);
   std::size_t size() const;
 
   ExpectVoid openTmpFile();
@@ -41,6 +42,8 @@ private:
 
   ExpectStr _getFront(std::size_t bytes);
   ExpectVoid _saveRemainder();
+  static ExpectVoid _copyData(std::fstream& bufFrom, std::fstream& bufTo);
+  ExpectVoid _replaceCurrFile(FileBuffer& tmpFb);
   ExpectVoid _calcSize();
 
   static const std::size_t _copyBufferSize = 4096;
