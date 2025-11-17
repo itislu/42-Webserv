@@ -69,6 +69,24 @@ TEST(DuplicatesTester, DupPortSameLine)
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
 }
 
+TEST(DuplicatesTester, DupErrorCodes)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "duplicates/dup_error_codes.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(DuplicatesTester, DupErrorPaths)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "duplicates/dup_error_paths.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
 // ============================================================================
 // Empty Config Tests
 // ============================================================================
