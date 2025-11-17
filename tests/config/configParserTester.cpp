@@ -113,6 +113,19 @@ TEST(EmptyConfigTester, EmptyServer)
 // Invalid Files Tests
 // ============================================================================
 
+TEST(InvalidFilesTester, DirectoryConf)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_files/directory.conf";
+  EXPECT_THROW(const ConfigParser parser(configPath.c_str()),
+               std::invalid_argument);
+}
+
+TEST(InvalidFilesTester, EmptyPath)
+{
+  EXPECT_THROW(const ConfigParser parser(""), std::invalid_argument);
+}
+
 TEST(InvalidFilesTester, InvalidExtensionConfig)
 {
   const std::string configPath =
@@ -125,6 +138,14 @@ TEST(InvalidFilesTester, InvalidExtensionTxt)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_files/invalid_extension.txt";
+  EXPECT_THROW(const ConfigParser parser(configPath.c_str()),
+               std::invalid_argument);
+}
+
+TEST(InvalidFilesTester, NonExistingFile)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_files/non_existing.conf";
   EXPECT_THROW(const ConfigParser parser(configPath.c_str()),
                std::invalid_argument);
 }
