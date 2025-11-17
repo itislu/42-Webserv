@@ -8,9 +8,7 @@
 
 #include <cstddef>
 #include <cstdio>
-#include <fstream>
 #include <ios>
-#include <iostream>
 #include <string>
 #include <sys/stat.h>
 
@@ -170,9 +168,8 @@ std::size_t FileBuffer::size() const
   return _size;
 }
 
-// NOLINTBEGIN(cert-msc30-c, cert-msc30-cpp, cert-msc32-c, cert-msc50-cpp,
-// cert-msc51-cpp)
-std::string FileBuffer::_getRandomeFileName()
+// NOLINTBEGIN(bugprone-random-generator-seed, misc-predictable-rand)
+static std::string getRandomeFileName()
 {
   static bool seeded = false;
 
@@ -187,15 +184,14 @@ std::string FileBuffer::_getRandomeFileName()
   filename.append(ft::to_string(std::rand()));
   return filename;
 }
-// NOLINTEND(cert-msc30-c, cert-msc30-cpp, cert-msc32-c, cert-msc50-cpp,
-// cert-msc51-cpp)
+// NOLINTEND(bugprone-random-generator-seed, misc-predictable-rand)
 
 IBuffer::ExpectVoid FileBuffer::openTmpFile()
 {
   const std::size_t countMax = 100;
   std::size_t count = 0;
   while (count < countMax) {
-    _fileName = _getRandomeFileName();
+    _fileName = getRandomeFileName();
     _fs.open(_fileName.c_str(), std::ios::in);
     // check if file does not exit
     if (!_fs.is_open()) {

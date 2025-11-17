@@ -420,7 +420,7 @@ private:
 	static no_type can_convert(...);
 
 public:
-	// NOLINTNEXTLINE(cert-err58-cpp)
+	// NOLINTNEXTLINE(bugprone-throwing-static-initialization): Compile-time.
 	static const bool value =
 	    sizeof(can_convert(make_from())) == sizeof(yes_type);
 };

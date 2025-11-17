@@ -4,7 +4,7 @@
 
 #include <libftpp/expected.hpp>
 
-#include <cstdio>
+#include <cstddef>
 #include <exception>
 #include <string>
 #include <vector>

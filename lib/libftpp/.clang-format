@@ -31,7 +31,7 @@ BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
 BreakStringLiterals: false
 BreakTemplateDeclarations: Yes
-CommentPragmas: '^ NOLINT.*'
+CommentPragmas: '^ NOLINT'
 FixNamespaceComments: true
 IncludeBlocks: Merge
 IncludeIsMainSourceRegex: '\.(ipp|tpp)$'
