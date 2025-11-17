@@ -1,8 +1,6 @@
 #include <libftpp/expected.hpp>
 #include <utils/FileBuffer.hpp>
 
-#include <cstdio>
-#include <cstdlib>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
