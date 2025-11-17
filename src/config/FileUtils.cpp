@@ -1,5 +1,4 @@
 #include "FileUtils.hpp"
-#include <cstddef>
 #include <string>
 #include <sys/stat.h> // for stat(), struct stat, and S_ISREG
 

@@ -6,7 +6,6 @@
 #include <libftpp/string.hpp>
 #include <map>
 #include <set>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>

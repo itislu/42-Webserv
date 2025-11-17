@@ -114,10 +114,10 @@ int convert::toCode(const std::string& str)
 bool convert::toBool(const std::string& str)
 {
   const std::string lower = ft::to_lower(str);
-  if (str == "1" || str == "true" || str == "yes" || str == "on") {
+  if (lower == "1" || lower == "true" || lower == "yes" || lower == "on") {
     return true;
   }
-  if (str == "0" || str == "false" || str == "no" || str == "off") {
+  if (lower == "0" || lower == "false" || lower == "no" || lower == "off") {
     return false;
   }
   throw std::runtime_error("invalid bool: " + str);

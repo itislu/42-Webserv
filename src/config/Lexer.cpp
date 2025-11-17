@@ -3,7 +3,6 @@
 #include "config/Token.hpp"
 #include <cctype>
 #include <cstddef>
-#include <fstream>
 #include <iterator>
 #include <libftpp/string.hpp>
 #include <stdexcept>
@@ -11,13 +10,13 @@
 
 namespace config {
 
-/*
-- Skips whitespace character (spaces, newlines, ...).
-- Skips comments that start with '#' and continue to the end of the line.
-- If it finds {, }, or ;, it returns those as individual tokens.
-- Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns
-it as an Token::Ident token.
-*/
+/**
+ * Skips whitespace character (spaces, newlines, ...).
+ * Skips comments that start with '#' and continue to the end of the line.
+ * If it finds {, }, or ;, it returns those as individual tokens.
+ * Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns
+ * it as a Token::Ident token.
+ */
 
 Lexer::Lexer(const std::string& file)
   : _filepath(file)

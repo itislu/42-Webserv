@@ -5,7 +5,6 @@
 #include "config/ServerConfig.hpp"
 #include <cstddef>
 #include <exception>
-#include <libftpp/algorithm.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <stdexcept>
