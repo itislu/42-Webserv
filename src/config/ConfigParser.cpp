@@ -47,9 +47,13 @@ void ConfigParser::skipComments()
 
 void ConfigParser::invalidToken(const std::string& err) const
 {
+  const std::string& tokenValue = _token.getValue();
   std::ostringstream oss;
-  oss << "invalid token in " << err << " at line " << _lexer.getLineNum()
-      << "got '" << _token.getValue() << "'";
+
+  oss << "invalid token in " << err << " at line " << _lexer.getLineNum();
+  if (!tokenValue.empty()) {
+    oss << ": '" << tokenValue << "'";
+  }
   throw std::invalid_argument(oss.str());
 }
 
@@ -124,7 +128,7 @@ void ConfigParser::parseDirective(DirectiveMap& directive)
   }
 
   if (value.empty()) {
-    throw std::invalid_argument("parse directive '" + key + "' has no values.");
+    throw std::invalid_argument("parse directive '" + key + "' has no values");
   }
 
   addToDirective(directive, key, value);

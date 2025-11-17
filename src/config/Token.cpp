@@ -73,7 +73,7 @@ std::ostream& operator<<(std::ostream& out, const Token& token)
       out << "Comment (#)\n";
       break;
     case Token::End:
-      out << "Token::End\n";
+      out << "End\n";
       break;
   }
   return out;
