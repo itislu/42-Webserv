@@ -170,8 +170,7 @@ std::size_t FileBuffer::size() const
   return _size;
 }
 
-// NOLINTBEGIN(cert-msc30-c, cert-msc30-cpp, cert-msc32-c, cert-msc50-cpp,
-// cert-msc51-cpp)
+// NOLINTBEGIN(bugprone-random-generator-seed, misc-predictable-rand)
 std::string FileBuffer::_getRandomeFileName()
 {
   static bool seeded = false;
@@ -187,8 +186,7 @@ std::string FileBuffer::_getRandomeFileName()
   filename.append(ft::to_string(std::rand()));
   return filename;
 }
-// NOLINTEND(cert-msc30-c, cert-msc30-cpp, cert-msc32-c, cert-msc50-cpp,
-// cert-msc51-cpp)
+// NOLINTEND(bugprone-random-generator-seed, misc-predictable-rand)
 
 IBuffer::ExpectVoid FileBuffer::openTmpFile()
 {
