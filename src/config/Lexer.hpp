@@ -6,6 +6,9 @@
 #include <fstream>
 #include <string>
 
+namespace config {
+
+
 class Lexer
 {
 public:
@@ -26,5 +29,7 @@ private:
   std::size_t _pos;
   std::size_t _line;
 };
+
+} // namespace config
 
 #endif

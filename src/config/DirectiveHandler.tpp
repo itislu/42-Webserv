@@ -6,11 +6,13 @@
 #include "config/ConfigTypes.hpp"
 #include "config/Converters.hpp"
 #include <cstdlib>
-#include <cstring>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <libftpp/utility.hpp>
+
+namespace config {
 
 template<typename ConfigType>
 void DirectiveHandler<ConfigType>::checkDirectiveHandler(
@@ -18,8 +20,8 @@ void DirectiveHandler<ConfigType>::checkDirectiveHandler(
   const std::vector<std::string>& values,
   ConfigType& config)
 {
-  for (std::size_t i = 0; Entries<ConfigType>::entries[i].key != 0; ++i) {
-    if (std::strcmp(Entries<ConfigType>::entries[i].key, key.c_str()) == 0) {
+  for (std::size_t i = 0; Entries<ConfigType>::entries[i].key != FT_NULLPTR; ++i) {
+    if (Entries<ConfigType>::entries[i].key == key) {
       Entries<ConfigType>::entries[i].func(values, config);
       return;
     }
@@ -65,7 +67,6 @@ void DirectiveHandlerBase<ConfigType>::setMaxBodySize(
   config.setMaxBodySize(size);
 }
 
-// error_page 505 504 50x.html 404 404.html
 template<typename ConfigType>
 void DirectiveHandlerBase<ConfigType>::setErrorPage(
   const std::vector<std::string>& values,
@@ -85,3 +86,5 @@ void DirectiveHandlerBase<ConfigType>::setErrorPage(
     }
   }
 }
+
+} // namespace config

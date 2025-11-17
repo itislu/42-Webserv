@@ -5,20 +5,22 @@
 #include <ostream>
 #include <string>
 
-enum e_type
-{
-  INVALID,
-  IDENT,
-  SEMICOLON,
-  LBRACE,
-  RBRACE,
-  COMMENT,
-  END
-};
+namespace config {
 
 class Token
 {
 public:
+  enum e_type
+  {
+    Invalid,
+    Ident,
+    Semicolon,
+    LBrace,
+    RBrace,
+    Comment,
+    End
+  };
+
   explicit Token(std::size_t line);
   Token(e_type type, const std::string& value, std::size_t line);
 
@@ -37,5 +39,7 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const Token& token);
+
+} // namespace config
 
 #endif

@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+namespace config {
+
 class Config
 {
 public:
@@ -45,9 +47,9 @@ public:
                                            const std::string& path) const;
 
 private:
-  static const char* const DEFAULT_ROOT;
-  static const std::size_t DEFAULT_BODY_SIZE;
-  static const int DEFAULT_TIMEOUT;
+  static const char* const defaultRoot;
+  static const std::size_t defaultMaxBodySize;
+  static const int defaultTimeout;
 
   std::string _root;
   std::size_t _maxBodySize;
@@ -58,5 +60,8 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const Config& config);
+
+} // namespace config
+
 
 #endif

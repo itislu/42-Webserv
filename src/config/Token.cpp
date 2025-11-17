@@ -3,8 +3,12 @@
 #include <ostream>
 #include <string>
 
+
+namespace config {
+
+
 Token::Token(std::size_t line)
-  : _type(INVALID)
+  : _type(Token::Invalid)
   , _line(line)
 {
 }
@@ -16,7 +20,7 @@ Token::Token(e_type type, const std::string& value, std::size_t line)
 {
 }
 
-e_type Token::getType() const
+Token::e_type Token::getType() const
 {
   return _type;
 }
@@ -52,30 +56,30 @@ std::ostream& operator<<(std::ostream& out, const Token& token)
   out << "\tValue: " << token.getValue() << "\n";
   out << "\tType: ";
   switch (token.getType()) {
-    case INVALID:
+    case Token::Invalid:
       out << "Invalid\n";
       break;
-    case IDENT:
+    case Token::Ident:
       out << "Identifier\n";
       break;
-    case SEMICOLON:
+    case Token::Semicolon:
       out << "Semicolon (;)\n";
       break;
-    case LBRACE:
+    case Token::LBrace:
       out << "Left Brace ({)\n";
       break;
-    case RBRACE:
+    case Token::RBrace:
       out << "Right Brace (})\n";
       break;
-    case COMMENT:
+    case Token::Comment:
       out << "Comment (#)\n";
       break;
-    case END:
-      out << "END\n";
-      break;
-    default:
-      out << "Error: unknown type\n";
+    case Token::End:
+      out << "Token::End\n";
       break;
   }
   return out;
 }
+
+} // namespace config
+

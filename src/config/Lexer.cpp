@@ -7,13 +7,15 @@
 #include <iterator>
 #include <stdexcept>
 #include <string>
+#include <libftpp/string.hpp>
 
+namespace config {
 
 /*
 - Skips whitespace character (spaces, newlines, ...).
 - Skips comments that start with '#' and continue to the end of the line.
 - If it finds {, }, or ;, it returns those as individual tokens.
-- Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns it as an IDENT token. 
+- Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns it as an Token::Ident token. 
 */
 
 Lexer::Lexer(const std::string& file)
@@ -34,7 +36,7 @@ void Lexer::init()
 
 void Lexer::validateInputFile()
 {
-  if (!fileutils::checkFileExtension(_filepath, ".conf")) {
+  if (!ft::ends_with(_filepath, ".conf")) {
     throw std::invalid_argument("invalid file extension: " + _filepath);
   }
 
@@ -59,48 +61,48 @@ Token Lexer::next()
 
   Token token(_line);
   if (_pos >= _input.size()) {
-    token.setType(END);
+    token.setType(Token::End);
     return token;
   }
 
-  const unsigned char chr = static_cast<unsigned char>(_input[_pos]);
+  const char chr = _input[_pos];
 
   if (chr == '{') {
     ++_pos;
-    token.setType(LBRACE);
+    token.setType(Token::LBrace);
     return token;
   }
 
   if (chr == '}') {
     ++_pos;
-    token.setType(RBRACE);
+    token.setType(Token::RBrace);
     return token;
   }
 
   if (chr == ';') {
     ++_pos;
-    token.setType(SEMICOLON);
+    token.setType(Token::Semicolon);
     return token;
   }
 
   if (chr == '#') {
     ++_pos;
-    token.setType(COMMENT);
+    token.setType(Token::Comment);
     return token;
   }
 
-  if (isspace(chr) == 0) {
+  if (std::isspace(chr) == 0) {
     std::size_t idx = _pos;
     while (idx < _input.size()) {
-      const unsigned char curr = static_cast<unsigned char>(_input[idx]);
-      if ((isspace(curr) != 0) || curr == '{' || curr == '}' || curr == ';') {
+      const char curr = _input[idx];
+      if ((std::isspace(curr) != 0) || curr == '{' || curr == '}' || curr == ';') {
         break;
       }
       ++idx;
     }
     const std::string value = _input.substr(_pos, idx - _pos);
     token.setValue(value);
-    token.setType(IDENT);
+    token.setType(Token::Ident);
     _pos = idx;
     return token;
   }
@@ -110,7 +112,7 @@ Token Lexer::next()
 void Lexer::skipWhiteSpaces()
 {
   while (_pos < _input.size() &&
-         (isspace(static_cast<unsigned char>(_input[_pos])) != 0)) {
+         (std::isspace(_input[_pos]) != 0)) {
     if (_input[_pos] == '\n') {
       ++_line;
     }
@@ -129,3 +131,5 @@ void Lexer::skipComment()
     ++_pos;
   }
 }
+
+} // namespace config

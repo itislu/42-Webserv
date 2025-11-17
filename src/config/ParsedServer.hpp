@@ -5,6 +5,9 @@
 #include "config/ConfigTypes.hpp"
 #include <vector>
 
+namespace config {
+
+
 class ParsedServer
 {
 public:
@@ -18,5 +21,8 @@ private:
   DirectiveMap _directives;
   std::vector<ParsedLocation> _locations;
 };
+
+} // namespace config
+
 
 #endif

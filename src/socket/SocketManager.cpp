@@ -17,16 +17,16 @@
 // Owns _portToSocket and _pfds.
 // Handles creating listeners and pollfds.
 
-SocketManager::SocketManager(const Config& config)
+SocketManager::SocketManager(const config::Config& config)
 {
   createListeningSockets(config.getServers());
 }
 
 // only call in the constructor - because no exception guarantee
 void SocketManager::createListeningSockets(
-  const std::vector<ServerConfig>& configs)
+  const std::vector<config::ServerConfig>& configs)
 {
-  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
+  for (config::Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     createListener(it->getPorts());
   }

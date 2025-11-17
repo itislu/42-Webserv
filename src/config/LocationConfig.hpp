@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+namespace config {
+
+
 class ServerConfig;
 
 class LocationConfig
@@ -92,5 +95,8 @@ If autoindex is:
 that folder.
 ❌ false → the server returns a 403 Forbidden (or sometimes 404 Not Found).
 */
+
+} // namespace config
+
 
 #endif

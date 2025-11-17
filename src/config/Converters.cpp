@@ -5,6 +5,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <libftpp/string.hpp>
+
+namespace config {
+
 
 std::size_t convert::toSizeT(const std::string& str)
 {
@@ -110,6 +114,7 @@ int convert::toCode(const std::string& str)
 
 bool convert::toBool(const std::string& str)
 {
+   const std::string lower = ft::to_lower(str);
   if (str == "1" || str == "true" || str == "yes" || str == "on") {
     return true;
   }
@@ -123,3 +128,5 @@ bool convert::isMethod(const std::string& str)
 {
   return (str == "GET" || str == "POST" || str == "DELETE");
 }
+
+} // namespace config

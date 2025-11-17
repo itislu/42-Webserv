@@ -26,7 +26,7 @@ extern "C" void sigIntHandler(int /*sigNum*/)
   g_running = 0;
 }
 
-ServerManager::ServerManager(const Config& config)
+ServerManager::ServerManager(const config::Config& config)
   : _config(&config)
   , _socketManager(config)
   , _eventManager(_clientManager, _socketManager, *this)
@@ -37,10 +37,10 @@ ServerManager::ServerManager(const Config& config)
   createServers(_config->getServers());
 }
 
-void ServerManager::createServers(const std::vector<ServerConfig>& configs)
+void ServerManager::createServers(const std::vector<config::ServerConfig>& configs)
 {
   _servers.reserve(configs.size());
-  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
+  for (config::Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     const std::vector<const Socket*> listeners =
       createListeners(it->getPorts());
@@ -62,7 +62,7 @@ std::vector<const Socket*> ServerManager::createListeners(
   return listeners;
 }
 
-void ServerManager::addServer(const ServerConfig& config,
+void ServerManager::addServer(const config::ServerConfig& config,
                               const std::vector<const Socket*>& listeners)
 {
   const ft::shared_ptr<const Server> server =

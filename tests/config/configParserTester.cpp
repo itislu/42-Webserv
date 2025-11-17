@@ -1,17 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   configParserTester.cpp                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/14 13:08:39 by lstefane         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-// TESTER
-
 #include "config/Config.hpp"
 #include "config/ConfigParser.hpp"
 #include "config/LocationConfig.hpp"
@@ -19,6 +5,11 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <string>
+
+using config::Config;
+using config::ConfigParser;
+using config::ServerConfig;
+using config::LocationConfig;
 
 /* TEST - 000 */
 TEST(ConfigParserTest, ParsesSimpleServerBlock)
@@ -866,6 +857,26 @@ TEST(ConfigParserTest, NegativeValue)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "079_negative_value.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 080 */
+TEST(ConfigParserTest, ErrorCode05)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "80_errorcodes05.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 081 */
+TEST(ConfigParserTest, NegativeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "81_negative_zero.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

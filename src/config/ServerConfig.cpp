@@ -8,6 +8,11 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/string.hpp>
+
+namespace config {
+
 
 ServerConfig::ServerConfig(const Config& global)
   : _errorPages(global.getErrorPages())
@@ -119,13 +124,8 @@ void ServerConfig::addLocation(const LocationConfig& location)
 
 void ServerConfig::checkPortDuplicate(int port)
 {
-  for (std::vector<int>::const_iterator it = _ports.begin(); it != _ports.end();
-       ++it) {
-    if (port == *it) {
-      std::ostringstream oss;
-      oss << port;
-      throw std::invalid_argument("duplicated port " + oss.str());
-    }
+  if (ft::contains(_ports, port)) {
+    throw std::invalid_argument("duplicate port " + ft::to_string(port));
   }
 }
 
@@ -135,3 +135,8 @@ uri) const
 
 }
  */
+
+} // namespace config
+
+
+
