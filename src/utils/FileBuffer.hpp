@@ -42,7 +42,6 @@ private:
   ExpectStr _getFront(std::size_t bytes);
   ExpectVoid _saveRemainder();
   ExpectVoid _calcSize();
-  std::string _getRandomeFileName();
 
   static const std::size_t _copyBufferSize = 4096;
 

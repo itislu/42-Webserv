@@ -171,7 +171,7 @@ std::size_t FileBuffer::size() const
 }
 
 // NOLINTBEGIN(bugprone-random-generator-seed, misc-predictable-rand)
-std::string FileBuffer::_getRandomeFileName()
+static std::string getRandomeFileName()
 {
   static bool seeded = false;
 
@@ -193,7 +193,7 @@ IBuffer::ExpectVoid FileBuffer::openTmpFile()
   const std::size_t countMax = 100;
   std::size_t count = 0;
   while (count < countMax) {
-    _fileName = _getRandomeFileName();
+    _fileName = getRandomeFileName();
     _fs.open(_fileName.c_str(), std::ios::in);
     // check if file does not exit
     if (!_fs.is_open()) {
