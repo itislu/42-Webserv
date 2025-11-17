@@ -154,6 +154,51 @@ TEST(InvalidFilesTester, NonExistingFile)
 // Invalid Values Tests
 // ============================================================================
 
+TEST(InvalidValuesTester, BodysizeNegative)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/bodysize_negative.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, BodysizeNegativeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/bodysize_negative_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, BodysizeTrailingText)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/bodysize_trailing_text.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, ErrorCodeNegative)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/error_code_negative.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, ErrorCodeNegativeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/error_code_negative_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
 TEST(InvalidValuesTester, ErrorCodeNonNumber)
 {
   const std::string configPath =
@@ -185,6 +230,15 @@ TEST(InvalidValuesTester, ErrorCodeTrailingText)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/error_code_trailing_text.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, ErrorCodeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/error_code_zero.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -293,28 +347,19 @@ TEST(InvalidValuesTester, InvalidMethodServer)
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
 }
 
-TEST(InvalidValuesTester, NegativeBodySize)
+TEST(InvalidValuesTester, PortNegative)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "invalid_values/negative_bodysize.conf";
+    std::string(ASSETS_PATH) + "invalid_values/port_negative.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
 }
 
-TEST(InvalidValuesTester, NegativePort)
+TEST(InvalidValuesTester, PortNegativeZero)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "invalid_values/negative_port.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
-}
-
-TEST(InvalidValuesTester, NegativeZeroTimeout)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "invalid_values/negative_zero_timeout.conf";
+    std::string(ASSETS_PATH) + "invalid_values/port_negative_zero.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -347,19 +392,120 @@ TEST(InvalidValuesTester, PortTooHigh)
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
 }
 
-TEST(InvalidValuesTester, TimeoutTrailingText)
+TEST(InvalidValuesTester, PortTrailingText)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "invalid_values/timeout_trailing_text.conf";
+    std::string(ASSETS_PATH) + "invalid_values/port_trailing_text.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
 }
 
-TEST(InvalidValuesTester, ZeroPort)
+TEST(InvalidValuesTester, PortZero)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "invalid_values/zero_port.conf";
+    std::string(ASSETS_PATH) + "invalid_values/port_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, RedirectCodeNegative)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/redirect_code_negative.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, RedirectCodeNegativeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) +
+    "invalid_values/redirect_code_negative_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, RedirectCodeNonNumber)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/redirect_code_non_number.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, RedirectCodeTooHigh)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/redirect_code_too_high.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, RedirectCodeTooLow)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/redirect_code_too_low.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, RedirectCodeTrailingText)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) +
+    "invalid_values/redirect_code_trailing_text.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, RedirectCodeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/redirect_code_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, TimeoutNegative)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/timeout_negative.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, TimeoutNegativeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/timeout_negative_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, TimeoutNonNumber)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/timeout_non_number.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+TEST(InvalidValuesTester, TimeoutTrailingText)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "invalid_values/timeout_trailing_text.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -750,6 +896,15 @@ TEST(ValidConfigTester, BodySizeMultiplier_M)
   EXPECT_NO_THROW(config = parser.parseConfig());
 }
 
+TEST(ValidConfigTester, BodysizeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "valid/bodysize_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
 TEST(ValidConfigTester, CommentsInValue)
 {
   const std::string configPath =
@@ -939,6 +1094,15 @@ TEST(ValidConfigTester, Simple)
   EXPECT_EQ(config.getServers().size(), 1);
   EXPECT_EQ(config.getServers()[0].getPorts()[0], 8080);
   EXPECT_EQ(config.getServers()[0].getHostnames()[0], "serv1");
+}
+
+TEST(ValidConfigTester, TimeoutZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "valid/timeout_zero.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
 }
 
 TEST(ValidConfigTester, TestAllValues)
