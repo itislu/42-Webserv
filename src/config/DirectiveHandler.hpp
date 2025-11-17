@@ -8,6 +8,9 @@
 #include <string>
 #include <vector>
 
+namespace config {
+
+
 /*
   CONFIG  : root, maxbodysize, errorpage, timeout,
   SERVER  : root, maxbodysize, errorpage, timeout, index, allowed, port, hosts
@@ -40,7 +43,7 @@ template<>
 class Entries<Config> : public DirectiveHandlerBase<Config>
 {
 public:
-  static Entry entries[];
+  static const Entry entries[];
 
 private:
   static void setTimeout(const std::vector<std::string>& values,
@@ -51,7 +54,7 @@ template<>
 class Entries<ServerConfig> : public DirectiveHandlerBase<ServerConfig>
 {
 public:
-  static Entry entries[];
+  static const Entry entries[];
 
 private:
   static void setTimeout(const std::vector<std::string>& values,
@@ -70,7 +73,7 @@ template<>
 class Entries<LocationConfig> : public DirectiveHandlerBase<LocationConfig>
 {
 public:
-  static Entry entries[];
+  static const Entry entries[];
 
 private:
   static void setIndex(const std::vector<std::string>& values,
@@ -104,6 +107,9 @@ public:
   static void buildDirectives(const DirectiveMap& directives,
                               ConfigType& config);
 };
+
+} // namespace config
+
 
 #include "DirectiveHandler.tpp" // IWYU pragma: export
 

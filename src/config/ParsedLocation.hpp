@@ -4,6 +4,9 @@
 #include "config/ConfigTypes.hpp"
 #include <string>
 
+namespace config {
+
+
 class ParsedLocation
 {
 public:
@@ -19,5 +22,8 @@ private:
   std::string _path;
   DirectiveMap _directives;
 };
+
+} // namespace config
+
 
 #endif

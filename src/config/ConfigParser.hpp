@@ -10,6 +10,9 @@
 #include <string>
 #include <vector>
 
+namespace config {
+
+
 class ConfigParser
 {
 public:
@@ -28,7 +31,7 @@ private:
                              const std::vector<std::string>& value);
   static bool isRepeatableDirective(const std::string& key);
 
-  bool isExpectedNext(e_type type);
+  bool isExpectedNext(Token::e_type type);
   void invalidToken(const std::string& err) const;
   void skipComments();
 
@@ -37,5 +40,7 @@ private:
   Token _token;
   ParsedConfig _parsed;
 };
+
+} // namespace config
 
 #endif

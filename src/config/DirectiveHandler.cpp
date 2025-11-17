@@ -8,20 +8,26 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+
+namespace config {
+
 
 // ==================== Config ====================
 
-Entries<Config>::Entry Entries<Config>::entries[] = {
+const Entries<Config>::Entry Entries<Config>::entries[] = {
   { "root", setRoot },
   { "keepalive_timeout", setTimeout },
   { "max_body_size", setMaxBodySize },
   { "error_page", setErrorPage },
-  { 0, 0 }
+  { FT_NULLPTR, FT_NULLPTR }
 };
 
 // ==================== ServerConfig ====================
 
-Entries<ServerConfig>::Entry Entries<ServerConfig>::entries[] = {
+const Entries<ServerConfig>::Entry Entries<ServerConfig>::entries[] = {
   { "listen", setPorts },
   { "server_name", setHostnames },
   { "root", setRoot },
@@ -30,12 +36,12 @@ Entries<ServerConfig>::Entry Entries<ServerConfig>::entries[] = {
   { "max_body_size", setMaxBodySize },
   { "error_page", setErrorPage },
   { "allowed_methods", setAllowedMethods },
-  { 0, 0 }
+  { FT_NULLPTR, FT_NULLPTR }
 };
 
 // ==================== LocationConfig ====================
 
-Entries<LocationConfig>::Entry Entries<LocationConfig>::entries[] = {
+const Entries<LocationConfig>::Entry Entries<LocationConfig>::entries[] = {
   { "root", setRoot },
   { "index", setIndex },
   { "max_body_size", setMaxBodySize },
@@ -48,7 +54,7 @@ Entries<LocationConfig>::Entry Entries<LocationConfig>::entries[] = {
   { "redirect", setRedirect },
   { "redirect_url", setRedirection },
   { "redirect_code", setRedirectCode },
-  { 0, 0 }
+  { FT_NULLPTR, FT_NULLPTR }
 };
 
 // =========== Shared - Implementations ============
@@ -67,6 +73,10 @@ static void setTimeoutImpl(const std::vector<std::string>& values,
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
+  }
+  if (timeout < 0)
+  {
+    throw std::invalid_argument("keepalive_timeout: invalid value: '" + ft::to_string(timeout) + "', negative value not allowed");
   }
   config.setTimeout(timeout);
 }
@@ -262,3 +272,5 @@ void Entries<LocationConfig>::setRedirectCode(
   }
   config.setRedirectCode(code);
 }
+
+} // namespace config

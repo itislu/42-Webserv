@@ -4,6 +4,9 @@
 #include <cstddef>
 #include <string>
 
+namespace config {
+
+
 namespace convert {
 
 std::size_t toSizeT(const std::string& str);
@@ -16,5 +19,8 @@ bool toBool(const std::string& str);
 bool isMethod(const std::string& str);
 
 } // namespace convert
+
+} // namespace config
+
 
 #endif

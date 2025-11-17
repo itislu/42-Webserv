@@ -4,7 +4,7 @@
 # Keeps connections open by piping an infinite stream into nc (tail -f /dev/null)
 
 HOST="127.0.0.1"
-PORTS=(8080, 8081)
+PORTS=(8080 8081)
 CLIENTS_PER_PORT=1000       # number of simultaneous clients per port
 INITIAL_MSG="Hello from client"  # empty to skip
 RUN_SECONDS=0             # 0 = run until you Ctrl+C or kill PIDs

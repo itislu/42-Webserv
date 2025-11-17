@@ -3,20 +3,8 @@
 #include <string>
 #include <sys/stat.h> // for stat(), struct stat, and S_ISREG
 
-bool fileutils::checkFileExtension(const std::string& filepath,
-                                   const std::string& ext)
-{
-  if (filepath.size() <= ext.size()) {
-    return false;
-  }
-  const std::size_t dotPos = filepath.find_last_of('.');
-  if (dotPos != std::string::npos) {
-    const std::string fileExt =
-      filepath.substr(dotPos, filepath.size() - dotPos);
-    return fileExt == ext;
-  }
-  return false;
-}
+namespace config {
+
 
 bool fileutils::isFile(const std::string& filepath)
 {
@@ -28,3 +16,5 @@ bool fileutils::isFile(const std::string& filepath)
   }
   return (S_ISREG(path_stat.st_mode));
 }
+
+} // namespace config

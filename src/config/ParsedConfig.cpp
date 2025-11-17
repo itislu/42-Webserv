@@ -7,6 +7,10 @@
 #include <string>
 #include <vector>
 
+
+namespace config {
+
+
 DirectiveMap& ParsedConfig::getDirectives()
 {
   return _directives;
@@ -112,3 +116,5 @@ std::ostream& operator<<(std::ostream& out, const ParsedConfig& parsed)
   out << "End of configuration" << "\n";
   return out;
 }
+
+} // namespace config

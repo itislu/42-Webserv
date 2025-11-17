@@ -22,6 +22,9 @@
 // Blocks are wrapped in { } (like server { ... }, location { ... })
 // Comments start with # - ignore rest of the line
 
+namespace config {
+
+
 ConfigParser::ConfigParser(const char* path)
   : _filepath(path)
   , _lexer(_filepath)
@@ -29,7 +32,7 @@ ConfigParser::ConfigParser(const char* path)
 {
 }
 
-bool ConfigParser::isExpectedNext(e_type type)
+bool ConfigParser::isExpectedNext(Token::e_type type)
 {
   return _token.getType() == type;
 }
@@ -37,7 +40,7 @@ bool ConfigParser::isExpectedNext(e_type type)
 void ConfigParser::skipComments()
 {
   _token = _lexer.next();
-  while (_token.getType() == COMMENT && _token.getType() != END) {
+  while (_token.getType() == Token::Comment && _token.getType() != Token::End) {
     _lexer.skipComment();
     _token = _lexer.next();
   }
@@ -47,7 +50,7 @@ void ConfigParser::invalidToken(const std::string& err) const
 {
   std::ostringstream oss;
   oss << "invalid token in " << err << " at line " << _lexer.getLineNum()
-      << ": '" << _token.getValue() << "'";
+      << "got '" << _token.getValue() << "'";
   throw std::invalid_argument(oss.str());
 }
 
@@ -108,17 +111,22 @@ void ConfigParser::parseDirective(DirectiveMap& directive)
   const std::string key = _token.getValue();
   std::vector<std::string> value;
   _token = _lexer.next();
-  while (_token.getType() != SEMICOLON && _token.getType() != END) {
-    if (_token.getType() == COMMENT) {
+  while (_token.getType() != Token::Semicolon && _token.getType() != Token::End) {
+    if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
     } else {
       value.push_back(_token.getValue());
     }
     _token = _lexer.next();
   }
-  if (_token.getType() != SEMICOLON) {
-    invalidToken("parse directive - missing ';'");
+  if (_token.getType() != Token::Semicolon) {
+    invalidToken("parse directive '" + key + "' - missing ';'");
   }
+
+  if (value.empty()) {
+    throw std::invalid_argument("parse directive '" + key + "' has no values.");
+  }
+
   addToDirective(directive, key, value);
 }
 
@@ -126,31 +134,31 @@ void ConfigParser::parseLocationConfig(ParsedServer& server)
 {
   skipComments();
 
-  if (!isExpectedNext(IDENT)) {
-    invalidToken("location config");
+  if (!isExpectedNext(Token::Ident)) {
+    invalidToken("location config - missing path");
   }
 
   ParsedLocation location(_token.getValue());
 
   skipComments();
 
-  if (!isExpectedNext(LBRACE)) {
-    invalidToken("location config");
+  if (!isExpectedNext(Token::LBrace)) {
+    invalidToken("location config - missing '{'");
   }
 
   for (_token = _lexer.next();
-       _token.getType() != RBRACE && _token.getType() != END;
+       _token.getType() != Token::RBrace && _token.getType() != Token::End;
        _token = _lexer.next()) {
-    if (_token.getType() == COMMENT) {
+    if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
-    } else if (_token.getType() == IDENT) {
+    } else if (_token.getType() == Token::Ident) {
       parseDirective(location.getDirectives());
     } else {
       invalidToken("location config");
     }
   }
 
-  if (_token.getType() != RBRACE) {
+  if (_token.getType() != Token::RBrace) {
     invalidToken("location config - missing '}'");
   }
 
@@ -163,24 +171,24 @@ void ConfigParser::parseServerConfig()
 
   skipComments();
 
-  if (!isExpectedNext(LBRACE)) {
+  if (!isExpectedNext(Token::LBrace)) {
     invalidToken("server config - missing '{'");
   }
 
   for (_token = _lexer.next();
-       _token.getType() != RBRACE && _token.getType() != END;
+       _token.getType() != Token::RBrace && _token.getType() != Token::End;
        _token = _lexer.next()) {
-    if (_token.getType() == COMMENT) {
+    if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
-    } else if (_token.getType() == IDENT && _token.getValue() == "location") {
+    } else if (_token.getType() == Token::Ident && _token.getValue() == "location") {
       parseLocationConfig(server);
-    } else if (_token.getType() == IDENT) {
+    } else if (_token.getType() == Token::Ident) {
       parseDirective(server.getDirectives());
     } else {
       invalidToken("server config");
     }
   }
-  if (_token.getType() != RBRACE) {
+  if (_token.getType() != Token::RBrace) {
     invalidToken("server config - missing '}'");
   }
 
@@ -189,13 +197,13 @@ void ConfigParser::parseServerConfig()
 
 void ConfigParser::parse()
 {
-  for (_token = _lexer.next(); _token.getType() != END;
+  for (_token = _lexer.next(); _token.getType() != Token::End;
        _token = _lexer.next()) {
-    if (_token.getType() == COMMENT) {
+    if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
-    } else if (_token.getType() == IDENT && _token.getValue() == "server") {
+    } else if (_token.getType() == Token::Ident && _token.getValue() == "server") {
       parseServerConfig();
-    } else if (_token.getType() == IDENT) {
+    } else if (_token.getType() == Token::Ident) {
       parseDirective(_parsed.getDirectives());
     } else {
       invalidToken("global config");
@@ -211,6 +219,9 @@ Config ConfigParser::parseConfig()
   // build
   return ConfigBuilder::build(_parsed);
 }
+
+} // namespace config
+
 
 // error_page 505 505.html
 // error_page 404 403 402 401 40x.html

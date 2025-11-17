@@ -2,6 +2,9 @@
 #include "config/ConfigTypes.hpp"
 #include <string>
 
+namespace config {
+
+
 ParsedLocation::ParsedLocation(const std::string& path)
   : _path(path)
 {
@@ -26,6 +29,9 @@ const std::string& ParsedLocation::getPath() const
 {
   return _path;
 }
+
+} // namespace config
+
 
 /*
   VALID KEYS

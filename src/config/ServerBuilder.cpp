@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+namespace config {
+
 void ServerBuilder::validateMandatoryDirectives(const DirectiveMap& directives)
 {
   DirectiveMap::const_iterator iter;
@@ -67,3 +69,5 @@ ServerConfig ServerBuilder::build(const ParsedServer& parsed,
 
   return server;
 }
+
+} // namespace config

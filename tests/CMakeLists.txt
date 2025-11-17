@@ -70,7 +70,7 @@ add_my_test(utilsTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
 )
 
-# # http
+# http
 
 # http/parser
 add_my_test(headerLineRulesTester

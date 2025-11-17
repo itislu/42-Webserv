@@ -6,6 +6,9 @@
 #include "config/ParsedServer.hpp"
 #include <vector>
 
+namespace config {
+
+
 class ConfigBuilder
 {
 public:
@@ -15,5 +18,8 @@ private:
   static void buildServers(const std::vector<ParsedServer>& servers,
                            Config& config);
 };
+
+} // namespace config
+
 
 #endif

@@ -4,6 +4,9 @@
 #include "config/ParsedLocation.hpp"
 #include "config/ServerConfig.hpp"
 
+namespace config {
+
+
 LocationConfig LocationBuilder::build(const ParsedLocation& parsed,
                                       const ServerConfig& config)
 {
@@ -14,3 +17,5 @@ LocationConfig LocationBuilder::build(const ParsedLocation& parsed,
 
   return location;
 }
+
+} // namespace config

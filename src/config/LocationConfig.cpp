@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+namespace config {
+
+
 LocationConfig::LocationConfig(const ServerConfig& serverConfig)
   : _root(serverConfig.getRoot())
   , _autoindex(false)
@@ -169,3 +172,5 @@ void LocationConfig::setRedirectCode(int code)
 {
   _redirectCode = code;
 }
+
+} // namespace config

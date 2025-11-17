@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+namespace config {
+
 /*
   - no duplicates in global directive allowed
   - every directive must have only one value
@@ -37,3 +39,5 @@ Config ConfigBuilder::build(const ParsedConfig& parsed)
 
   return config;
 }
+
+} // namespace config

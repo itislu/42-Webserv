@@ -6,6 +6,9 @@
 #include <ostream>
 #include <vector>
 
+namespace config {
+
+
 class ParsedConfig
 {
 public:
@@ -24,5 +27,7 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const ParsedConfig& parsed);
+
+} // namespace config
 
 #endif

@@ -3,6 +3,9 @@
 #include "config/ParsedLocation.hpp"
 #include <vector>
 
+namespace config {
+
+
 DirectiveMap& ParsedServer::getDirectives()
 {
   return _directives;
@@ -38,3 +41,5 @@ const std::vector<ParsedLocation>& ParsedServer::getLocations() const
 
   error_log
 */
+
+} // namespace config

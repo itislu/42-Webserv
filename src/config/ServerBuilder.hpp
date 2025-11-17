@@ -7,6 +7,9 @@
 #include "config/ServerConfig.hpp"
 #include <vector>
 
+namespace config {
+
+
 class ServerBuilder
 {
 public:
@@ -18,5 +21,8 @@ private:
   static void validateMandatoryDirectives(const DirectiveMap& directives);
   static void validateLocations(const std::vector<ParsedLocation>& locations);
 };
+
+} // namespace config
+
 
 #endif

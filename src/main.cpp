@@ -19,9 +19,7 @@ int main(int argc, char* argv[])
     Logger::getInstance(LOG_GENERAL).info() << "webserv started\n";
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    ConfigParser parser(argv[1]);
-
-    const Config config = parser.parseConfig();
+    const config::Config config = config::ConfigParser(argv[1]).parseConfig();
     std::cout << config;
 
     ServerManager serverManager(config);

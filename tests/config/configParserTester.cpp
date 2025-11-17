@@ -1,17 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   configParserTester.cpp                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: lstefane <lstefane@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/05 14:48:55 by lstefane          #+#    #+#             */
-/*   Updated: 2025/11/14 13:08:39 by lstefane         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-// TESTER
-
 #include "config/Config.hpp"
 #include "config/ConfigParser.hpp"
 #include "config/LocationConfig.hpp"
@@ -20,13 +6,17 @@
 #include <stdexcept>
 #include <string>
 
+using config::Config;
+using config::ConfigParser;
+using config::ServerConfig;
+using config::LocationConfig;
+
 /* TEST - 000 */
 TEST(ConfigParserTest, ParsesSimpleServerBlock)
 {
   const std::string configPath = std::string(ASSETS_PATH) + "000_simple.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
-  std::string(ASSETS_PATH) + "047_additional_semicolon.conf";
   EXPECT_NO_THROW(config = parser.parseConfig());
 
   EXPECT_EQ(config.getRoot(), "/var/www/");
@@ -38,7 +28,7 @@ TEST(ConfigParserTest, ParsesSimpleServerBlock)
 }
 
 /* TEST - 001 */
-TEST(ConfigParserTest, MutlipleServerBlock)
+TEST(ConfigParserTest, MultipleServerBlockk)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "001_multiple_servers.conf";
@@ -633,10 +623,10 @@ TEST(ConfigParserTest, GlobalRoot)
 }
 
 /* TEST - 056 */
-TEST(ConfigParserTest, DoubleBracers)
+TEST(ConfigParserTest, DoubleBraces)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "056_double_bracers.conf";
+    std::string(ASSETS_PATH) + "056_double_braces.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -847,6 +837,46 @@ TEST(ConfigParserTest, ErrorCodes04)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "077_errorcodes04.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 078 */
+TEST(ConfigParserTest, NoValue)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "078_no_value.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 079 */
+TEST(ConfigParserTest, NegativeValue)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "079_negative_value.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 080 */
+TEST(ConfigParserTest, ErrorCode05)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "80_errorcodes05.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+}
+
+/* TEST - 081 */
+TEST(ConfigParserTest, NegativeZero)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "81_negative_zero.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

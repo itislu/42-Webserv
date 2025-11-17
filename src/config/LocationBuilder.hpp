@@ -4,6 +4,8 @@
 #include "config/LocationConfig.hpp"
 #include "config/ParsedLocation.hpp"
 
+namespace config {
+
 class ServerConfig;
 
 class LocationBuilder
@@ -14,5 +16,8 @@ public:
 
 private:
 };
+
+} // namespace config
+
 
 #endif
