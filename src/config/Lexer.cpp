@@ -8,11 +8,13 @@
 #include <stdexcept>
 #include <string>
 
-// Skip spaces and newlines.
-// Skip comments (# ...).
-// If it finds {, }, or ;, it returns those as individual tokens.
-// Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns
-// it as an IDENT token.
+
+/*
+- Skips whitespace character (spaces, newlines, ...).
+- Skips comments that start with '#' and continue to the end of the line.
+- If it finds {, }, or ;, it returns those as individual tokens.
+- Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns it as an IDENT token. 
+*/
 
 Lexer::Lexer(const std::string& file)
   : _filepath(file)

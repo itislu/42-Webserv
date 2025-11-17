@@ -47,7 +47,7 @@ void ConfigParser::invalidToken(const std::string& err) const
 {
   std::ostringstream oss;
   oss << "invalid token in " << err << " at line " << _lexer.getLineNum()
-      << ": '" << _token.getValue() << "'";
+      << "got '" << _token.getValue() << "'";
   throw std::invalid_argument(oss.str());
 }
 
@@ -117,8 +117,13 @@ void ConfigParser::parseDirective(DirectiveMap& directive)
     _token = _lexer.next();
   }
   if (_token.getType() != SEMICOLON) {
-    invalidToken("parse directive - missing ';'");
+    invalidToken("parse directive '" + key + "' - missing ';'");
   }
+
+  if (value.empty()) {
+    throw std::invalid_argument("parse directive '" + key + "' has no values.");
+  }
+
   addToDirective(directive, key, value);
 }
 
@@ -127,7 +132,7 @@ void ConfigParser::parseLocationConfig(ParsedServer& server)
   skipComments();
 
   if (!isExpectedNext(IDENT)) {
-    invalidToken("location config");
+    invalidToken("location config - missing path");
   }
 
   ParsedLocation location(_token.getValue());
@@ -135,7 +140,7 @@ void ConfigParser::parseLocationConfig(ParsedServer& server)
   skipComments();
 
   if (!isExpectedNext(LBRACE)) {
-    invalidToken("location config");
+    invalidToken("location config - missing '{'");
   }
 
   for (_token = _lexer.next();
