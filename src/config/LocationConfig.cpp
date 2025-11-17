@@ -8,7 +8,6 @@
 
 namespace config {
 
-
 LocationConfig::LocationConfig(const ServerConfig& serverConfig)
   : _root(serverConfig.getRoot())
   , _autoindex(false)

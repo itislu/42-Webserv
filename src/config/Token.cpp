@@ -3,9 +3,7 @@
 #include <ostream>
 #include <string>
 
-
 namespace config {
-
 
 Token::Token(std::size_t line)
   : _type(Token::Invalid)
@@ -82,4 +80,3 @@ std::ostream& operator<<(std::ostream& out, const Token& token)
 }
 
 } // namespace config
-

@@ -12,7 +12,6 @@
 
 namespace config {
 
-
 class ConfigParser
 {
 public:

@@ -5,15 +5,14 @@
 #include "config/ServerConfig.hpp"
 #include <cstddef>
 #include <exception>
-#include <stdexcept>
-#include <string>
-#include <vector>
 #include <libftpp/algorithm.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace config {
-
 
 // ==================== Config ====================
 
@@ -74,9 +73,10 @@ static void setTimeoutImpl(const std::vector<std::string>& values,
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
   }
-  if (timeout < 0)
-  {
-    throw std::invalid_argument("keepalive_timeout: invalid value: '" + ft::to_string(timeout) + "', negative value not allowed");
+  if (timeout < 0) {
+    throw std::invalid_argument("keepalive_timeout: invalid value: '" +
+                                ft::to_string(timeout) +
+                                "', negative value not allowed");
   }
   config.setTimeout(timeout);
 }

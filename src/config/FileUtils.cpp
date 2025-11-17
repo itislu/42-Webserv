@@ -5,7 +5,6 @@
 
 namespace config {
 
-
 bool fileutils::isFile(const std::string& filepath)
 {
   const char* const path = filepath.c_str();

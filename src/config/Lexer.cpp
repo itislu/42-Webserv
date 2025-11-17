@@ -5,9 +5,9 @@
 #include <cstddef>
 #include <fstream>
 #include <iterator>
+#include <libftpp/string.hpp>
 #include <stdexcept>
 #include <string>
-#include <libftpp/string.hpp>
 
 namespace config {
 
@@ -15,7 +15,8 @@ namespace config {
 - Skips whitespace character (spaces, newlines, ...).
 - Skips comments that start with '#' and continue to the end of the line.
 - If it finds {, }, or ;, it returns those as individual tokens.
-- Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns it as an Token::Ident token. 
+- Otherwise, it reads a word (like listen, 8080, or /var/www/html) and returns
+it as an Token::Ident token.
 */
 
 Lexer::Lexer(const std::string& file)
@@ -95,7 +96,8 @@ Token Lexer::next()
     std::size_t idx = _pos;
     while (idx < _input.size()) {
       const char curr = _input[idx];
-      if ((std::isspace(curr) != 0) || curr == '{' || curr == '}' || curr == ';') {
+      if ((std::isspace(curr) != 0) || curr == '{' || curr == '}' ||
+          curr == ';') {
         break;
       }
       ++idx;
@@ -111,8 +113,7 @@ Token Lexer::next()
 
 void Lexer::skipWhiteSpaces()
 {
-  while (_pos < _input.size() &&
-         (std::isspace(_input[_pos]) != 0)) {
+  while (_pos < _input.size() && (std::isspace(_input[_pos]) != 0)) {
     if (_input[_pos] == '\n') {
       ++_line;
     }

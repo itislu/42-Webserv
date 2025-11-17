@@ -24,7 +24,6 @@
 
 namespace config {
 
-
 ConfigParser::ConfigParser(const char* path)
   : _filepath(path)
   , _lexer(_filepath)
@@ -111,7 +110,8 @@ void ConfigParser::parseDirective(DirectiveMap& directive)
   const std::string key = _token.getValue();
   std::vector<std::string> value;
   _token = _lexer.next();
-  while (_token.getType() != Token::Semicolon && _token.getType() != Token::End) {
+  while (_token.getType() != Token::Semicolon &&
+         _token.getType() != Token::End) {
     if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
     } else {
@@ -180,7 +180,8 @@ void ConfigParser::parseServerConfig()
        _token = _lexer.next()) {
     if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
-    } else if (_token.getType() == Token::Ident && _token.getValue() == "location") {
+    } else if (_token.getType() == Token::Ident &&
+               _token.getValue() == "location") {
       parseLocationConfig(server);
     } else if (_token.getType() == Token::Ident) {
       parseDirective(server.getDirectives());
@@ -201,7 +202,8 @@ void ConfigParser::parse()
        _token = _lexer.next()) {
     if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
-    } else if (_token.getType() == Token::Ident && _token.getValue() == "server") {
+    } else if (_token.getType() == Token::Ident &&
+               _token.getValue() == "server") {
       parseServerConfig();
     } else if (_token.getType() == Token::Ident) {
       parseDirective(_parsed.getDirectives());
@@ -221,7 +223,6 @@ Config ConfigParser::parseConfig()
 }
 
 } // namespace config
-
 
 // error_page 505 505.html
 // error_page 404 403 402 401 40x.html

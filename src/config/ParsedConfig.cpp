@@ -7,9 +7,7 @@
 #include <string>
 #include <vector>
 
-
 namespace config {
-
 
 DirectiveMap& ParsedConfig::getDirectives()
 {
