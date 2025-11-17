@@ -11,14 +11,14 @@ Token::Token(std::size_t line)
 {
 }
 
-Token::Token(e_type type, const std::string& value, std::size_t line)
+Token::Token(Type type, const std::string& value, std::size_t line)
   : _type(type)
   , _value(value)
   , _line(line)
 {
 }
 
-Token::e_type Token::getType() const
+Token::Type Token::getType() const
 {
   return _type;
 }
@@ -32,7 +32,7 @@ std::size_t Token::getLine() const
   return _line;
 }
 
-void Token::setType(e_type type)
+void Token::setType(Type type)
 {
   _type = type;
 }

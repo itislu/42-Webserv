@@ -31,7 +31,7 @@ ConfigParser::ConfigParser(const char* path)
 {
 }
 
-bool ConfigParser::isExpectedNext(Token::e_type type)
+bool ConfigParser::isExpectedNext(Token::Type type)
 {
   return _token.getType() == type;
 }
