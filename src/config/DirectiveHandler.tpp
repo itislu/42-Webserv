@@ -75,7 +75,7 @@ void DirectiveHandlerBase<ConfigType>::setErrorPage(
 {
   std::vector<int> codes;
   for (std::size_t i = 0; i < values.size(); ++i) {
-    std::stringstream sstream(values[i]);
+    std::istringstream sstream(values[i]);
     int value = 0;
     sstream >> value;
 

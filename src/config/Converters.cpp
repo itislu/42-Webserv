@@ -12,7 +12,7 @@ namespace convert {
 
 std::size_t toSizeT(const std::string& str)
 {
-  std::stringstream sstream(str);
+  std::istringstream sstream(str);
   std::size_t value = 0;
   sstream >> value;
 
@@ -25,7 +25,7 @@ std::size_t toSizeT(const std::string& str)
 
 long toLong(const std::string& str)
 {
-  std::stringstream sstream(str);
+  std::istringstream sstream(str);
   long value = 0;
   sstream >> value;
 
@@ -61,7 +61,7 @@ std::size_t toMaxBodySize(const std::string& str)
     number = str.substr(0, len - 1);
   }
   std::size_t value = 0;
-  std::stringstream sstream(number);
+  std::istringstream sstream(number);
   sstream >> value;
 
   if (sstream.fail() || !sstream.eof() || number[0] == '-') {
@@ -77,7 +77,7 @@ std::size_t toMaxBodySize(const std::string& str)
 
 int toInt(const std::string& str)
 {
-  std::stringstream sstream(str);
+  std::istringstream sstream(str);
   int value = 0;
   sstream >> value;
 
