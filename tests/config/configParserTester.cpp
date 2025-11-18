@@ -865,7 +865,7 @@ TEST(ConfigParserTest, NegativeValue)
 TEST(ConfigParserTest, ErrorCode05)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "80_errorcodes05.conf";
+    std::string(ASSETS_PATH) + "080_errorcodes05.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -875,7 +875,7 @@ TEST(ConfigParserTest, ErrorCode05)
 TEST(ConfigParserTest, NegativeZero)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "81_negative_zero.conf";
+    std::string(ASSETS_PATH) + "081_negative_zero.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
