@@ -99,7 +99,8 @@ add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
 )
 
-# config parser
+# config
+
 add_my_test(configParserTester
   ${CMAKE_CURRENT_SOURCE_DIR}/config/configParserTester.cpp
 )
