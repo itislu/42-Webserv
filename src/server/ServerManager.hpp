@@ -15,7 +15,7 @@
 class ServerManager
 {
 public:
-  explicit ServerManager(const Config& config);
+  explicit ServerManager(const config::Config& config);
   ~ServerManager() {}
 
   const Server* getServerFromSocket(const Socket* socket) const;
@@ -32,9 +32,9 @@ private:
   typedef std::map<const Socket*, std::vector<const Server*> >::const_iterator
     const_SockToServIter;
 
-  void addServer(const ServerConfig& config,
+  void addServer(const config::ServerConfig& config,
                  const std::vector<const Socket*>& listeners);
-  void createServers(const std::vector<ServerConfig>& configs);
+  void createServers(const std::vector<config::ServerConfig>& configs);
   std::vector<const Socket*> createListeners(const std::vector<int>& ports);
   void mapServerToSocket(const Server& server,
                          const std::vector<const Socket*>& listeners);
@@ -42,7 +42,7 @@ private:
   ServerManager(const ServerManager& other);
   ServerManager& operator=(const ServerManager& other);
 
-  const Config* _config;
+  const config::Config* _config;
   SocketManager _socketManager;
   ClientManager _clientManager;
   EventManager _eventManager;

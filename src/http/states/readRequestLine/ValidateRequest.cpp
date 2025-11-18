@@ -52,10 +52,10 @@ void ValidateRequest::run()
     */
   }
 
-  const ServerConfig& serverConfig = _client->getServer()->getConfig();
+  const config::ServerConfig& serverConfig = _client->getServer()->getConfig();
   const std::string& uriPath = _client->getRequest().getUri().getPath();
 
-  const LocationConfig* const location =
+  const config::LocationConfig* const location =
     serverConfig.getBestMatchLocation(uriPath);
 
   if (!validateMethod(location->getAllowedMethods(),
