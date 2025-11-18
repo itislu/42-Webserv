@@ -48,6 +48,11 @@ int Client::getFd() const
   return _fd.get();
 }
 
+bool Client::hasServer() const
+{
+  return (_server != FT_NULLPTR);
+}
+
 const std::string& Client::getHost() const
 {
   return _host;
@@ -101,18 +106,13 @@ bool Client::receive()
   static std::vector<unsigned char> buffer(MAX_CHUNK);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
+    /* TODO: remove this! */
     std::cout << "Client " << getFd() << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     std::cout.write(reinterpret_cast<const char*>(buffer.data()),
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
     _inBuff.add(buffer, bytes);
-    // TODO: STATEMACHINE/PARSING
-    _stateHandler.setStateHasChanged(true);
-    while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
-      _stateHandler.setStateHasChanged(false);
-      _stateHandler.getState()->run();
-    }
   } else if (bytes == 0) {
     std::cout << "[CLIENT] wants to disconnect\n";
     return false;

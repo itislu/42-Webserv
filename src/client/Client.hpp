@@ -22,6 +22,7 @@ public:
   Client(int fdes, const Server* server);
 
   int getFd() const;
+  bool hasServer() const;
   const std::string& getHost() const;
   Buffer& getInBuff();
   Buffer& getOutBuff();

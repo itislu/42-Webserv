@@ -1,6 +1,7 @@
 #include "ServerConfig.hpp"
 #include "Config.hpp"
 #include "LocationConfig.hpp"
+#include "libftpp/utility.hpp"
 #include <cstddef>
 #include <map>
 #include <string>
@@ -106,9 +107,22 @@ void ServerConfig::addLocation(const LocationConfig& location)
   _locations.push_back(location);
 }
 
-/* const LocationConfig& ServerConfig::getLocationForPath(const std::string&
-uri) const
+const LocationConfig* ServerConfig::getBestMatchLocation(
+  const std::string& uri) const
 {
+  std::size_t bestMatchLen = 0;
+  const LocationConfig* bestMatch = FT_NULLPTR;
 
+  const std::vector<LocationConfig>& locations = getLocations();
+  for (std::vector<LocationConfig>::const_iterator it = locations.begin();
+       it != locations.end();
+       ++it) {
+    if (uri.rfind(it->getPath(), 0) == 0) {
+      if (it->getPath().length() > bestMatchLen) {
+        bestMatch = &*it;
+        bestMatchLen = it->getPath().length();
+      }
+    }
+  }
+  return bestMatch;
 }
- */

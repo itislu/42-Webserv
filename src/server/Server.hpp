@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-// maybe just store a pointer to the ServerConfig here?
 class Server
 {
 public:

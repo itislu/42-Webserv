@@ -107,6 +107,7 @@ std::size_t Request::_getMaxMethodLen() throw()
   return maxLen;
 }
 
+/* TODO: need this to be public */
 std::string Request::_methodToString() const
 {
   switch (_method) {

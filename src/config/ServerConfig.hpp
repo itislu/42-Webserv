@@ -36,7 +36,9 @@ public:
   void setTimeout(long time);
   void addLocation(const LocationConfig& location);
 
-  const LocationConfig& getLocationForPath(const std::string& uri) const;
+  const LocationConfig* getBestMatchLocation(const std::string& uri) const;
+  static std::size_t getMatchLength(const std::string& uri,
+                                    const std::string& path);
 
 private:
   std::vector<int> _ports;             // listeners
