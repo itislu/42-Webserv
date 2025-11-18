@@ -8,8 +8,9 @@
 #include <string>
 
 namespace config {
+namespace convert {
 
-std::size_t convert::toSizeT(const std::string& str)
+std::size_t toSizeT(const std::string& str)
 {
   std::stringstream sstream(str);
   std::size_t value = 0;
@@ -22,7 +23,7 @@ std::size_t convert::toSizeT(const std::string& str)
   return value;
 }
 
-long convert::toLong(const std::string& str)
+long toLong(const std::string& str)
 {
   std::stringstream sstream(str);
   long value = 0;
@@ -35,7 +36,7 @@ long convert::toLong(const std::string& str)
   return value;
 }
 
-std::size_t convert::toMaxBodySize(const std::string& str)
+std::size_t toMaxBodySize(const std::string& str)
 {
   std::size_t const len = str.length();
   char const suffix = str[len - 1];
@@ -74,7 +75,7 @@ std::size_t convert::toMaxBodySize(const std::string& str)
   return value * multiplier;
 }
 
-int convert::toInt(const std::string& str)
+int toInt(const std::string& str)
 {
   std::stringstream sstream(str);
   int value = 0;
@@ -88,7 +89,7 @@ int convert::toInt(const std::string& str)
 }
 
 // 65535
-int convert::toPort(const std::string& str)
+int toPort(const std::string& str)
 {
   const int port = toInt(str);
   const int maxPort = 65535;
@@ -99,7 +100,7 @@ int convert::toPort(const std::string& str)
 }
 
 // 300 - 599
-int convert::toCode(const std::string& str)
+int toCode(const std::string& str)
 {
   const int code = toInt(str);
   const int minCode = 300;
@@ -111,7 +112,7 @@ int convert::toCode(const std::string& str)
                               " (must be between 300 and 599)");
 }
 
-bool convert::toBool(const std::string& str)
+bool toBool(const std::string& str)
 {
   const std::string lower = ft::to_lower(str);
   if (lower == "1" || lower == "true" || lower == "yes" || lower == "on") {
@@ -123,9 +124,10 @@ bool convert::toBool(const std::string& str)
   throw std::runtime_error("invalid bool: " + str);
 }
 
-bool convert::isMethod(const std::string& str)
+bool isMethod(const std::string& str)
 {
   return (str == "GET" || str == "POST" || str == "DELETE");
 }
 
+} // namespace convert
 } // namespace config

@@ -4,13 +4,11 @@
 #include <string>
 
 namespace config {
-
 namespace fileutils {
 
 bool isFile(const std::string& filepath);
 
 } // namespace fileutils
-
 } // namespace config
 
 #endif
