@@ -72,10 +72,9 @@ static void setTimeoutImpl(const std::vector<std::string>& values,
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
   }
-  if (timeout < 0) {
+  if (timeout < 0 || values[0][0] == '-') {
     throw std::invalid_argument("keepalive_timeout: invalid value: '" +
-                                ft::to_string(timeout) +
-                                "', negative value not allowed");
+                                values[0] + "'");
   }
   config.setTimeout(timeout);
 }
