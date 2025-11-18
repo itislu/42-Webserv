@@ -5,7 +5,7 @@
 
 #include "config/ConfigTypes.hpp"
 #include "config/Converters.hpp"
-#include <cstdlib>
+#include <cstddef>
 #include <libftpp/utility.hpp>
 #include <sstream>
 #include <stdexcept>

@@ -38,8 +38,8 @@ long toLong(const std::string& str)
 
 std::size_t toMaxBodySize(const std::string& str)
 {
-  std::size_t const len = str.length();
-  char const suffix = str[len - 1];
+  const std::size_t len = str.length();
+  const char suffix = str[len - 1];
 
   std::size_t multiplier = 1;
   const unsigned long multi = 1024;

@@ -5,7 +5,6 @@
 #include "config/ParsedLocation.hpp"
 #include "config/ParsedServer.hpp"
 #include "config/ServerConfig.hpp"
-#include <cstring>
 #include <set>
 #include <stdexcept>
 #include <string>

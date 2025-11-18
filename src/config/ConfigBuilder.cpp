@@ -4,8 +4,6 @@
 #include "config/ParsedConfig.hpp"
 #include "config/ParsedServer.hpp"
 #include "config/ServerBuilder.hpp"
-#include <cstdlib>
-#include <cstring>
 #include <stdexcept>
 #include <string>
 #include <vector>
