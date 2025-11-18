@@ -6,7 +6,6 @@
 
 namespace config {
 
-
 LocationConfig LocationBuilder::build(const ParsedLocation& parsed,
                                       const ServerConfig& config)
 {

@@ -63,5 +63,4 @@ std::ostream& operator<<(std::ostream& out, const Config& config);
 
 } // namespace config
 
-
 #endif

@@ -8,7 +8,6 @@
 
 namespace config {
 
-
 class ConfigBuilder
 {
 public:
@@ -20,6 +19,5 @@ private:
 };
 
 } // namespace config
-
 
 #endif

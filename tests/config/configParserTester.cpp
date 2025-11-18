@@ -8,8 +8,8 @@
 
 using config::Config;
 using config::ConfigParser;
-using config::ServerConfig;
 using config::LocationConfig;
+using config::ServerConfig;
 
 /* TEST - 000 */
 TEST(ConfigParserTest, ParsesSimpleServerBlock)
@@ -845,8 +845,7 @@ TEST(ConfigParserTest, ErrorCodes04)
 /* TEST - 078 */
 TEST(ConfigParserTest, NoValue)
 {
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "078_no_value.conf";
+  const std::string configPath = std::string(ASSETS_PATH) + "078_no_value.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -866,7 +865,7 @@ TEST(ConfigParserTest, NegativeValue)
 TEST(ConfigParserTest, ErrorCode05)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "80_errorcodes05.conf";
+    std::string(ASSETS_PATH) + "080_errorcodes05.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
@@ -876,7 +875,7 @@ TEST(ConfigParserTest, ErrorCode05)
 TEST(ConfigParserTest, NegativeZero)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "81_negative_zero.conf";
+    std::string(ASSETS_PATH) + "081_negative_zero.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);

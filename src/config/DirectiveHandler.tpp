@@ -6,11 +6,11 @@
 #include "config/ConfigTypes.hpp"
 #include "config/Converters.hpp"
 #include <cstdlib>
+#include <libftpp/utility.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <libftpp/utility.hpp>
 
 namespace config {
 
@@ -20,7 +20,8 @@ void DirectiveHandler<ConfigType>::checkDirectiveHandler(
   const std::vector<std::string>& values,
   ConfigType& config)
 {
-  for (std::size_t i = 0; Entries<ConfigType>::entries[i].key != FT_NULLPTR; ++i) {
+  for (std::size_t i = 0; Entries<ConfigType>::entries[i].key != FT_NULLPTR;
+       ++i) {
     if (Entries<ConfigType>::entries[i].key == key) {
       Entries<ConfigType>::entries[i].func(values, config);
       return;
@@ -74,7 +75,7 @@ void DirectiveHandlerBase<ConfigType>::setErrorPage(
 {
   std::vector<int> codes;
   for (std::size_t i = 0; i < values.size(); ++i) {
-    std::stringstream sstream(values[i]);
+    std::istringstream sstream(values[i]);
     int value = 0;
     sstream >> value;
 
