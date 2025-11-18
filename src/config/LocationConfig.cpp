@@ -1,8 +1,12 @@
 #include "LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
 #include <cstddef>
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
+
+namespace config {
 
 LocationConfig::LocationConfig(const ServerConfig& serverConfig)
   : _root(serverConfig.getRoot())
@@ -27,12 +31,12 @@ const std::string& LocationConfig::getRoot() const
   return _root;
 }
 
-bool LocationConfig::isAutoindex() const
+bool LocationConfig::isAutoIndex() const
 {
   return _autoindex;
 }
 
-const std::vector<std::string>& LocationConfig::getAllowedMethods() const
+const std::set<std::string>& LocationConfig::getAllowedMethods() const
 {
   return _allowedMethods;
 }
@@ -77,6 +81,23 @@ int LocationConfig::getRedirectCode() const
   return _redirectCode;
 }
 
+const std::map<int, std::string>& LocationConfig::getErrorPages() const
+{
+  return _errorPages;
+}
+
+/* returns an empty string at the moment if not found */
+const std::string& LocationConfig::getErrorPage(int code) const
+{
+  const std::map<int, std::string>::const_iterator iter =
+    _errorPages.find(code);
+  if (iter != _errorPages.end()) {
+    return iter->second;
+  }
+  static const std::string empty;
+  return empty;
+}
+
 // SETTERS
 void LocationConfig::setPath(const std::string& path)
 {
@@ -88,20 +109,27 @@ void LocationConfig::setRoot(const std::string& root)
   _root = root;
 }
 
-void LocationConfig::setAutoindex(bool autoindex)
+void LocationConfig::setAutoIndex(bool autoindex)
 {
   _autoindex = autoindex;
 }
 
-void LocationConfig::setAllowedMethods(const std::string& method)
+void LocationConfig::addAllowedMethod(const std::string& method)
 {
-  _allowedMethods.clear();
-  _allowedMethods.push_back(method);
+  _allowedMethods.insert(method);
 }
 
-void LocationConfig::addAllowedMethods(const std::string& method)
+void LocationConfig::setErrorPages(const std::vector<int>& codes,
+                                   const std::string& path)
 {
-  _allowedMethods.push_back(method);
+  for (std::size_t i = 0; i < codes.size(); ++i) {
+    addErrorPage(codes[i], path);
+  }
+}
+
+void LocationConfig::addErrorPage(int code, const std::string& path)
+{
+  _errorPages[code] = path;
 }
 
 void LocationConfig::setIndex(const std::string& index)
@@ -109,7 +137,7 @@ void LocationConfig::setIndex(const std::string& index)
   _index = index;
 }
 
-void LocationConfig::setMaxSize(std::size_t size)
+void LocationConfig::setMaxBodySize(std::size_t size)
 {
   _maxBodysize = size;
 }
@@ -143,3 +171,5 @@ void LocationConfig::setRedirectCode(int code)
 {
   _redirectCode = code;
 }
+
+} // namespace config
