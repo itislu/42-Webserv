@@ -10,7 +10,6 @@
 
 namespace config {
 
-
 /*
   CONFIG  : root, maxbodysize, errorpage, timeout,
   SERVER  : root, maxbodysize, errorpage, timeout, index, allowed, port, hosts
@@ -109,7 +108,6 @@ public:
 };
 
 } // namespace config
-
 
 #include "DirectiveHandler.tpp" // IWYU pragma: export
 

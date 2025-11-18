@@ -2,17 +2,15 @@
 #include "Config.hpp"
 #include "LocationConfig.hpp"
 #include <cstddef>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/string.hpp>
 #include <map>
 #include <set>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <libftpp/algorithm.hpp>
-#include <libftpp/string.hpp>
 
 namespace config {
-
 
 ServerConfig::ServerConfig(const Config& global)
   : _errorPages(global.getErrorPages())
@@ -137,6 +135,3 @@ uri) const
  */
 
 } // namespace config
-
-
-

@@ -8,7 +8,6 @@
 
 namespace config {
 
-
 class Lexer
 {
 public:

@@ -9,7 +9,6 @@
 
 namespace config {
 
-
 class ServerBuilder
 {
 public:
@@ -23,6 +22,5 @@ private:
 };
 
 } // namespace config
-
 
 #endif

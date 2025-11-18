@@ -4,7 +4,6 @@
 
 namespace config {
 
-
 ParsedLocation::ParsedLocation(const std::string& path)
   : _path(path)
 {
@@ -31,7 +30,6 @@ const std::string& ParsedLocation::getPath() const
 }
 
 } // namespace config
-
 
 /*
   VALID KEYS

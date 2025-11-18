@@ -6,7 +6,6 @@
 
 namespace config {
 
-
 class ParsedLocation
 {
 public:
@@ -24,6 +23,5 @@ private:
 };
 
 } // namespace config
-
 
 #endif
