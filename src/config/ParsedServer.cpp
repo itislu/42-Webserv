@@ -5,7 +5,6 @@
 
 namespace config {
 
-
 DirectiveMap& ParsedServer::getDirectives()
 {
   return _directives;

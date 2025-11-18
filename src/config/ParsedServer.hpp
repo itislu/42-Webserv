@@ -7,7 +7,6 @@
 
 namespace config {
 
-
 class ParsedServer
 {
 public:
@@ -23,6 +22,5 @@ private:
 };
 
 } // namespace config
-
 
 #endif

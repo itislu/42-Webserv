@@ -12,7 +12,6 @@
 
 namespace config {
 
-
 class ConfigParser
 {
 public:
@@ -31,7 +30,7 @@ private:
                              const std::vector<std::string>& value);
   static bool isRepeatableDirective(const std::string& key);
 
-  bool isExpectedNext(Token::e_type type);
+  bool isExpectedNext(Token::Type type);
   void invalidToken(const std::string& err) const;
   void skipComments();
 

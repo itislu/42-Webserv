@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-
 namespace config {
 
 int Config::_defaultTimeout = 0;

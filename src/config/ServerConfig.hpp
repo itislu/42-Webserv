@@ -8,9 +8,7 @@
 #include <string>
 #include <vector>
 
-
 namespace config {
-
 
 class Config;
 
@@ -65,6 +63,5 @@ private:
 };
 
 } // namespace config
-
 
 #endif

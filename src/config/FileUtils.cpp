@@ -1,12 +1,11 @@
 #include "FileUtils.hpp"
-#include <cstddef>
 #include <string>
 #include <sys/stat.h> // for stat(), struct stat, and S_ISREG
 
 namespace config {
+namespace fileutils {
 
-
-bool fileutils::isFile(const std::string& filepath)
+bool isFile(const std::string& filepath)
 {
   const char* const path = filepath.c_str();
   struct stat path_stat = {};
@@ -17,4 +16,5 @@ bool fileutils::isFile(const std::string& filepath)
   return (S_ISREG(path_stat.st_mode));
 }
 
+} // namespace fileutils
 } // namespace config

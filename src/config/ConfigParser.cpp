@@ -24,7 +24,6 @@
 
 namespace config {
 
-
 ConfigParser::ConfigParser(const char* path)
   : _filepath(path)
   , _lexer(_filepath)
@@ -32,7 +31,7 @@ ConfigParser::ConfigParser(const char* path)
 {
 }
 
-bool ConfigParser::isExpectedNext(Token::e_type type)
+bool ConfigParser::isExpectedNext(Token::Type type)
 {
   return _token.getType() == type;
 }
@@ -48,9 +47,13 @@ void ConfigParser::skipComments()
 
 void ConfigParser::invalidToken(const std::string& err) const
 {
+  const std::string& tokenValue = _token.getValue();
   std::ostringstream oss;
-  oss << "invalid token in " << err << " at line " << _lexer.getLineNum()
-      << "got '" << _token.getValue() << "'";
+
+  oss << "invalid token in " << err << " at line " << _lexer.getLineNum();
+  if (!tokenValue.empty()) {
+    oss << ": '" << tokenValue << "'";
+  }
   throw std::invalid_argument(oss.str());
 }
 
@@ -111,7 +114,8 @@ void ConfigParser::parseDirective(DirectiveMap& directive)
   const std::string key = _token.getValue();
   std::vector<std::string> value;
   _token = _lexer.next();
-  while (_token.getType() != Token::Semicolon && _token.getType() != Token::End) {
+  while (_token.getType() != Token::Semicolon &&
+         _token.getType() != Token::End) {
     if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
     } else {
@@ -124,7 +128,7 @@ void ConfigParser::parseDirective(DirectiveMap& directive)
   }
 
   if (value.empty()) {
-    throw std::invalid_argument("parse directive '" + key + "' has no values.");
+    throw std::invalid_argument("parse directive '" + key + "' has no values");
   }
 
   addToDirective(directive, key, value);
@@ -180,7 +184,8 @@ void ConfigParser::parseServerConfig()
        _token = _lexer.next()) {
     if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
-    } else if (_token.getType() == Token::Ident && _token.getValue() == "location") {
+    } else if (_token.getType() == Token::Ident &&
+               _token.getValue() == "location") {
       parseLocationConfig(server);
     } else if (_token.getType() == Token::Ident) {
       parseDirective(server.getDirectives());
@@ -201,7 +206,8 @@ void ConfigParser::parse()
        _token = _lexer.next()) {
     if (_token.getType() == Token::Comment) {
       _lexer.skipComment();
-    } else if (_token.getType() == Token::Ident && _token.getValue() == "server") {
+    } else if (_token.getType() == Token::Ident &&
+               _token.getValue() == "server") {
       parseServerConfig();
     } else if (_token.getType() == Token::Ident) {
       parseDirective(_parsed.getDirectives());
@@ -221,7 +227,6 @@ Config ConfigParser::parseConfig()
 }
 
 } // namespace config
-
 
 // error_page 505 505.html
 // error_page 404 403 402 401 40x.html

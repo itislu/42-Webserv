@@ -13,11 +13,8 @@ class LocationBuilder
 public:
   static LocationConfig build(const ParsedLocation& parsed,
                               const ServerConfig& config);
-
-private:
 };
 
 } // namespace config
-
 
 #endif

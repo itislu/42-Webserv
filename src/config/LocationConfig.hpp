@@ -9,7 +9,6 @@
 
 namespace config {
 
-
 class ServerConfig;
 
 class LocationConfig
@@ -97,6 +96,5 @@ that folder.
 */
 
 } // namespace config
-
 
 #endif
