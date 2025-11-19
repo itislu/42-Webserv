@@ -5,6 +5,7 @@
 #include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -139,6 +140,8 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
 
 IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 {
+  bytes = std::min(bytes, _size);
+
   _fs.seekg(static_cast<std::streamoff>(bytes));
   if (_fs.fail()) {
     return ft::unexpected<BufferException>(errSeek);
@@ -159,6 +162,8 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
 {
+  bytes = std::min(bytes, _size);
+
   // Go to start of file
   _fs.seekp(0, std::ios::beg);
   if (_fs.fail()) {
