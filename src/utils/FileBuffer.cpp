@@ -44,34 +44,12 @@ FileBuffer::~FileBuffer()
 
 IBuffer::ExpectChr FileBuffer::get()
 {
-  if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
-  }
-
-  const int chr = _fs.get();
-  if (_fs.fail()) {
-    if (_fs.eof()) {
-      return ft::unexpected<BufferException>(errOutOfRange);
-    }
-    return ft::unexpected<BufferException>(errRead);
-  }
-  return chr;
+  return _getChr(&std::fstream::get);
 }
 
 IBuffer::ExpectChr FileBuffer::peek()
 {
-  if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
-  }
-
-  const int chr = _fs.peek();
-  if (_fs.fail()) {
-    if (_fs.eof()) {
-      return ft::unexpected<BufferException>(errOutOfRange);
-    }
-    return ft::unexpected<BufferException>(errRead);
-  }
-  return chr;
+  return _getChr(&std::fstream::peek);
 }
 
 IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
@@ -92,71 +70,26 @@ IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
 
 IBuffer::ExpectVoid FileBuffer::append(const std::string& data)
 {
-  if (!_fs.is_open()) {
-    const ExpectVoid res = _openTmpFile();
-    if (!res.has_value()) {
-      return res;
-    }
-  }
-
-  // Go to end and add new data
-  _fs.seekp(0, std::ios::end);
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
-  }
-
-  _fs.write(data.c_str(), static_cast<std::streamsize>(data.size()));
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errWrite);
-  }
-
-  _size += data.size();
-  return ExpectVoid();
+  return _append(data.data(), static_cast<std::streamsize>(data.size()));
 }
 
 IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
                                        long bytes)
 {
-  if (!_fs.is_open()) {
-    const ExpectVoid res = _openTmpFile();
-    if (!res.has_value()) {
-      return res;
-    }
-  }
-
-  // Go to end and add new data
-  _fs.seekp(0, std::ios::end);
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
-  }
-
-  _fs.write(buffer.data(), bytes);
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errWrite);
-  }
-
-  _size += bytes;
-  return ExpectVoid();
+  return _append(buffer.data(), static_cast<std::streamsize>(bytes));
 }
 
 IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 {
-  if (bytes > _size) {
-    return ft::unexpected<BufferException>(errOutOfRange);
-  }
-  if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
-  }
-
-  _fs.seekg(static_cast<std::streamoff>(bytes));
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
+  ExpectVoid res = seek(bytes);
+  if (!res.has_value()) {
+    return res;
   }
 
   // read/write rest into new tempFile
-  const ExpectVoid resB = _saveRemainder();
-  if (!resB.has_value()) {
-    return resB;
+  res = _saveRemainder();
+  if (!res.has_value()) {
+    return res;
   }
 
   _size -= bytes;
@@ -165,24 +98,23 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
 {
-  if (bytes > _size) {
-    return ft::unexpected<BufferException>(errOutOfRange);
-  }
-  if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
+  // go to start of file
+  ExpectVoid res = seek(0);
+  if (!res.has_value()) {
+    return ft::unexpected<BufferException>(res.error());
   }
 
   // read bytes from the beginning
-  const ExpectStr front = _getFront(bytes);
+  const ExpectStr front = _getStr(bytes);
   if (!front.has_value()) {
     return front;
   }
   assert(front->size() == bytes); // Unexpected EOF should not happen
 
   // read/write rest into new tempFile
-  const ExpectVoid resB = _saveRemainder();
-  if (!resB.has_value()) {
-    return ft::unexpected<BufferException>(resB.error().what());
+  res = _saveRemainder();
+  if (!res.has_value()) {
+    return ft::unexpected<BufferException>(res.error());
   }
 
   _size -= bytes;
@@ -241,13 +173,25 @@ IBuffer::ExpectVoid FileBuffer::_openTmpFile()
   return ft::unexpected<BufferException>(errOpen);
 }
 
-IBuffer::ExpectStr FileBuffer::_getFront(std::size_t bytes)
+IBuffer::ExpectChr FileBuffer::_getChr(
+  std::fstream::int_type (std::fstream::*func)())
 {
-  // Go to start of file
-  _fs.seekg(0, std::ios::beg);
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
   }
+
+  const int chr = (_fs.*func)();
+  if (_fs.fail()) {
+    if (_fs.eof()) {
+      return ft::unexpected<BufferException>(errOutOfRange);
+    }
+    return ft::unexpected<BufferException>(errRead);
+  }
+  return chr;
+}
+
+IBuffer::ExpectStr FileBuffer::_getStr(std::size_t bytes)
+{
   if (bytes == 0) {
     return std::string();
   }
@@ -260,6 +204,30 @@ IBuffer::ExpectStr FileBuffer::_getFront(std::size_t bytes)
   const std::streamsize actuallyRead = _fs.gcount();
   front.resize(static_cast<std::size_t>(actuallyRead));
   return front;
+}
+
+IBuffer::ExpectVoid FileBuffer::_append(const char* data, std::streamsize bytes)
+{
+  if (!_fs.is_open()) {
+    const ExpectVoid res = _openTmpFile();
+    if (!res.has_value()) {
+      return res;
+    }
+  }
+
+  // Go to end and add new data
+  _fs.seekp(0, std::ios::end);
+  if (_fs.fail()) {
+    return ft::unexpected<BufferException>(errSeek);
+  }
+
+  _fs.write(data, bytes);
+  if (_fs.fail()) {
+    return ft::unexpected<BufferException>(errWrite);
+  }
+
+  _size += bytes;
+  return ExpectVoid();
 }
 
 IBuffer::ExpectVoid FileBuffer::_saveRemainder()

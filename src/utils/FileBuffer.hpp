@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include <fstream>
+#include <ios>
 #include <string>
 
 /* ************************************************************************** */
@@ -37,7 +38,9 @@ private:
   FileBuffer& operator=(const FileBuffer& other);
 
   ExpectVoid _openTmpFile();
-  ExpectStr _getFront(std::size_t bytes);
+  ExpectChr _getChr(std::fstream::int_type (std::fstream::*func)());
+  ExpectStr _getStr(std::size_t bytes);
+  ExpectVoid _append(const char* data, std::streamsize bytes);
   ExpectVoid _saveRemainder();
   static ExpectVoid _copyData(std::fstream& bufFrom, std::fstream& bufTo);
   ExpectVoid _replaceCurrFile(FileBuffer& tmpFb);
