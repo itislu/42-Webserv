@@ -155,12 +155,6 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
 {
   bytes = std::min(bytes, _size);
 
-  // Go to start of file
-  _fs.seekg(0, std::ios::beg);
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
-  }
-
   // read bytes from the beginning
   const ExpectStr front = _getFront(bytes);
   if (!front.has_value()) {
@@ -234,6 +228,12 @@ IBuffer::ExpectStr FileBuffer::_getFront(std::size_t bytes)
 {
   if (!_fs.is_open()) {
     return ft::unexpected<BufferException>(errFileNotOpened);
+  }
+
+  // Go to start of file
+  _fs.seekg(0, std::ios::beg);
+  if (_fs.fail()) {
+    return ft::unexpected<BufferException>(errSeek);
   }
 
   std::string front(bytes, '\0');
