@@ -33,12 +33,11 @@ public:
   ExpectStr consumeFront(std::size_t bytes);
   std::size_t size() const;
 
-  ExpectVoid openTmpFile();
-
 private:
   FileBuffer(const FileBuffer& other);
   FileBuffer& operator=(const FileBuffer& other);
 
+  ExpectVoid _openTmpFile();
   ExpectStr _getFront(std::size_t bytes);
   ExpectVoid _saveRemainder();
   static ExpectVoid _copyData(std::fstream& bufFrom, std::fstream& bufTo);

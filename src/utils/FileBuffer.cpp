@@ -92,7 +92,10 @@ IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
 IBuffer::ExpectVoid FileBuffer::append(const std::string& data)
 {
   if (!_fs.is_open()) {
-    return ft::unexpected<BufferException>(errFileNotOpened);
+    const ExpectVoid res = _openTmpFile();
+    if (!res.has_value()) {
+      return res;
+    }
   }
 
   // Go to end and add new data
@@ -114,7 +117,10 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
                                        long bytes)
 {
   if (!_fs.is_open()) {
-    return ft::unexpected<BufferException>(errFileNotOpened);
+    const ExpectVoid res = _openTmpFile();
+    if (!res.has_value()) {
+      return res;
+    }
   }
 
   // Go to end and add new data
@@ -176,6 +182,9 @@ std::size_t FileBuffer::size() const
   return _size;
 }
 
+/* ************************************************************************** */
+// PRIVATE
+
 // NOLINTBEGIN(bugprone-random-generator-seed, misc-predictable-rand)
 static std::string getRandomFileName()
 {
@@ -194,12 +203,12 @@ static std::string getRandomFileName()
 }
 // NOLINTEND(bugprone-random-generator-seed, misc-predictable-rand)
 
-IBuffer::ExpectVoid FileBuffer::openTmpFile()
+IBuffer::ExpectVoid FileBuffer::_openTmpFile()
 {
   assert(!_fs.is_open());
   const std::size_t countMax = 100;
   std::size_t count = 0;
-  while (count < countMax) {
+  for (; count < countMax; ++count) {
     _fileName = getRandomFileName();
     _fs.open(_fileName.c_str(), std::ios::in);
     // check if file does not exist
@@ -215,21 +224,13 @@ IBuffer::ExpectVoid FileBuffer::openTmpFile()
     } else {
       _fs.close();
     }
-    ++count;
   }
   // tried to open 100 random files
   return ft::unexpected<BufferException>(errOpen);
 }
 
-/* ************************************************************************** */
-// PRIVATE
-
 IBuffer::ExpectStr FileBuffer::_getFront(std::size_t bytes)
 {
-  if (!_fs.is_open()) {
-    return ft::unexpected<BufferException>(errFileNotOpened);
-  }
-
   // Go to start of file
   _fs.seekg(0, std::ios::beg);
   if (_fs.fail()) {
@@ -250,7 +251,7 @@ IBuffer::ExpectVoid FileBuffer::_saveRemainder()
 {
   // Create a temporary file for the remainder
   FileBuffer tmp;
-  ExpectVoid res = tmp.openTmpFile();
+  ExpectVoid res = tmp._openTmpFile();
   if (!res.has_value()) {
     return res;
   }
