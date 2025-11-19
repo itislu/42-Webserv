@@ -13,8 +13,8 @@
 class IBuffer
 {
 public:
-  IBuffer();
-  virtual ~IBuffer() {};
+  IBuffer() {}
+  virtual ~IBuffer() {}
 
   class BufferException;
 
