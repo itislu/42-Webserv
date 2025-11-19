@@ -134,7 +134,7 @@ static std::string getRandomFileName()
   }
 
   std::string filename;
-  filename.append("tmpfile_");
+  filename.append(".tmpfile_");
   filename.append(ft::to_string(std::rand()));
   filename.append(ft::to_string(std::rand()));
   return filename;
