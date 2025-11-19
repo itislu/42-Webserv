@@ -42,8 +42,9 @@ private:
   ExpectStr _getStr(std::size_t bytes);
   ExpectVoid _append(const char* data, std::streamsize bytes);
   ExpectVoid _saveRemainder();
-  static ExpectVoid _copyData(std::fstream& bufFrom, std::fstream& bufTo);
+  ExpectVoid _copyFrom(FileBuffer& src);
   ExpectVoid _replaceCurrFile(FileBuffer& tmpFb);
+  void _removeCurrFile();
 
   static const std::size_t _copyBufferSize = 4096;
 

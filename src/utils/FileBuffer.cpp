@@ -5,6 +5,7 @@
 #include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -34,12 +35,7 @@ FileBuffer::FileBuffer()
 
 FileBuffer::~FileBuffer()
 {
-  if (_fs.is_open()) {
-    _fs.close();
-  }
-  if (!_fileName.empty()) {
-    (void)std::remove(_fileName.c_str());
-  }
+  _removeCurrFile();
 }
 
 IBuffer::ExpectChr FileBuffer::get()
@@ -92,7 +88,6 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
     return res;
   }
 
-  _size -= bytes;
   return ExpectVoid();
 }
 
@@ -117,7 +112,6 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
     return ft::unexpected<BufferException>(res.error());
   }
 
-  _size -= bytes;
   return front;
 }
 
@@ -162,7 +156,6 @@ IBuffer::ExpectVoid FileBuffer::_openTmpFile()
                std::ios::in | std::ios::out | std::ios::binary |
                  std::ios::trunc);
       if (_fs.is_open()) {
-        _size = 0;
         return ExpectVoid();
       }
     } else {
@@ -232,6 +225,12 @@ IBuffer::ExpectVoid FileBuffer::_append(const char* data, std::streamsize bytes)
 
 IBuffer::ExpectVoid FileBuffer::_saveRemainder()
 {
+  if (_fs.eof() || _fs.peek() == EOF) {
+    // No remainder
+    _removeCurrFile();
+    return ExpectVoid();
+  }
+
   // Create a temporary file for the remainder
   FileBuffer tmp;
   ExpectVoid res = tmp._openTmpFile();
@@ -240,7 +239,7 @@ IBuffer::ExpectVoid FileBuffer::_saveRemainder()
   }
 
   // Copy the remaining data
-  res = _copyData(_fs, tmp._fs);
+  res = tmp._copyFrom(*this);
   if (!res.has_value()) {
     return res;
   }
@@ -253,21 +252,22 @@ IBuffer::ExpectVoid FileBuffer::_saveRemainder()
 }
 
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-IBuffer::ExpectVoid FileBuffer::_copyData(std::fstream& bufFrom,
-                                          std::fstream& bufTo)
+IBuffer::ExpectVoid FileBuffer::_copyFrom(FileBuffer& src)
 {
+  std::fstream& fsSrc = src._fs;
   char buffer[_copyBufferSize];
-  while (!bufFrom.eof()) {
-    bufFrom.read(buffer, _copyBufferSize);
-    if (bufFrom.bad()) {
+  while (!fsSrc.eof()) {
+    fsSrc.read(buffer, _copyBufferSize);
+    if (fsSrc.bad()) {
       return ft::unexpected<BufferException>(errRead);
     }
-    const std::streamsize bytesRead = bufFrom.gcount();
+    const std::streamsize bytesRead = fsSrc.gcount();
     if (bytesRead > 0) {
-      bufTo.write(buffer, bytesRead);
-      if (bufTo.fail()) {
+      _fs.write(buffer, bytesRead);
+      if (_fs.fail()) {
         return ft::unexpected<BufferException>(errWrite);
       }
+      _size += static_cast<std::size_t>(bytesRead);
     }
   }
   return ExpectVoid();
@@ -277,18 +277,30 @@ IBuffer::ExpectVoid FileBuffer::_copyData(std::fstream& bufFrom,
 IBuffer::ExpectVoid FileBuffer::_replaceCurrFile(FileBuffer& tmpFb)
 {
   // close and remove curr file
-  _fs.close();
-  (void)std::remove(_fileName.c_str());
+  _removeCurrFile();
 
   // rename curr file
-  _fileName = tmpFb._fileName;
-  _fs.open(_fileName.c_str(), std::ios::in | std::ios::out | std::ios::binary);
+  _fs.open(tmpFb._fileName.c_str(),
+           std::ios::in | std::ios::out | std::ios::binary);
   if (!_fs.is_open()) {
-    _fileName.clear();
     return ft::unexpected<BufferException>(errOpen);
   }
+  using std::swap;
+  swap(_fileName, tmpFb._fileName);
+  swap(_size, tmpFb._size);
 
-  // remove filename of tmp file so it wont be removed in destructor
-  tmpFb._fileName.clear();
   return ExpectVoid();
+}
+
+void FileBuffer::_removeCurrFile()
+{
+  if (_fileName.empty()) {
+    return;
+  }
+  if (_fs.is_open()) {
+    _fs.close();
+  }
+  (void)std::remove(_fileName.c_str());
+  _fileName.clear();
+  _size = 0;
 }
