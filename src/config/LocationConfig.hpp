@@ -2,8 +2,12 @@
 #define LOCATIONCONFIG_HPP
 
 #include <cstddef>
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
+
+namespace config {
 
 class ServerConfig;
 
@@ -14,11 +18,15 @@ public:
 
   // GETTERS
   const std::string& getPath() const;
+
   const std::string& getRoot() const;
-  bool isAutoindex() const;
-  const std::vector<std::string>& getAllowedMethods() const;
   const std::string& getIndex() const;
   std::size_t getMaxBodySize() const;
+  const std::map<int, std::string>& getErrorPages() const;
+  const std::string& getErrorPage(int code) const;
+  const std::set<std::string>& getAllowedMethods() const;
+
+  bool isAutoIndex() const;
 
   bool isCgi() const;
   const std::string& getCgiPass() const;
@@ -31,12 +39,15 @@ public:
   // SETTERS
 
   void setPath(const std::string& path);
+
   void setRoot(const std::string& root);
-  void setAutoindex(bool autoindex);
-  void setAllowedMethods(const std::string& method);
-  void addAllowedMethods(const std::string& method);
   void setIndex(const std::string& index);
-  void setMaxSize(std::size_t size);
+  void setMaxBodySize(std::size_t size);
+  void setErrorPages(const std::vector<int>& codes, const std::string& path);
+  void addErrorPage(int code, const std::string& path);
+  void addAllowedMethod(const std::string& method);
+
+  void setAutoIndex(bool autoindex);
 
   void setCgi(bool cgi);
   void setCgiPass(const std::string& cgiPass);
@@ -51,10 +62,11 @@ private:
   std::string _root; // Filesystem path, allows overriding server root,
                      // e.g. /images can be somewhere else than rest
   bool _autoindex;   // true = enable directory listing
-  std::vector<std::string> _allowedMethods; // e.g. {"GET", "POST", "DELETE"}
-  std::string _index;                       // override default index (optional)
+  std::set<std::string> _allowedMethods; // e.g. {"GET", "POST", "DELETE"}
+  std::string _index;                    // override default index (optional)
   std::size_t
     _maxBodysize; // optional: override maxuploadsize for this location
+  std::map<int, std::string> _errorPages;
 
   // CGI
   bool _cgiEnabled;
@@ -82,5 +94,7 @@ If autoindex is:
 that folder.
 ❌ false → the server returns a 403 Forbidden (or sometimes 404 Not Found).
 */
+
+} // namespace config
 
 #endif

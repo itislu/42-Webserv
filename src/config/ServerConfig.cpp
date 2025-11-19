@@ -2,9 +2,15 @@
 #include "Config.hpp"
 #include "LocationConfig.hpp"
 #include <cstddef>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/string.hpp>
 #include <map>
+#include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
+
+namespace config {
 
 ServerConfig::ServerConfig(const Config& global)
   : _errorPages(global.getErrorPages())
@@ -39,7 +45,7 @@ const std::map<int, std::string>& ServerConfig::getErrorPages() const
   return _errorPages;
 }
 
-const std::vector<std::string>& ServerConfig::getAllowedMethods() const
+const std::set<std::string>& ServerConfig::getAllowedMethods() const
 {
   return _allowedMethods;
 }
@@ -62,6 +68,7 @@ long ServerConfig::getTimeout() const
 // SETTERS
 void ServerConfig::addPort(int port)
 {
+  checkPortDuplicate(port);
   _ports.push_back(port);
 }
 
@@ -80,7 +87,14 @@ void ServerConfig::setIndex(const std::string& index)
   _index = index;
 }
 
-// overrides if errorpage already exists
+void ServerConfig::setErrorPages(const std::vector<int>& codes,
+                                 const std::string& path)
+{
+  for (std::size_t i = 0; i < codes.size(); ++i) {
+    addErrorPage(codes[i], path);
+  }
+}
+
 void ServerConfig::addErrorPage(int code, const std::string& path)
 {
   _errorPages[code] = path;
@@ -93,7 +107,7 @@ void ServerConfig::setMaxBodySize(std::size_t size)
 
 void ServerConfig::addAllowedMethod(const std::string& method)
 {
-  _allowedMethods.push_back(method);
+  _allowedMethods.insert(method);
 }
 
 void ServerConfig::setTimeout(long time)
@@ -106,9 +120,18 @@ void ServerConfig::addLocation(const LocationConfig& location)
   _locations.push_back(location);
 }
 
+void ServerConfig::checkPortDuplicate(int port)
+{
+  if (ft::contains(_ports, port)) {
+    throw std::invalid_argument("duplicate port " + ft::to_string(port));
+  }
+}
+
 /* const LocationConfig& ServerConfig::getLocationForPath(const std::string&
 uri) const
 {
 
 }
  */
+
+} // namespace config
