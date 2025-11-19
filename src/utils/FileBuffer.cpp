@@ -248,6 +248,9 @@ IBuffer::ExpectStr FileBuffer::_getFront(std::size_t bytes)
   if (_fs.fail()) {
     return ft::unexpected<BufferException>(errSeek);
   }
+  if (bytes == 0) {
+    return std::string();
+  }
 
   std::string front(bytes, '\0');
   _fs.read(&front[0], static_cast<std::streamsize>(bytes));
