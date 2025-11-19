@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-Server::Server(const ServerConfig& config,
+Server::Server(const config::ServerConfig& config,
                const std::vector<const Socket*>& listeners)
   : _config(&config)
   , _listeners(listeners)
@@ -13,7 +13,7 @@ Server::Server(const ServerConfig& config,
 {
 }
 
-const ServerConfig& Server::getConfig() const
+const config::ServerConfig& Server::getConfig() const
 {
   return *_config;
 }

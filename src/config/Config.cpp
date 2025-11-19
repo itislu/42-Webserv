@@ -9,18 +9,28 @@
 #include <string>
 #include <vector>
 
-int Config::_defaultTimeout = 0;
+namespace config {
 
-Config::Config(const std::string& configFile)
-  : _configFile(configFile)
-  , _maxBodySize()
-  , _timeout()
+int Config::_defaultTimeout = 0;
+const char* const Config::defaultRoot = "/var/www";
+const std::size_t Config::defaultMaxBodySize = 1024L * 1024;
+const int Config::defaultTimeout = 60;
+
+Config::Config()
+  : _root(defaultRoot)
+  , _maxBodySize(defaultMaxBodySize)
+  , _timeout(defaultTimeout)
 {
 }
 
 const std::vector<ServerConfig>& Config::getServers() const
 {
   return _servers;
+}
+
+const std::string& Config::getRoot() const
+{
+  return _root;
 }
 
 std::size_t Config::getMaxBodySize() const
@@ -33,19 +43,20 @@ long Config::getTimeout() const
   return _timeout;
 }
 
+const std::string& Config::getErrorPage(int code) const
+{
+  const std::map<int, std::string>::const_iterator iter =
+    _errorPages.find(code);
+  if (iter != _errorPages.end()) {
+    return iter->second;
+  }
+  static const std::string empty;
+  return empty;
+}
+
 const std::map<int, std::string>& Config::getErrorPages() const
 {
   return _errorPages;
-}
-
-const std::string& Config::getErrorLogPath() const
-{
-  return _errorLogPath;
-}
-
-const std::string& Config::getAccessLogPath() const
-{
-  return _accessLogPath;
 }
 
 void Config::addServer(const ServerConfig& server)
@@ -53,24 +64,19 @@ void Config::addServer(const ServerConfig& server)
   _servers.push_back(server);
 }
 
+void Config::setRoot(const std::string& root)
+{
+  _root = root;
+}
+
 void Config::setMaxBodySize(std::size_t bytes)
 {
   _maxBodySize = bytes;
 }
 
-void Config::setTimeout(long seconds)
+void Config::setTimeout(long time)
 {
-  _timeout = seconds;
-}
-
-void Config::setErrorLogPath(const std::string& path)
-{
-  _errorLogPath = path;
-}
-
-void Config::setAccessLogPath(const std::string& path)
-{
-  _accessLogPath = path;
+  _timeout = time;
 }
 
 void Config::setDefaultTimeout()
@@ -86,6 +92,19 @@ void Config::setDefaultTimeout()
   Config::_defaultTimeout = static_cast<int>(timeout);
 }
 
+void Config::setErrorPages(const std::vector<int>& codes,
+                           const std::string& path)
+{
+  for (std::size_t i = 0; i < codes.size(); ++i) {
+    addErrorPage(codes[i], path);
+  }
+}
+
+void Config::addErrorPage(int code, const std::string& path)
+{
+  _errorPages[code] = path;
+}
+
 int Config::getDefaultTimeout()
 {
   return Config::_defaultTimeout;
@@ -93,7 +112,28 @@ int Config::getDefaultTimeout()
 
 std::ostream& operator<<(std::ostream& out, const Config& config)
 {
+  out << "==============================" << "\n";
+  out << " Global Configuration" << "\n";
+  out << "==============================" << "\n";
+
+  out << "Root: " << config.getRoot() << "\n";
+  out << "Timeout: " << config.getTimeout() << "s\n";
+  out << "BodySize: " << config.getMaxBodySize() << "\n";
+  if (!config.getErrorPages().empty()) {
+    out << "Error Page:" << "\n";
+    for (std::map<int, std::string>::const_iterator it =
+           config.getErrorPages().begin();
+         it != config.getErrorPages().end();
+         ++it) {
+      out << "  " << it->first << " : " << it->second << "\n";
+    }
+  }
+
   const std::vector<ServerConfig>& servers = config.getServers();
+  if (servers.empty()) {
+    out << "no servers";
+    return out;
+  }
   for (Config::const_ServConfIter serverIt = servers.begin();
        serverIt != servers.end();
        ++serverIt) {
@@ -120,11 +160,14 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
     for (std::vector<LocationConfig>::const_iterator locIt = locations.begin();
          locIt != locations.end();
          ++locIt) {
-      out << "  Location: " << locIt->getPath()
-          << ", root: " << locIt->getRoot()
-          << ", autoindex: " << (locIt->isAutoindex() ? "on" : "off") << "\n";
+      out << "  Location: " << locIt->getPath() << "\n"
+          << "    root: " << locIt->getRoot() << "\n"
+          << "    autoindex: " << (locIt->isAutoIndex() ? "on" : "off") << "\n"
+          << "    cgi: " << (locIt->isCgi() ? "on" : "off") << "\n";
     }
   }
   out << "Lowest Timeout(Default): " << Config::getDefaultTimeout() << "s\n";
   return out;
 }
+
+} // namespace config
