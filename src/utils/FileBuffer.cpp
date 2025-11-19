@@ -101,7 +101,10 @@ IBuffer::ExpectVoid FileBuffer::append(const std::string& data)
     return ft::unexpected<BufferException>(errSeek);
   }
 
-  _fs << data;
+  _fs.write(data.c_str(), static_cast<std::streamsize>(data.size()));
+  if (_fs.fail()) {
+    return ft::unexpected<BufferException>(errWrite);
+  }
 
   _size += data.size();
   return ExpectVoid();
