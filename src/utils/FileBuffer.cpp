@@ -177,6 +177,7 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
   if (!front.has_value()) {
     return front;
   }
+  assert(front->size() == bytes); // Unexpected EOF should not happen
 
   // read/write rest into new tempFile
   const ExpectVoid resB = _saveRemainder();
@@ -250,10 +251,10 @@ IBuffer::ExpectStr FileBuffer::_getFront(std::size_t bytes)
 
   std::string front(bytes, '\0');
   _fs.read(&front[0], static_cast<std::streamsize>(bytes));
-  const std::streamsize actuallyRead = _fs.gcount();
-  if (actuallyRead == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
+  if (_fs.bad()) {
+    return ft::unexpected<BufferException>(errRead);
   }
+  const std::streamsize actuallyRead = _fs.gcount();
   front.resize(static_cast<std::size_t>(actuallyRead));
   return front;
 }
@@ -287,7 +288,7 @@ IBuffer::ExpectVoid FileBuffer::_copyData(std::fstream& bufFrom,
   char buffer[_copyBufferSize];
   while (!bufFrom.eof()) {
     bufFrom.read(buffer, _copyBufferSize);
-    if (bufFrom.fail() && !bufFrom.eof()) {
+    if (bufFrom.bad()) {
       return ft::unexpected<BufferException>(errRead);
     }
     const std::streamsize bytesRead = bufFrom.gcount();
