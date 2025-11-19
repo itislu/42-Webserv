@@ -25,8 +25,6 @@ const char* const FileBuffer::errFileNotOpened =
 const char* const FileBuffer::errEof = "FbException: tried to get end of file";
 const char* const FileBuffer::errRead = "FbException: read failed";
 const char* const FileBuffer::errWrite = "FbException: write failed";
-const char* const FileBuffer::errTellp =
-  "FbException: failed to get stream position";
 
 /* ************************************************************************** */
 // PUBLIC
@@ -155,7 +153,7 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
   bytes = std::min(bytes, _size);
 
   // Go to start of file
-  _fs.seekp(0, std::ios::beg);
+  _fs.seekg(0, std::ios::beg);
   if (_fs.fail()) {
     return ft::unexpected<BufferException>(errSeek);
   }

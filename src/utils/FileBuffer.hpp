@@ -19,7 +19,6 @@ public:
   static const char* const errEof;
   static const char* const errRead;
   static const char* const errWrite;
-  static const char* const errTellp;
 
   FileBuffer();
   ~FileBuffer();
