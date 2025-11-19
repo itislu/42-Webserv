@@ -15,8 +15,7 @@ public:
   static const char* const errOpen;
   static const char* const errSeek;
   static const char* const errFileEmpty;
-  static const char* const errFileNotOpened;
-  static const char* const errEof;
+  static const char* const errOutOfRange;
   static const char* const errRead;
   static const char* const errWrite;
 

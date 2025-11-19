@@ -5,7 +5,6 @@
 #include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
 
-#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -20,9 +19,8 @@
 const char* const FileBuffer::errOpen = "FbException: open failed";
 const char* const FileBuffer::errSeek = "FbException: seek failed";
 const char* const FileBuffer::errFileEmpty = "FbException: file is empty";
-const char* const FileBuffer::errFileNotOpened =
-  "FbException: file is not opened";
-const char* const FileBuffer::errEof = "FbException: tried to get end of file";
+const char* const FileBuffer::errOutOfRange =
+  "FbException: tried to access out of range";
 const char* const FileBuffer::errRead = "FbException: read failed";
 const char* const FileBuffer::errWrite = "FbException: write failed";
 
@@ -46,14 +44,14 @@ FileBuffer::~FileBuffer()
 
 IBuffer::ExpectChr FileBuffer::get()
 {
-  if (!_fs.is_open()) {
-    return ft::unexpected<BufferException>(errFileNotOpened);
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
   }
 
   const int chr = _fs.get();
   if (_fs.fail()) {
     if (_fs.eof()) {
-      return ft::unexpected<BufferException>(errEof);
+      return ft::unexpected<BufferException>(errOutOfRange);
     }
     return ft::unexpected<BufferException>(errRead);
   }
@@ -62,14 +60,14 @@ IBuffer::ExpectChr FileBuffer::get()
 
 IBuffer::ExpectChr FileBuffer::peek()
 {
-  if (!_fs.is_open()) {
-    return ft::unexpected<BufferException>(errFileNotOpened);
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
   }
 
   const int chr = _fs.peek();
   if (_fs.fail()) {
     if (_fs.eof()) {
-      return ft::unexpected<BufferException>(errEof);
+      return ft::unexpected<BufferException>(errOutOfRange);
     }
     return ft::unexpected<BufferException>(errRead);
   }
@@ -78,8 +76,11 @@ IBuffer::ExpectChr FileBuffer::peek()
 
 IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
 {
-  if (!_fs.is_open()) {
-    return ft::unexpected<BufferException>(errFileNotOpened);
+  if (pos > _size) {
+    return ft::unexpected<BufferException>(errOutOfRange);
+  }
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
   }
 
   _fs.seekg(static_cast<std::streamoff>(pos));
@@ -140,7 +141,12 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
 
 IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 {
-  bytes = std::min(bytes, _size);
+  if (bytes > _size) {
+    return ft::unexpected<BufferException>(errOutOfRange);
+  }
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
+  }
 
   _fs.seekg(static_cast<std::streamoff>(bytes));
   if (_fs.fail()) {
@@ -159,7 +165,12 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
 {
-  bytes = std::min(bytes, _size);
+  if (bytes > _size) {
+    return ft::unexpected<BufferException>(errOutOfRange);
+  }
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
+  }
 
   // read bytes from the beginning
   const ExpectStr front = _getFront(bytes);
