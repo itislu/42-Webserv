@@ -44,7 +44,6 @@ private:
   ExpectVoid _saveRemainder();
   static ExpectVoid _copyData(std::fstream& bufFrom, std::fstream& bufTo);
   ExpectVoid _replaceCurrFile(FileBuffer& tmpFb);
-  ExpectVoid _calcSize();
 
   static const std::size_t _copyBufferSize = 4096;
 

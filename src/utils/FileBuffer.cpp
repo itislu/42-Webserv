@@ -105,11 +105,7 @@ IBuffer::ExpectVoid FileBuffer::append(const std::string& data)
 
   _fs << data;
 
-  const ExpectVoid res = _calcSize();
-  if (!res.has_value()) {
-    return res;
-  }
-
+  _size += data.size();
   return ExpectVoid();
 }
 
@@ -131,10 +127,7 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
     return ft::unexpected<BufferException>(errWrite);
   }
 
-  const ExpectVoid res = _calcSize();
-  if (!res.has_value()) {
-    return res;
-  }
+  _size += bytes;
   return ExpectVoid();
 }
 
@@ -153,10 +146,7 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
     return resB;
   }
 
-  const ExpectVoid resC = _calcSize();
-  if (!resC.has_value()) {
-    return resC;
-  }
+  _size -= bytes;
   return ExpectVoid();
 }
 
@@ -182,11 +172,7 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
     return ft::unexpected<BufferException>(resB.error().what());
   }
 
-  const ExpectVoid resC = _calcSize();
-  if (!resC.has_value()) {
-    return ft::unexpected<BufferException>(resC.error().what());
-  }
-
+  _size -= bytes;
   return front;
 }
 
@@ -319,19 +305,5 @@ IBuffer::ExpectVoid FileBuffer::_replaceCurrFile(FileBuffer& tmpFb)
 
   // remove filename of tmp file so it wont be removed in destructor
   tmpFb._fileName.clear();
-  return ExpectVoid();
-}
-
-IBuffer::ExpectVoid FileBuffer::_calcSize()
-{
-  _fs.seekp(0, std::ios::end);
-  if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
-  }
-  const std::streampos tempSize = _fs.tellp();
-  if (tempSize == std::streampos(-1)) {
-    return ft::unexpected<BufferException>(errTellp);
-  }
-  _size = static_cast<std::size_t>(tempSize);
   return ExpectVoid();
 }
