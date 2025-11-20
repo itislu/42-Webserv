@@ -2,16 +2,16 @@
 #ifndef BUFFER_READER_HPP
 #define BUFFER_READER_HPP
 
-#include <utils/Buffer.hpp>
+#include "utils/IBuffer.hpp"
 
 /* ************************************************************************** */
 class BufferReader
 {
 public:
-  void init(Buffer* buffer);
+  void init(IBuffer* buffer);
+
   bool reachedEnd() const;
   char getNextChar();
-  char getCurrChar() const;
   long getPosInBuff() const;
   void setPosInBuff(long pos);
   void resetPosInBuff();
@@ -19,9 +19,14 @@ public:
 
   void printRemaining();
 
+  bool fail() const;
+  const IBuffer::BufferException& error() const;
+
 private:
-  Buffer* _buffer;
+  IBuffer* _buffer;
+  IBuffer::BufferException _error;
   long _posInBuff;
+  bool _fail;
 };
 
-#endif // BUFFER_READER_HPP
+#endif

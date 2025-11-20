@@ -8,8 +8,8 @@
 #include <http/states/readRequestLine/ValidateRequest.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
-#include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/logger/Logger.hpp>
@@ -66,9 +66,13 @@ void ParseVersion::run()
 void ParseVersion::_extractVersion()
 {
   const long index = _buffReader.getPosInBuff();
-  std::string str = _client->getInBuff().consume(index + 1);
-  ft::trim(str);
-  _client->getRequest().setVersion(str);
+  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
+  if (!res.has_value()) {
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    return;
+  }
+  const std::string version = ft::trim(*res);
+  _client->getRequest().setVersion(version);
 }
 
 /* ************************************************************************** */

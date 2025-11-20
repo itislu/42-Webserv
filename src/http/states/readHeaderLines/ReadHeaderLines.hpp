@@ -24,6 +24,7 @@ public:
 
 private:
   void _init();
+  bool _readingOk();
   void _readLines();
   void _setNextState();
   bool _hasEndOfLine();

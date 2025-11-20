@@ -26,7 +26,7 @@ ft::unique_ptr<Client> requestTestCharByChar(std::string& rawBuffer)
   while (!client->getStateHandler().isDone() && index < rawBuffer.size()) {
     std::string chr;
     chr.push_back(rawBuffer[index]);
-    client->getInBuff().add(chr);
+    client->getInBuff().append(chr);
     client->getStateHandler().getState()->run();
     index++;
   }
@@ -40,7 +40,7 @@ ft::unique_ptr<Client> requestTest(std::string& rawBuffer)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
   client->getStateHandler().setState<ReadRequestLine>();
-  client->getInBuff().add(rawBuffer);
+  client->getInBuff().append(rawBuffer);
 
   while (!client->getStateHandler().isDone()) {
     client->getStateHandler().getState()->run();

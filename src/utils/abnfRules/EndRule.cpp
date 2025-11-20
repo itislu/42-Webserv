@@ -22,7 +22,8 @@ bool EndRule::matches()
   setEndPos(getBuffReader()->getPosInBuff());
   bool matches = false;
   long rewindCount = 1;
-  while (!matches && getBuffReader()->getPosInBuff() > getStartPos()) {
+  while (!matches && !getBuffReader()->fail() &&
+         getBuffReader()->getPosInBuff() > getStartPos()) {
     getBuffReader()->rewind(rewindCount);
     if (getBuffReader()->getPosInBuff() < 0) {
       break;

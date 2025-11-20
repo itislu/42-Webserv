@@ -29,9 +29,12 @@ public:
   ExpectChr peek();
   ExpectVoid seek(std::size_t pos);
   ExpectVoid append(const std::string& data);
-  ExpectVoid append(const Container& buffer, long bytes);
+  ExpectVoid append(const RawBytes& buffer, long bytes);
   ExpectVoid removeFront(std::size_t bytes);
   ExpectStr consumeFront(std::size_t bytes);
+  ExpectRaw consumeAll();
+  ExpectVoid replace(RawBytes& rawData);
+  bool isEmpty() const;
   std::size_t size() const;
 
 private:

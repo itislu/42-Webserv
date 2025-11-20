@@ -10,6 +10,8 @@
 #include <http/states/readBody/ReadBody.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
+#include <utils/BufferReader.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -70,10 +72,28 @@ void ReadHeaderLines::_init()
   _endOfLine->setResultMap(&_results);
 }
 
+bool ReadHeaderLines::_readingOk()
+{
+  const StatusCode& statuscode = _client->getResponse().getStatusCode();
+  if (statuscode != StatusCode::Ok) {
+    return false;
+  }
+  if (_buffReader.fail()) {
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    _log.error() << "ReadHeaderLines: _buffReader failed: "
+                 << _buffReader.error().what() << "\n";
+    return false;
+  }
+  if (_buffReader.reachedEnd()) {
+    return false;
+  }
+  return true;
+}
+
 void ReadHeaderLines::_readLines()
 {
   _buffReader.resetPosInBuff();
-  while (!_buffReader.reachedEnd()) {
+  while (_readingOk()) {
     _results.clear();
     _fieldLine->reset();
     _endOfLine->reset();
@@ -81,7 +101,6 @@ void ReadHeaderLines::_readLines()
     if (_fieldLine->matches()) {
       if (_fieldLine->reachedEnd()) {
         const std::string fieldLine = _extractPart(FieldLinePart);
-        // todo parse each field value
         _addLineToHeaders(fieldLine);
       }
     } else if (_hasEndOfLine()) {
@@ -115,8 +134,14 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 {
   const RuleResult& result = _results[ruleId];
   const long index = result.getEnd();
+  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
+  if (!res.has_value()) {
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    _log.error() << "ReadHeaderLines: _extractPart: InternalServerError\n";
+    return "";
+  }
   _buffReader.resetPosInBuff();
-  return _client->getInBuff().consume(index + 1);
+  return *res;
 }
 
 void ReadHeaderLines::_addLineToHeaders(const std::string& line)

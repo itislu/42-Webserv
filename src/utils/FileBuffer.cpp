@@ -69,7 +69,7 @@ IBuffer::ExpectVoid FileBuffer::append(const std::string& data)
   return _append(data.data(), static_cast<std::streamsize>(data.size()));
 }
 
-IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
+IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
                                        long bytes)
 {
   return _append(buffer.data(), static_cast<std::streamsize>(bytes));
@@ -97,6 +97,43 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
 {
   return _consumeFront<std::string>(bytes);
+}
+
+IBuffer::ExpectRaw FileBuffer::consumeAll()
+{
+  ExpectRaw result;
+  RawBytes& rawBytes = result.value();
+  rawBytes.resize(_size);
+  _fs.read(&rawBytes[0], static_cast<std::streamsize>(_size));
+  const std::streamsize actuallyRead = _fs.gcount();
+  if (actuallyRead == 0) {
+    return ft::unexpected<BufferException>(errRead);
+  }
+  if (_fs.is_open()) {
+    _fs.close();
+  }
+  if (!_fileName.empty()) {
+    (void)std::remove(_fileName.c_str());
+  }
+  return result;
+}
+
+IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData)
+{
+  if (_size > 0) {
+    if (_fs.is_open()) {
+      _fs.close();
+    }
+    if (!_fileName.empty()) {
+      (void)std::remove(_fileName.c_str());
+    }
+  }
+  return append(rawData, static_cast<long>(rawData.size()));
+}
+
+bool FileBuffer::isEmpty() const
+{
+  return _size == 0;
 }
 
 std::size_t FileBuffer::size() const

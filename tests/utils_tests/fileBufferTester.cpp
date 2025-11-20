@@ -35,7 +35,7 @@ TEST(FileBufferTester, AppendString)
 TEST(FileBufferTester, AppendVector)
 {
   std::string inputStr = "0123456789Alaaaaaaaaaaaaaaaaaarm";
-  const FileBuffer::Container input(inputStr.begin(), inputStr.end());
+  const FileBuffer::RawBytes input(inputStr.begin(), inputStr.end());
 
   FileBuffer filebuffer;
   FileBuffer::ExpectVoid expectVoid;

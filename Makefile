@@ -50,7 +50,7 @@ fclean: clean
 
 
 # **************************************************************************** #
-ARGS ?= "resources/config/test.conf"
+ARGS ?= "./assets/testWebsite/simple.conf"
 
 export ASAN_OPTIONS := check_initialization_order=1: \
 												detect_stack_use_after_return=1: \

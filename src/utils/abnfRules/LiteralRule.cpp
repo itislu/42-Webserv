@@ -20,7 +20,7 @@ bool LiteralRule::matches()
   setStartPos(getBuffReader()->getPosInBuff());
   debugPrintRuleEntry();
   bool matches = true;
-  while (!getBuffReader()->reachedEnd()) {
+  while (!getBuffReader()->fail() && !getBuffReader()->reachedEnd()) {
     const char chr = getBuffReader()->getNextChar();
     matches = chr == _literal[_pos];
     _pos++;

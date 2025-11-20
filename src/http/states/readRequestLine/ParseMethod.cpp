@@ -8,8 +8,8 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
@@ -82,8 +82,12 @@ void ParseMethod::_init()
 void ParseMethod::_extractMethod()
 {
   const long index = _buffReader.getPosInBuff();
-  std::string strMethod = _client->getInBuff().consume(index + 1);
-  ft::trim(strMethod);
-  const Request::Method method = Request::strToMethod(strMethod);
+  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
+  if (!res.has_value()) {
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    return;
+  }
+  const std::string methodStr = ft::trim(*res);
+  const Request::Method method = Request::strToMethod(methodStr);
   _client->getRequest().setMethod(method);
 }

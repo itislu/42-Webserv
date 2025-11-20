@@ -1,10 +1,16 @@
 #include "IBuffer.hpp"
+#include "libftpp/utility.hpp"
 
 /* ************************************************************************** */
 // Exceptions
 
 /* ************************************************************************** */
 // PUBLIC
+IBuffer::BufferException::BufferException()
+  : _message(FT_NULLPTR)
+{
+}
+
 IBuffer::BufferException::BufferException(const char* message)
   : _message(message)
 {

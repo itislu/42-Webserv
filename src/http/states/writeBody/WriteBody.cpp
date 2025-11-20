@@ -1,7 +1,7 @@
 #include "WriteBody.hpp"
 
 #include <client/Client.hpp>
-#include <utils/Buffer.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -37,8 +37,8 @@ void WriteBody::run()
   std::ostringstream oss;
   oss << ifs.rdbuf();
 
-  Buffer& outBuffer = _client->getOutBuff();
-  outBuffer.add(oss.str());
+  IBuffer& outBuffer = _client->getOutBuff();
+  outBuffer.append(oss.str());
 
   // _log.info(_client->getOutBuff().toString());
   _client->getStateHandler().setDone();

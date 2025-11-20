@@ -18,18 +18,22 @@ public:
 
   class BufferException;
 
-  typedef std::vector<char> Container;
+  typedef std::vector<char> RawBytes;
   typedef ft::expected<void, BufferException> ExpectVoid;
   typedef ft::expected<char, BufferException> ExpectChr;
   typedef ft::expected<std::string, BufferException> ExpectStr;
+  typedef ft::expected<RawBytes, BufferException> ExpectRaw;
 
   virtual ExpectChr get() = 0;
   virtual ExpectChr peek() = 0;
   virtual ExpectVoid seek(std::size_t pos) = 0;
   virtual ExpectVoid append(const std::string& data) = 0;
-  virtual ExpectVoid append(const Container& buffer, long bytes) = 0;
+  virtual ExpectVoid append(const RawBytes& buffer, long bytes) = 0;
   virtual ExpectVoid removeFront(std::size_t bytes) = 0;
   virtual ExpectStr consumeFront(std::size_t bytes) = 0;
+  virtual ExpectRaw consumeAll() = 0;
+  virtual ExpectVoid replace(RawBytes& rawData) = 0;
+  virtual bool isEmpty() const = 0;
   virtual std::size_t size() const = 0;
 
 private:
@@ -42,6 +46,7 @@ private:
 class IBuffer::BufferException : public std::exception
 {
 public:
+  BufferException();
   explicit BufferException(const char* message);
   ~BufferException() throw() {};
   BufferException(const BufferException& other);

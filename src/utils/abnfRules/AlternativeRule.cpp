@@ -86,6 +86,9 @@ bool AlternativeRule::_firstMatchMode()
       setEndPos(getBuffReader()->getPosInBuff());
       break;
     }
+    if (getBuffReader()->fail()) {
+      break;
+    }
     rewindToStartPos();
   }
   return matches;
@@ -94,7 +97,7 @@ bool AlternativeRule::_firstMatchMode()
 bool AlternativeRule::_greedyMode()
 {
   setStartPos(getBuffReader()->getPosInBuff());
-  setEndPos(-1);
+  setEndPos(0);
   bool somethingMatched = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
     if (_rules[i]->matches()) {
@@ -103,6 +106,9 @@ bool AlternativeRule::_greedyMode()
         setEndPos(getBuffReader()->getPosInBuff());
       }
       somethingMatched = true;
+    }
+    if (getBuffReader()->fail()) {
+      break;
     }
     rewindToStartPos();
   }

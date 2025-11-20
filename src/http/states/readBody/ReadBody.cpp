@@ -1,17 +1,17 @@
 #include "ReadBody.hpp"
-#include "libftpp/string.hpp"
 
-#include <algorithm>
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <libftpp/algorithm.hpp>
-#include <utils/Buffer.hpp>
+#include <libftpp/string.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <algorithm>
 #include <sstream>
 #include <string>
 
@@ -111,12 +111,10 @@ bool ReadBody::_isValidTransferEncoding()
 
 void ReadBody::_readFixedLengthBody()
 {
-  // TODO: For large bodies, write to file or use a smart buffer that flushes to
-  // file.
-  Buffer& inBuffer = _client->getInBuff();
+  IBuffer& inBuffer = _client->getInBuff();
   Request& request = _client->getRequest();
 
-  const long size = static_cast<long>(inBuffer.getSize());
+  const long size = static_cast<long>(inBuffer.size());
   if (size <= 0 || _done) {
     return;
   }
@@ -129,7 +127,17 @@ void ReadBody::_readFixedLengthBody()
     return;
   }
 
-  request.getBody().add(inBuffer.consume(toConsume));
+  IBuffer::ExpectStr res = inBuffer.consumeFront(toConsume);
+  if (!res.has_value()) {
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    return;
+  }
+
+  const IBuffer::ExpectVoid resVoid = request.getBody().append(*res);
+  if (!resVoid.has_value()) {
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    return;
+  }
   _consumed += toConsume;
 
   if (_consumed >= _bodyLength) {
