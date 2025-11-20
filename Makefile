@@ -50,7 +50,7 @@ fclean: clean
 
 
 # **************************************************************************** #
-ARGS ?= "assets/config.json"
+ARGS ?= "resources/config/test.conf"
 
 export ASAN_OPTIONS := check_initialization_order=1: \
 												detect_stack_use_after_return=1: \
@@ -64,6 +64,7 @@ export UBSAN_OPTIONS := print_stacktrace=1: \
 
 VALGRINDFLAGS := --errors-for-leak-kinds=all \
 									--leak-check=full \
+									--num-callers=50 \
 									--show-error-list=yes \
 									--show-leak-kinds=all \
 									--trace-children=yes \

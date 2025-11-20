@@ -7,7 +7,7 @@ on:
     types: [submitted]
 
 jobs:
-  assign-reviewer:
+  pr-assign-reviewer:
     # Prevents the job from running if:
     # 1. The reviewer is the same as the PR author, OR
     # 2. The reviewer is already assigned to the PR.

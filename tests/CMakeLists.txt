@@ -21,22 +21,21 @@ FetchContent_MakeAvailable(googletest)
 
 
 # **************************************************************************** #
-# Download & add googletest
-include(CTest)
-set(MEMORYCHECK_COMMAND valgrind)
-set(MEMORYCHECK_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
-                                 --leak-check=full \
-                                 --show-error-list=yes \
-                                 --show-leak-kinds=all \
-                                 --trace-children=yes \
-                                 --track-origins=yes \
-                                 --track-fds=all"
+# Set valgrind options
+set(VALGRIND_COMMAND_OPTIONS "--errors-for-leak-kinds=all \
+                              --leak-check=full \
+                              --num-callers=50 \
+                              --show-leak-kinds=all \
+                              --trace-children=yes \
+                              --track-origins=yes \
+                              --track-fds=all"
 )
+include(CTest)
 
 
 
 # **************************************************************************** #
-# function to add test
+# Function to add test
 function(add_my_test test_name)
   add_executable(${test_name} ${ARGN})
 
@@ -56,6 +55,7 @@ function(add_my_test test_name)
     http
     server
     utils
+    config
   )
 
   add_test(NAME ${PROJECT_NAME}_${test_name} COMMAND ${test_name})
@@ -68,6 +68,10 @@ endfunction()
 # utils
 add_my_test(utilsTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
+)
+
+add_my_test(fileBufferTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/fileBufferTester.cpp
 )
 
 # http
@@ -101,4 +105,10 @@ add_my_test(readRequestLineTester
 
 add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
+)
+
+# config
+
+add_my_test(configParserTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/config/configParserTester.cpp
 )
