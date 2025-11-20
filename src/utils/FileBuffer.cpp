@@ -278,15 +278,19 @@ IBuffer::ExpectVoid FileBuffer::_copyFrom(FileBuffer& src)
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 
+/**
+ * Close curr file and try to open tmp file.
+ * If success, swap filename and destructor of tmpFb will remove old curr file.
+ * If fail, reopen curr file and keep it; tmpFb will remove its tmp file.
+ */
 IBuffer::ExpectVoid FileBuffer::_replaceCurrFile(FileBuffer& tmpFb)
 {
-  // close and remove curr file
-  _removeCurrFile();
-
-  // rename curr file
+  _fs.close();
   _fs.open(tmpFb._fileName.c_str(),
            std::ios::in | std::ios::out | std::ios::binary);
   if (!_fs.is_open()) {
+    _fs.open(_fileName.c_str(),
+             std::ios::in | std::ios::out | std::ios::binary);
     return ft::unexpected<BufferException>(errOpen);
   }
   using std::swap;
