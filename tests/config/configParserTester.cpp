@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 using config::Config;
 using config::ConfigParser;
@@ -657,76 +658,33 @@ TEST(SyntaxErrorsTester, SemicolonBeforeDirective)
 // Valid Config Tests
 // ============================================================================
 
-TEST(ValidConfigTester, BodySizeMultiplier_b)
+TEST(ValidConfigTester, BodySizeMultipliers)
 {
   const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_b.conf";
+    std::string(ASSETS_PATH) + "valid/bodysize_multipliers.conf";
   ConfigParser parser(configPath.c_str());
   Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
-}
+  ASSERT_NO_THROW(config = parser.parseConfig());
 
-TEST(ValidConfigTester, BodySizeMultiplier_B)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_B.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
-}
+  const std::vector<ServerConfig>& servers = config.getServers();
+  ASSERT_EQ(servers.size(), 8);
 
-TEST(ValidConfigTester, BodySizeMultiplier_g)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_g.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
-}
-
-TEST(ValidConfigTester, BodySizeMultiplier_G)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_G.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
-}
-
-TEST(ValidConfigTester, BodySizeMultiplier_k)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_k.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
-}
-
-TEST(ValidConfigTester, BodySizeMultiplier_K)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_K.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
-}
-
-TEST(ValidConfigTester, BodySizeMultiplier_m)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_m.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
-}
-
-TEST(ValidConfigTester, BodySizeMultiplier_M)
-{
-  const std::string configPath =
-    std::string(ASSETS_PATH) + "valid/bodysize_multiplier_M.conf";
-  ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  // b (bytes)
+  EXPECT_EQ(servers[0].getMaxBodySize(), 1UL);
+  // B (bytes)
+  EXPECT_EQ(servers[1].getMaxBodySize(), 2UL);
+  // k (kilobytes)
+  EXPECT_EQ(servers[2].getMaxBodySize(), 3UL * 1024);
+  // K (kilobytes)
+  EXPECT_EQ(servers[3].getMaxBodySize(), 4UL * 1024);
+  // m (megabytes)
+  EXPECT_EQ(servers[4].getMaxBodySize(), 5UL * 1024 * 1024);
+  // M (megabytes)
+  EXPECT_EQ(servers[5].getMaxBodySize(), 6UL * 1024 * 1024);
+  // g (gigabytes)
+  EXPECT_EQ(servers[6].getMaxBodySize(), 7UL * 1024 * 1024 * 1024);
+  // G (gigabytes)
+  EXPECT_EQ(servers[7].getMaxBodySize(), 8UL * 1024 * 1024 * 1024);
 }
 
 TEST(ValidConfigTester, CommentsInValue)
