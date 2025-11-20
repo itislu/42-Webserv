@@ -13,7 +13,6 @@
 #include <ios>
 #include <iosfwd>
 #include <string>
-#include <vector>
 
 /* ************************************************************************** */
 // INIT

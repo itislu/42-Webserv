@@ -3,10 +3,8 @@
 #include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
 
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <iostream>
 
 /* ************************************************************************** */
 // PUBLIC
@@ -97,27 +95,6 @@ void BufferReader::rewind(long bytes)
     return;
   }
   _posInBuff = newPos;
-}
-
-void BufferReader::printRemaining()
-{
-  assert(_buffer != FT_NULLPTR);
-  if (_fail) {
-    return;
-  }
-  IBuffer::ExpectChr res;
-  const long istart = getPosInBuff();
-  std::size_t pos = static_cast<std::size_t>(istart);
-  pos = std::max<long>(istart, 0);
-  res = _buffer->get();
-  pos++;
-  while (res.has_value() && pos < _buffer->size() && *res != '\r' &&
-         *res != '\n') {
-    std::cout << *res;
-    pos++;
-    res = _buffer->get();
-  }
-  setPosInBuff(istart);
 }
 
 bool BufferReader::fail() const

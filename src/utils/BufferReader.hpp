@@ -17,8 +17,6 @@ public:
   void resetPosInBuff();
   void rewind(long bytes);
 
-  void printRemaining();
-
   bool fail() const;
   const IBuffer::BufferException& error() const;
 
