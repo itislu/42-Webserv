@@ -141,17 +141,6 @@ void SmartBuffer::_checkBuffer()
   if (_buffer == FT_NULLPTR) {
     // todo should first be MemoryBuffer
     _buffer = ft::make_shared<FileBuffer>();
-
-    FileBuffer* ptr = dynamic_cast<FileBuffer*>(_buffer.get());
-    ExpectVoid resVoid;
-    if (ptr != FT_NULLPTR) {
-      // todo remove when lukas implemented it in FileBuffer
-      resVoid = ptr->openTmpFile();
-      if (!resVoid.has_value()) {
-        _buffer.reset();
-        return;
-      }
-    }
     _usesFile = true;
   }
 }
@@ -170,18 +159,7 @@ IBuffer::ExpectVoid SmartBuffer::_switchToFileBuffer()
   }
   _buffer = ft::make_shared<FileBuffer>();
 
-  FileBuffer* ptr = dynamic_cast<FileBuffer*>(_buffer.get());
-  ExpectVoid resVoid;
-  if (ptr != FT_NULLPTR) {
-    // todo remove when lukas implemented it in FileBuffer
-    resVoid = ptr->openTmpFile();
-    if (!resVoid.has_value()) {
-      _buffer.reset();
-      return resVoid;
-    }
-  }
-
-  resVoid = _buffer->replace(*res);
+  const ExpectVoid resVoid = _buffer->replace(*res);
   if (!resVoid.has_value()) {
     _buffer.reset();
     return resVoid;

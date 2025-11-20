@@ -13,6 +13,7 @@
 #include <ios>
 #include <iosfwd>
 #include <string>
+#include <vector>
 
 /* ************************************************************************** */
 // INIT
@@ -101,33 +102,12 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
 
 IBuffer::ExpectRaw FileBuffer::consumeAll()
 {
-  ExpectRaw result;
-  RawBytes& rawBytes = result.value();
-  rawBytes.resize(_size);
-  _fs.read(&rawBytes[0], static_cast<std::streamsize>(_size));
-  const std::streamsize actuallyRead = _fs.gcount();
-  if (actuallyRead == 0) {
-    return ft::unexpected<BufferException>(errRead);
-  }
-  if (_fs.is_open()) {
-    _fs.close();
-  }
-  if (!_fileName.empty()) {
-    (void)std::remove(_fileName.c_str());
-  }
-  return result;
+  return _consumeFront<RawBytes>(_size);
 }
 
 IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData)
 {
-  if (_size > 0) {
-    if (_fs.is_open()) {
-      _fs.close();
-    }
-    if (!_fileName.empty()) {
-      (void)std::remove(_fileName.c_str());
-    }
-  }
+  _removeCurrFile();
   return append(rawData, static_cast<long>(rawData.size()));
 }
 
@@ -241,6 +221,8 @@ template<typename ContigContainer>
 ft::expected<ContigContainer, FileBuffer::BufferException> FileBuffer::_getData(
   std::size_t bytes)
 {
+  typedef ft::expected<ContigContainer, BufferException> ExpectCont;
+
   if (bytes == 0) {
     return ContigContainer();
   }
@@ -248,7 +230,7 @@ ft::expected<ContigContainer, FileBuffer::BufferException> FileBuffer::_getData(
     return ft::unexpected<BufferException>(errOutOfRange);
   }
 
-  ExpectStr res;
+  ExpectCont res;
   ContigContainer& front = res.value();
   front.resize(bytes);
 
