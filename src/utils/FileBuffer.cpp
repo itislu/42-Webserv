@@ -180,7 +180,7 @@ IBuffer::ExpectChr FileBuffer::_getChr(
     }
     return ft::unexpected<BufferException>(errRead);
   }
-  return chr;
+  return static_cast<char>(chr);
 }
 
 IBuffer::ExpectStr FileBuffer::_getStr(std::size_t bytes)
