@@ -83,10 +83,6 @@ void ParseMethod::_extractMethod()
 {
   const long index = _buffReader.getPosInBuff();
   const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
-  if (!res.has_value()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    return;
-  }
   const std::string methodStr = ft::trim(*res);
   const Request::Method method = Request::strToMethod(methodStr);
   _client->getRequest().setMethod(method);

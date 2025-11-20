@@ -33,9 +33,12 @@ public:
   ExpectVoid removeFront(std::size_t bytes);
   ExpectStr consumeFront(std::size_t bytes);
   ExpectRaw consumeAll();
+  ExpectStr getStr(std::size_t start, std::size_t bytes);
+  ExpectRaw getRawBytes(std::size_t start, std::size_t bytes);
   ExpectVoid replace(RawBytes& rawData);
   bool isEmpty() const;
   std::size_t size() const;
+  void print();
 
 private:
   FileBuffer(const FileBuffer& other);
@@ -48,6 +51,10 @@ private:
     std::size_t bytes);
   template<typename ContigContainer>
   ft::expected<ContigContainer, BufferException> _getData(std::size_t bytes);
+  template<typename ContigContainer>
+  ft::expected<ContigContainer, BufferException> _getDataRange(
+    std::size_t start,
+    std::size_t bytes);
   ExpectVoid _append(const char* data, std::streamsize bytes);
   ExpectVoid _saveRemainder();
   ExpectVoid _copyFrom(FileBuffer& src);

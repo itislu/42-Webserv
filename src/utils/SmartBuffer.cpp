@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <iostream>
 #include <string>
 
 /* ************************************************************************** */
@@ -108,6 +109,25 @@ IBuffer::ExpectRaw SmartBuffer::consumeAll()
   return _buffer->consumeAll();
 }
 
+IBuffer::ExpectStr SmartBuffer::getStr(std::size_t start, std::size_t bytes)
+{
+  _checkBuffer();
+  if (_buffer == FT_NULLPTR) {
+    return ft::unexpected<BufferException>(errAllocBuffer);
+  }
+  return _buffer->getStr(start, bytes);
+}
+
+IBuffer::ExpectRaw SmartBuffer::getRawBytes(std::size_t start,
+                                            std::size_t bytes)
+{
+  _checkBuffer();
+  if (_buffer == FT_NULLPTR) {
+    return ft::unexpected<BufferException>(errAllocBuffer);
+  }
+  return _buffer->getRawBytes(start, bytes);
+}
+
 IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData)
 {
   _checkBuffer();
@@ -131,6 +151,15 @@ std::size_t SmartBuffer::size() const
     return 0;
   }
   return _buffer->size();
+}
+
+void SmartBuffer::print()
+{
+  if (_buffer == FT_NULLPTR) {
+    std::cout << "No buffer available" << "\n";
+    return;
+  }
+  _buffer->print();
 }
 
 /* ************************************************************************** */

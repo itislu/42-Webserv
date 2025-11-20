@@ -1,3 +1,4 @@
+#include "utils/SmartBuffer.hpp"
 #include <http/abnfRules/http11Rules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/Buffer.hpp>
@@ -18,8 +19,8 @@ namespace {
 
 bool runParser(const std::string& str, Rule& rule)
 {
-  Buffer buffer;
-  buffer.add(str);
+  SmartBuffer buffer;
+  buffer.append(str);
   BufferReader reader = BufferReader();
   reader.init(&buffer);
   rule.setBufferReader(&reader);

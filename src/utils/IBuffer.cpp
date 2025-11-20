@@ -1,8 +1,27 @@
 #include "IBuffer.hpp"
+#include "libftpp/expected.hpp"
 #include "libftpp/utility.hpp"
 
 /* ************************************************************************** */
 // Exceptions
+IBuffer::IBuffer()
+  : _noThrow(false)
+{
+}
+
+void IBuffer::setNoThrow(bool value)
+{
+  _noThrow = value;
+}
+
+ft::unexpected<IBuffer::BufferException> IBuffer::handleUnexpected(
+  const char* message) const
+{
+  if (_noThrow) {
+    return ft::unexpected<BufferException>(message);
+  }
+  throw BufferException(message);
+}
 
 /* ************************************************************************** */
 // PUBLIC
@@ -16,14 +35,15 @@ IBuffer::BufferException::BufferException(const char* message)
 {
 }
 
-IBuffer::BufferException::BufferException(const IBuffer::BufferException& other)
+IBuffer::BufferException::BufferException(
+  const IBuffer::BufferException& other) throw()
   : _message(other._message)
 {
 }
 
 // NOLINTBEGIN(bugprone-unhandled-self-assignment)
 IBuffer::BufferException& IBuffer::BufferException::operator=(
-  const BufferException& other)
+  const BufferException& other) throw()
 {
   _message = other._message;
   return *this;

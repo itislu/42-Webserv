@@ -1,4 +1,5 @@
 #include "ReadHeaderLines.hpp"
+#include "http/states/prepareResponse/PrepareResponse.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -51,12 +52,16 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
  *                  [ message-body ]
  */
 void ReadHeaderLines::run()
-{
+try {
   _readLines();
   if (_done) {
     _setNextState();
     return;
   }
+} catch (const IBuffer::BufferException& e) {
+  _log.error() << "ReadHeaderLines: " << e.what() << "\n";
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 void ReadHeaderLines::_init()
@@ -76,12 +81,6 @@ bool ReadHeaderLines::_readingOk()
 {
   const StatusCode& statuscode = _client->getResponse().getStatusCode();
   if (statuscode != StatusCode::Ok) {
-    return false;
-  }
-  if (_buffReader.fail()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    _log.error() << "ReadHeaderLines: _buffReader failed: "
-                 << _buffReader.error().what() << "\n";
     return false;
   }
   if (_buffReader.reachedEnd()) {
@@ -135,11 +134,6 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
   const RuleResult& result = _results[ruleId];
   const long index = result.getEnd();
   const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
-  if (!res.has_value()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    _log.error() << "ReadHeaderLines: _extractPart: InternalServerError\n";
-    return "";
-  }
   _buffReader.resetPosInBuff();
   return *res;
 }

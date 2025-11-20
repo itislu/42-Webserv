@@ -27,7 +27,7 @@ bool RepetitionRule::matches()
   debugPrintRuleEntry();
   const long ogStartPos = getBuffReader()->getPosInBuff();
 
-  while (!getBuffReader()->fail() && !getBuffReader()->reachedEnd()) {
+  while (!getBuffReader()->reachedEnd()) {
 
     setStartPos(getBuffReader()->getPosInBuff());
 

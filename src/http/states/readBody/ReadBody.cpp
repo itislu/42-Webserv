@@ -37,7 +37,7 @@ ReadBody::ReadBody(Client* context)
 }
 
 void ReadBody::run()
-{
+try {
   if (!_initialized) {
     _initialized = true;
     _determineBodyFraming();
@@ -52,6 +52,10 @@ void ReadBody::run()
   if (_done) {
     getContext()->getStateHandler().setState<PrepareResponse>();
   }
+} catch (const IBuffer::BufferException& e) {
+  _log.error() << "ReadBody: " << e.what() << '\n';
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 /* ************************************************************************** */
@@ -128,16 +132,7 @@ void ReadBody::_readFixedLengthBody()
   }
 
   IBuffer::ExpectStr res = inBuffer.consumeFront(toConsume);
-  if (!res.has_value()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    return;
-  }
-
-  const IBuffer::ExpectVoid resVoid = request.getBody().append(*res);
-  if (!resVoid.has_value()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    return;
-  }
+  request.getBody().append(*res);
   _consumed += toConsume;
 
   if (_consumed >= _bodyLength) {

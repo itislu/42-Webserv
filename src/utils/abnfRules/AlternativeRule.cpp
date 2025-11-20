@@ -86,9 +86,6 @@ bool AlternativeRule::_firstMatchMode()
       setEndPos(getBuffReader()->getPosInBuff());
       break;
     }
-    if (getBuffReader()->fail()) {
-      break;
-    }
     rewindToStartPos();
   }
   return matches;
@@ -106,9 +103,6 @@ bool AlternativeRule::_greedyMode()
         setEndPos(getBuffReader()->getPosInBuff());
       }
       somethingMatched = true;
-    }
-    if (getBuffReader()->fail()) {
-      break;
     }
     rewindToStartPos();
   }

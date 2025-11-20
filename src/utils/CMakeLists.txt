@@ -20,6 +20,7 @@ add_library(${LIB_NAME} STATIC
   BufferReader.cpp
   FileBuffer.cpp
   IBuffer.cpp
+  printUtils.cpp
   SmartBuffer.cpp
 )
 

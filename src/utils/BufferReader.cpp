@@ -11,9 +11,7 @@
 void BufferReader::init(IBuffer* buffer)
 {
   assert(buffer != FT_NULLPTR);
-  _fail = false;
   _buffer = buffer;
-  _error = IBuffer::BufferException("Success");
   resetPosInBuff();
 }
 
@@ -32,16 +30,7 @@ bool BufferReader::reachedEnd() const
 char BufferReader::getNextChar()
 {
   assert(_buffer != FT_NULLPTR);
-  if (_fail) {
-    return '\0';
-  }
-
   const IBuffer::ExpectChr res = _buffer->get();
-  if (!res.has_value()) {
-    _fail = true;
-    _error = res.error();
-    return '\0';
-  }
   _posInBuff++;
   return (*res);
 }
@@ -54,57 +43,26 @@ long BufferReader::getPosInBuff() const
 void BufferReader::setPosInBuff(long pos)
 {
   assert(_buffer != FT_NULLPTR);
-  if (_fail) {
-    return;
-  }
-  const IBuffer::ExpectVoid res = _buffer->seek(pos);
-  if (!res.has_value()) {
-    _fail = true;
-    _error = res.error();
-    return;
-  }
+  _buffer->seek(pos);
   _posInBuff = pos;
 }
 
 void BufferReader::resetPosInBuff()
 {
   assert(_buffer != FT_NULLPTR);
-  if (_fail) {
-    return;
-  }
-  const IBuffer::ExpectVoid res = _buffer->seek(0);
-  if (!res.has_value()) {
-    _fail = true;
-    _error = res.error();
-    return;
-  }
+  _buffer->seek(0);
   _posInBuff = 0;
 }
 
 void BufferReader::rewind(long bytes)
 {
-  if (_fail || bytes <= 0) {
+  if (bytes <= 0) {
     return;
   }
   const long newPos = _posInBuff - bytes;
   assert(newPos >= 0);
-  const IBuffer::ExpectVoid res = _buffer->seek(newPos);
-  if (!res.has_value()) {
-    _fail = true;
-    _error = res.error();
-    return;
-  }
+  _buffer->seek(newPos);
   _posInBuff = newPos;
-}
-
-bool BufferReader::fail() const
-{
-  return _fail;
-}
-
-const IBuffer::BufferException& BufferReader::error() const
-{
-  return _error;
 }
 
 /* ************************************************************************** */

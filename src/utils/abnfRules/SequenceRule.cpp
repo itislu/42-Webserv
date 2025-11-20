@@ -24,8 +24,7 @@ bool SequenceRule::matches()
   debugPrintRuleEntry();
   setStartPos(getBuffReader()->getPosInBuff());
   bool matches = true;
-  while (matches && !getBuffReader()->fail() &&
-         !getBuffReader()->reachedEnd()) {
+  while (matches && !getBuffReader()->reachedEnd()) {
     matches = _rules[_currRule]->matches();
 
     if (matches) {

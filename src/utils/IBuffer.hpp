@@ -13,7 +13,7 @@
 class IBuffer
 {
 public:
-  IBuffer() {}
+  IBuffer();
   virtual ~IBuffer() {}
 
   class BufferException;
@@ -32,13 +32,21 @@ public:
   virtual ExpectVoid removeFront(std::size_t bytes) = 0;
   virtual ExpectStr consumeFront(std::size_t bytes) = 0;
   virtual ExpectRaw consumeAll() = 0;
+  virtual ExpectStr getStr(std::size_t start, std::size_t end) = 0;
+  virtual ExpectRaw getRawBytes(std::size_t start, std::size_t end) = 0;
   virtual ExpectVoid replace(RawBytes& rawData) = 0;
   virtual bool isEmpty() const = 0;
   virtual std::size_t size() const = 0;
+  virtual void print() = 0;
+
+  void setNoThrow(bool value);
+  ft::unexpected<BufferException> handleUnexpected(const char* message) const;
 
 private:
   IBuffer(const IBuffer& other);
   IBuffer& operator=(const IBuffer& other);
+
+  bool _noThrow;
 };
 
 /* ************************************************************************** */
@@ -49,8 +57,8 @@ public:
   BufferException();
   explicit BufferException(const char* message);
   ~BufferException() throw() {};
-  BufferException(const BufferException& other);
-  BufferException& operator=(const BufferException& other);
+  BufferException(const BufferException& other) throw();
+  BufferException& operator=(const BufferException& other) throw();
   const char* what() const throw();
 
 private:

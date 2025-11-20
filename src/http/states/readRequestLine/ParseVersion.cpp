@@ -52,6 +52,7 @@ void ParseVersion::run()
   _buffReader.resetPosInBuff();
   if (!_sequence.matches()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _log.info() << "ParseVersion: no match\n";
     getContext()->getStateHandler().setDone();
     return;
   }
@@ -67,10 +68,6 @@ void ParseVersion::_extractVersion()
 {
   const long index = _buffReader.getPosInBuff();
   const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
-  if (!res.has_value()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    return;
-  }
   const std::string version = ft::trim(*res);
   _client->getRequest().setVersion(version);
 }
@@ -82,7 +79,7 @@ void ParseVersion::_init()
 {
   _buffReader.init(&_client->getInBuff());
 
-  _sequence.addRule(rwsRule());
+  // _sequence.addRule(owsRule());
   _sequence.addRule(ft::make_shared<LiteralRule>("HTTP/"));
   _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
   _sequence.addRule(ft::make_shared<LiteralRule>("."));

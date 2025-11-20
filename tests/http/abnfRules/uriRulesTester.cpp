@@ -1,4 +1,5 @@
 #include "utils/SmartBuffer.hpp"
+#include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>

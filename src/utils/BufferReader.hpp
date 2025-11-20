@@ -17,14 +17,9 @@ public:
   void resetPosInBuff();
   void rewind(long bytes);
 
-  bool fail() const;
-  const IBuffer::BufferException& error() const;
-
 private:
   IBuffer* _buffer;
-  IBuffer::BufferException _error;
   long _posInBuff;
-  bool _fail;
 };
 
 #endif
