@@ -188,6 +188,9 @@ IBuffer::ExpectStr FileBuffer::_getStr(std::size_t bytes)
   if (bytes == 0) {
     return std::string();
   }
+  if (bytes > _size) {
+    return ft::unexpected<BufferException>(errOutOfRange);
+  }
 
   ExpectStr res;
   std::string& front = res.value();
