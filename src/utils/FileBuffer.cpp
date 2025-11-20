@@ -189,14 +189,18 @@ IBuffer::ExpectStr FileBuffer::_getStr(std::size_t bytes)
     return std::string();
   }
 
-  std::string front(bytes, '\0');
+  ExpectStr res;
+  std::string& front = res.value();
+  front.resize(bytes);
+
   _fs.read(&front[0], static_cast<std::streamsize>(bytes));
   if (_fs.bad()) {
     return ft::unexpected<BufferException>(errRead);
   }
   const std::streamsize actuallyRead = _fs.gcount();
   front.resize(static_cast<std::size_t>(actuallyRead));
-  return front;
+
+  return res;
 }
 
 IBuffer::ExpectVoid FileBuffer::_append(const char* data, std::streamsize bytes)
