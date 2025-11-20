@@ -96,29 +96,7 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
 {
-  // go to start of file
-  ExpectVoid res = seek(0);
-  if (!res.has_value()) {
-    return ft::unexpected<BufferException>(res.error());
-  }
-  if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
-  }
-
-  // read bytes from the beginning
-  const ExpectStr front = _getStr(bytes);
-  if (!front.has_value()) {
-    return front;
-  }
-  assert(front->size() == bytes); // Unexpected EOF should not happen
-
-  // read/write rest into new tempFile
-  res = _saveRemainder();
-  if (!res.has_value()) {
-    return ft::unexpected<BufferException>(res.error());
-  }
-
-  return front;
+  return _consumeFront<std::string>(bytes);
 }
 
 std::size_t FileBuffer::size() const
@@ -189,17 +167,52 @@ IBuffer::ExpectChr FileBuffer::_getChr(
   return static_cast<char>(chr);
 }
 
-IBuffer::ExpectStr FileBuffer::_getStr(std::size_t bytes)
+// Template can be in source file if only used here.
+template<typename ContigContainer>
+ft::expected<ContigContainer, FileBuffer::BufferException>
+FileBuffer::_consumeFront(std::size_t bytes)
+{
+  typedef ft::expected<ContigContainer, BufferException> ExpectCont;
+
+  // go to start of file
+  ExpectVoid res = seek(0);
+  if (!res.has_value()) {
+    return ft::unexpected<BufferException>(res.error());
+  }
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
+  }
+
+  // read bytes from the beginning
+  const ExpectCont front = _getData<ContigContainer>(bytes);
+  if (!front.has_value()) {
+    return front;
+  }
+  assert(front->size() == bytes); // Unexpected EOF should not happen
+
+  // read/write rest into new tempFile
+  res = _saveRemainder();
+  if (!res.has_value()) {
+    return ft::unexpected<BufferException>(res.error());
+  }
+
+  return front;
+}
+
+// Template can be in source file if only used here.
+template<typename ContigContainer>
+ft::expected<ContigContainer, FileBuffer::BufferException> FileBuffer::_getData(
+  std::size_t bytes)
 {
   if (bytes == 0) {
-    return std::string();
+    return ContigContainer();
   }
   if (bytes > _size) {
     return ft::unexpected<BufferException>(errOutOfRange);
   }
 
   ExpectStr res;
-  std::string& front = res.value();
+  ContigContainer& front = res.value();
   front.resize(bytes);
 
   _fs.read(&front[0], static_cast<std::streamsize>(bytes));

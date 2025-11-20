@@ -2,6 +2,7 @@
 #ifndef FILE_BUFFER_HPP
 #define FILE_BUFFER_HPP
 
+#include <libftpp/expected.hpp>
 #include <utils/IBuffer.hpp>
 
 #include <cstddef>
@@ -39,7 +40,11 @@ private:
 
   ExpectVoid _openTmpFile();
   ExpectChr _getChr(std::fstream::int_type (std::fstream::*func)());
-  ExpectStr _getStr(std::size_t bytes);
+  template<typename ContigContainer>
+  ft::expected<ContigContainer, BufferException> _consumeFront(
+    std::size_t bytes);
+  template<typename ContigContainer>
+  ft::expected<ContigContainer, BufferException> _getData(std::size_t bytes);
   ExpectVoid _append(const char* data, std::streamsize bytes);
   ExpectVoid _saveRemainder();
   ExpectVoid _copyFrom(FileBuffer& src);
