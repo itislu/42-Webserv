@@ -54,7 +54,7 @@ IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
     return ft::unexpected<BufferException>(errOutOfRange);
   }
   if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
+    return ExpectVoid();
   }
 
   _fs.seekg(static_cast<std::streamoff>(pos));
@@ -81,6 +81,9 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
   if (!res.has_value()) {
     return res;
   }
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
+  }
 
   // read/write rest into new tempFile
   res = _saveRemainder();
@@ -97,6 +100,9 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
   ExpectVoid res = seek(0);
   if (!res.has_value()) {
     return ft::unexpected<BufferException>(res.error());
+  }
+  if (_size == 0) {
+    return ft::unexpected<BufferException>(errFileEmpty);
   }
 
   // read bytes from the beginning
