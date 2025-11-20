@@ -10,12 +10,7 @@ TEST(FileBufferTester, AppendString)
   const std::string input = "0123456789Alaaaaaaaaaaaaaaaaaarm";
 
   FileBuffer filebuffer;
-  FileBuffer::ExpectVoid expectVoid = filebuffer.openTmpFile();
-  EXPECT_TRUE(expectVoid.has_value());
-  if (!expectVoid.has_value()) {
-    std::cout << expectVoid.error().what() << "\n";
-    return;
-  }
+  FileBuffer::ExpectVoid expectVoid;
 
   expectVoid = filebuffer.append(input);
   EXPECT_TRUE(expectVoid.has_value());
@@ -43,12 +38,7 @@ TEST(FileBufferTester, AppendVector)
   const FileBuffer::Container input(inputStr.begin(), inputStr.end());
 
   FileBuffer filebuffer;
-  FileBuffer::ExpectVoid expectVoid = filebuffer.openTmpFile();
-  EXPECT_TRUE(expectVoid.has_value());
-  if (!expectVoid.has_value()) {
-    std::cout << expectVoid.error().what() << "\n";
-    return;
-  }
+  FileBuffer::ExpectVoid expectVoid;
 
   expectVoid = filebuffer.append(input, static_cast<long>(input.size()));
   EXPECT_TRUE(expectVoid.has_value());
@@ -75,12 +65,7 @@ TEST(FileBufferTester, GetPeekSeek)
   const std::string input = "0123456789";
 
   FileBuffer filebuffer;
-  FileBuffer::ExpectVoid expectVoid = filebuffer.openTmpFile();
-  EXPECT_TRUE(expectVoid.has_value());
-  if (!expectVoid.has_value()) {
-    std::cout << expectVoid.error().what() << "\n";
-    return;
-  }
+  FileBuffer::ExpectVoid expectVoid;
 
   expectVoid = filebuffer.append(input);
   EXPECT_TRUE(expectVoid.has_value());

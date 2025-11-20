@@ -2,10 +2,12 @@
 #ifndef FILE_BUFFER_HPP
 #define FILE_BUFFER_HPP
 
+#include <libftpp/expected.hpp>
 #include <utils/IBuffer.hpp>
 
 #include <cstddef>
 #include <fstream>
+#include <ios>
 #include <string>
 
 /* ************************************************************************** */
@@ -15,11 +17,9 @@ public:
   static const char* const errOpen;
   static const char* const errSeek;
   static const char* const errFileEmpty;
-  static const char* const errFileNotOpened;
-  static const char* const errEof;
+  static const char* const errOutOfRange;
   static const char* const errRead;
   static const char* const errWrite;
-  static const char* const errTellp;
 
   FileBuffer();
   ~FileBuffer();
@@ -34,17 +34,22 @@ public:
   ExpectStr consumeFront(std::size_t bytes);
   std::size_t size() const;
 
-  ExpectVoid openTmpFile();
-
 private:
   FileBuffer(const FileBuffer& other);
   FileBuffer& operator=(const FileBuffer& other);
 
-  ExpectStr _getFront(std::size_t bytes);
+  ExpectVoid _openTmpFile();
+  ExpectChr _getChr(std::fstream::int_type (std::fstream::*func)());
+  template<typename ContigContainer>
+  ft::expected<ContigContainer, BufferException> _consumeFront(
+    std::size_t bytes);
+  template<typename ContigContainer>
+  ft::expected<ContigContainer, BufferException> _getData(std::size_t bytes);
+  ExpectVoid _append(const char* data, std::streamsize bytes);
   ExpectVoid _saveRemainder();
-  static ExpectVoid _copyData(std::fstream& bufFrom, std::fstream& bufTo);
+  ExpectVoid _copyFrom(FileBuffer& src);
   ExpectVoid _replaceCurrFile(FileBuffer& tmpFb);
-  ExpectVoid _calcSize();
+  void _removeCurrFile();
 
   static const std::size_t _copyBufferSize = 4096;
 
