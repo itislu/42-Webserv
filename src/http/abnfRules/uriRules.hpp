@@ -5,10 +5,12 @@
 #include <libftpp/memory.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
+#include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
 ft::shared_ptr<SequenceRule> uriRule();
 ft::shared_ptr<AlternativeRule> hierPartRule();
+ft::shared_ptr<SequenceRule> absoluteUriRule();
 ft::shared_ptr<SequenceRule> schemeRule();
 ft::shared_ptr<SequenceRule> authorityRule();
 ft::shared_ptr<RepetitionRule> userinfoRule();
@@ -23,11 +25,11 @@ ft::shared_ptr<SequenceRule> ipv4AddressRule();
 ft::shared_ptr<AlternativeRule> decOctetRule();
 ft::shared_ptr<RepetitionRule> regNameRule();
 ft::shared_ptr<AlternativeRule> pathRule();
-ft::shared_ptr<RepetitionRule> pathAbEmptyRule();
-ft::shared_ptr<SequenceRule> pathAbsoluteRule();
-ft::shared_ptr<SequenceRule> pathNoSchemeRule();
-ft::shared_ptr<SequenceRule> pathRootlessRule();
-ft::shared_ptr<RepetitionRule> pathEmptyRule();
+ft::shared_ptr<RepetitionRule> pathAbEmptyRule(Rule::RuleId ruleId);
+ft::shared_ptr<SequenceRule> pathAbsoluteRule(Rule::RuleId ruleId);
+ft::shared_ptr<SequenceRule> pathNoSchemeRule(Rule::RuleId ruleId);
+ft::shared_ptr<SequenceRule> pathRootlessRule(Rule::RuleId ruleId);
+ft::shared_ptr<RepetitionRule> pathEmptyRule(Rule::RuleId ruleId);
 ft::shared_ptr<RepetitionRule> segmentRule();
 ft::shared_ptr<RepetitionRule> segmentNzRule();
 ft::shared_ptr<RepetitionRule> segmentNzNcRule();

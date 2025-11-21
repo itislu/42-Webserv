@@ -6,7 +6,11 @@ set(LIB_NAME http)
 
 add_library(${LIB_NAME} STATIC
   abnfRules/generalRules.cpp
+  abnfRules/headerLineRules.cpp
+  abnfRules/http11Rules.cpp
   abnfRules/requestLineRules.cpp
+  abnfRules/ruleIds.cpp
+  abnfRules/ruleUtils.cpp
   abnfRules/uriRules.cpp
   abnfRules/headerLineRules.cpp
   states/prepareResponse/HandleDelete.cpp
@@ -24,6 +28,7 @@ add_library(${LIB_NAME} STATIC
   states/writeBody/WriteBody.cpp
   states/writeHeaderLines/WriteHeaderLines.cpp
   states/writeStatusLine/WriteStatusLine.cpp
+  Authority.cpp
   Headers.cpp
   http.cpp
   Request.cpp

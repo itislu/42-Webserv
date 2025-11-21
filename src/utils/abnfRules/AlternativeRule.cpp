@@ -66,16 +66,24 @@ void AlternativeRule::addRule(ft::shared_ptr<Rule> rule)
   _rules.push_back(ft::move(rule));
 }
 
+void AlternativeRule::setMatchMode(AlternativeMode mode)
+{
+  _mode = mode;
+}
+
 /* ************************************************************************** */
 // PRIVATE
 
 bool AlternativeRule::_firstMatchMode()
 {
   setStartPos(getBuffReader()->getPosInBuff());
+  setEndPos(-1);
   bool matches = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
     matches = _rules[i]->matches();
     if (matches) {
+      setReachedEnd(_rules[i]->reachedEnd());
+      setEndPos(getBuffReader()->getPosInBuff());
       break;
     }
     rewindToStartPos();

@@ -27,6 +27,7 @@ public:
   void setResultMap(ResultMap* results);
 
   void addRule(ft::shared_ptr<Rule> rule);
+  void setMatchMode(AlternativeMode mode);
 
 private:
   AlternativeRule(const AlternativeRule& other);
