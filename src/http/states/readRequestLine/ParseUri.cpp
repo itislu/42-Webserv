@@ -6,7 +6,6 @@
 #include <http/Uri.hpp>
 #include <http/abnfRules/http11Rules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
-#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readRequestLine/ParseVersion.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>

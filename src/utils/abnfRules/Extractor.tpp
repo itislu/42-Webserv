@@ -23,13 +23,14 @@ void Extractor<T>::addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr)
 
 template<typename T>
 void Extractor<T>::run(T& obj,
-                       Rule::ResultMap resultMap,
+                       const Rule::ResultMap& resultMap,
                        const Buffer& buffer) const
 {
   for (typename Setters::const_iterator setterIter = _setters.begin();
        setterIter != _setters.end();
        ++setterIter) {
-    Rule::ResultMap::iterator resultIter = resultMap.find(setterIter->first);
+    Rule::ResultMap::const_iterator resultIter =
+      resultMap.find(setterIter->first);
     if (resultIter != resultMap.end()) {
       ft::optional<std::string> str = _getString(resultIter->second, buffer);
       FuncPtr fPtr = setterIter->second;

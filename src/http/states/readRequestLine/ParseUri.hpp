@@ -29,7 +29,6 @@ private:
   static Extractor<Uri>& _uriExtractorAbsoluteForm();
   static Extractor<Authority>& _authExtractor();
   void _extractParts(const Rule::ResultMap& results);
-  void _validateUri();
 
   static Logger& _log;
   Client* _client;

@@ -18,7 +18,9 @@ class Extractor
 public:
   typedef void (T::*FuncPtr)(const std::string&);
   void addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr);
-  void run(T& obj, Rule::ResultMap resultMap, const Buffer& buffer) const;
+  void run(T& obj,
+           const Rule::ResultMap& resultMap,
+           const Buffer& buffer) const;
 
 private:
   typedef std::pair<Rule::RuleId, FuncPtr> SetterPair;
