@@ -25,6 +25,7 @@ public:
 
   const std::string& getRoot() const;
   const std::string& getIndex() const;
+  const std::string& getErrorPage(int code) const;
   const std::map<int, std::string>& getErrorPages() const;
   std::size_t getMaxBodySize() const;
   const std::set<std::string>& getAllowedMethods() const;

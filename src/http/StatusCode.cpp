@@ -15,7 +15,10 @@
 const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
   StatusCode::_codeMap = { { { Ok, "Ok" },
                              { BadRequest, "Bad Request" },
-                             { Unauthorized, "Unauthorized" } } };
+                             { Unauthorized, "Unauthorized" },
+                             { Forbidden, "Forbidden" },
+                             { NotFound, "Not Found" },
+                             { MethodNotAllowed, "Method not allowed" } } };
 
 /* ***************************************************************************/
 // PUBLIC

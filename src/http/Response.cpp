@@ -1,4 +1,5 @@
 #include "Response.hpp"
+#include "http/Resource.hpp"
 
 #include <fstream>
 #include <http/Headers.hpp>
@@ -32,6 +33,11 @@ const StatusCode& Response::getStatusCode() const
 Headers& Response::getHeaders()
 {
   return _headers;
+}
+
+Resource& Response::getResource()
+{
+  return _resource;
 }
 
 std::ifstream& Response::getBody()

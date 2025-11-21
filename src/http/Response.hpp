@@ -1,4 +1,5 @@
 #pragma once
+#include "http/Resource.hpp"
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 

@@ -2,6 +2,7 @@
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
 #include "http/Request.hpp"
+#include "http/Resource.hpp"
 #include "http/Response.hpp"
 #include "http/states/readRequestLine/ReadRequestLine.hpp"
 #include "libftpp/utility.hpp"
@@ -81,6 +82,11 @@ Request& Client::getRequest()
 Response& Client::getResponse()
 {
   return _response;
+}
+
+Resource& Client::getResource()
+{
+  return _resource;
 }
 
 long Client::getTimeout() const

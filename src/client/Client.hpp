@@ -3,6 +3,7 @@
 
 #include "client/TimeStamp.hpp"
 #include "http/Request.hpp"
+#include "http/Resource.hpp"
 #include "http/Response.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
@@ -30,6 +31,7 @@ public:
   StateHandler<Client>& getStateHandler();
   Request& getRequest();
   Response& getResponse();
+  Resource& getResource();
 
   void setServer(const Server* server);
 
@@ -52,6 +54,7 @@ private:
   StateHandler<Client> _stateHandler;
   Request _request;
   Response _response;
+  Resource _resource;
 };
 
 #endif
