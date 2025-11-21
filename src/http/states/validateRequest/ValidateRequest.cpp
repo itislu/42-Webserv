@@ -1,6 +1,5 @@
 #include "ValidateRequest.hpp"
 #include "client/Client.hpp"
-#include "config/FileUtils.hpp"
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
 #include "http/StatusCode.hpp"
@@ -14,6 +13,7 @@
 #include "server/Server.hpp"
 
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <iostream>
 #include <set>
 #include <string>
 #include <utils/logger/Logger.hpp>
@@ -51,9 +51,23 @@ void ValidateRequest::run()
     if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
       getContext()->getStateHandler().setState<ReadBody>();
     } else {
+      // TODO: set errorpage here?
       getContext()->getStateHandler().setState<PrepareResponse>();
     }
   }
+}
+
+const std::string& ValidateRequest::getPath() const
+{
+  return _path;
+}
+const config::ServerConfig* ValidateRequest::getServer() const
+{
+  return _server;
+}
+const config::LocationConfig* ValidateRequest::getLocation() const
+{
+  return _location;
 }
 
 /* ************************************************************************** */
@@ -111,7 +125,7 @@ void ValidateRequest::_initState(const Request::Method& method)
       _stateHandler.setState<ValidateDelete>();
       break;
     case Request::UNDEFINED:
-      _stateHandler.setState<PrepareResponse>(); // TODO: check this
+      getContext()->getStateHandler().setState<PrepareResponse>();
       break;
   }
 }

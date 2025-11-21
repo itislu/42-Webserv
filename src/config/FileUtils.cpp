@@ -39,5 +39,10 @@ bool isReadable(const std::string& path)
   return (access(path.c_str(), R_OK) == 0);
 }
 
+bool isWriteable(const std::string& path)
+{
+  return access(path.c_str(), W_OK) == 0;
+}
+
 } // namespace fileutils
 } // namespace config

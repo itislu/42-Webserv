@@ -1,7 +1,6 @@
 #ifndef RESOURCE_HPP
 #define RESOURCE_HPP
 
-#include "config/LocationConfig.hpp"
 #include <string>
 
 class Resource

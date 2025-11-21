@@ -5,7 +5,7 @@
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
-#include <http/states/readRequestLine/ValidateRequest.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/Buffer.hpp>
@@ -58,7 +58,7 @@ void ParseVersion::run()
 
   if (_sequence.reachedEnd()) {
     _extractVersion();
-    getContext()->getStateHandler().setState<ValidateRequest>();
+    getContext()->getStateHandler().setDone();
     return;
   }
 }

@@ -1,11 +1,11 @@
 #pragma once
-#include "config/LocationConfig.hpp"
-#include "utils/state/StateHandler.hpp"
+#include <set>
 #ifndef VALIDATE_REQUEST_HPP
 #define VALIDATE_REQUEST_HPP
 
+#include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
-#include <set>
+#include "utils/state/StateHandler.hpp"
 #include <string>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -20,7 +20,11 @@ public:
   explicit ValidateRequest(Client* context);
 
   void run();
+
   StateHandler<ValidateRequest>& getStateHandler();
+  const std::string& getPath() const;
+  const config::ServerConfig* getServer() const;
+  const config::LocationConfig* getLocation() const;
 
 private:
   void _init();

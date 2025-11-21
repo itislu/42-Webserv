@@ -2,6 +2,7 @@
 #define VALIDATEGET_HPP
 
 #include "config/LocationConfig.hpp"
+#include "http/StatusCode.hpp"
 #include "http/states/validateRequest/ValidateRequest.hpp"
 #include "utils/logger/Logger.hpp"
 #include <string>
@@ -15,11 +16,16 @@ public:
   void run();
 
 private:
+  void validate();
+  void validateFile();
+  void validateDirectory();
+  void endState(StatusCode::Code status);
+
   Client* _client;
   static Logger& _log;
   std::string _path;
-  config::LocationConfig* location;
-  config::ServerConfig* server;
+  const config::ServerConfig* _server;
+  const config::LocationConfig* _location;
 };
 
 #endif

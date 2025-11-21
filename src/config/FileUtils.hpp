@@ -11,6 +11,7 @@ bool isDirectory(const std::string& filepath);
 
 bool isExecuteable(const std::string& path);
 bool isReadable(const std::string& path);
+bool isWriteable(const std::string& path);
 
 } // namespace fileutils
 } // namespace config

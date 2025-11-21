@@ -35,11 +35,6 @@ Headers& Response::getHeaders()
   return _headers;
 }
 
-Resource& Response::getResource()
-{
-  return _resource;
-}
-
 std::ifstream& Response::getBody()
 {
   return _body;
