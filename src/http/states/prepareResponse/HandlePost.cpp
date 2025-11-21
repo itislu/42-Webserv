@@ -1,5 +1,8 @@
 #include "HandlePost.hpp"
+#include "http/Headers.hpp"
+#include "http/StatusCode.hpp"
 
+#include <client/Client.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -22,7 +25,8 @@ HandlePost::HandlePost(PrepareResponse* context)
 
 void HandlePost::run()
 {
-  // todo
+  Headers& headers = _client->getRequest().getHeaders();
+  headers.addHeader("Content-Type", "text/plain");
   getContext()->getStateHandler().setDone();
 }
 

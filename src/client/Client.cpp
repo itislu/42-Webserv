@@ -107,12 +107,6 @@ bool Client::receive()
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
     _inBuff.append(buffer, bytes);
-    // TODO: STATEMACHINE/PARSING
-    _stateHandler.setStateHasChanged(true);
-    while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
-      _stateHandler.setStateHasChanged(false);
-      _stateHandler.getState()->run();
-    }
   } else if (bytes == 0) {
     std::cout << "[CLIENT] wants to disconnect\n";
     return false;

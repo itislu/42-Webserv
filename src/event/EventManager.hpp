@@ -4,6 +4,7 @@
 #include "client/Client.hpp"
 #include "client/ClientManager.hpp"
 #include "socket/SocketManager.hpp"
+#include "utils/logger/Logger.hpp"
 
 class ServerManager;
 
@@ -29,6 +30,7 @@ private:
   /* TIMEOUT */
   int calculateTimeout() const;
 
+  static Logger& _log;
   ClientManager* _clientsManager;
   SocketManager* _socketsManager;
   ServerManager* _serverManager;

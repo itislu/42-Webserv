@@ -7,7 +7,7 @@
 #include <utils/state/IState.hpp>
 
 #include <fstream>
-#include <sstream>
+#include <ios>
 
 /* ************************************************************************** */
 // INIT
@@ -22,11 +22,17 @@ WriteBody::WriteBody(Client* context)
   , _client(context)
 {
   _log.info() << "WriteBody\n";
-  _log.info() << getContext()->getRequest().toString() << "\n";
 }
 
+// NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
 void WriteBody::run()
 try {
+  if (_client->getRequest().getMethod() == Request::POST) {
+    _client->getStateHandler().setDone();
+    return;
+  }
+
+  _log.info() << "WriteBody: run\n";
   std::ifstream& ifs = _client->getResponse().getBody();
 
   if (!ifs.is_open()) {
@@ -35,19 +41,28 @@ try {
     return;
   }
 
-  std::ostringstream oss;
-  oss << ifs.rdbuf();
-
   IBuffer& outBuffer = _client->getOutBuff();
-  outBuffer.append(oss.str());
+  if (outBuffer.size() >= _outBufferLimit) {
+    return;
+  }
 
-  // _log.info(_client->getOutBuff().toString());
-  _client->getStateHandler().setDone();
+  IBuffer::RawBytes buff(_chunkSize);
+  ifs.read(reinterpret_cast<char*>(buff.data()), _chunkSize);
+  const std::streamsize readCount = ifs.gcount();
+  if (readCount > 0) {
+    outBuffer.append(buff, readCount);
+  }
+
+  if (ifs.eof()) {
+    _log.info() << "WriteBody: done\n";
+    _client->getStateHandler().setDone();
+  }
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "ReadRequestLine: " << e.what() << '\n';
+  _log.error() << "WriteBody: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setDone();
 }
+// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
 
 /* ************************************************************************** */
 // PRIVATE

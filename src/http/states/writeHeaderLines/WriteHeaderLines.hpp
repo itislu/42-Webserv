@@ -5,6 +5,8 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <string>
+
 class Client;
 
 /* ************************************************************************** */
@@ -16,8 +18,10 @@ public:
   void run();
 
 private:
-  Client* _client;
   static Logger& _log;
+  static std::string _makeHttpDate();
+
+  Client* _client;
 };
 
 #endif

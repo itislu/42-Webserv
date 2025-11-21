@@ -8,11 +8,20 @@
 #include "server/Server.hpp"
 #include "server/ServerManager.hpp"
 #include "socket/SocketManager.hpp"
+#include "utils/logger/Logger.hpp"
+#include "utils/state/StateHandler.hpp"
 #include <cstddef>
 #include <exception>
 #include <iostream>
 #include <sys/poll.h>
 #include <vector>
+
+/* ************************************************************************** */
+// INIT
+
+Logger& EventManager::_log = Logger::getInstance(LOG_SERVER);
+
+/* ************************************************************************** */
 
 // Handles the main poll loop:
 // Calls poll()
@@ -31,8 +40,9 @@ EventManager::EventManager(ClientManager& clients,
 bool EventManager::sendToClient(Client& client)
 {
   const bool alive = client.sendTo();
-  if (alive && !client.hasDataToSend()) {
+  if (alive && !client.hasDataToSend() && client.getStateHandler().isDone()) {
     _socketsManager->disablePollout(client.getFd());
+    _log.info() << "Pollout disabled\n";
   }
   return alive;
 }
@@ -54,6 +64,16 @@ bool EventManager::handleClient(Client* client, unsigned events)
   bool alive = true;
   if ((events & POLLIN) != 0 && alive) { // Receive Data
     alive = receiveFromClient(*client);
+  }
+  StateHandler<Client>& stateHandler = client->getStateHandler();
+  stateHandler.setStateHasChanged(true);
+  while (!stateHandler.isDone() && stateHandler.stateHasChanged()) {
+    stateHandler.setStateHasChanged(false);
+    stateHandler.getState()->run();
+  }
+  if (alive && client->hasDataToSend()) {
+    _socketsManager->enablePollout(client->getFd());
+    _log.info() << "Pollout enabled\n";
   }
   if ((events & POLLOUT) != 0 && alive) { // Send Data
     alive = sendToClient(*client);

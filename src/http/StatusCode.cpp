@@ -14,6 +14,7 @@
 
 const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
   StatusCode::_codeMap = { { { Ok, "Ok" },
+                             { Created, "Created" },
                              { BadRequest, "Bad Request" },
                              { Unauthorized, "Unauthorized" },
                              { InternalServerError, "Internal Server Error" } }

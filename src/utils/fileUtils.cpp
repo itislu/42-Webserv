@@ -1,9 +1,7 @@
-#include "FileUtils.hpp"
+#include "fileUtils.hpp"
+
 #include <string>
 #include <sys/stat.h> // for stat(), struct stat, and S_ISREG
-
-namespace config {
-namespace fileutils {
 
 bool isFile(const std::string& filepath)
 {
@@ -16,5 +14,11 @@ bool isFile(const std::string& filepath)
   return (S_ISREG(path_stat.st_mode));
 }
 
-} // namespace fileutils
-} // namespace config
+std::string getFileExtension(const std::string& filepath)
+{
+  const std::string::size_type pos = filepath.find_last_of('.');
+  if (pos == std::string::npos) {
+    return "";
+  }
+  return filepath.substr(pos);
+}

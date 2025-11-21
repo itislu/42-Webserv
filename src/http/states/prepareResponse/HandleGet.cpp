@@ -3,9 +3,11 @@
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/http.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/algorithm.hpp>
+#include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -67,8 +69,17 @@ void HandleGet::_addContentLengthHeader()
 
 void HandleGet::_addContentType()
 {
+  const std::string file = "someffile.html"; // todo from resource
+  const std::string fileExt = getFileExtension(file);
+  const http::ExtToTypeMap& extToType = http::getExtToType();
+  const http::ExtToTypeMap::const_iterator type = extToType.find(fileExt);
+
   Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Content-Type", "text/html");
+  if (type != extToType.end()) {
+    headers.addHeader("Content-Type", type->second);
+  } else {
+    headers.addHeader("Content-Type", "text/html");
+  }
 }
 
 void HandleGet::_openFile()

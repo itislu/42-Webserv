@@ -1,6 +1,6 @@
 #include "Lexer.hpp"
-#include "config/FileUtils.hpp"
 #include "config/Token.hpp"
+#include "utils/fileUtils.hpp"
 #include <cctype>
 #include <cstddef>
 #include <iterator>
@@ -40,7 +40,7 @@ void Lexer::validateInputFile()
     throw std::invalid_argument("invalid file extension: " + _filepath);
   }
 
-  if (!fileutils::isFile(_filepath)) {
+  if (!isFile(_filepath)) {
     throw std::invalid_argument("invalid file: " + _filepath);
   }
 

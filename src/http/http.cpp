@@ -3,6 +3,8 @@
 #include <libftpp/algorithm.hpp>
 
 #include <ctype.h>
+#include <map>
+#include <string>
 
 namespace http {
 
@@ -189,4 +191,22 @@ int isVchar(int chr)
   return static_cast<int>(chr >= begin && chr <= end);
 }
 
+const ExtToTypeMap& getExtToType()
+{
+  static std::map<std::string, std::string> map;
+  if (map.empty()) {
+    map[".html"] = "text/html";
+    map[".css"] = "text/css";
+    map[".js"] = "application/javascript";
+    map[".txt"] = "text/plain";
+    map[".png"] = "image/png";
+    map[".jpg"] = "image/jpeg";
+    map[".jpeg"] = "image/jpeg";
+    map[".gif"] = "image/gif";
+    map[".ico"] = "image/x-icon";
+    map[".pdf"] = "application/pdf";
+    map[".json"] = "application/json";
+  }
+  return map;
+}
 }
