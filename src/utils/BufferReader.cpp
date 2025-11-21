@@ -18,9 +18,6 @@ void BufferReader::init(IBuffer* buffer)
 bool BufferReader::reachedEnd() const
 {
   assert(_buffer != FT_NULLPTR);
-  if (_buffer == FT_NULLPTR) {
-    return true;
-  }
   if (_posInBuff < 0) {
     return false;
   }
@@ -61,8 +58,7 @@ void BufferReader::rewind(long bytes)
   }
   const long newPos = _posInBuff - bytes;
   assert(newPos >= 0);
-  _buffer->seek(newPos);
-  _posInBuff = newPos;
+  setPosInBuff(newPos);
 }
 
 /* ************************************************************************** */

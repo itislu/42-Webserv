@@ -39,11 +39,10 @@ private:
 
   static const std::size_t _thresholdMemoryBuffer = 0; // always uses file now
 
-  void _checkBuffer();
   bool _fileNeeded(long newBytes);
   ExpectVoid _switchToFileBuffer();
 
-  ft::shared_ptr<IBuffer> _buffer;
+  ft::unique_ptr<IBuffer> _buffer;
   bool _usesFile;
 };
 

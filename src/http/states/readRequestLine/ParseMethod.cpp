@@ -18,7 +18,6 @@
 #include <utils/state/StateHandler.hpp>
 
 #include <ctype.h>
-#include <string>
 
 /* ************************************************************************** */
 // INIT
@@ -82,8 +81,8 @@ void ParseMethod::_init()
 void ParseMethod::_extractMethod()
 {
   const long index = _buffReader.getPosInBuff();
-  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
-  const std::string methodStr = ft::trim(*res);
-  const Request::Method method = Request::strToMethod(methodStr);
+  IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
+  ft::trim(*res);
+  const Request::Method method = Request::strToMethod(*res);
   _client->getRequest().setMethod(method);
 }

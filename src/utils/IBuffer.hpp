@@ -40,6 +40,8 @@ public:
   virtual void print() = 0;
 
   void setNoThrow(bool value);
+
+protected:
   ft::unexpected<BufferException> handleUnexpected(const char* message) const;
 
 private:

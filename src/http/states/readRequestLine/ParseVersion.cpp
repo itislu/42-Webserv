@@ -16,7 +16,6 @@
 #include <utils/state/IState.hpp>
 
 #include <ctype.h>
-#include <string>
 
 /* ************************************************************************** */
 // INIT
@@ -67,9 +66,9 @@ void ParseVersion::run()
 void ParseVersion::_extractVersion()
 {
   const long index = _buffReader.getPosInBuff();
-  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
-  const std::string version = ft::trim(*res);
-  _client->getRequest().setVersion(version);
+  IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
+  ft::trim(*res);
+  _client->getRequest().setVersion(*res);
 }
 
 /* ************************************************************************** */

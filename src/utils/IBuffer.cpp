@@ -1,6 +1,5 @@
 #include "IBuffer.hpp"
 #include "libftpp/expected.hpp"
-#include "libftpp/utility.hpp"
 
 /* ************************************************************************** */
 // Exceptions
@@ -26,7 +25,7 @@ ft::unexpected<IBuffer::BufferException> IBuffer::handleUnexpected(
 /* ************************************************************************** */
 // PUBLIC
 IBuffer::BufferException::BufferException()
-  : _message(FT_NULLPTR)
+  : _message("Success")
 {
 }
 
