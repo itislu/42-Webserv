@@ -1,9 +1,14 @@
 #include "IBuffer.hpp"
+
 #include "libftpp/expected.hpp"
 #include "libftpp/utility.hpp"
+#include "utils/printUtils.hpp"
+
+#include <cstddef>
+#include <ostream>
 
 /* ************************************************************************** */
-// Exceptions
+// PUBLIC
 IBuffer::IBuffer()
   : _noThrow(false)
 {
@@ -23,8 +28,27 @@ ft::unexpected<IBuffer::BufferException> IBuffer::handleUnexpected(
   throw BufferException(message);
 }
 
+std::ostream& operator<<(std::ostream& out, IBuffer& buffer)
+{
+  const std::size_t oldpos = buffer.pos();
+  std::size_t pos = oldpos;
+
+  out << "'";
+  while (pos + 1 < buffer.size()) {
+    const IBuffer::ExpectChr expectChr = buffer.get();
+    const char chr = *expectChr;
+    // printEscapedChar(out, chr);
+    out << chr;
+    ++pos;
+  }
+  out << "'\n";
+  buffer.seek(oldpos);
+
+  return out;
+}
+
 /* ************************************************************************** */
-// PUBLIC
+// Exceptions
 IBuffer::BufferException::BufferException()
   : _message(FT_NULLPTR)
 {

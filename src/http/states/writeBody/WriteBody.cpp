@@ -2,6 +2,7 @@
 #include "http/StatusCode.hpp"
 
 #include <client/Client.hpp>
+#include <sstream>
 #include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -27,13 +28,8 @@ WriteBody::WriteBody(Client* context)
 // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
 void WriteBody::run()
 try {
-  if (_client->getRequest().getMethod() == Request::POST) {
-    _client->getStateHandler().setDone();
-    return;
-  }
-
-  _log.info() << "WriteBody: run\n";
   std::ifstream& ifs = _client->getResponse().getBody();
+  _log.info() << "WriteBody: run\n";
 
   if (!ifs.is_open()) {
     _log.error() << "Failed to open file\n";
@@ -47,7 +43,7 @@ try {
   }
 
   IBuffer::RawBytes buff(_chunkSize);
-  ifs.read(reinterpret_cast<char*>(buff.data()), _chunkSize);
+  ifs.read(buff.data(), _chunkSize);
   const std::streamsize readCount = ifs.gcount();
   if (readCount > 0) {
     outBuffer.append(buff, readCount);

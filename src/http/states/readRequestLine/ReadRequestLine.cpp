@@ -42,8 +42,6 @@ try {
   }
 
   if (_stateHandler.isDone()) {
-    _log.info() << "ReadRequestLine result\n"
-                << getContext()->getRequest().toString() << "\n";
     if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
       getContext()->getStateHandler().setState<ReadHeaderLines>();
     } else {

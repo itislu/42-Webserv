@@ -32,13 +32,14 @@ public:
   ExpectVoid append(const RawBytes& buffer, long bytes);
   ExpectVoid removeFront(std::size_t bytes);
   ExpectStr consumeFront(std::size_t bytes);
+  ExpectRaw consumeRawFront(std::size_t bytes);
   ExpectRaw consumeAll();
   ExpectStr getStr(std::size_t start, std::size_t bytes);
   ExpectRaw getRawBytes(std::size_t start, std::size_t bytes);
   ExpectVoid replace(RawBytes& rawData);
   bool isEmpty() const;
   std::size_t size() const;
-  void print();
+  std::size_t pos();
 
 private:
   FileBuffer(const FileBuffer& other);

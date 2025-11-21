@@ -4,12 +4,12 @@
 #include <http/Headers.hpp>
 #include <http/http.hpp>
 #include <http/states/writeBody/WriteBody.hpp>
-#include <string>
 #include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <ctime>
+#include <string>
 
 /* ************************************************************************** */
 // INIT

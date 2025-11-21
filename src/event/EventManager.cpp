@@ -65,11 +65,8 @@ bool EventManager::handleClient(Client* client, unsigned events)
   if ((events & POLLIN) != 0 && alive) { // Receive Data
     alive = receiveFromClient(*client);
   }
-  StateHandler<Client>& stateHandler = client->getStateHandler();
-  stateHandler.setStateHasChanged(true);
-  while (!stateHandler.isDone() && stateHandler.stateHasChanged()) {
-    stateHandler.setStateHasChanged(false);
-    stateHandler.getState()->run();
+  if (alive) {
+    checkClientState(*client);
   }
   if (alive && client->hasDataToSend()) {
     _socketsManager->enablePollout(client->getFd());
@@ -82,6 +79,16 @@ bool EventManager::handleClient(Client* client, unsigned events)
     return false; // disconnect client
   }
   return alive;
+}
+
+void EventManager::checkClientState(Client& client)
+{
+  StateHandler<Client>& stateHandler = client.getStateHandler();
+  stateHandler.setStateHasChanged(true);
+  while (!stateHandler.isDone() && stateHandler.stateHasChanged()) {
+    stateHandler.setStateHasChanged(false);
+    stateHandler.getState()->run();
+  }
 }
 
 void EventManager::disconnectClient(Client* client)

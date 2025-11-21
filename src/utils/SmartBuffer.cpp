@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstddef>
 #include <iostream>
+#include <ostream>
 #include <string>
 
 /* ************************************************************************** */
@@ -100,6 +101,15 @@ IBuffer::ExpectStr SmartBuffer::consumeFront(std::size_t bytes)
   return _buffer->consumeFront(bytes);
 }
 
+IBuffer::ExpectRaw SmartBuffer::consumeRawFront(std::size_t bytes)
+{
+  _checkBuffer();
+  if (_buffer == FT_NULLPTR) {
+    return ft::unexpected<BufferException>(errAllocBuffer);
+  }
+  return _buffer->consumeRawFront(bytes);
+}
+
 IBuffer::ExpectRaw SmartBuffer::consumeAll()
 {
   _checkBuffer();
@@ -153,13 +163,12 @@ std::size_t SmartBuffer::size() const
   return _buffer->size();
 }
 
-void SmartBuffer::print()
+std::size_t SmartBuffer::pos()
 {
   if (_buffer == FT_NULLPTR) {
-    std::cout << "No buffer available" << "\n";
-    return;
+    return 0;
   }
-  _buffer->print();
+  return _buffer->pos();
 }
 
 /* ************************************************************************** */

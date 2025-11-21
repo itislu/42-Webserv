@@ -2,32 +2,34 @@
 
 #include <iostream>
 
-void printEscapedChar(char chr)
+std::ostream& printEscapedChar(std::ostream& out, char chr)
 {
   switch (chr) {
     case '\n':
-      std::cout << "\\n";
+      out << "\\n";
       break;
     case '\r':
-      std::cout << "\\r";
+      out << "\\r";
       break;
     case '\t':
-      std::cout << "\\t";
+      out << "\\t";
       break;
     case '\\':
-      std::cout << "\\\\";
+      out << "\\\\";
       break;
     case '\'':
-      std::cout << "\\'";
+      out << "\\'";
       break;
 
     default:
-      if (static_cast<unsigned char>(chr) < 32) {
+      const int otherControlChars = 32;
+      if (static_cast<unsigned char>(chr) < otherControlChars) {
         // Print other control chars as hex
-        std::cout << "\\x" << std::hex << std::uppercase
-                  << int(static_cast<unsigned char>(chr)) << std::dec;
+        out << "\\x" << std::hex << std::uppercase
+            << int(static_cast<unsigned char>(chr)) << std::dec;
       } else {
-        std::cout << chr;
+        out << chr;
       }
   }
+  return out;
 }

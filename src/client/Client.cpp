@@ -9,15 +9,26 @@
 #include "socket/AutoFd.hpp"
 #include "utils/IBuffer.hpp"
 #include "utils/SmartBuffer.hpp"
+#include "utils/logger/Logger.hpp"
 #include "utils/state/StateHandler.hpp"
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
+
+/* ************************************************************************** */
+// Init
+
+Logger& Client::_log = Logger::getInstance(LOG_SERVER);
+
+const std::size_t Client::_maxChunk;
+
+/* ************************************************************************** */
 
 Client::Client()
   : _fd(-1)
@@ -98,7 +109,7 @@ void Client::setServer(const Server* server)
 
 bool Client::receive()
 {
-  static IBuffer::RawBytes buffer(MAX_CHUNK);
+  static IBuffer::RawBytes buffer(_maxChunk);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
     std::cout << "Client " << getFd() << ": ";
@@ -121,21 +132,21 @@ bool Client::receive()
 
 bool Client::sendTo()
 {
-  const std::size_t toSend =
-    std::min(_outBuff.size(), static_cast<std::size_t>(MAX_CHUNK));
-  const IBuffer::ExpectStr buff = _outBuff.consumeFront(toSend);
-  if (!buff.has_value()) {
-    // todo error
-  }
-  const ssize_t bytes = send(getFd(), &buff, toSend, 0);
+  const std::size_t toSend = std::min(_outBuff.size(), _maxChunk);
+  // todo handle exception
+  _log.info() << "outbuf size before: " << _outBuff.size() << "\n";
+  const IBuffer::ExpectRaw expectBuff = _outBuff.consumeRawFront(toSend);
+  _log.info() << "outbuf size after : " << _outBuff.size() << "\n";
+
+  const IBuffer::RawBytes& buff = *expectBuff;
+  const ssize_t bytes = send(getFd(), buff.data(), buff.size(), 0);
   if (bytes > 0) {
-    // todo ok
-  }
-  if (bytes == 0) {
-    std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
+    _log.info() << "sent " << bytes << " bytes\n";
+  } else if (bytes == 0) {
+    _log.warning() << "no data sent to client fd=" << getFd() << "\n";
   } else {
-    std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
-              << std::strerror(errno) << "\n";
+    _log.error() << "send error for client fd=" << getFd() << ": "
+                 << std::strerror(errno) << "\n";
     return false;
   }
   updateLastActivity();

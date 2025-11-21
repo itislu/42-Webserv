@@ -33,6 +33,8 @@ PrepareResponse::PrepareResponse(Client* context)
 void PrepareResponse::run()
 try {
   if (!_initialized) {
+    _log.info() << "PrepareResponse Request:\n\n"
+                << getContext()->getRequest().toString() << "\n\n";
     _init();
   }
 

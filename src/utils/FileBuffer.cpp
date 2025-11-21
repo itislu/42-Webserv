@@ -1,5 +1,4 @@
 #include "FileBuffer.hpp"
-#include "utils/printUtils.hpp"
 
 #include <iostream>
 #include <libftpp/expected.hpp>
@@ -102,6 +101,11 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
   return _consumeFront<std::string>(bytes);
 }
 
+IBuffer::ExpectRaw FileBuffer::consumeRawFront(std::size_t bytes)
+{
+  return _consumeFront<RawBytes>(bytes);
+}
+
 IBuffer::ExpectRaw FileBuffer::consumeAll()
 {
   return _consumeFront<RawBytes>(_size);
@@ -133,18 +137,11 @@ std::size_t FileBuffer::size() const
   return _size;
 }
 
-void FileBuffer::print()
+std::size_t FileBuffer::pos()
 {
-  const std::streampos oldPos = _fs.tellg();
-
-  char chr = ' ';
-  std::cout << "'";
-  while (_fs.get(chr) != 0) {
-    printEscapedChar(chr);
-  }
-  std::cout << "'\n";
-  _fs.clear(); // after get last, fstream is in failestate
-  _fs.seekg(oldPos);
+  // todo make safe
+  const std::streampos pos = _fs.tellg();
+  return static_cast<std::size_t>(pos);
 }
 
 /* ************************************************************************** */

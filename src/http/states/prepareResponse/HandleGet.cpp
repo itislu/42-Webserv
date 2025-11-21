@@ -35,7 +35,7 @@ HandleGet::HandleGet(PrepareResponse* context)
 void HandleGet::run()
 {
   _addContentLengthHeader();
-  _addContentType();
+  // _addContentType();
   _openFile();
   getContext()->getStateHandler().setDone();
 }
