@@ -1,7 +1,6 @@
 #include "utils/SmartBuffer.hpp"
 #include <http/abnfRules/http11Rules.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>

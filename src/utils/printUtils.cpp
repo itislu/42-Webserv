@@ -22,7 +22,8 @@ void printEscapedChar(char chr)
       break;
 
     default:
-      if (static_cast<unsigned char>(chr) < 32) {
+      const int controlCharsStart = 32;
+      if (static_cast<unsigned char>(chr) < controlCharsStart) {
         // Print other control chars as hex
         std::cout << "\\x" << std::hex << std::uppercase
                   << int(static_cast<unsigned char>(chr)) << std::dec;
