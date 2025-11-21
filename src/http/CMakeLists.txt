@@ -10,6 +10,7 @@ add_library(${LIB_NAME} STATIC
   abnfRules/http11Rules.cpp
   abnfRules/requestLineRules.cpp
   abnfRules/ruleIds.cpp
+  abnfRules/ruleUtils.cpp
   abnfRules/uriRules.cpp
   abnfRules/headerLineRules.cpp
   states/prepareResponse/HandleDelete.cpp

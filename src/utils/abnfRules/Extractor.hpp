@@ -20,7 +20,7 @@ public:
   typedef void (T::*FuncPtr)(const std::string&);
 
   void addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr);
-  void run(T& obj, Rule::ResultMap resultMap, IBuffer& buffer) const;
+  void run(T& obj, const Rule::ResultMap& resultMap, IBuffer& buffer) const;
 
 private:
   typedef std::pair<Rule::RuleId, FuncPtr> SetterPair;

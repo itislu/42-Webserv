@@ -3,10 +3,7 @@
 #include "Extractor.hpp"
 #endif
 
-#include <libftpp/expected.hpp>
-#include <libftpp/memory.hpp>
 #include <libftpp/optional.hpp>
-#include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
@@ -26,12 +23,15 @@ void Extractor<T>::addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr)
 }
 
 template<typename T>
-void Extractor<T>::run(T& obj, Rule::ResultMap resultMap, IBuffer& buffer) const
+void Extractor<T>::run(T& obj,
+                       const Rule::ResultMap& resultMap,
+                       IBuffer& buffer) const
 {
   for (typename Setters::const_iterator setterIter = _setters.begin();
        setterIter != _setters.end();
        ++setterIter) {
-    Rule::ResultMap::iterator resultIter = resultMap.find(setterIter->first);
+    Rule::ResultMap::const_iterator resultIter =
+      resultMap.find(setterIter->first);
     if (resultIter != resultMap.end()) {
       OptionStr str = _getString(resultIter->second, buffer);
       if (str.has_value()) {
