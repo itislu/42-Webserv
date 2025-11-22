@@ -51,6 +51,10 @@ IBuffer::ExpectChr FileBuffer::peek()
   return _getChr(&std::fstream::peek);
 }
 
+/**
+ * Seeking beyond EOF is an error.
+ * Seeking to the beginning of an empty buffer is therefore allowed.
+ */
 IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
 {
   if (pos > _size) {
