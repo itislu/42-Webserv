@@ -8,6 +8,13 @@
 
 /* ************************************************************************** */
 // PUBLIC
+
+BufferReader::BufferReader()
+  : _buffer(FT_NULLPTR)
+  , _posInBuff(0)
+{
+}
+
 void BufferReader::init(IBuffer* buffer)
 {
   assert(buffer != FT_NULLPTR);

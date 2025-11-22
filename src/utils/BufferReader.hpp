@@ -8,6 +8,8 @@
 class BufferReader
 {
 public:
+  // `init()` required before use.
+  BufferReader();
   void init(IBuffer* buffer);
 
   bool reachedEnd() const;
