@@ -18,10 +18,9 @@ const char* const SmartBuffer::errAllocBuffer =
 // PUBLIC
 
 SmartBuffer::SmartBuffer()
-  : _usesFile(true)
+  : _buffer(new FileBuffer())
+  , _usesFile(true)
 {
-  ft::unique_ptr<FileBuffer> newBuffer = ft::make_unique<FileBuffer>();
-  _buffer = ft::move(newBuffer);
 }
 
 IBuffer::ExpectChr SmartBuffer::get()
