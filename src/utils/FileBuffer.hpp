@@ -50,11 +50,8 @@ private:
   ft::expected<ContigContainer, BufferException> _consumeFront(
     std::size_t bytes);
   template<typename ContigContainer>
-  ft::expected<ContigContainer, BufferException> _getData(std::size_t bytes);
-  template<typename ContigContainer>
-  ft::expected<ContigContainer, BufferException> _getDataRange(
-    std::size_t start,
-    std::size_t bytes);
+  ft::expected<ContigContainer, BufferException> _getData(std::size_t start,
+                                                          std::size_t bytes);
   ExpectVoid _append(const char* data, std::streamsize bytes);
   ExpectVoid _saveRemainder();
   ExpectVoid _copyFrom(FileBuffer& src);
