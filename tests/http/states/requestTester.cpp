@@ -65,8 +65,11 @@ TEST(RequestTester, PartialBufferTest)
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
   Headers& headers = request.getHeaders();
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("TestHeader"), "7"));
+  std::string value;
+  EXPECT_NO_THROW(value = headers.at("Host"));
+  EXPECT_EQ(value, "webserv");
+  EXPECT_NO_THROW(value = headers.at("TestHeader"));
+  EXPECT_EQ(value, "7");
 }
 
 TEST(RequestTester, CompleteBufferTest)
@@ -85,8 +88,11 @@ TEST(RequestTester, CompleteBufferTest)
   EXPECT_EQ(request.getVersion(), "HTTP/1.0");
 
   Headers& headers = request.getHeaders();
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("TestHeader"), "7"));
+  std::string value;
+  EXPECT_NO_THROW(value = headers.at("Host"));
+  EXPECT_EQ(value, "webserv");
+  EXPECT_NO_THROW(value = headers.at("TestHeader"));
+  EXPECT_EQ(value, "7");
 }
 
 // NOLINTEND
