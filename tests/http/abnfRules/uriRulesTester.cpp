@@ -25,10 +25,7 @@ bool runParser(const std::string& str, Rule& rule)
 {
   SmartBuffer buffer;
   buffer.append(str);
-
-  BufferReader reader = BufferReader();
-  reader.init(&buffer);
-
+  BufferReader reader(buffer);
   rule.setBufferReader(&reader);
   rule.reset();
   bool matches = rule.matches();

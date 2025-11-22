@@ -30,10 +30,9 @@ Logger& ParseUri::_log = Logger::getInstance(LOG_HTTP);
 ParseUri::ParseUri(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _buffReader()
+  , _buffReader(_client->getInBuff())
 {
   _log.info() << "ParseUri\n";
-  _buffReader.init(&_client->getInBuff());
 }
 
 void ParseUri::run()

@@ -12,10 +12,22 @@
 /* ************************************************************************** */
 // PUBLIC
 
-void BufferReader::init(IBuffer* buffer)
+BufferReader::BufferReader()
+  : _buffer(FT_NULLPTR)
+  , _posInBuff(0)
 {
-  assert(buffer != FT_NULLPTR);
-  _buffer = buffer;
+}
+
+BufferReader::ExpectVoid BufferReader::init(IBuffer& buffer)
+{
+  _buffer = &buffer;
+  return resetPosInBuff(std::nothrow);
+}
+
+BufferReader::BufferReader(IBuffer& buffer)
+  : _buffer(&buffer)
+  , _posInBuff(0)
+{
   resetPosInBuff();
 }
 
