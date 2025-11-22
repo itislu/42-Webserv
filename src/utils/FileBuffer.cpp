@@ -134,14 +134,15 @@ std::size_t FileBuffer::size() const
 void FileBuffer::print()
 {
   const std::streampos oldPos = _fs.tellg();
+  const std::ios::iostate oldState = _fs.rdstate();
 
-  char chr = ' ';
+  char chr = '\0';
   std::cout << "'";
-  while (_fs.get(chr) != 0) {
+  while (_fs.get(chr).good()) {
     printEscapedChar(chr);
   }
   std::cout << "'\n";
-  _fs.clear(); // after get last, fstream is in failestate
+  _fs.clear(oldState); // after get last, fstream is in fail state
   _fs.seekg(oldPos);
 }
 
