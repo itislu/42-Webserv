@@ -30,7 +30,7 @@ Logger& ParseMethod::_log = Logger::getInstance(LOG_HTTP);
 ParseMethod::ParseMethod(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _buffReader()
+  , _buffReader(_client->getInBuff())
 {
   _log.info() << "ParseMethod\n";
   _init();
@@ -64,8 +64,6 @@ void ParseMethod::run()
 
 void ParseMethod::_init()
 {
-  _buffReader.init(&_client->getInBuff());
-
   ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(::isupper));
   rep->setMax(static_cast<int>(Request::MaxMethodLen));

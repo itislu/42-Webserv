@@ -1,6 +1,5 @@
 #include "BufferReader.hpp"
 
-#include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
 
 #include <cassert>
@@ -8,16 +7,16 @@
 
 /* ************************************************************************** */
 // PUBLIC
-void BufferReader::init(IBuffer* buffer)
+
+BufferReader::BufferReader(IBuffer& buffer)
+  : _buffer(&buffer)
+  , _posInBuff(0)
 {
-  assert(buffer != FT_NULLPTR);
-  _buffer = buffer;
   resetPosInBuff();
 }
 
 bool BufferReader::reachedEnd() const
 {
-  assert(_buffer != FT_NULLPTR);
   if (_posInBuff < 0) {
     return false;
   }
@@ -26,10 +25,9 @@ bool BufferReader::reachedEnd() const
 
 char BufferReader::getNextChar()
 {
-  assert(_buffer != FT_NULLPTR);
   const IBuffer::ExpectChr res = _buffer->get();
   _posInBuff++;
-  return (*res);
+  return *res;
 }
 
 long BufferReader::getPosInBuff() const
@@ -39,14 +37,12 @@ long BufferReader::getPosInBuff() const
 
 void BufferReader::setPosInBuff(long pos)
 {
-  assert(_buffer != FT_NULLPTR);
   _buffer->seek(pos);
   _posInBuff = pos;
 }
 
 void BufferReader::resetPosInBuff()
 {
-  assert(_buffer != FT_NULLPTR);
   _buffer->seek(0);
   _posInBuff = 0;
 }

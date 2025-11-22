@@ -8,7 +8,7 @@
 class BufferReader
 {
 public:
-  void init(IBuffer* buffer);
+  explicit BufferReader(IBuffer& buffer);
 
   bool reachedEnd() const;
   char getNextChar();
