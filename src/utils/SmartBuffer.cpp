@@ -7,6 +7,7 @@
 #include <utils/IBuffer.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <new>
 #include <string>
 
@@ -100,7 +101,7 @@ IBuffer::ExpectChr SmartBuffer::get(std::nothrow_t /*unused*/)
 {
   try {
     return get();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -109,7 +110,7 @@ IBuffer::ExpectChr SmartBuffer::peek(std::nothrow_t /*unused*/)
 {
   try {
     return peek();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -120,7 +121,7 @@ IBuffer::ExpectVoid SmartBuffer::seek(std::size_t pos,
   try {
     seek(pos);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -131,7 +132,7 @@ IBuffer::ExpectVoid SmartBuffer::append(const std::string& data,
   try {
     append(data);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -143,7 +144,7 @@ IBuffer::ExpectVoid SmartBuffer::append(const RawBytes& buffer,
   try {
     append(buffer, bytes);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -154,7 +155,7 @@ IBuffer::ExpectVoid SmartBuffer::removeFront(std::size_t bytes,
   try {
     removeFront(bytes);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -164,7 +165,7 @@ IBuffer::ExpectStr SmartBuffer::consumeFront(std::size_t bytes,
 {
   try {
     return consumeFront(bytes);
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -173,7 +174,7 @@ IBuffer::ExpectRaw SmartBuffer::consumeAll(std::nothrow_t /*unused*/)
 {
   try {
     return consumeAll();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -184,7 +185,7 @@ IBuffer::ExpectStr SmartBuffer::getStr(std::size_t start,
 {
   try {
     return getStr(start, bytes);
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -195,7 +196,7 @@ IBuffer::ExpectRaw SmartBuffer::getRawBytes(std::size_t start,
 {
   try {
     return getRawBytes(start, bytes);
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -206,7 +207,7 @@ IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData,
   try {
     replace(rawData);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }

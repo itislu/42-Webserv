@@ -1,5 +1,7 @@
 #include "IBuffer.hpp"
 
+#include <exception>
+
 /* ************************************************************************** */
 // Exceptions
 
@@ -13,6 +15,11 @@ IBuffer::BufferException::BufferException()
 
 IBuffer::BufferException::BufferException(const char* message)
   : _message(message)
+{
+}
+
+IBuffer::BufferException::BufferException(const std::exception& exception)
+  : _message(exception.what())
 {
 }
 

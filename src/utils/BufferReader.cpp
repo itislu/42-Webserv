@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <exception>
 #include <new>
 
 /* ************************************************************************** */
@@ -58,7 +59,7 @@ BufferReader::ExpectChr BufferReader::getNextChar(std::nothrow_t /*unused*/)
 {
   try {
     return getNextChar();
-  } catch (const IBuffer::BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<IBuffer::BufferException>(e);
   }
 }
@@ -69,7 +70,7 @@ BufferReader::ExpectVoid BufferReader::setPosInBuff(long pos,
   try {
     setPosInBuff(pos);
     return ExpectVoid();
-  } catch (const IBuffer::BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<IBuffer::BufferException>(e);
   }
 }
@@ -79,7 +80,7 @@ BufferReader::ExpectVoid BufferReader::resetPosInBuff(std::nothrow_t /*unused*/)
   try {
     resetPosInBuff();
     return ExpectVoid();
-  } catch (const IBuffer::BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<IBuffer::BufferException>(e);
   }
 }
@@ -90,7 +91,7 @@ BufferReader::ExpectVoid BufferReader::rewind(long bytes,
   try {
     rewind(bytes);
     return ExpectVoid();
-  } catch (const IBuffer::BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<IBuffer::BufferException>(e);
   }
 }

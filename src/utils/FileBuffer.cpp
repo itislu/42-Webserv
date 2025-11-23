@@ -1,7 +1,6 @@
 #include "FileBuffer.hpp"
 #include "utils/printUtils.hpp"
 
-#include <iostream>
 #include <libftpp/expected.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
@@ -13,8 +12,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <exception>
 #include <ios>
 #include <iosfwd>
+#include <iostream>
 #include <new>
 #include <string>
 
@@ -130,7 +131,7 @@ IBuffer::ExpectChr FileBuffer::get(std::nothrow_t /*unused*/)
 {
   try {
     return get();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -139,7 +140,7 @@ IBuffer::ExpectChr FileBuffer::peek(std::nothrow_t /*unused*/)
 {
   try {
     return peek();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -149,7 +150,7 @@ IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos, std::nothrow_t /*unused*/)
   try {
     seek(pos);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -160,7 +161,7 @@ IBuffer::ExpectVoid FileBuffer::append(const std::string& data,
   try {
     append(data);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -172,7 +173,7 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
   try {
     append(buffer, bytes);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -183,7 +184,7 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes,
   try {
     removeFront(bytes);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -193,7 +194,7 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes,
 {
   try {
     return consumeFront(bytes);
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -202,7 +203,7 @@ IBuffer::ExpectRaw FileBuffer::consumeAll(std::nothrow_t /*unused*/)
 {
   try {
     return consumeAll();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -213,7 +214,7 @@ IBuffer::ExpectStr FileBuffer::getStr(std::size_t start,
 {
   try {
     return getStr(start, bytes);
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -224,7 +225,7 @@ IBuffer::ExpectRaw FileBuffer::getRawBytes(std::size_t start,
 {
   try {
     return getRawBytes(start, bytes);
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
@@ -235,7 +236,7 @@ IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData,
   try {
     replace(rawData);
     return ExpectVoid();
-  } catch (const BufferException& e) {
+  } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
 }
