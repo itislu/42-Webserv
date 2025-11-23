@@ -9,7 +9,6 @@
 #include <http/states/readRequestLine/ParseVersion.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
@@ -133,6 +132,6 @@ void ParseUri::_extractParts(const Rule::ResultMap& results)
   _authExtractor().run(_tmpUri.getAuthority(), results, _client->getInBuff());
 
   // remove bytes from buffer
-  const std::size_t indexInBuff = _buffReader.getPosInBuff();
-  _client->getInBuff().remove(indexInBuff);
+  const std::size_t posInBuff = _buffReader.getPosInBuff();
+  _client->getInBuff().removeFront(posInBuff);
 }

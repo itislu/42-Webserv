@@ -1,5 +1,7 @@
 #include "FileBuffer.hpp"
+#include "utils/printUtils.hpp"
 
+#include <iostream>
 #include <libftpp/expected.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
@@ -7,6 +9,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -48,10 +51,17 @@ IBuffer::ExpectChr FileBuffer::peek()
   return _getChr(&std::fstream::peek);
 }
 
+/**
+ * Seeking beyond EOF is an error.
+ * Seeking to the beginning of an empty buffer is therefore allowed.
+ */
 IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
 {
   if (pos > _size) {
-    return ft::unexpected<BufferException>(errOutOfRange);
+    if (_size == 0) {
+      return handleUnexpected(errFileEmpty);
+    }
+    return handleUnexpected(errOutOfRange);
   }
   if (_size == 0) {
     return ExpectVoid();
@@ -59,7 +69,7 @@ IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
 
   _fs.seekg(static_cast<std::streamoff>(pos));
   if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
+    return handleUnexpected(errSeek);
   }
   return ExpectVoid();
 }
@@ -69,7 +79,7 @@ IBuffer::ExpectVoid FileBuffer::append(const std::string& data)
   return _append(data.data(), static_cast<std::streamsize>(data.size()));
 }
 
-IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
+IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
                                        long bytes)
 {
   return _append(buffer.data(), static_cast<std::streamsize>(bytes));
@@ -77,21 +87,16 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::Container& buffer,
 
 IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 {
-  ExpectVoid res = seek(bytes);
-  if (!res.has_value()) {
-    return res;
-  }
   if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
+    return handleUnexpected(errFileEmpty);
   }
 
-  // read/write rest into new tempFile
-  res = _saveRemainder();
+  const ExpectVoid res = seek(bytes);
   if (!res.has_value()) {
     return res;
   }
-
-  return ExpectVoid();
+  // read/write rest into new tempFile
+  return _saveRemainder();
 }
 
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
@@ -99,9 +104,50 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
   return _consumeFront<std::string>(bytes);
 }
 
+IBuffer::ExpectRaw FileBuffer::consumeAll()
+{
+  return _consumeFront<RawBytes>(_size);
+}
+
+IBuffer::ExpectStr FileBuffer::getStr(std::size_t start, std::size_t bytes)
+{
+  return _getData<std::string>(start, bytes);
+}
+
+IBuffer::ExpectRaw FileBuffer::getRawBytes(std::size_t start, std::size_t bytes)
+{
+  return _getData<RawBytes>(start, bytes);
+}
+
+IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData)
+{
+  _removeCurrFile();
+  return append(rawData, static_cast<long>(rawData.size()));
+}
+
+bool FileBuffer::isEmpty() const
+{
+  return _size == 0;
+}
+
 std::size_t FileBuffer::size() const
 {
   return _size;
+}
+
+void FileBuffer::print()
+{
+  const std::streampos oldPos = _fs.tellg();
+  const std::ios::iostate oldState = _fs.rdstate();
+
+  char chr = '\0';
+  std::cout << "'";
+  while (_fs.get(chr).good()) {
+    printEscapedChar(chr);
+  }
+  std::cout << "'\n";
+  _fs.clear(oldState); // after get last, fstream is in fail state
+  _fs.seekg(oldPos);
 }
 
 /* ************************************************************************** */
@@ -147,22 +193,22 @@ IBuffer::ExpectVoid FileBuffer::_openTmpFile()
     }
   }
   // tried to open 100 random files
-  return ft::unexpected<BufferException>(errOpen);
+  return handleUnexpected(errOpen);
 }
 
 IBuffer::ExpectChr FileBuffer::_getChr(
   std::fstream::int_type (std::fstream::*func)())
 {
   if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
+    return handleUnexpected(errFileEmpty);
   }
 
   const int chr = (_fs.*func)();
   if (_fs.fail()) {
     if (_fs.eof()) {
-      return ft::unexpected<BufferException>(errOutOfRange);
+      return handleUnexpected(errOutOfRange);
     }
-    return ft::unexpected<BufferException>(errRead);
+    return handleUnexpected(errRead);
   }
   return static_cast<char>(chr);
 }
@@ -174,26 +220,17 @@ FileBuffer::_consumeFront(std::size_t bytes)
 {
   typedef ft::expected<ContigContainer, BufferException> ExpectCont;
 
-  // go to start of file
-  ExpectVoid res = seek(0);
-  if (!res.has_value()) {
-    return ft::unexpected<BufferException>(res.error());
-  }
-  if (_size == 0) {
-    return ft::unexpected<BufferException>(errFileEmpty);
-  }
-
   // read bytes from the beginning
-  const ExpectCont front = _getData<ContigContainer>(bytes);
+  const ExpectCont front = _getData<ContigContainer>(0, bytes);
   if (!front.has_value()) {
     return front;
   }
   assert(front->size() == bytes); // Unexpected EOF should not happen
 
   // read/write rest into new tempFile
-  res = _saveRemainder();
+  const ExpectVoid res = _saveRemainder();
   if (!res.has_value()) {
-    return ft::unexpected<BufferException>(res.error());
+    return handleUnexpected(res.error().what());
   }
 
   return front;
@@ -202,27 +239,38 @@ FileBuffer::_consumeFront(std::size_t bytes)
 // Template can be in source file if only used here.
 template<typename ContigContainer>
 ft::expected<ContigContainer, FileBuffer::BufferException> FileBuffer::_getData(
+  std::size_t start,
   std::size_t bytes)
 {
+  typedef ft::expected<ContigContainer, BufferException> ExpectCont;
+
+  if (start >= _size || bytes > _size - start) {
+    if (_size == 0) {
+      return handleUnexpected(errFileEmpty);
+    }
+    return handleUnexpected(errOutOfRange);
+  }
   if (bytes == 0) {
     return ContigContainer();
   }
-  if (bytes > _size) {
-    return ft::unexpected<BufferException>(errOutOfRange);
+
+  const ExpectVoid res = seek(start);
+  if (!res.has_value()) {
+    return handleUnexpected(res.error().what());
   }
 
-  ExpectStr res;
-  ContigContainer& front = res.value();
+  ExpectCont cont;
+  ContigContainer& front = cont.value();
   front.resize(bytes);
 
   _fs.read(&front[0], static_cast<std::streamsize>(bytes));
   if (_fs.bad()) {
-    return ft::unexpected<BufferException>(errRead);
+    return handleUnexpected(errRead);
   }
   const std::streamsize actuallyRead = _fs.gcount();
   front.resize(static_cast<std::size_t>(actuallyRead));
 
-  return res;
+  return cont;
 }
 
 IBuffer::ExpectVoid FileBuffer::_append(const char* data, std::streamsize bytes)
@@ -237,12 +285,12 @@ IBuffer::ExpectVoid FileBuffer::_append(const char* data, std::streamsize bytes)
   // Go to end and add new data
   _fs.seekp(0, std::ios::end);
   if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errSeek);
+    return handleUnexpected(errSeek);
   }
 
   _fs.write(data, bytes);
   if (_fs.fail()) {
-    return ft::unexpected<BufferException>(errWrite);
+    return handleUnexpected(errWrite);
   }
 
   _size += bytes;
@@ -270,11 +318,7 @@ IBuffer::ExpectVoid FileBuffer::_saveRemainder()
     return res;
   }
 
-  res = _replaceCurrFile(tmp);
-  if (!res.has_value()) {
-    return res;
-  }
-  return ExpectVoid();
+  return _replaceCurrFile(tmp);
 }
 
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
@@ -285,13 +329,13 @@ IBuffer::ExpectVoid FileBuffer::_copyFrom(FileBuffer& src)
   while (!fsSrc.eof()) {
     fsSrc.read(buffer, _copyBufferSize);
     if (fsSrc.bad()) {
-      return ft::unexpected<BufferException>(errRead);
+      return handleUnexpected(errRead);
     }
     const std::streamsize bytesRead = fsSrc.gcount();
     if (bytesRead > 0) {
       _fs.write(buffer, bytesRead);
       if (_fs.fail()) {
-        return ft::unexpected<BufferException>(errWrite);
+        return handleUnexpected(errWrite);
       }
       _size += static_cast<std::size_t>(bytesRead);
     }
@@ -313,7 +357,7 @@ IBuffer::ExpectVoid FileBuffer::_replaceCurrFile(FileBuffer& tmpFb)
   if (!_fs.is_open()) {
     _fs.open(_fileName.c_str(),
              std::ios::in | std::ios::out | std::ios::binary);
-    return ft::unexpected<BufferException>(errOpen);
+    return handleUnexpected(errOpen);
   }
   using std::swap;
   swap(_fileName, tmpFb._fileName);

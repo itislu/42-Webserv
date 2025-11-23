@@ -1,6 +1,6 @@
+#include "utils/SmartBuffer.hpp"
 #include <http/abnfRules/headerLineRules.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -19,8 +19,8 @@ namespace {
 
 bool runParser(const std::string& str, Rule& rule)
 {
-  Buffer buffer;
-  buffer.add(str);
+  SmartBuffer buffer;
+  buffer.append(str);
   BufferReader reader = BufferReader();
   reader.init(&buffer);
   rule.setBufferReader(&reader);

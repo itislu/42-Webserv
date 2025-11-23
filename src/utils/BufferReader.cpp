@@ -1,34 +1,35 @@
 #include "BufferReader.hpp"
-#include "libftpp/utility.hpp"
-#include "utils/Buffer.hpp"
-#include <algorithm>
-#include <iostream>
+
+#include <libftpp/utility.hpp>
+#include <utils/IBuffer.hpp>
+
+#include <cassert>
+#include <cstddef>
 
 /* ************************************************************************** */
 // PUBLIC
-void BufferReader::init(Buffer* buffer)
+void BufferReader::init(IBuffer* buffer)
 {
+  assert(buffer != FT_NULLPTR);
   _buffer = buffer;
   resetPosInBuff();
 }
 
 bool BufferReader::reachedEnd() const
 {
-  if (_buffer == FT_NULLPTR) {
-    return true;
+  assert(_buffer != FT_NULLPTR);
+  if (_posInBuff < 0) {
+    return false;
   }
-  return (_buffer->begin() + (_posInBuff + 1)) == _buffer->end();
+  return (static_cast<std::size_t>(_posInBuff) >= _buffer->size());
 }
 
 char BufferReader::getNextChar()
 {
-  _posInBuff += 1;
-  return static_cast<char>(_buffer->at(_posInBuff));
-}
-
-char BufferReader::getCurrChar() const
-{
-  return static_cast<char>(_buffer->at(_posInBuff));
+  assert(_buffer != FT_NULLPTR);
+  const IBuffer::ExpectChr res = _buffer->get();
+  _posInBuff++;
+  return (*res);
 }
 
 long BufferReader::getPosInBuff() const
@@ -38,31 +39,26 @@ long BufferReader::getPosInBuff() const
 
 void BufferReader::setPosInBuff(long pos)
 {
+  assert(_buffer != FT_NULLPTR);
+  _buffer->seek(pos);
   _posInBuff = pos;
 }
 
 void BufferReader::resetPosInBuff()
 {
-  _posInBuff = -1;
+  assert(_buffer != FT_NULLPTR);
+  _buffer->seek(0);
+  _posInBuff = 0;
 }
 
 void BufferReader::rewind(long bytes)
 {
-  if (bytes < 0) {
+  if (bytes <= 0) {
     return;
   }
-  _posInBuff -= bytes;
-}
-
-void BufferReader::printRemaining()
-{
-  long istart = getPosInBuff();
-  istart = std::max<long>(istart + 1, 0);
-  Buffer::iterator iter = _buffer->getIterAt(istart);
-  while (iter < _buffer->end() && *iter != '\r' && *iter != '\n') {
-    std::cout << *iter;
-    iter++;
-  }
+  const long newPos = _posInBuff - bytes;
+  assert(newPos >= 0);
+  setPosInBuff(newPos);
 }
 
 /* ************************************************************************** */

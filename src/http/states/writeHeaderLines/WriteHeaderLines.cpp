@@ -5,7 +5,7 @@
 #include <http/http.hpp>
 #include <http/states/writeBody/WriteBody.hpp>
 #include <string>
-#include <utils/Buffer.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -31,9 +31,9 @@ void WriteHeaderLines::run()
   headers.addHeader("Server", "webserv"); // TODO from config probaly
   headers.addHeader("Connection", "close");
 
-  Buffer& outBuffer = _client->getOutBuff();
-  outBuffer.add(headers.toString());
-  outBuffer.add(http::CRLF);
+  IBuffer& outBuffer = _client->getOutBuff();
+  outBuffer.append(headers.toString());
+  outBuffer.append(http::CRLF);
 
   _client->getStateHandler().setState<WriteBody>();
 }

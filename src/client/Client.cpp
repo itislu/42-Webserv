@@ -7,7 +7,8 @@
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/AutoFd.hpp"
-#include "utils/Buffer.hpp"
+#include "utils/IBuffer.hpp"
+#include "utils/SmartBuffer.hpp"
 #include "utils/state/StateHandler.hpp"
 #include <algorithm>
 #include <cerrno>
@@ -17,7 +18,6 @@
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <vector>
 
 Client::Client()
   : _fd(-1)
@@ -53,12 +53,12 @@ const std::string& Client::getHost() const
   return _host;
 }
 
-Buffer& Client::getInBuff()
+SmartBuffer& Client::getInBuff()
 {
   return _inBuff;
 }
 
-Buffer& Client::getOutBuff()
+SmartBuffer& Client::getOutBuff()
 {
   return _outBuff;
 }
@@ -98,7 +98,7 @@ void Client::setServer(const Server* server)
 
 bool Client::receive()
 {
-  static std::vector<unsigned char> buffer(MAX_CHUNK);
+  static IBuffer::RawBytes buffer(MAX_CHUNK);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
     std::cout << "Client " << getFd() << ": ";
@@ -106,7 +106,7 @@ bool Client::receive()
     std::cout.write(reinterpret_cast<const char*>(buffer.data()),
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
-    _inBuff.add(buffer, bytes);
+    _inBuff.append(buffer, bytes);
     // TODO: STATEMACHINE/PARSING
     _stateHandler.setStateHasChanged(true);
     while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
@@ -128,12 +128,16 @@ bool Client::receive()
 bool Client::sendTo()
 {
   const std::size_t toSend =
-    std::min(_outBuff.getSize(), static_cast<std::size_t>(MAX_CHUNK));
-  const ssize_t bytes = send(getFd(), _outBuff.data(), toSend, 0);
-
+    std::min(_outBuff.size(), static_cast<std::size_t>(MAX_CHUNK));
+  const IBuffer::ExpectStr buff = _outBuff.consumeFront(toSend);
+  if (!buff.has_value()) {
+    // todo error
+  }
+  const ssize_t bytes = send(getFd(), &buff, toSend, 0);
   if (bytes > 0) {
-    _outBuff.remove(bytes);
-  } else if (bytes == 0) {
+    // todo ok
+  }
+  if (bytes == 0) {
     std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
   } else {
     std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "

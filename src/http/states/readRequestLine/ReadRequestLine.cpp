@@ -1,5 +1,7 @@
 #include "ReadRequestLine.hpp"
 #include "ParseMethod.hpp"
+#include "http/states/prepareResponse/HandleError.hpp"
+#include "utils/IBuffer.hpp"
 
 #include <client/Client.hpp>
 #include <http/StatusCode.hpp>
@@ -32,7 +34,7 @@ ReadRequestLine::ReadRequestLine(Client* context)
  * Example: `GET test/hello_world.html HTTP/1.1\r\n`
  */
 void ReadRequestLine::run()
-{
+try {
   _stateHandler.setStateHasChanged(true);
   while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
     _stateHandler.setStateHasChanged(false);
@@ -41,9 +43,7 @@ void ReadRequestLine::run()
 
   if (_stateHandler.isDone()) {
     _log.info() << "ReadRequestLine result\n"
-                << getContext()->getRequest().toString() << "\n"
-                << "buffer: \n"
-                << getContext()->getInBuff().toString() << "\n";
+                << getContext()->getRequest().toString() << "\n";
     if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
       getContext()->getStateHandler().setState<ReadHeaderLines>();
     } else {
@@ -51,6 +51,10 @@ void ReadRequestLine::run()
     }
     return;
   }
+} catch (const IBuffer::BufferException& e) {
+  _log.error() << "ReadRequestLine: " << e.what() << '\n';
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 StateHandler<ReadRequestLine>& ReadRequestLine::getStateHandler()

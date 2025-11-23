@@ -16,7 +16,7 @@ namespace {
 ft::unique_ptr<Client> StateTest(const std::string& requestLine)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
-  client->getInBuff().add(requestLine);
+  client->getInBuff().append(requestLine);
   client->getStateHandler().setState<ReadRequestLine>();
   client->getStateHandler().getState()->run();
   return ft::move(client);
