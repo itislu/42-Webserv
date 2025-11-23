@@ -23,7 +23,7 @@ public:
   char peek();
   void seek(std::size_t pos);
   void append(const std::string& data);
-  void append(const RawBytes& buffer, long bytes);
+  void append(const RawBytes& buffer, std::size_t bytes);
   void removeFront(std::size_t bytes);
   std::string consumeFront(std::size_t bytes);
   RawBytes consumeAll();
@@ -37,7 +37,7 @@ public:
   ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/);
   ExpectVoid append(const std::string& data, std::nothrow_t /*unused*/);
   ExpectVoid append(const RawBytes& buffer,
-                    long bytes,
+                    std::size_t bytes,
                     std::nothrow_t /*unused*/);
   ExpectVoid removeFront(std::size_t bytes, std::nothrow_t /*unused*/);
   ExpectStr consumeFront(std::size_t bytes, std::nothrow_t /*unused*/);
@@ -60,7 +60,7 @@ private:
 
   static const std::size_t _thresholdMemoryBuffer = 0; // always uses file now
 
-  bool _fileNeeded(long newBytes);
+  bool _fileNeeded(std::size_t newBytes);
   void _switchToFileBuffer();
 
   ft::unique_ptr<IBuffer> _buffer;

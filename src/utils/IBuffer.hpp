@@ -30,7 +30,7 @@ public:
   virtual char peek() = 0;
   virtual void seek(std::size_t pos) = 0;
   virtual void append(const std::string& data) = 0;
-  virtual void append(const RawBytes& buffer, long bytes) = 0;
+  virtual void append(const RawBytes& buffer, std::size_t bytes) = 0;
   virtual void removeFront(std::size_t bytes) = 0;
   virtual std::string consumeFront(std::size_t bytes) = 0;
   virtual RawBytes consumeAll() = 0;
@@ -45,7 +45,7 @@ public:
   virtual ExpectVoid append(const std::string& data,
                             std::nothrow_t /*unused*/) = 0;
   virtual ExpectVoid append(const RawBytes& buffer,
-                            long bytes,
+                            std::size_t bytes,
                             std::nothrow_t /*unused*/) = 0;
   virtual ExpectVoid removeFront(std::size_t bytes,
                                  std::nothrow_t /*unused*/) = 0;

@@ -46,13 +46,13 @@ void SmartBuffer::seek(std::size_t pos)
 
 void SmartBuffer::append(const std::string& data)
 {
-  if (!_usesFile && _fileNeeded(static_cast<long>(data.size()))) {
+  if (!_usesFile && _fileNeeded(data.size())) {
     _switchToFileBuffer();
   }
   _buffer->append(data);
 }
 
-void SmartBuffer::append(const RawBytes& buffer, long bytes)
+void SmartBuffer::append(const RawBytes& buffer, std::size_t bytes)
 {
   if (!_usesFile && _fileNeeded(bytes)) {
     _switchToFileBuffer();
@@ -138,7 +138,7 @@ IBuffer::ExpectVoid SmartBuffer::append(const std::string& data,
 }
 
 IBuffer::ExpectVoid SmartBuffer::append(const RawBytes& buffer,
-                                        long bytes,
+                                        std::size_t bytes,
                                         std::nothrow_t /*unused*/)
 {
   try {
@@ -230,7 +230,7 @@ void SmartBuffer::print()
 /* ************************************************************************** */
 // PRIVATE
 
-bool SmartBuffer::_fileNeeded(long newBytes)
+bool SmartBuffer::_fileNeeded(std::size_t newBytes)
 {
   return _buffer->size() + newBytes >= _thresholdMemoryBuffer;
 }

@@ -24,7 +24,7 @@ TEST(FileBufferTester, AppendVector)
   const FileBuffer::RawBytes input(inputStr.begin(), inputStr.end());
 
   FileBuffer filebuffer;
-  filebuffer.append(input, static_cast<long>(input.size()));
+  filebuffer.append(input, input.size());
 
   std::string result;
   while (filebuffer.size() > 0) {

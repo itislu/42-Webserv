@@ -82,7 +82,7 @@ void FileBuffer::append(const std::string& data)
   _append(data.data(), static_cast<std::streamsize>(data.size()));
 }
 
-void FileBuffer::append(const FileBuffer::RawBytes& buffer, long bytes)
+void FileBuffer::append(const FileBuffer::RawBytes& buffer, std::size_t bytes)
 {
   _append(buffer.data(), static_cast<std::streamsize>(bytes));
 }
@@ -122,7 +122,7 @@ FileBuffer::RawBytes FileBuffer::getRawBytes(std::size_t start,
 void FileBuffer::replace(RawBytes& rawData)
 {
   _removeCurrFile();
-  append(rawData, static_cast<long>(rawData.size()));
+  append(rawData, rawData.size());
 }
 
 // Non-throwing versions
@@ -167,7 +167,7 @@ IBuffer::ExpectVoid FileBuffer::append(const std::string& data,
 }
 
 IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
-                                       long bytes,
+                                       std::size_t bytes,
                                        std::nothrow_t /*unused*/)
 {
   try {
