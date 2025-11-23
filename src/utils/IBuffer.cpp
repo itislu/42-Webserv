@@ -1,5 +1,7 @@
 #include "IBuffer.hpp"
 
+#include <exception>
+
 /* ************************************************************************** */
 // Exceptions
 
@@ -10,14 +12,20 @@ IBuffer::BufferException::BufferException(const char* message)
 {
 }
 
-IBuffer::BufferException::BufferException(const IBuffer::BufferException& other)
+IBuffer::BufferException::BufferException(const std::exception& exception)
+  : _message(exception.what())
+{
+}
+
+IBuffer::BufferException::BufferException(
+  const IBuffer::BufferException& other) throw()
   : _message(other._message)
 {
 }
 
 // NOLINTBEGIN(bugprone-unhandled-self-assignment)
 IBuffer::BufferException& IBuffer::BufferException::operator=(
-  const BufferException& other)
+  const BufferException& other) throw()
 {
   _message = other._message;
   return *this;

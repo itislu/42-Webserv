@@ -1,28 +1,22 @@
 #pragma once
-#ifndef FILE_BUFFER_HPP
-#define FILE_BUFFER_HPP
+#ifndef SMART_BUFFER_HPP
+#define SMART_BUFFER_HPP
 
+#include <libftpp/memory.hpp>
 #include <utils/IBuffer.hpp>
 
 #include <cstddef>
-#include <fstream>
-#include <ios>
 #include <new>
 #include <string>
 
 /* ************************************************************************** */
-class FileBuffer : public IBuffer
+class SmartBuffer : public IBuffer
 {
 public:
-  static const char* const errOpen;
-  static const char* const errSeek;
-  static const char* const errFileEmpty;
-  static const char* const errOutOfRange;
-  static const char* const errRead;
-  static const char* const errWrite;
+  static const char* const errAllocBuffer;
 
-  FileBuffer();
-  ~FileBuffer();
+  SmartBuffer();
+  ~SmartBuffer() {}
 
   // Interface IBuffer - Throwing versions
   char get();
@@ -61,26 +55,16 @@ public:
   void print();
 
 private:
-  FileBuffer(const FileBuffer& other);
-  FileBuffer& operator=(const FileBuffer& other);
+  SmartBuffer(const SmartBuffer& other);
+  SmartBuffer& operator=(const SmartBuffer& other);
 
-  void _openTmpFile();
-  char _getChr(std::fstream::int_type (std::fstream::*func)());
-  template<typename ContigContainer>
-  ContigContainer _consumeFront(std::size_t bytes);
-  template<typename ContigContainer>
-  ContigContainer _getData(std::size_t start, std::size_t bytes);
-  void _append(const char* data, std::streamsize bytes);
-  void _saveRemainder();
-  void _copyFrom(FileBuffer& src);
-  void _replaceCurrFile(FileBuffer& tmpFb);
-  void _removeCurrFile();
+  static const std::size_t _thresholdMemoryBuffer = 0; // always uses file now
 
-  static const std::size_t _copyBufferSize = 4096;
+  bool _fileNeeded(std::size_t newBytes);
+  void _switchToFileBuffer();
 
-  std::fstream _fs;
-  std::string _fileName;
-  std::size_t _size;
+  ft::unique_ptr<IBuffer> _buffer;
+  bool _usesFile;
 };
 
 #endif

@@ -5,7 +5,7 @@
 #include <http/Headers.hpp>
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
-#include <utils/Buffer.hpp>
+#include <utils/SmartBuffer.hpp>
 
 #include <cstddef>
 #include <string>
@@ -38,7 +38,7 @@ public:
 
   Headers& getHeaders();
 
-  Buffer& getBody();
+  SmartBuffer& getBody();
 
   std::string toString();
 
@@ -53,7 +53,7 @@ private:
   Uri _uri;
   std::string _version;
   Headers _headers;
-  Buffer _body;
+  SmartBuffer _body;
 };
 
 struct Request::MethodMap

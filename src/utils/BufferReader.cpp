@@ -1,68 +1,113 @@
 #include "BufferReader.hpp"
-#include "libftpp/utility.hpp"
-#include "utils/Buffer.hpp"
-#include <algorithm>
-#include <iostream>
+
+#include <libftpp/expected.hpp>
+#include <libftpp/utility.hpp>
+#include <utils/IBuffer.hpp>
+
+#include <cassert>
+#include <cstddef>
+#include <exception>
+#include <new>
 
 /* ************************************************************************** */
 // PUBLIC
-void BufferReader::init(Buffer* buffer)
+
+void BufferReader::init(IBuffer* buffer)
 {
+  assert(buffer != FT_NULLPTR);
   _buffer = buffer;
   resetPosInBuff();
 }
 
-bool BufferReader::reachedEnd() const
-{
-  if (_buffer == FT_NULLPTR) {
-    return true;
-  }
-  return (_buffer->begin() + (_posInBuff + 1)) == _buffer->end();
-}
+// Throwing versions
 
 char BufferReader::getNextChar()
 {
-  _posInBuff += 1;
-  return static_cast<char>(_buffer->at(_posInBuff));
-}
-
-char BufferReader::getCurrChar() const
-{
-  return static_cast<char>(_buffer->at(_posInBuff));
-}
-
-long BufferReader::getPosInBuff() const
-{
-  return _posInBuff;
+  assert(_buffer != FT_NULLPTR);
+  const char chr = _buffer->get();
+  _posInBuff++;
+  return chr;
 }
 
 void BufferReader::setPosInBuff(long pos)
 {
+  assert(_buffer != FT_NULLPTR);
+  _buffer->seek(pos);
   _posInBuff = pos;
 }
 
 void BufferReader::resetPosInBuff()
 {
-  _posInBuff = -1;
+  assert(_buffer != FT_NULLPTR);
+  _buffer->seek(0);
+  _posInBuff = 0;
 }
 
 void BufferReader::rewind(long bytes)
 {
-  if (bytes < 0) {
+  if (bytes <= 0) {
     return;
   }
-  _posInBuff -= bytes;
+  const long newPos = _posInBuff - bytes;
+  assert(newPos >= 0);
+  setPosInBuff(newPos);
 }
 
-void BufferReader::printRemaining()
+// Non-throwing versions
+
+BufferReader::ExpectChr BufferReader::getNextChar(std::nothrow_t /*unused*/)
 {
-  long istart = getPosInBuff();
-  istart = std::max<long>(istart + 1, 0);
-  Buffer::iterator iter = _buffer->getIterAt(istart);
-  while (iter < _buffer->end() && *iter != '\r' && *iter != '\n') {
-    std::cout << *iter;
-    iter++;
+  try {
+    return getNextChar();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
   }
+}
+
+BufferReader::ExpectVoid BufferReader::setPosInBuff(long pos,
+                                                    std::nothrow_t /*unused*/)
+{
+  try {
+    setPosInBuff(pos);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
+  }
+}
+
+BufferReader::ExpectVoid BufferReader::resetPosInBuff(std::nothrow_t /*unused*/)
+{
+  try {
+    resetPosInBuff();
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
+  }
+}
+
+BufferReader::ExpectVoid BufferReader::rewind(long bytes,
+                                              std::nothrow_t /*unused*/)
+{
+  try {
+    rewind(bytes);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
+  }
+}
+
+bool BufferReader::reachedEnd() const
+{
+  assert(_buffer != FT_NULLPTR);
+  if (_posInBuff < 0) {
+    return false;
+  }
+  return (static_cast<std::size_t>(_posInBuff) >= _buffer->size());
+}
+
+long BufferReader::getPosInBuff() const
+{
+  return _posInBuff;
 }
 
 /* ************************************************************************** */

@@ -77,7 +77,7 @@ void AlternativeRule::setMatchMode(AlternativeMode mode)
 bool AlternativeRule::_firstMatchMode()
 {
   setStartPos(getBuffReader()->getPosInBuff());
-  setEndPos(-1);
+  setEndPos(0);
   bool matches = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
     matches = _rules[i]->matches();
@@ -94,7 +94,7 @@ bool AlternativeRule::_firstMatchMode()
 bool AlternativeRule::_greedyMode()
 {
   setStartPos(getBuffReader()->getPosInBuff());
-  setEndPos(-1);
+  setEndPos(0);
   bool somethingMatched = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
     if (_rules[i]->matches()) {

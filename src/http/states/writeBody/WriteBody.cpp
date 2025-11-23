@@ -1,7 +1,8 @@
 #include "WriteBody.hpp"
+#include "http/StatusCode.hpp"
 
 #include <client/Client.hpp>
-#include <utils/Buffer.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -25,7 +26,7 @@ WriteBody::WriteBody(Client* context)
 }
 
 void WriteBody::run()
-{
+try {
   std::ifstream& ifs = _client->getResponse().getBody();
 
   if (!ifs.is_open()) {
@@ -37,11 +38,15 @@ void WriteBody::run()
   std::ostringstream oss;
   oss << ifs.rdbuf();
 
-  Buffer& outBuffer = _client->getOutBuff();
-  outBuffer.add(oss.str());
+  IBuffer& outBuffer = _client->getOutBuff();
+  outBuffer.append(oss.str());
 
   // _log.info(_client->getOutBuff().toString());
   _client->getStateHandler().setDone();
+} catch (const IBuffer::BufferException& e) {
+  _log.error() << "ReadRequestLine: " << e.what() << '\n';
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setDone();
 }
 
 /* ************************************************************************** */

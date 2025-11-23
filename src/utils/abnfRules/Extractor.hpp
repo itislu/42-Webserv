@@ -3,7 +3,7 @@
 #define EXTRACTOR_HPP
 
 #include <libftpp/optional.hpp>
-#include <utils/Buffer.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 
@@ -16,19 +16,18 @@ template<typename T>
 class Extractor
 {
 public:
+  typedef ft::optional<std::string> OptionStr;
   typedef void (T::*FuncPtr)(const std::string&);
+
   void addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr);
-  void run(T& obj,
-           const Rule::ResultMap& resultMap,
-           const Buffer& buffer) const;
+  void run(T& obj, const Rule::ResultMap& resultMap, IBuffer& buffer) const;
 
 private:
   typedef std::pair<Rule::RuleId, FuncPtr> SetterPair;
   typedef std::vector<SetterPair> Setters; // vector to keep order
 
   Setters _setters;
-  static ft::optional<std::string> _getString(const RuleResult& result,
-                                              const Buffer& buffer);
+  static OptionStr _getString(const RuleResult& result, IBuffer& buffer);
 };
 
 #include "Extractor.tpp" // IWYU pragma: export
