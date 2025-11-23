@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <cstring>
 #include <iostream>
+#include <new>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -129,7 +130,7 @@ bool Client::sendTo()
 {
   const std::size_t toSend =
     std::min(_outBuff.size(), static_cast<std::size_t>(MAX_CHUNK));
-  const IBuffer::ExpectStr buff = _outBuff.consumeFront(toSend);
+  const IBuffer::ExpectStr buff = _outBuff.consumeFront(toSend, std::nothrow);
   if (!buff.has_value()) {
     // todo error
   }

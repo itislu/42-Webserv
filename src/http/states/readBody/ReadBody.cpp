@@ -131,8 +131,8 @@ void ReadBody::_readFixedLengthBody()
     return;
   }
 
-  IBuffer::ExpectStr res = inBuffer.consumeFront(toConsume);
-  request.getBody().append(*res);
+  const std::string input = inBuffer.consumeFront(toConsume);
+  request.getBody().append(input);
   _consumed += toConsume;
 
   if (_consumed >= _bodyLength) {

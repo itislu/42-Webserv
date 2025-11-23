@@ -27,9 +27,9 @@ bool BufferReader::reachedEnd() const
 char BufferReader::getNextChar()
 {
   assert(_buffer != FT_NULLPTR);
-  const IBuffer::ExpectChr res = _buffer->get();
+  const char chr = _buffer->get();
   _posInBuff++;
-  return (*res);
+  return chr;
 }
 
 long BufferReader::getPosInBuff() const
