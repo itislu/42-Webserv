@@ -51,9 +51,16 @@ IBuffer::ExpectChr FileBuffer::peek()
   return _getChr(&std::fstream::peek);
 }
 
+/**
+ * Seeking beyond EOF is an error.
+ * Seeking to the beginning of an empty buffer is therefore allowed.
+ */
 IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos)
 {
   if (pos > _size) {
+    if (_size == 0) {
+      return handleUnexpected(errFileEmpty);
+    }
     return handleUnexpected(errOutOfRange);
   }
   if (_size == 0) {
@@ -80,21 +87,16 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
 
 IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes)
 {
-  ExpectVoid res = seek(bytes);
-  if (!res.has_value()) {
-    return res;
-  }
   if (_size == 0) {
     return handleUnexpected(errFileEmpty);
   }
 
-  // read/write rest into new tempFile
-  res = _saveRemainder();
+  const ExpectVoid res = seek(bytes);
   if (!res.has_value()) {
     return res;
   }
-
-  return ExpectVoid();
+  // read/write rest into new tempFile
+  return _saveRemainder();
 }
 
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes)
@@ -109,12 +111,12 @@ IBuffer::ExpectRaw FileBuffer::consumeAll()
 
 IBuffer::ExpectStr FileBuffer::getStr(std::size_t start, std::size_t bytes)
 {
-  return _getDataRange<std::string>(start, bytes);
+  return _getData<std::string>(start, bytes);
 }
 
 IBuffer::ExpectRaw FileBuffer::getRawBytes(std::size_t start, std::size_t bytes)
 {
-  return _getDataRange<RawBytes>(start, bytes);
+  return _getData<RawBytes>(start, bytes);
 }
 
 IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData)
@@ -136,14 +138,15 @@ std::size_t FileBuffer::size() const
 void FileBuffer::print()
 {
   const std::streampos oldPos = _fs.tellg();
+  const std::ios::iostate oldState = _fs.rdstate();
 
-  char chr = ' ';
+  char chr = '\0';
   std::cout << "'";
-  while (_fs.get(chr) != 0) {
+  while (_fs.get(chr).good()) {
     printEscapedChar(chr);
   }
   std::cout << "'\n";
-  _fs.clear(); // after get last, fstream is in failestate
+  _fs.clear(oldState); // after get last, fstream is in fail state
   _fs.seekg(oldPos);
 }
 
@@ -217,24 +220,15 @@ FileBuffer::_consumeFront(std::size_t bytes)
 {
   typedef ft::expected<ContigContainer, BufferException> ExpectCont;
 
-  // go to start of file
-  ExpectVoid res = seek(0);
-  if (!res.has_value()) {
-    return handleUnexpected(res.error().what());
-  }
-  if (_size == 0) {
-    return handleUnexpected(errFileEmpty);
-  }
-
   // read bytes from the beginning
-  const ExpectCont front = _getData<ContigContainer>(bytes);
+  const ExpectCont front = _getData<ContigContainer>(0, bytes);
   if (!front.has_value()) {
     return front;
   }
   assert(front->size() == bytes); // Unexpected EOF should not happen
 
   // read/write rest into new tempFile
-  res = _saveRemainder();
+  const ExpectVoid res = _saveRemainder();
   if (!res.has_value()) {
     return handleUnexpected(res.error().what());
   }
@@ -245,19 +239,28 @@ FileBuffer::_consumeFront(std::size_t bytes)
 // Template can be in source file if only used here.
 template<typename ContigContainer>
 ft::expected<ContigContainer, FileBuffer::BufferException> FileBuffer::_getData(
+  std::size_t start,
   std::size_t bytes)
 {
   typedef ft::expected<ContigContainer, BufferException> ExpectCont;
 
+  if (start >= _size || bytes > _size - start) {
+    if (_size == 0) {
+      return handleUnexpected(errFileEmpty);
+    }
+    return handleUnexpected(errOutOfRange);
+  }
   if (bytes == 0) {
     return ContigContainer();
   }
-  if (bytes > _size) {
-    return handleUnexpected(errOutOfRange);
+
+  const ExpectVoid res = seek(start);
+  if (!res.has_value()) {
+    return handleUnexpected(res.error().what());
   }
 
-  ExpectCont res;
-  ContigContainer& front = res.value();
+  ExpectCont cont;
+  ContigContainer& front = cont.value();
   front.resize(bytes);
 
   _fs.read(&front[0], static_cast<std::streamsize>(bytes));
@@ -267,24 +270,7 @@ ft::expected<ContigContainer, FileBuffer::BufferException> FileBuffer::_getData(
   const std::streamsize actuallyRead = _fs.gcount();
   front.resize(static_cast<std::size_t>(actuallyRead));
 
-  return res;
-}
-
-// Template can be in source file if only used here.
-template<typename ContigContainer>
-ft::expected<ContigContainer, FileBuffer::BufferException>
-FileBuffer::_getDataRange(std::size_t start, std::size_t bytes)
-{
-  if (start >= _size || bytes > _size - start) {
-    return handleUnexpected(errOutOfRange);
-  }
-
-  // go to start position
-  ExpectVoid res = seek(start);
-  if (!res.has_value()) {
-    return handleUnexpected(res.error().what());
-  }
-  return _getData<ContigContainer>(bytes);
+  return cont;
 }
 
 IBuffer::ExpectVoid FileBuffer::_append(const char* data, std::streamsize bytes)
@@ -332,11 +318,7 @@ IBuffer::ExpectVoid FileBuffer::_saveRemainder()
     return res;
   }
 
-  res = _replaceCurrFile(tmp);
-  if (!res.has_value()) {
-    return res;
-  }
-  return ExpectVoid();
+  return _replaceCurrFile(tmp);
 }
 
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
