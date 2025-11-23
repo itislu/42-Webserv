@@ -7,12 +7,6 @@
 
 /* ************************************************************************** */
 // PUBLIC
-
-IBuffer::BufferException::BufferException()
-  : _message("Success")
-{
-}
-
 IBuffer::BufferException::BufferException(const char* message)
   : _message(message)
 {

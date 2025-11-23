@@ -74,7 +74,6 @@ private:
 class IBuffer::BufferException : public std::exception
 {
 public:
-  BufferException();
   explicit BufferException(const char* message);
   explicit BufferException(const std::exception& exception);
   ~BufferException() throw() {}
