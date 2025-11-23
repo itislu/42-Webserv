@@ -1,13 +1,17 @@
 #include "BufferReader.hpp"
 
+#include <libftpp/expected.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
 
 #include <cassert>
 #include <cstddef>
+#include <exception>
+#include <new>
 
 /* ************************************************************************** */
 // PUBLIC
+
 void BufferReader::init(IBuffer* buffer)
 {
   assert(buffer != FT_NULLPTR);
@@ -15,26 +19,14 @@ void BufferReader::init(IBuffer* buffer)
   resetPosInBuff();
 }
 
-bool BufferReader::reachedEnd() const
-{
-  assert(_buffer != FT_NULLPTR);
-  if (_posInBuff < 0) {
-    return false;
-  }
-  return (static_cast<std::size_t>(_posInBuff) >= _buffer->size());
-}
+// Throwing versions
 
 char BufferReader::getNextChar()
 {
   assert(_buffer != FT_NULLPTR);
-  const IBuffer::ExpectChr res = _buffer->get();
+  const char chr = _buffer->get();
   _posInBuff++;
-  return (*res);
-}
-
-long BufferReader::getPosInBuff() const
-{
-  return _posInBuff;
+  return chr;
 }
 
 void BufferReader::setPosInBuff(long pos)
@@ -59,6 +51,63 @@ void BufferReader::rewind(long bytes)
   const long newPos = _posInBuff - bytes;
   assert(newPos >= 0);
   setPosInBuff(newPos);
+}
+
+// Non-throwing versions
+
+BufferReader::ExpectChr BufferReader::getNextChar(std::nothrow_t /*unused*/)
+{
+  try {
+    return getNextChar();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
+  }
+}
+
+BufferReader::ExpectVoid BufferReader::setPosInBuff(long pos,
+                                                    std::nothrow_t /*unused*/)
+{
+  try {
+    setPosInBuff(pos);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
+  }
+}
+
+BufferReader::ExpectVoid BufferReader::resetPosInBuff(std::nothrow_t /*unused*/)
+{
+  try {
+    resetPosInBuff();
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
+  }
+}
+
+BufferReader::ExpectVoid BufferReader::rewind(long bytes,
+                                              std::nothrow_t /*unused*/)
+{
+  try {
+    rewind(bytes);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<IBuffer::BufferException>(e);
+  }
+}
+
+bool BufferReader::reachedEnd() const
+{
+  assert(_buffer != FT_NULLPTR);
+  if (_posInBuff < 0) {
+    return false;
+  }
+  return (static_cast<std::size_t>(_posInBuff) >= _buffer->size());
+}
+
+long BufferReader::getPosInBuff() const
+{
+  return _posInBuff;
 }
 
 /* ************************************************************************** */

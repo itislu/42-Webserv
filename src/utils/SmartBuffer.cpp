@@ -1,11 +1,14 @@
 #include "SmartBuffer.hpp"
 
+#include <libftpp/expected.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/FileBuffer.hpp>
 #include <utils/IBuffer.hpp>
 
 #include <cstddef>
+#include <exception>
+#include <new>
 #include <string>
 
 /* ************************************************************************** */
@@ -24,76 +27,189 @@ SmartBuffer::SmartBuffer()
   _buffer = ft::move(newBuffer);
 }
 
-IBuffer::ExpectChr SmartBuffer::get()
+// Throwing versions
+
+char SmartBuffer::get()
 {
   return _buffer->get();
 }
 
-IBuffer::ExpectChr SmartBuffer::peek()
+char SmartBuffer::peek()
 {
   return _buffer->peek();
 }
 
-IBuffer::ExpectVoid SmartBuffer::seek(std::size_t pos)
+void SmartBuffer::seek(std::size_t pos)
 {
-  return _buffer->seek(pos);
+  _buffer->seek(pos);
 }
 
-IBuffer::ExpectVoid SmartBuffer::append(const std::string& data)
+void SmartBuffer::append(const std::string& data)
 {
-  if (!_usesFile && _fileNeeded(static_cast<long>(data.size()))) {
-    const ExpectVoid res = _switchToFileBuffer();
-    if (!res.has_value()) {
-      return res;
-    }
+  if (!_usesFile && _fileNeeded(data.size())) {
+    _switchToFileBuffer();
   }
-  return _buffer->append(data);
+  _buffer->append(data);
 }
 
-IBuffer::ExpectVoid SmartBuffer::append(const RawBytes& buffer, long bytes)
+void SmartBuffer::append(const RawBytes& buffer, std::size_t bytes)
 {
   if (!_usesFile && _fileNeeded(bytes)) {
-    const ExpectVoid res = _switchToFileBuffer();
-    if (!res.has_value()) {
-      return res;
-    }
+    _switchToFileBuffer();
   }
-  return _buffer->append(buffer, bytes);
+  _buffer->append(buffer, bytes);
 }
 
-IBuffer::ExpectVoid SmartBuffer::removeFront(std::size_t bytes)
+void SmartBuffer::removeFront(std::size_t bytes)
 {
   // todo switch to memory buffer if possible
-  return _buffer->removeFront(bytes);
+  _buffer->removeFront(bytes);
 }
 
-IBuffer::ExpectStr SmartBuffer::consumeFront(std::size_t bytes)
+std::string SmartBuffer::consumeFront(std::size_t bytes)
 {
   // todo switch to memory buffer if possible
   return _buffer->consumeFront(bytes);
 }
 
-IBuffer::ExpectRaw SmartBuffer::consumeAll()
+SmartBuffer::RawBytes SmartBuffer::consumeAll()
 {
   // todo switch to memory buffer
   return _buffer->consumeAll();
 }
 
-IBuffer::ExpectStr SmartBuffer::getStr(std::size_t start, std::size_t bytes)
+std::string SmartBuffer::getStr(std::size_t start, std::size_t bytes)
 {
   return _buffer->getStr(start, bytes);
 }
 
-IBuffer::ExpectRaw SmartBuffer::getRawBytes(std::size_t start,
-                                            std::size_t bytes)
+SmartBuffer::RawBytes SmartBuffer::getRawBytes(std::size_t start,
+                                               std::size_t bytes)
 {
   return _buffer->getRawBytes(start, bytes);
 }
 
-IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData)
+void SmartBuffer::replace(RawBytes& rawData)
 {
   // todo maybe check size first
-  return _buffer->replace(rawData);
+  _buffer->replace(rawData);
+}
+
+// Non-throwing versions
+
+IBuffer::ExpectChr SmartBuffer::get(std::nothrow_t /*unused*/)
+{
+  try {
+    return get();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectChr SmartBuffer::peek(std::nothrow_t /*unused*/)
+{
+  try {
+    return peek();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectVoid SmartBuffer::seek(std::size_t pos,
+                                      std::nothrow_t /*unused*/)
+{
+  try {
+    seek(pos);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectVoid SmartBuffer::append(const std::string& data,
+                                        std::nothrow_t /*unused*/)
+{
+  try {
+    append(data);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectVoid SmartBuffer::append(const RawBytes& buffer,
+                                        std::size_t bytes,
+                                        std::nothrow_t /*unused*/)
+{
+  try {
+    append(buffer, bytes);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectVoid SmartBuffer::removeFront(std::size_t bytes,
+                                             std::nothrow_t /*unused*/)
+{
+  try {
+    removeFront(bytes);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectStr SmartBuffer::consumeFront(std::size_t bytes,
+                                             std::nothrow_t /*unused*/)
+{
+  try {
+    return consumeFront(bytes);
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectRaw SmartBuffer::consumeAll(std::nothrow_t /*unused*/)
+{
+  try {
+    return consumeAll();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectStr SmartBuffer::getStr(std::size_t start,
+                                       std::size_t bytes,
+                                       std::nothrow_t /*unused*/)
+{
+  try {
+    return getStr(start, bytes);
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectRaw SmartBuffer::getRawBytes(std::size_t start,
+                                            std::size_t bytes,
+                                            std::nothrow_t /*unused*/)
+{
+  try {
+    return getRawBytes(start, bytes);
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData,
+                                         std::nothrow_t /*unused*/)
+{
+  try {
+    replace(rawData);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
 }
 
 bool SmartBuffer::isEmpty() const
@@ -114,24 +230,16 @@ void SmartBuffer::print()
 /* ************************************************************************** */
 // PRIVATE
 
-bool SmartBuffer::_fileNeeded(long newBytes)
+bool SmartBuffer::_fileNeeded(std::size_t newBytes)
 {
   return _buffer->size() + newBytes >= _thresholdMemoryBuffer;
 }
 
-IBuffer::ExpectVoid SmartBuffer::_switchToFileBuffer()
+void SmartBuffer::_switchToFileBuffer()
 {
   ft::unique_ptr<FileBuffer> newBuffer = ft::make_unique<FileBuffer>();
-  ExpectRaw res = _buffer->consumeAll();
-  if (!res.has_value()) {
-    return handleUnexpected(res.error().what());
-  }
-
-  const ExpectVoid resVoid = newBuffer->replace(*res);
-  if (!resVoid.has_value()) {
-    return resVoid;
-  }
+  RawBytes data = _buffer->consumeAll();
+  newBuffer->replace(data);
   _buffer = ft::move(newBuffer);
   _usesFile = true;
-  return resVoid;
 }
