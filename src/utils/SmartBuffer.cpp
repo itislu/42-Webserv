@@ -26,10 +26,75 @@ SmartBuffer::SmartBuffer()
   _buffer = ft::move(newBuffer);
 }
 
+// Throwing versions
+
 char SmartBuffer::get()
 {
   return _buffer->get();
 }
+
+char SmartBuffer::peek()
+{
+  return _buffer->peek();
+}
+
+void SmartBuffer::seek(std::size_t pos)
+{
+  _buffer->seek(pos);
+}
+
+void SmartBuffer::append(const std::string& data)
+{
+  if (!_usesFile && _fileNeeded(static_cast<long>(data.size()))) {
+    _switchToFileBuffer();
+  }
+  _buffer->append(data);
+}
+
+void SmartBuffer::append(const RawBytes& buffer, long bytes)
+{
+  if (!_usesFile && _fileNeeded(bytes)) {
+    _switchToFileBuffer();
+  }
+  _buffer->append(buffer, bytes);
+}
+
+void SmartBuffer::removeFront(std::size_t bytes)
+{
+  // todo switch to memory buffer if possible
+  _buffer->removeFront(bytes);
+}
+
+std::string SmartBuffer::consumeFront(std::size_t bytes)
+{
+  // todo switch to memory buffer if possible
+  return _buffer->consumeFront(bytes);
+}
+
+SmartBuffer::RawBytes SmartBuffer::consumeAll()
+{
+  // todo switch to memory buffer
+  return _buffer->consumeAll();
+}
+
+std::string SmartBuffer::getStr(std::size_t start, std::size_t bytes)
+{
+  return _buffer->getStr(start, bytes);
+}
+
+SmartBuffer::RawBytes SmartBuffer::getRawBytes(std::size_t start,
+                                               std::size_t bytes)
+{
+  return _buffer->getRawBytes(start, bytes);
+}
+
+void SmartBuffer::replace(RawBytes& rawData)
+{
+  // todo maybe check size first
+  _buffer->replace(rawData);
+}
+
+// Non-throwing versions
 
 IBuffer::ExpectChr SmartBuffer::get(std::nothrow_t /*unused*/)
 {
@@ -40,11 +105,6 @@ IBuffer::ExpectChr SmartBuffer::get(std::nothrow_t /*unused*/)
   }
 }
 
-char SmartBuffer::peek()
-{
-  return _buffer->peek();
-}
-
 IBuffer::ExpectChr SmartBuffer::peek(std::nothrow_t /*unused*/)
 {
   try {
@@ -52,11 +112,6 @@ IBuffer::ExpectChr SmartBuffer::peek(std::nothrow_t /*unused*/)
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-void SmartBuffer::seek(std::size_t pos)
-{
-  _buffer->seek(pos);
 }
 
 IBuffer::ExpectVoid SmartBuffer::seek(std::size_t pos,
@@ -70,14 +125,6 @@ IBuffer::ExpectVoid SmartBuffer::seek(std::size_t pos,
   }
 }
 
-void SmartBuffer::append(const std::string& data)
-{
-  if (!_usesFile && _fileNeeded(static_cast<long>(data.size()))) {
-    _switchToFileBuffer();
-  }
-  _buffer->append(data);
-}
-
 IBuffer::ExpectVoid SmartBuffer::append(const std::string& data,
                                         std::nothrow_t /*unused*/)
 {
@@ -87,14 +134,6 @@ IBuffer::ExpectVoid SmartBuffer::append(const std::string& data,
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-void SmartBuffer::append(const RawBytes& buffer, long bytes)
-{
-  if (!_usesFile && _fileNeeded(bytes)) {
-    _switchToFileBuffer();
-  }
-  _buffer->append(buffer, bytes);
 }
 
 IBuffer::ExpectVoid SmartBuffer::append(const RawBytes& buffer,
@@ -109,12 +148,6 @@ IBuffer::ExpectVoid SmartBuffer::append(const RawBytes& buffer,
   }
 }
 
-void SmartBuffer::removeFront(std::size_t bytes)
-{
-  // todo switch to memory buffer if possible
-  _buffer->removeFront(bytes);
-}
-
 IBuffer::ExpectVoid SmartBuffer::removeFront(std::size_t bytes,
                                              std::nothrow_t /*unused*/)
 {
@@ -124,12 +157,6 @@ IBuffer::ExpectVoid SmartBuffer::removeFront(std::size_t bytes,
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-std::string SmartBuffer::consumeFront(std::size_t bytes)
-{
-  // todo switch to memory buffer if possible
-  return _buffer->consumeFront(bytes);
 }
 
 IBuffer::ExpectStr SmartBuffer::consumeFront(std::size_t bytes,
@@ -142,12 +169,6 @@ IBuffer::ExpectStr SmartBuffer::consumeFront(std::size_t bytes,
   }
 }
 
-SmartBuffer::RawBytes SmartBuffer::consumeAll()
-{
-  // todo switch to memory buffer
-  return _buffer->consumeAll();
-}
-
 IBuffer::ExpectRaw SmartBuffer::consumeAll(std::nothrow_t /*unused*/)
 {
   try {
@@ -155,11 +176,6 @@ IBuffer::ExpectRaw SmartBuffer::consumeAll(std::nothrow_t /*unused*/)
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-std::string SmartBuffer::getStr(std::size_t start, std::size_t bytes)
-{
-  return _buffer->getStr(start, bytes);
 }
 
 IBuffer::ExpectStr SmartBuffer::getStr(std::size_t start,
@@ -173,12 +189,6 @@ IBuffer::ExpectStr SmartBuffer::getStr(std::size_t start,
   }
 }
 
-SmartBuffer::RawBytes SmartBuffer::getRawBytes(std::size_t start,
-                                               std::size_t bytes)
-{
-  return _buffer->getRawBytes(start, bytes);
-}
-
 IBuffer::ExpectRaw SmartBuffer::getRawBytes(std::size_t start,
                                             std::size_t bytes,
                                             std::nothrow_t /*unused*/)
@@ -188,12 +198,6 @@ IBuffer::ExpectRaw SmartBuffer::getRawBytes(std::size_t start,
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-void SmartBuffer::replace(RawBytes& rawData)
-{
-  // todo maybe check size first
-  _buffer->replace(rawData);
 }
 
 IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData,

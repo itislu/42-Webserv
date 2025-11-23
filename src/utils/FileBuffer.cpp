@@ -42,32 +42,16 @@ FileBuffer::~FileBuffer()
   _removeCurrFile();
 }
 
+// Throwing versions
+
 char FileBuffer::get()
 {
   return _getChr(&std::fstream::get);
 }
 
-IBuffer::ExpectChr FileBuffer::get(std::nothrow_t /*unused*/)
-{
-  try {
-    return get();
-  } catch (const BufferException& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
 char FileBuffer::peek()
 {
   return _getChr(&std::fstream::peek);
-}
-
-IBuffer::ExpectChr FileBuffer::peek(std::nothrow_t /*unused*/)
-{
-  try {
-    return peek();
-  } catch (const BufferException& e) {
-    return ft::unexpected<BufferException>(e);
-  }
 }
 
 /**
@@ -92,6 +76,74 @@ void FileBuffer::seek(std::size_t pos)
   }
 }
 
+void FileBuffer::append(const std::string& data)
+{
+  _append(data.data(), static_cast<std::streamsize>(data.size()));
+}
+
+void FileBuffer::append(const FileBuffer::RawBytes& buffer, long bytes)
+{
+  _append(buffer.data(), static_cast<std::streamsize>(bytes));
+}
+
+void FileBuffer::removeFront(std::size_t bytes)
+{
+  if (_size == 0) {
+    throw BufferException(errFileEmpty);
+  }
+
+  seek(bytes);
+  // read/write rest into new tempFile
+  _saveRemainder();
+}
+
+std::string FileBuffer::consumeFront(std::size_t bytes)
+{
+  return _consumeFront<std::string>(bytes);
+}
+
+FileBuffer::RawBytes FileBuffer::consumeAll()
+{
+  return _consumeFront<RawBytes>(_size);
+}
+
+std::string FileBuffer::getStr(std::size_t start, std::size_t bytes)
+{
+  return _getData<std::string>(start, bytes);
+}
+
+FileBuffer::RawBytes FileBuffer::getRawBytes(std::size_t start,
+                                             std::size_t bytes)
+{
+  return _getData<RawBytes>(start, bytes);
+}
+
+void FileBuffer::replace(RawBytes& rawData)
+{
+  _removeCurrFile();
+  append(rawData, static_cast<long>(rawData.size()));
+}
+
+// Non-throwing versions
+
+IBuffer::ExpectChr FileBuffer::get(std::nothrow_t /*unused*/)
+{
+  try {
+    return get();
+  } catch (const BufferException& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectChr FileBuffer::peek(std::nothrow_t /*unused*/)
+{
+  try {
+    return peek();
+  } catch (const BufferException& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
 IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos, std::nothrow_t /*unused*/)
 {
   try {
@@ -100,11 +152,6 @@ IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos, std::nothrow_t /*unused*/)
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-void FileBuffer::append(const std::string& data)
-{
-  _append(data.data(), static_cast<std::streamsize>(data.size()));
 }
 
 IBuffer::ExpectVoid FileBuffer::append(const std::string& data,
@@ -116,11 +163,6 @@ IBuffer::ExpectVoid FileBuffer::append(const std::string& data,
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-void FileBuffer::append(const FileBuffer::RawBytes& buffer, long bytes)
-{
-  _append(buffer.data(), static_cast<std::streamsize>(bytes));
 }
 
 IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
@@ -135,17 +177,6 @@ IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
   }
 }
 
-void FileBuffer::removeFront(std::size_t bytes)
-{
-  if (_size == 0) {
-    throw BufferException(errFileEmpty);
-  }
-
-  seek(bytes);
-  // read/write rest into new tempFile
-  _saveRemainder();
-}
-
 IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes,
                                             std::nothrow_t /*unused*/)
 {
@@ -155,11 +186,6 @@ IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes,
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-std::string FileBuffer::consumeFront(std::size_t bytes)
-{
-  return _consumeFront<std::string>(bytes);
 }
 
 IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes,
@@ -172,11 +198,6 @@ IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes,
   }
 }
 
-FileBuffer::RawBytes FileBuffer::consumeAll()
-{
-  return _consumeFront<RawBytes>(_size);
-}
-
 IBuffer::ExpectRaw FileBuffer::consumeAll(std::nothrow_t /*unused*/)
 {
   try {
@@ -184,11 +205,6 @@ IBuffer::ExpectRaw FileBuffer::consumeAll(std::nothrow_t /*unused*/)
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-std::string FileBuffer::getStr(std::size_t start, std::size_t bytes)
-{
-  return _getData<std::string>(start, bytes);
 }
 
 IBuffer::ExpectStr FileBuffer::getStr(std::size_t start,
@@ -202,12 +218,6 @@ IBuffer::ExpectStr FileBuffer::getStr(std::size_t start,
   }
 }
 
-FileBuffer::RawBytes FileBuffer::getRawBytes(std::size_t start,
-                                             std::size_t bytes)
-{
-  return _getData<RawBytes>(start, bytes);
-}
-
 IBuffer::ExpectRaw FileBuffer::getRawBytes(std::size_t start,
                                            std::size_t bytes,
                                            std::nothrow_t /*unused*/)
@@ -217,12 +227,6 @@ IBuffer::ExpectRaw FileBuffer::getRawBytes(std::size_t start,
   } catch (const BufferException& e) {
     return ft::unexpected<BufferException>(e);
   }
-}
-
-void FileBuffer::replace(RawBytes& rawData)
-{
-  _removeCurrFile();
-  append(rawData, static_cast<long>(rawData.size()));
 }
 
 IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData,
