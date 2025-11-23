@@ -5,6 +5,8 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <cstddef>
+
 class Client;
 
 /* ************************************************************************** */
@@ -17,20 +19,21 @@ public:
 
 private:
   void _determineBodyFraming();
-  bool _isValidContentLength();
-  bool _isValidTransferEncoding();
+  void _validateContentLength();
+  void _validateTransferEncoding();
 
   void _readFixedLengthBody();
   void _readChunkedBody();
 
-  Client* _client;
   static Logger& _log;
-  long _bodyLength;
-  long _consumed;
+  static const std::size_t _chunkSize = 1024;
+  Client* _client;
   bool _initialized;
   bool _fixedLengthBody;
   bool _chunked;
   bool _done;
+  std::size_t _bodyLength;
+  std::size_t _consumed;
 };
 
 #endif

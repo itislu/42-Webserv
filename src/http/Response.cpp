@@ -1,9 +1,9 @@
 #include "Response.hpp"
 
-#include <fstream>
 #include <http/Headers.hpp>
 #include <http/StatusCode.hpp>
 
+#include <fstream>
 #include <string>
 
 /* ************************************************************************** */

@@ -1,6 +1,7 @@
 #include "EndRule.hpp"
 #include "Rule.hpp"
 
+#include <cstddef>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
@@ -21,7 +22,7 @@ bool EndRule::matches()
   debugPrintRuleEntry();
   setEndPos(getBuffReader()->getPosInBuff());
   bool matches = false;
-  long rewindCount = 1;
+  std::size_t rewindCount = 1;
   while (!matches && getBuffReader()->getPosInBuff() > getStartPos()) {
     getBuffReader()->rewind(rewindCount);
     if (getBuffReader()->getPosInBuff() < 0) {

@@ -8,8 +8,6 @@
 
 #include <cassert>
 #include <cstddef>
-#include <iostream>
-#include <ostream>
 #include <string>
 
 /* ************************************************************************** */
@@ -24,6 +22,11 @@ const char* const SmartBuffer::errAllocBuffer =
 SmartBuffer::SmartBuffer()
   : _usesFile(false)
 {
+}
+
+IBuffer::ExpectPos SmartBuffer::pos()
+{
+  return _buffer->pos();
 }
 
 IBuffer::ExpectChr SmartBuffer::get()
@@ -147,6 +150,11 @@ IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData)
   return _buffer->replace(rawData);
 }
 
+IBuffer::ExpectVoid SmartBuffer::moveBufferToFile(const std::string& filepath)
+{
+  return _buffer->moveBufferToFile(filepath);
+}
+
 bool SmartBuffer::isEmpty() const
 {
   if (_buffer == FT_NULLPTR) {
@@ -161,14 +169,6 @@ std::size_t SmartBuffer::size() const
     return 0;
   }
   return _buffer->size();
-}
-
-std::size_t SmartBuffer::pos()
-{
-  if (_buffer == FT_NULLPTR) {
-    return 0;
-  }
-  return _buffer->pos();
 }
 
 /* ************************************************************************** */

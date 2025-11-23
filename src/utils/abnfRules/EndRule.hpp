@@ -7,6 +7,8 @@
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 
+#include <cstddef>
+
 /* ************************************************************************** */
 class EndRule : public Rule
 {
@@ -25,7 +27,7 @@ private:
   EndRule& operator=(const EndRule& other);
 
   ft::shared_ptr<Rule> _rule;
-  long _pos;
+  std::size_t _pos;
 };
 
 #endif

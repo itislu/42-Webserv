@@ -17,7 +17,9 @@ public:
     Created = 201,
     BadRequest = 400,
     Unauthorized = 401,
-    InternalServerError = 500
+    UriTooLong = 414,
+    InternalServerError = 500,
+    NotImplemented = 501
   };
 
   StatusCode();
@@ -34,7 +36,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 5;
+  static const int _codes = 7;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;

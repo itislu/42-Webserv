@@ -1,19 +1,13 @@
 #include "FileBuffer.hpp"
 
-#include <iostream>
 #include <libftpp/expected.hpp>
-#include <libftpp/string.hpp>
-#include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
+#include <utils/fileUtils.hpp>
 
-#include <algorithm>
 #include <cassert>
-#include <cstddef>
 #include <cstdio>
-#include <cstdlib>
-#include <ctime>
-#include <ios>
 #include <iosfwd>
+#include <iostream>
 #include <string>
 
 /* ************************************************************************** */
@@ -26,6 +20,8 @@ const char* const FileBuffer::errOutOfRange =
   "FbException: tried to access out of range";
 const char* const FileBuffer::errRead = "FbException: read failed";
 const char* const FileBuffer::errWrite = "FbException: write failed";
+const char* const FileBuffer::errTell = "FbException: tell position failed";
+const char* const FileBuffer::errRename = "FbException: rename file failed";
 
 /* ************************************************************************** */
 // PUBLIC
@@ -38,6 +34,15 @@ FileBuffer::FileBuffer()
 FileBuffer::~FileBuffer()
 {
   _removeCurrFile();
+}
+
+IBuffer::ExpectPos FileBuffer::pos()
+{
+  const std::streampos pos = _fs.tellg();
+  if (pos < std::streampos(0)) {
+    return handleUnexpected(errTell);
+  }
+  return static_cast<std::size_t>(pos);
 }
 
 IBuffer::ExpectChr FileBuffer::get()
@@ -127,6 +132,25 @@ IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData)
   return append(rawData, static_cast<long>(rawData.size()));
 }
 
+IBuffer::ExpectVoid FileBuffer::moveBufferToFile(const std::string& filepath)
+{
+  if (_fileName.empty()) {
+    return handleUnexpected(errRename);
+  }
+  if (_fs.is_open()) {
+    _fs.close();
+  }
+
+  const int res = std::rename(_fileName.c_str(), filepath.c_str());
+  if (res != 0) {
+    return handleUnexpected(errRename);
+  }
+
+  _fileName.clear();
+  _size = 0;
+  return ExpectVoid();
+}
+
 bool FileBuffer::isEmpty() const
 {
   return _size == 0;
@@ -137,33 +161,8 @@ std::size_t FileBuffer::size() const
   return _size;
 }
 
-std::size_t FileBuffer::pos()
-{
-  // todo make safe
-  const std::streampos pos = _fs.tellg();
-  return static_cast<std::size_t>(pos);
-}
-
 /* ************************************************************************** */
 // PRIVATE
-
-// NOLINTBEGIN(bugprone-random-generator-seed, misc-predictable-rand)
-static std::string getRandomFileName()
-{
-  static bool seeded = false;
-
-  if (!seeded) {
-    seeded = true;
-    std::srand(std::time(FT_NULLPTR));
-  }
-
-  std::string filename;
-  filename.append(".tmpfile_");
-  filename.append(ft::to_string(std::rand()));
-  filename.append(ft::to_string(std::rand()));
-  return filename;
-}
-// NOLINTEND(bugprone-random-generator-seed, misc-predictable-rand)
 
 IBuffer::ExpectVoid FileBuffer::_openTmpFile()
 {
@@ -171,7 +170,7 @@ IBuffer::ExpectVoid FileBuffer::_openTmpFile()
   const std::size_t countMax = 100;
   std::size_t count = 0;
   for (; count < countMax; ++count) {
-    _fileName = getRandomFileName();
+    _fileName = getRandomFileName(".tmp");
     _fs.open(_fileName.c_str(), std::ios::in);
     // check if file does not exist
     if (!_fs.is_open()) {

@@ -13,11 +13,13 @@
 // INIT
 
 const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
-  StatusCode::_codeMap = { { { Ok, "Ok" },
+  StatusCode::_codeMap = { { { Ok, "OK" },
                              { Created, "Created" },
                              { BadRequest, "Bad Request" },
                              { Unauthorized, "Unauthorized" },
-                             { InternalServerError, "Internal Server Error" } }
+                             { UriTooLong, "URI Too Long" },
+                             { InternalServerError, "Internal Server Error" },
+                             { NotImplemented, "Not implemented" } }
 
   };
 

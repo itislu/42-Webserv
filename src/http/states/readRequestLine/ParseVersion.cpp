@@ -1,6 +1,7 @@
 #include "ParseVersion.hpp"
 
 #include <client/Client.hpp>
+#include <cstddef>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
@@ -66,7 +67,7 @@ void ParseVersion::run()
 
 void ParseVersion::_extractVersion()
 {
-  const long index = _buffReader.getPosInBuff();
+  const std::size_t index = _buffReader.getPosInBuff();
   const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
   const std::string version = ft::trim(*res);
   _client->getRequest().setVersion(version);

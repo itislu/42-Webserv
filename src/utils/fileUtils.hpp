@@ -5,5 +5,6 @@
 
 bool isFile(const std::string& filepath);
 std::string getFileExtension(const std::string& filepath);
+std::string getRandomFileName(const std::string& prefix);
 
 #endif

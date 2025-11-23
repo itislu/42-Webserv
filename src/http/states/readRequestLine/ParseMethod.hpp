@@ -21,6 +21,7 @@ public:
 private:
   void _init();
   void _extractMethod();
+  bool _methodNotImplemented();
 
   Client* _client;
   BufferReader _buffReader;

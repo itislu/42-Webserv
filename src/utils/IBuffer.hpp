@@ -24,7 +24,9 @@ public:
   typedef ft::expected<char, BufferException> ExpectChr;
   typedef ft::expected<std::string, BufferException> ExpectStr;
   typedef ft::expected<RawBytes, BufferException> ExpectRaw;
+  typedef ft::expected<std::size_t, BufferException> ExpectPos;
 
+  virtual ExpectPos pos() = 0;
   virtual ExpectChr get() = 0;
   virtual ExpectChr peek() = 0;
   virtual ExpectVoid seek(std::size_t pos) = 0;
@@ -37,9 +39,9 @@ public:
   virtual ExpectStr getStr(std::size_t start, std::size_t end) = 0;
   virtual ExpectRaw getRawBytes(std::size_t start, std::size_t end) = 0;
   virtual ExpectVoid replace(RawBytes& rawData) = 0;
+  virtual ExpectVoid moveBufferToFile(const std::string& filepath) = 0;
   virtual bool isEmpty() const = 0;
   virtual std::size_t size() const = 0;
-  virtual std::size_t pos() = 0;
 
   void setNoThrow(bool value);
   ft::unexpected<BufferException> handleUnexpected(const char* message) const;

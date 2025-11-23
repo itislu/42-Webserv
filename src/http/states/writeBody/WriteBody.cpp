@@ -1,8 +1,7 @@
 #include "WriteBody.hpp"
-#include "http/StatusCode.hpp"
 
 #include <client/Client.hpp>
-#include <sstream>
+#include <http/StatusCode.hpp>
 #include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -21,6 +20,7 @@ Logger& WriteBody::_log = Logger::getInstance(LOG_HTTP);
 WriteBody::WriteBody(Client* context)
   : IState<Client>(context)
   , _client(context)
+  , _done(false)
 {
   _log.info() << "WriteBody\n";
 }
@@ -28,11 +28,29 @@ WriteBody::WriteBody(Client* context)
 // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
 void WriteBody::run()
 try {
+  _writeIntoOutBuffer();
+
+  if (_done) {
+    _log.info() << "WriteBody: done\n";
+    _client->getStateHandler().setDone();
+  }
+} catch (const IBuffer::BufferException& e) {
+  _log.error() << "WriteBody: " << e.what() << '\n';
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setDone();
+}
+// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+
+/* ************************************************************************** */
+// PRIVATE
+
+void WriteBody::_writeIntoOutBuffer()
+{
   std::ifstream& ifs = _client->getResponse().getBody();
   _log.info() << "WriteBody: run\n";
 
   if (!ifs.is_open()) {
-    _log.error() << "Failed to open file\n";
+    _log.info() << "no body\n";
     _client->getStateHandler().setDone();
     return;
   }
@@ -50,15 +68,6 @@ try {
   }
 
   if (ifs.eof()) {
-    _log.info() << "WriteBody: done\n";
-    _client->getStateHandler().setDone();
+    _done = true;
   }
-} catch (const IBuffer::BufferException& e) {
-  _log.error() << "WriteBody: " << e.what() << '\n';
-  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
-  getContext()->getStateHandler().setDone();
 }
-// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
-
-/* ************************************************************************** */
-// PRIVATE

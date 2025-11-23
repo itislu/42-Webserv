@@ -1,5 +1,10 @@
 #include "fileUtils.hpp"
 
+#include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+
+#include <cstdlib>
+#include <ctime>
 #include <string>
 #include <sys/stat.h> // for stat(), struct stat, and S_ISREG
 
@@ -22,3 +27,21 @@ std::string getFileExtension(const std::string& filepath)
   }
   return filepath.substr(pos);
 }
+
+// NOLINTBEGIN(bugprone-random-generator-seed, misc-predictable-rand)
+std::string getRandomFileName(const std::string& prefix)
+{
+  static bool seeded = false;
+
+  if (!seeded) {
+    seeded = true;
+    std::srand(std::time(FT_NULLPTR));
+  }
+
+  std::string filename;
+  filename.append(prefix);
+  filename.append(ft::to_string(std::rand()));
+  filename.append(ft::to_string(std::rand()));
+  return filename;
+}
+// NOLINTEND(bugprone-random-generator-seed, misc-predictable-rand)

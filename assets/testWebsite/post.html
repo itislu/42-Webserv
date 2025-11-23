@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Get Tests</title>
+  <title>Post Tests</title>
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -22,11 +22,37 @@
       color: white;
       text-decoration: underline;
     }
+
+    form {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.15);
+      padding: 20px;
+      border-radius: 10px;
+      backdrop-filter: blur(4px);
+    }
+
+    input[type="file"] {
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>Post Tests</h1>
-  <p>This is the page for testing POST requests.</p>
+  <p>This page allows you to upload a file for POST testing.</p>
+
+  <form action="/post" method="POST" enctype="multipart/form-data">
+    <input type="file" name="testFile" required>
+    <br>
+    <button type="submit">Upload File</button>
+  </form>
+
   <a href="index.html">⬅ Back to Home</a>
 </body>
 </html>

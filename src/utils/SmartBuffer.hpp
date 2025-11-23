@@ -18,6 +18,7 @@ public:
   ~SmartBuffer() {}
 
   // Interface IBuffer
+  ExpectPos pos();
   ExpectChr get();
   ExpectChr peek();
   ExpectVoid seek(std::size_t pos);
@@ -30,9 +31,9 @@ public:
   ExpectStr getStr(std::size_t start, std::size_t bytes);
   ExpectRaw getRawBytes(std::size_t start, std::size_t bytes);
   ExpectVoid replace(RawBytes& rawData);
+  virtual ExpectVoid moveBufferToFile(const std::string& filepath);
   bool isEmpty() const;
   std::size_t size() const;
-  std::size_t pos();
 
 private:
   SmartBuffer(const SmartBuffer& other);

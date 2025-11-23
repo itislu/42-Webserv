@@ -9,7 +9,8 @@
 
 ft::shared_ptr<LiteralRule> endOfLineRule()
 {
-  const ft::shared_ptr<LiteralRule> seq = ft::make_shared<LiteralRule>("\r\n");
+  const ft::shared_ptr<LiteralRule> seq =
+    ft::make_shared<LiteralRule>(http::CRLF);
 
   seq->setDebugTag("endOfLineRule");
   seq->setRuleId(EndOfLine);

@@ -1,6 +1,8 @@
 #include <libftpp/expected.hpp>
 #include <utils/FileBuffer.hpp>
 
+#include <cstdio>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
@@ -102,6 +104,24 @@ TEST(FileBufferTester, GetPeekSeek)
   if (expectChr.has_value()) {
     EXPECT_EQ(expectChr.value(), '6');
   }
+}
+
+TEST(FileBufferTester, MoveToFile)
+{
+  std::string testFilePath;
+  testFilePath.append(ASSETS_PATH);
+  testFilePath.append("TestFile_FileBufferTester.txt");
+
+  FileBuffer fileBuffer;
+  fileBuffer.append("HelloWorld");
+
+  fileBuffer.moveBufferToFile(testFilePath);
+
+  const std::fstream fstream(testFilePath);
+  EXPECT_TRUE(fstream.is_open());
+  EXPECT_EQ(fileBuffer.size(), 0);
+
+  (void)std::remove(testFilePath.c_str());
 }
 
 // Main function to run all tests

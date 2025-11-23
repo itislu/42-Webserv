@@ -1,5 +1,7 @@
 #include "RuleResult.hpp"
 
+#include <cstddef>
+
 /* ************************************************************************** */
 // PUBLIC
 RuleResult::RuleResult()
@@ -8,17 +10,17 @@ RuleResult::RuleResult()
 {
 }
 
-RuleResult::RuleResult(long start, long end)
+RuleResult::RuleResult(std::size_t start, std::size_t end)
   : _start(start)
   , _end(end)
 {
 }
 
-long RuleResult::getStart() const
+std::size_t RuleResult::getStart() const
 {
   return _start;
 }
-long RuleResult::getEnd() const
+std::size_t RuleResult::getEnd() const
 {
   return _end;
 }
