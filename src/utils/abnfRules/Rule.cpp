@@ -5,6 +5,7 @@
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 
@@ -89,30 +90,30 @@ BufferReader* Rule::getBuffReader()
   return _buffReader;
 }
 
-void Rule::setStartPos(long pos)
+void Rule::setStartPos(std::size_t pos)
 {
   _startPos = pos;
 }
 
-long Rule::getStartPos() const
+std::size_t Rule::getStartPos() const
 {
   return _startPos;
 }
 
-void Rule::setEndPos(long pos)
+void Rule::setEndPos(std::size_t pos)
 {
   _endPos = pos;
 }
 
-long Rule::getEndPos() const
+std::size_t Rule::getEndPos() const
 {
   return _endPos;
 }
 
 void Rule::rewindToStartPos()
 {
-  const long currPos = getBuffReader()->getPosInBuff();
-  const long diff = currPos - getStartPos();
+  const std::size_t currPos = getBuffReader()->getPosInBuff();
+  const std::size_t diff = currPos - getStartPos();
   getBuffReader()->rewind(diff);
 }
 

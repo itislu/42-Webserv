@@ -4,6 +4,8 @@
 
 #include "utils/IBuffer.hpp"
 
+#include <cstddef>
+
 /* ************************************************************************** */
 class BufferReader
 {
@@ -12,14 +14,14 @@ public:
 
   bool reachedEnd() const;
   char getNextChar();
-  long getPosInBuff() const;
-  void setPosInBuff(long pos);
+  std::size_t getPosInBuff() const;
+  void setPosInBuff(std::size_t pos);
   void resetPosInBuff();
-  void rewind(long bytes);
+  void rewind(std::size_t bytes);
 
 private:
   IBuffer* _buffer;
-  long _posInBuff;
+  std::size_t _posInBuff;
 };
 
 #endif

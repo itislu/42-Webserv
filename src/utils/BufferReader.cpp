@@ -24,7 +24,7 @@ bool BufferReader::reachedEnd() const
   if (_posInBuff < 0) {
     return false;
   }
-  return (static_cast<std::size_t>(_posInBuff) >= _buffer->size());
+  return (_posInBuff >= _buffer->size());
 }
 
 char BufferReader::getNextChar()
@@ -35,12 +35,12 @@ char BufferReader::getNextChar()
   return (*res);
 }
 
-long BufferReader::getPosInBuff() const
+std::size_t BufferReader::getPosInBuff() const
 {
   return _posInBuff;
 }
 
-void BufferReader::setPosInBuff(long pos)
+void BufferReader::setPosInBuff(std::size_t pos)
 {
   assert(_buffer != FT_NULLPTR);
   _buffer->seek(pos);
@@ -54,15 +54,13 @@ void BufferReader::resetPosInBuff()
   _posInBuff = 0;
 }
 
-void BufferReader::rewind(long bytes)
+void BufferReader::rewind(std::size_t bytes)
 {
-  if (bytes <= 0) {
+  assert(bytes <= _posInBuff);
+  if (bytes == 0) {
     return;
   }
-  const long newPos = _posInBuff - bytes;
-  assert(newPos >= 0);
-  _buffer->seek(newPos);
-  _posInBuff = newPos;
+  setPosInBuff(_posInBuff - bytes);
 }
 
 /* ************************************************************************** */
