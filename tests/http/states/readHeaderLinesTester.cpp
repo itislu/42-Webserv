@@ -33,8 +33,11 @@ TEST(ReadHeaderLinesTester, BasicHeaders)
   Request& request = client->getRequest();
   Headers& headers = request.getHeaders();
 
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Content-Length"), "7"));
+  std::string value;
+  EXPECT_NO_THROW(value = headers.at("Host"));
+  EXPECT_EQ(value, "webserv");
+  EXPECT_NO_THROW(value = headers.at("Content-Length"));
+  EXPECT_EQ(value, "7");
 }
 
 TEST(ReadHeaderLinesTester, HeaderList)
@@ -53,8 +56,11 @@ TEST(ReadHeaderLinesTester, HeaderList)
   Request& request = client->getRequest();
   Headers& headers = request.getHeaders();
 
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("Host"), "webserv"));
-  EXPECT_NO_THROW(EXPECT_EQ(headers.at("sec-ch-ua"), headerValue));
+  std::string value;
+  EXPECT_NO_THROW(value = headers.at("Host"));
+  EXPECT_EQ(value, "webserv");
+  EXPECT_NO_THROW(value = headers.at("sec-ch-ua"));
+  EXPECT_EQ(value, headerValue);
 }
 
 // NOLINTEND

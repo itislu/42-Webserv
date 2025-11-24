@@ -16,12 +16,12 @@
 #include <cstddef>
 #include <cstring>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 
-/* ************************************************************************** */
+/* **************************************************************************
+ */
 // Init
 
 Logger& Client::_log = Logger::getInstance(LOG_SERVER);
@@ -135,10 +135,9 @@ bool Client::sendTo()
   const std::size_t toSend = std::min(_outBuff.size(), _maxChunk);
   // todo handle exception
   _log.info() << "outbuf size before: " << _outBuff.size() << "\n";
-  const IBuffer::ExpectRaw expectBuff = _outBuff.consumeRawFront(toSend);
+  const IBuffer::RawBytes buff = _outBuff.consumeRawFront(toSend);
   _log.info() << "outbuf size after : " << _outBuff.size() << "\n";
 
-  const IBuffer::RawBytes& buff = *expectBuff;
   const ssize_t bytes = send(getFd(), buff.data(), buff.size(), 0);
   if (bytes > 0) {
     _log.info() << "sent " << bytes << " bytes\n";

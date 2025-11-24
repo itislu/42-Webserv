@@ -50,7 +50,7 @@ try {
 } catch (const IBuffer::BufferException& e) {
   _log.error() << "PrepareResponse: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
-  getContext()->getStateHandler().setState<PrepareResponse>();
+  getContext()->getStateHandler().setState<WriteStatusLine>();
 }
 
 StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()

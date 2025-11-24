@@ -9,7 +9,6 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/BufferReader.hpp>
-#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/logger/Logger.hpp>
@@ -67,9 +66,9 @@ void ParseVersion::run()
 void ParseVersion::_extractVersion()
 {
   const long index = _buffReader.getPosInBuff();
-  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
-  const std::string version = ft::trim(*res);
-  _client->getRequest().setVersion(version);
+  std::string input = _client->getInBuff().consumeFront(index);
+  ft::trim(input);
+  _client->getRequest().setVersion(input);
 }
 
 /* ************************************************************************** */

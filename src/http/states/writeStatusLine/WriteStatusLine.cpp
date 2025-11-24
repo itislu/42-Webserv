@@ -36,7 +36,8 @@ void WriteStatusLine::run()
   statusLine.append(_client->getResponse().getStatusCode().toString());
   statusLine.append(http::CRLF);
 
-  const IBuffer::ExpectVoid res = buff.append(statusLine);
+  // todo what if an exception happens?
+  buff.append(statusLine);
   _client->getStateHandler().setState<WriteHeaderLines>();
 }
 

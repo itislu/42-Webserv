@@ -22,8 +22,8 @@ std::ostream& printEscapedChar(std::ostream& out, char chr)
       break;
 
     default:
-      const int otherControlChars = 32;
-      if (static_cast<unsigned char>(chr) < otherControlChars) {
+      const int controlCharsStart = 32;
+      if (static_cast<unsigned char>(chr) < controlCharsStart) {
         // Print other control chars as hex
         out << "\\x" << std::hex << std::uppercase
             << int(static_cast<unsigned char>(chr)) << std::dec;

@@ -1,32 +1,11 @@
 #include "IBuffer.hpp"
 
-#include "libftpp/expected.hpp"
-#include "libftpp/utility.hpp"
-#include "utils/printUtils.hpp"
-
 #include <cstddef>
+#include <exception>
 #include <ostream>
 
 /* ************************************************************************** */
-// PUBLIC
-IBuffer::IBuffer()
-  : _noThrow(false)
-{
-}
-
-void IBuffer::setNoThrow(bool value)
-{
-  _noThrow = value;
-}
-
-ft::unexpected<IBuffer::BufferException> IBuffer::handleUnexpected(
-  const char* message) const
-{
-  if (_noThrow) {
-    return ft::unexpected<BufferException>(message);
-  }
-  throw BufferException(message);
-}
+// Exceptions
 
 std::ostream& operator<<(std::ostream& out, IBuffer& buffer)
 {
@@ -48,14 +27,14 @@ std::ostream& operator<<(std::ostream& out, IBuffer& buffer)
 }
 
 /* ************************************************************************** */
-// Exceptions
-IBuffer::BufferException::BufferException()
-  : _message(FT_NULLPTR)
+// PUBLIC
+IBuffer::BufferException::BufferException(const char* message)
+  : _message(message)
 {
 }
 
-IBuffer::BufferException::BufferException(const char* message)
-  : _message(message)
+IBuffer::BufferException::BufferException(const std::exception& exception)
+  : _message(exception.what())
 {
 }
 

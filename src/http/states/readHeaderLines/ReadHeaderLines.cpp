@@ -133,9 +133,9 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 {
   const RuleResult& result = _results[ruleId];
   const long index = result.getEnd();
-  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
+  const std::string input = _client->getInBuff().consumeFront(index);
   _buffReader.resetPosInBuff();
-  return *res;
+  return input;
 }
 
 void ReadHeaderLines::_addLineToHeaders(const std::string& line)
