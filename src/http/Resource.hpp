@@ -5,6 +5,7 @@
 
 class Resource
 {
+public:
   enum Type
   {
     File,
@@ -13,7 +14,6 @@ class Resource
     Error
   };
 
-public:
   Type getType() const;
   const std::string& getPath() const;
 

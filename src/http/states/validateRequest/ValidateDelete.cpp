@@ -1,6 +1,7 @@
 #include "ValidateDelete.hpp"
 #include "client/Client.hpp"
 #include "config/FileUtils.hpp"
+#include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
 #include "http/states/validateRequest/ValidateRequest.hpp"
 #include "utils/logger/Logger.hpp"
@@ -69,6 +70,7 @@ void ValidateDelete::validateParentDirPermissions()
 void ValidateDelete::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
+  _client->getResource().setType(Resource::Error);
 }
 
 /*

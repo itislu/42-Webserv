@@ -2,6 +2,7 @@
 #include "ValidateGet.hpp"
 #include "client/Client.hpp"
 #include "config/FileUtils.hpp"
+#include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
 #include "http/states/validateRequest/ValidateRequest.hpp"
 #include "libftpp/utility.hpp"
@@ -108,4 +109,5 @@ void ValidateGet::validateDirectory()
 void ValidateGet::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
+  _client->getResource().setType(Resource::Error);
 }

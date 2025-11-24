@@ -1,7 +1,9 @@
 #include "ValidateRequest.hpp"
 #include "client/Client.hpp"
+#include "config/Converters.hpp"
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
+#include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
 #include "http/states/prepareResponse/PrepareResponse.hpp"
 #include "http/states/readBody/ReadBody.hpp"
@@ -12,12 +14,16 @@
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 
+#include <cstddef>
+#include <cstdlib>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <iostream>
 #include <set>
+#include <sstream>
 #include <string>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
+#include <vector>
 
 /* ************************************************************************** */
 // INIT
@@ -35,6 +41,7 @@ ValidateRequest::ValidateRequest(Client* context)
   , _location()
 {
   _log.info() << "ValidateRequest\n";
+  std::cout << "ValidateRequest\n";
 }
 
 void ValidateRequest::run()
@@ -86,12 +93,24 @@ void ValidateRequest::_init()
   const Request::Method method = _client->getRequest().getMethod();
   if (validateMethod(allowedMethods, method)) {
     _initState(method);
-    _initRequestPath(); // TODO: check this again, should the path only append,
-                        // if the method is allowed?
+    _initRequestPath();
   } else {
-    _stateHandler.setDone();
-    getContext()->getResponse().setStatusCode(StatusCode::MethodNotAllowed);
+    endState(StatusCode::MethodNotAllowed);
   }
+}
+
+bool ValidateRequest::validateMethod(
+  const std::set<std::string>& allowedMethods,
+  Request::Method method)
+{
+  for (std::set<std::string>::const_iterator it = allowedMethods.begin();
+       it != allowedMethods.end();
+       ++it) {
+    if (method == Request::strToMethod(*it)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void ValidateRequest::_initServer()
@@ -132,27 +151,93 @@ void ValidateRequest::_initState(const Request::Method& method)
 
 void ValidateRequest::_initRequestPath()
 {
-  /* TODO: validate path security ../../path */
+  // 1. Decode URI
+  std::string decoded = decodePath(_path);
+  if (decoded.empty() && !_path.empty()) {
+    endState(StatusCode::BadRequest);
+    return;
+  }
+
+  // 2. check for illegal characters (NULL, control chars).
+  if (!validateChars(decoded)) {
+    endState(StatusCode::BadRequest);
+    return;
+  }
+
+  // 3. Normalize Path (collapse . / .. / //).
+  decoded = normalizePath(decoded);
+
+  // 4. Combine with root.
   if (_location != FT_NULLPTR) {
     _path = removePrefix(_path, _location->getPath());
     _path = appendToRoot(_path, _location->getRoot());
   } else {
     _path = appendToRoot(_path, _server->getRoot());
   }
+  _client->getResource().setPath(_path);
 }
 
-bool ValidateRequest::validateMethod(
-  const std::set<std::string>& allowedMethods,
-  Request::Method method)
+std::string ValidateRequest::decodePath(std::string& path)
 {
-  for (std::set<std::string>::const_iterator it = allowedMethods.begin();
-       it != allowedMethods.end();
-       ++it) {
-    if (method == Request::strToMethod(*it)) {
-      return true;
+  std::string decoded;
+  decoded.reserve(path.size());
+
+  for (std::size_t i = 0; i < path.size(); ++i) {
+    if (path[i] == '%') {
+      // decode hex
+      if (path.size() < i + 2) {
+        return ""; // error
+      }
+      const int hex1 = config::convert::hexToInt(path[i + 1]);
+      const int hex2 = config::convert::hexToInt(path[i + 2]);
+      if (hex1 < 0 || hex2 < 0) {
+        return ""; // error
+      }
+    } else {
+      decoded += path[i];
     }
   }
-  return false;
+  return decoded;
+}
+
+bool ValidateRequest::validateChars(const std::string& path)
+{
+  for (size_t i = 0; i < path.size(); ++i) {
+    const unsigned char chr = path[i];
+    if (chr < ' ') {
+      return false;
+    }
+  }
+  return true;
+}
+
+std::string ValidateRequest::normalizePath(std::string& path)
+{
+  std::vector<std::string> segments;
+  std::string token;
+  std::stringstream stream(path);
+
+  while (std::getline(stream, token, '/') != 0) {
+    if (token.empty() || token == ".") {
+      continue;
+    }
+    if (token == "..") {
+      if (!segments.empty()) {
+        segments.pop_back();
+      }
+    } else {
+      segments.push_back(token);
+    }
+  }
+
+  std::string final = "/";
+  for (std::size_t i = 0; i < segments.size(); ++i) {
+    final += segments[i];
+    if (i + 1 < segments.size()) {
+      final += "/";
+    }
+  }
+  return final;
 }
 
 std::string ValidateRequest::removePrefix(const std::string& uriPath,
@@ -182,4 +267,11 @@ std::string ValidateRequest::appendToRoot(const std::string& uri,
     return root + uri;
   }
   return root + "/" + uri;
+}
+
+void ValidateRequest::endState(StatusCode::Code status)
+{
+  _client->getResponse().setStatusCode(status);
+  _client->getResource().setType(Resource::Error);
+  _stateHandler.setDone();
 }

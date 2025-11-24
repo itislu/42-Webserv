@@ -5,6 +5,7 @@
 
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
+#include "http/StatusCode.hpp"
 #include "utils/state/StateHandler.hpp"
 #include <string>
 #include <utils/logger/Logger.hpp>
@@ -39,6 +40,12 @@ private:
                                   const std::string& locPath);
   static bool validateMethod(const std::set<std::string>& allowedMethods,
                              Request::Method method);
+
+  static std::string decodePath(std::string& path);
+  static bool validateChars(const std::string& path);
+  static std::string normalizePath(std::string& path);
+
+  void endState(StatusCode::Code status);
 
   Client* _client;
   static Logger& _log;

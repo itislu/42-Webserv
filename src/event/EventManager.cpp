@@ -49,6 +49,10 @@ bool EventManager::receiveFromClient(Client& client)
 
 void EventManager::clientStateMachine(Client& client)
 {
+  /* TODO: remove this check */
+  if (client.hasServer()) {
+    std::cout << "[CLIENT] has server\n";
+  }
   StateHandler<Client>& handler = client.getStateHandler();
   handler.setStateHasChanged(true);
 

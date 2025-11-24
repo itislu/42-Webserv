@@ -2,6 +2,7 @@
 #include "ValidatePost.hpp"
 #include "client/Client.hpp"
 #include "config/FileUtils.hpp"
+#include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
 #include "http/states/validateRequest/ValidateRequest.hpp"
 #include "libftpp/utility.hpp"
@@ -90,4 +91,5 @@ void ValidatePost::validateParentDirPermissions()
 void ValidatePost::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
+  _client->getResource().setType(Resource::Error);
 }

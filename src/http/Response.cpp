@@ -1,5 +1,4 @@
 #include "Response.hpp"
-#include "http/Resource.hpp"
 
 #include <fstream>
 #include <http/Headers.hpp>

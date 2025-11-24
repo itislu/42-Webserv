@@ -141,12 +141,10 @@ bool Client::sendTo()
     // todo error
   }
   const ssize_t bytes = send(getFd(), &buff, toSend, 0);
-  if (bytes > 0) {
-    // todo ok
-  }
   if (bytes == 0) {
     std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
-  } else {
+  }
+  if (bytes < 0) {
     std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
               << std::strerror(errno) << "\n";
     return false;
