@@ -2,6 +2,8 @@
 #ifndef URI_HPP
 #define URI_HPP
 
+#include <http/Authority.hpp>
+
 #include <string>
 
 /* ************************************************************************** */
@@ -9,21 +11,22 @@ class Uri
 {
 public:
   const std::string& getScheme() const;
-  void setScheme(const std::string& str);
-  const std::string& getAuthority() const;
-  void setAuthority(const std::string& str);
+  const Authority& getAuthority() const;
+  Authority& getAuthority();
   const std::string& getPath() const;
-  void setPath(const std::string& str);
   const std::string& getQuery() const;
-  void setQuery(const std::string& str);
   const std::string& getFragment() const;
+
+  void setScheme(const std::string& str);
+  void setPath(const std::string& str);
+  void setQuery(const std::string& str);
   void setFragment(const std::string& str);
 
   std::string toString() const;
 
 private:
   std::string _scheme;
-  std::string _authority;
+  Authority _authority;
   std::string _path;
   std::string _query;
   std::string _fragment;

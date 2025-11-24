@@ -70,9 +70,21 @@ add_my_test(utilsTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
 )
 
+add_my_test(fileBufferTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/fileBufferTester.cpp
+)
+
+add_my_test(smartBufferTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/smartBufferTester.cpp
+)
+
 # http
 
 # http/parser
+add_my_test(http11RulesTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/http11RulesTester.cpp
+)
+
 add_my_test(headerLineRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerLineRulesTester.cpp
 )

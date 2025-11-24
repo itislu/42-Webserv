@@ -2,26 +2,37 @@
 #ifndef BUFFER_READER_HPP
 #define BUFFER_READER_HPP
 
-#include <utils/Buffer.hpp>
+#include "utils/IBuffer.hpp"
+
+#include <new>
 
 /* ************************************************************************** */
 class BufferReader
 {
 public:
-  void init(Buffer* buffer);
-  bool reachedEnd() const;
+  typedef IBuffer::ExpectChr ExpectChr;
+  typedef IBuffer::ExpectVoid ExpectVoid;
+
+  void init(IBuffer* buffer);
+
+  // Throwing versions
   char getNextChar();
-  char getCurrChar() const;
-  long getPosInBuff() const;
   void setPosInBuff(long pos);
   void resetPosInBuff();
   void rewind(long bytes);
 
-  void printRemaining();
+  // Non-throwing versions
+  ExpectChr getNextChar(std::nothrow_t /*unused*/);
+  ExpectVoid setPosInBuff(long pos, std::nothrow_t /*unused*/);
+  ExpectVoid resetPosInBuff(std::nothrow_t /*unused*/);
+  ExpectVoid rewind(long bytes, std::nothrow_t /*unused*/);
+
+  bool reachedEnd() const;
+  long getPosInBuff() const;
 
 private:
-  Buffer* _buffer;
+  IBuffer* _buffer;
   long _posInBuff;
 };
 
-#endif // BUFFER_READER_HPP
+#endif

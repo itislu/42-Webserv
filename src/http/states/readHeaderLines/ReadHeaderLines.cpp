@@ -1,4 +1,5 @@
 #include "ReadHeaderLines.hpp"
+#include "http/states/prepareResponse/PrepareResponse.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -10,6 +11,8 @@
 #include <http/states/readBody/ReadBody.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
+#include <utils/BufferReader.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -49,12 +52,16 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
  *                  [ message-body ]
  */
 void ReadHeaderLines::run()
-{
+try {
   _readLines();
   if (_done) {
     _setNextState();
     return;
   }
+} catch (const IBuffer::BufferException& e) {
+  _log.error() << "ReadHeaderLines: " << e.what() << "\n";
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 void ReadHeaderLines::_init()
@@ -70,10 +77,22 @@ void ReadHeaderLines::_init()
   _endOfLine->setResultMap(&_results);
 }
 
+bool ReadHeaderLines::_readingOk()
+{
+  const StatusCode& statuscode = _client->getResponse().getStatusCode();
+  if (statuscode != StatusCode::Ok) {
+    return false;
+  }
+  if (_buffReader.reachedEnd()) {
+    return false;
+  }
+  return true;
+}
+
 void ReadHeaderLines::_readLines()
 {
   _buffReader.resetPosInBuff();
-  while (!_buffReader.reachedEnd()) {
+  while (_readingOk()) {
     _results.clear();
     _fieldLine->reset();
     _endOfLine->reset();
@@ -81,7 +100,6 @@ void ReadHeaderLines::_readLines()
     if (_fieldLine->matches()) {
       if (_fieldLine->reachedEnd()) {
         const std::string fieldLine = _extractPart(FieldLinePart);
-        // todo parse each field value
         _addLineToHeaders(fieldLine);
       }
     } else if (_hasEndOfLine()) {
@@ -115,8 +133,9 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 {
   const RuleResult& result = _results[ruleId];
   const long index = result.getEnd();
+  const std::string input = _client->getInBuff().consumeFront(index);
   _buffReader.resetPosInBuff();
-  return _client->getInBuff().consume(index + 1);
+  return input;
 }
 
 void ReadHeaderLines::_addLineToHeaders(const std::string& line)

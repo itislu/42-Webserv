@@ -3,9 +3,11 @@
 #include <client/Client.hpp>
 #include <http/http.hpp>
 #include <http/states/writeHeaderLines/WriteHeaderLines.hpp>
-#include <utils/Buffer.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
+
+#include <string>
 
 /* ************************************************************************** */
 // INIT
@@ -27,10 +29,15 @@ WriteStatusLine::WriteStatusLine(Client* context)
  */
 void WriteStatusLine::run()
 {
-  Buffer& buff = _client->getOutBuff();
-  buff.add("HTTP/1.1 ");
-  buff.add(_client->getResponse().getStatusCode().toString());
-  buff.add(http::CRLF);
+  IBuffer& buff = _client->getOutBuff();
+
+  std::string statusLine;
+  statusLine.append("HTTP/1.1 ");
+  statusLine.append(_client->getResponse().getStatusCode().toString());
+  statusLine.append(http::CRLF);
+
+  // todo what if an exception happens?
+  buff.append(statusLine);
   _client->getStateHandler().setState<WriteHeaderLines>();
 }
 

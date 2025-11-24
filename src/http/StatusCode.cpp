@@ -18,7 +18,9 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
                              { Unauthorized, "Unauthorized" },
                              { Forbidden, "Forbidden" },
                              { NotFound, "Not Found" },
-                             { MethodNotAllowed, "Method not allowed" } } };
+                             { MethodNotAllowed, "Method not allowed" },
+                             { InternalServerError,
+                               "Internal Server Error" } } };
 
 /* ***************************************************************************/
 // PUBLIC

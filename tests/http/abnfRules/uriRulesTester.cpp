@@ -1,7 +1,8 @@
+#include "utils/SmartBuffer.hpp"
+#include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/Buffer.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
@@ -22,10 +23,12 @@ namespace {
 
 bool runParser(const std::string& str, Rule& rule)
 {
-  Buffer buffer;
-  buffer.add(str);
+  SmartBuffer buffer;
+  buffer.append(str);
+
   BufferReader reader = BufferReader();
   reader.init(&buffer);
+
   rule.setBufferReader(&reader);
   rule.reset();
   bool matches = rule.matches();
@@ -610,7 +613,7 @@ TEST(UriAbnfTest, Path)
 TEST(UriAbnfTest, PathAbEmpty)
 {
   SequenceRule sequence;
-  ft::shared_ptr<RepetitionRule> rep = pathAbEmptyRule();
+  ft::shared_ptr<RepetitionRule> rep = pathAbEmptyRule(Undefined);
   sequence.addRule(rep);
   EXPECT_TRUE(runParser("/abc/def", sequence));
   EXPECT_TRUE(runParser("/abc/def//", sequence));
@@ -622,7 +625,7 @@ TEST(UriAbnfTest, PathAbEmpty)
  */
 TEST(UriAbnfTest, PathAbsolute)
 {
-  ft::shared_ptr<SequenceRule> sequence = pathAbsoluteRule();
+  ft::shared_ptr<SequenceRule> sequence = pathAbsoluteRule(Undefined);
   EXPECT_TRUE(runParser("/abc/def", *sequence));
   EXPECT_TRUE(runParser("/abc/def///a", *sequence));
   EXPECT_TRUE(runParser("/", *sequence));
@@ -637,7 +640,7 @@ TEST(UriAbnfTest, PathAbsolute)
  */
 TEST(UriAbnfTest, PathNoScheme)
 {
-  ft::shared_ptr<SequenceRule> sequence = pathNoSchemeRule();
+  ft::shared_ptr<SequenceRule> sequence = pathNoSchemeRule(Undefined);
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));
   EXPECT_TRUE(runParser("abc/def/ghi", *sequence));
@@ -667,7 +670,7 @@ TEST(UriAbnfTest, PathNoScheme)
  */
 TEST(UriAbnfTest, PathRootless)
 {
-  ft::shared_ptr<SequenceRule> sequence = pathRootlessRule();
+  ft::shared_ptr<SequenceRule> sequence = pathRootlessRule(Undefined);
 
   EXPECT_TRUE(runParser("abc", *sequence));
   EXPECT_TRUE(runParser("abc/def", *sequence));

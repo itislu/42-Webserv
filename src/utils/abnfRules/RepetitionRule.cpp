@@ -25,6 +25,7 @@ RepetitionRule::~RepetitionRule() {}
 bool RepetitionRule::matches()
 {
   debugPrintRuleEntry();
+  const long ogStartPos = getBuffReader()->getPosInBuff();
 
   while (!getBuffReader()->reachedEnd()) {
 
@@ -51,6 +52,8 @@ bool RepetitionRule::matches()
     _reachedMin = true;
   }
   setReachedEnd(_reachedMin);
+  setStartPos(ogStartPos);
+  setEndPos(getBuffReader()->getPosInBuff());
   addRuleResult(_reachedMin);
   debugPrintMatchStatus(_reachedMin);
   return _reachedMin;

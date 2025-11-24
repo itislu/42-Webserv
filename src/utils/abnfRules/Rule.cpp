@@ -155,10 +155,7 @@ void Rule::debugPrintMatchStatus(bool matches)
   if (_debugMatchReason != FT_NULLPTR) {
     std::cout << "  (" << _debugMatchReason << ")";
   }
-
-  std::cout << "   '";
-  _buffReader->printRemaining();
-  std::cout << "'\n";
+  std::cout << "\n";
 }
 
 /* ************************************************************************** */

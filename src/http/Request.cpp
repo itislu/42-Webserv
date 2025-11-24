@@ -4,7 +4,7 @@
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/Buffer.hpp>
+#include <utils/SmartBuffer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -76,7 +76,7 @@ Headers& Request::getHeaders()
   return _headers;
 }
 
-Buffer& Request::getBody()
+SmartBuffer& Request::getBody()
 {
   return _body;
 }
