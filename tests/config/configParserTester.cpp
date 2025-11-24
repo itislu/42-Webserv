@@ -16,6 +16,15 @@ using config::ServerConfig;
 // Duplicates Tests
 // ============================================================================
 
+TEST(DuplicatesTester, DupAllowedMethodLocation)
+{
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "duplicates/dup_allowed_method.conf";
+  ConfigParser parser(configPath.c_str());
+  Config config;
+  EXPECT_NO_THROW(config = parser.parseConfig());
+}
+
 TEST(DuplicatesTester, DupDirectiveGlobal)
 {
   const std::string configPath =

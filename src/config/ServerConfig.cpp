@@ -140,7 +140,6 @@ void ServerConfig::checkPortDuplicate(int port)
   }
 }
 
-/* TODO: regular expression? */
 const LocationConfig* ServerConfig::getBestMatchLocation(
   const std::string& uri) const
 {
