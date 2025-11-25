@@ -1,5 +1,5 @@
+#include "libftpp/ctype.hpp"
 #include "libftpp/string.hpp"
-#include <cctype>
 #include <string>
 
 namespace ft {
@@ -7,7 +7,7 @@ namespace ft {
 std::string& trim(std::string& str)
 {
 	std::string::iterator start = str.begin();
-	while (start != str.end() && std::isspace(*start) != 0) {
+	while (start != str.end() && ft::isspace(*start)) {
 		++start;
 	}
 	str.erase(str.begin(), start);
@@ -15,7 +15,7 @@ std::string& trim(std::string& str)
 		return str;
 	}
 	std::string::iterator end = str.end() - 1;
-	while (std::isspace(*end) != 0) {
+	while (ft::isspace(*end)) {
 		--end;
 	}
 	str.erase(end + 1, str.end());
