@@ -3,13 +3,13 @@
 #ifndef LIBFTPP_STRING_FROM_STRING_TPP
 #	define LIBFTPP_STRING_FROM_STRING_TPP
 
+#	include "libftpp/ctype.hpp"
 #	include "libftpp/expected.hpp"
 #	include "libftpp/iterator.hpp"
 #	include "libftpp/string.hpp"
 #	include "libftpp/type_traits.hpp"
 #	include "libftpp/utility.hpp"
 #	include <algorithm>
-#	include <cctype>
 #	include <cerrno>
 #	include <cmath>
 #	include <cstdlib>
@@ -76,7 +76,7 @@ To from_string(const std::string& str,
 	if (ft::is_same<To, bool>::value && fmt & std::ios::boolalpha) {
 		throw from_string_invalid_exception(str, typeid(To));
 	}
-	if (!(fmt & std::ios::skipws) && std::isspace(*str.c_str())) {
+	if (!(fmt & std::ios::skipws) && ft::isspace(*str.c_str())) {
 		throw from_string_invalid_exception(str, typeid(To));
 	}
 	return _from_string::impl<To>::handle_error(res, str, fmt, endpos);
