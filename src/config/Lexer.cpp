@@ -1,9 +1,9 @@
 #include "Lexer.hpp"
 #include "config/Token.hpp"
 #include "utils/fileUtils.hpp"
-#include <cctype>
 #include <cstddef>
 #include <iterator>
+#include <libftpp/ctype.hpp>
 #include <libftpp/string.hpp>
 #include <stdexcept>
 #include <string>
@@ -91,12 +91,11 @@ Token Lexer::next()
     return token;
   }
 
-  if (std::isspace(chr) == 0) {
+  if (!ft::isspace(chr)) {
     std::size_t idx = _pos;
     while (idx < _input.size()) {
       const char curr = _input[idx];
-      if ((std::isspace(curr) != 0) || curr == '{' || curr == '}' ||
-          curr == ';') {
+      if (ft::isspace(curr) || curr == '{' || curr == '}' || curr == ';') {
         break;
       }
       ++idx;
@@ -112,7 +111,7 @@ Token Lexer::next()
 
 void Lexer::skipWhiteSpaces()
 {
-  while (_pos < _input.size() && (std::isspace(_input[_pos]) != 0)) {
+  while (_pos < _input.size() && ft::isspace(_input[_pos])) {
     if (_input[_pos] == '\n') {
       ++_line;
     }

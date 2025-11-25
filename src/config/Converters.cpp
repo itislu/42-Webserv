@@ -1,6 +1,6 @@
 #include "Converters.hpp"
-#include <cctype>
 #include <cstddef>
+#include <libftpp/ctype.hpp>
 #include <libftpp/string.hpp>
 #include <limits>
 #include <sstream>
@@ -44,7 +44,7 @@ std::size_t toMaxBodySize(const std::string& str)
   std::size_t multiplier = 1;
   const unsigned long multi = 1024;
   std::string number;
-  if (std::isdigit(suffix) != 0) {
+  if (ft::isdigit(suffix)) {
     number = str;
   } else {
     if (suffix == 'b' || suffix == 'B') {
