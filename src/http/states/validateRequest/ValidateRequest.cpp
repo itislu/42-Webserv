@@ -48,13 +48,11 @@ void ValidateRequest::run()
 {
   _init();
 
-  _log.info() << "init DONE\n";
   _stateHandler.setStateHasChanged(true);
   while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
     _stateHandler.setStateHasChanged(false);
     _stateHandler.getState()->run();
   }
-  _log.info() << "state loop DONE\n";
 
   if (_stateHandler.isDone()) {
     _log.info() << "ValidateRequest result\n"

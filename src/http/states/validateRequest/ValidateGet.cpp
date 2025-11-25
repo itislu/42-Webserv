@@ -30,8 +30,6 @@ ValidateGet::ValidateGet(ValidateRequest* context)
 
 void ValidateGet::run()
 {
-  _log.info() << "Validate GET\n";
-  _log.info() << "path: " << _path << "\n";
   validate();
   getContext()->getStateHandler().setDone();
 }
@@ -48,7 +46,6 @@ void ValidateGet::validate()
     validateDirectory();
     return;
   }
-  _log.info() << "is a invalid file/directory\n";
   endState(StatusCode::NotFound);
 }
 
