@@ -44,15 +44,13 @@ void HandleGet::run()
 void HandleGet::_addContentLengthHeader()
 {
   struct stat info = {};
+  const Request::Method method = _client->getRequest().getMethod();
 
-  const std::string& path = _client->getRequest().getUri().getPath();
-
-  // todo just for testing
-  if (ft::contains_subrange(path, std::string("get"))) {
+  if (method == Request::GET) {
     stat("./assets/testWebsite/get.html", &info);
-  } else if (ft::contains_subrange(path, std::string("post"))) {
+  } else if (method == Request::POST) {
     stat("./assets/testWebsite/post.html", &info);
-  } else if (ft::contains_subrange(path, std::string("delete"))) {
+  } else if (method == Request::DELETE) {
     stat("./assets/testWebsite/delete.html", &info);
   } else {
     stat("./assets/testWebsite/index.html", &info);
@@ -73,19 +71,21 @@ void HandleGet::_addContentType()
 
 void HandleGet::_openFile()
 {
-  const std::string& path = _client->getRequest().getUri().getPath();
+  // const std::string& path = _client->getResource().getPath();
+  const Request::Method method = _client->getRequest().getMethod();
 
-  // todo just for testing
   std::string file;
-  if (ft::contains_subrange(path, std::string("get"))) {
+  if (method == Request::GET) {
     file = "./assets/testWebsite/get.html";
-  } else if (ft::contains_subrange(path, std::string("post"))) {
+  } else if (method == Request::POST) {
     file = "./assets/testWebsite/post.html";
-  } else if (ft::contains_subrange(path, std::string("delete"))) {
+  } else if (method == Request::DELETE) {
     file = "./assets/testWebsite/delete.html";
   } else {
     file = "./assets/testWebsite/index.html";
   }
+
+  _log.info() << "GET file: " << file << "\n";
 
   std::ifstream& body = _client->getResponse().getBody();
   body.open(file.c_str());

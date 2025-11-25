@@ -47,6 +47,8 @@ public:
   void addErrorPage(int code, const std::string& path);
   void addAllowedMethod(const std::string& method);
 
+  void clearAllowedMethods();
+
   void setAutoIndex(bool autoindex);
 
   void setCgi(bool cgi);

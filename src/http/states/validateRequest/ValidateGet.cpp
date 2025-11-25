@@ -13,7 +13,7 @@
 /* ************************************************************************** */
 // INIT
 
-Logger& ValidateRequest::_log = Logger::getInstance(LOG_HTTP);
+Logger& ValidateGet::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC
@@ -30,6 +30,8 @@ ValidateGet::ValidateGet(ValidateRequest* context)
 
 void ValidateGet::run()
 {
+  _log.info() << "Validate GET\n";
+  _log.info() << "path: " << _path << "\n";
   validate();
   getContext()->getStateHandler().setDone();
 }
@@ -37,13 +39,16 @@ void ValidateGet::run()
 void ValidateGet::validate()
 {
   if (config::fileutils::isFile(_path)) {
+    _log.info() << "is a file\n";
     validateFile();
     return;
   }
   if (config::fileutils::isDirectory(_path)) {
+    _log.info() << "is a directory\n";
     validateDirectory();
     return;
   }
+  _log.info() << "is a invalid file/directory\n";
   endState(StatusCode::NotFound);
 }
 
@@ -56,8 +61,8 @@ void ValidateGet::validateFile()
 
   if (_location != FT_NULLPTR && _location->isCgi()) {
     _client->getResource().setType(Resource::Cgi);
-    // TODO: check file extension if file is cgi?
-    // TODO: check if parent directory is executable
+    // TODO??: check file extension if file is cgi
+    // TODO??: check if parent directory is executable
     if (!config::fileutils::isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
       return;
@@ -88,8 +93,11 @@ void ValidateGet::validateDirectory()
   } else {
     indexName = _server->getIndex();
   }
+  _log.info() << "indexName: " << indexName << "\n";
+  _log.info() << "Path: " << _path << "\n";
 
   const std::string indexPath = ValidateRequest::appendToRoot(indexName, _path);
+  _log.info() << "indexPath: " << indexPath << "\n";
 
   if (config::fileutils::isFile(indexPath) &&
       config::fileutils::isReadable(indexPath)) {
@@ -110,6 +118,7 @@ void ValidateGet::validateDirectory()
 
 void ValidateGet::endState(StatusCode::Code status)
 {
+  _log.info() << "endState called with status: " << status << "\n";
   _client->getResponse().setStatusCode(status);
   if (status != StatusCode::Ok) {
     _client->getResource().setType(Resource::Error);

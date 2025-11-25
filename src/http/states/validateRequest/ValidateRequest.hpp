@@ -22,13 +22,14 @@ public:
 
   void run();
 
-  StateHandler<ValidateRequest>& getStateHandler();
   const std::string& getPath() const;
   const config::ServerConfig* getServer() const;
   const config::LocationConfig* getLocation() const;
 
   static std::string appendToRoot(const std::string& uri,
                                   const std::string& root);
+
+  StateHandler<ValidateRequest>& getStateHandler();
 
 private:
   void _init();

@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 // INIT
 
-Logger& ValidateRequest::_log = Logger::getInstance(LOG_HTTP);
+Logger& ValidateDelete::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC

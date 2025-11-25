@@ -87,7 +87,6 @@ const std::map<int, std::string>& LocationConfig::getErrorPages() const
   return _errorPages;
 }
 
-
 const std::string& LocationConfig::getErrorPage(int code) const
 {
   const std::map<int, std::string>::const_iterator iter =
@@ -118,6 +117,11 @@ void LocationConfig::setAutoIndex(bool autoindex)
 void LocationConfig::addAllowedMethod(const std::string& method)
 {
   _allowedMethods.insert(method);
+}
+
+void LocationConfig::clearAllowedMethods()
+{
+  _allowedMethods.clear();
 }
 
 void LocationConfig::setErrorPages(const std::vector<int>& codes,

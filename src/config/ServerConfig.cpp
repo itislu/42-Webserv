@@ -19,6 +19,9 @@ ServerConfig::ServerConfig(const Config& global)
   , _maxBodySize(global.getMaxBodySize())
   , _timeOut(global.getTimeout())
 {
+  _allowedMethods.insert("GET");
+  _allowedMethods.insert("POST");
+  _allowedMethods.insert("DELETE");
 }
 
 // GETTERS
@@ -121,6 +124,11 @@ void ServerConfig::setMaxBodySize(std::size_t size)
 void ServerConfig::addAllowedMethod(const std::string& method)
 {
   _allowedMethods.insert(method);
+}
+
+void ServerConfig::clearAllowedMethods()
+{
+  _allowedMethods.clear();
 }
 
 void ServerConfig::setTimeout(long time)

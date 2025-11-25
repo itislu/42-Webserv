@@ -45,6 +45,8 @@ public:
   void addErrorPage(int code, const std::string& path);
   void addAllowedMethod(const std::string& method);
 
+  void clearAllowedMethods();
+
   const LocationConfig* getBestMatchLocation(const std::string& uri) const;
   static std::size_t getMatchLength(const std::string& uri,
                                     const std::string& path);

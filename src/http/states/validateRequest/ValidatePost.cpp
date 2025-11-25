@@ -13,7 +13,7 @@
 /* ************************************************************************** */
 // INIT
 
-Logger& ValidateRequest::_log = Logger::getInstance(LOG_HTTP);
+Logger& ValidatePost::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC

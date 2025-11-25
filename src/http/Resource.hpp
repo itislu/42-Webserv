@@ -20,7 +20,11 @@ public:
   void setPath(const std::string& path);
   void setType(Type type);
 
+  std::string toString();
+
 private:
+  std::string _typeToString();
+
   Type _type;
   std::string _path;
 };

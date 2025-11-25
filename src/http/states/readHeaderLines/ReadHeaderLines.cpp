@@ -1,5 +1,6 @@
 #include "ReadHeaderLines.hpp"
 #include "http/states/prepareResponse/PrepareResponse.hpp"
+#include "http/states/validateRequest/ValidateRequest.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -120,7 +121,7 @@ void ReadHeaderLines::_readLines()
 
 void ReadHeaderLines::_setNextState()
 {
-  _client->getStateHandler().setState<ReadBody>();
+  _client->getStateHandler().setState<ValidateRequest>();
 }
 
 bool ReadHeaderLines::_hasEndOfLine()

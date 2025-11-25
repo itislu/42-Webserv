@@ -13,6 +13,7 @@
 #include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
+#include "utils/state/StateHandler.hpp"
 
 #include <cstddef>
 #include <cstdlib>
@@ -41,20 +42,23 @@ ValidateRequest::ValidateRequest(Client* context)
   , _location()
 {
   _log.info() << "ValidateRequest\n";
-  std::cout << "ValidateRequest\n";
 }
 
 void ValidateRequest::run()
 {
   _init();
 
+  _log.info() << "init DONE\n";
   _stateHandler.setStateHasChanged(true);
   while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
     _stateHandler.setStateHasChanged(false);
     _stateHandler.getState()->run();
   }
+  _log.info() << "state loop DONE\n";
 
   if (_stateHandler.isDone()) {
+    _log.info() << "ValidateRequest result\n"
+                << _client->getResource().toString() << "\n";
     if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
       getContext()->getStateHandler().setState<ReadBody>();
     } else {
@@ -76,6 +80,11 @@ const config::LocationConfig* ValidateRequest::getLocation() const
   return _location;
 }
 
+StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
+{
+  return _stateHandler;
+}
+
 /* ************************************************************************** */
 // PRIVATE
 
@@ -91,10 +100,13 @@ void ValidateRequest::_init()
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
   const Request::Method method = _client->getRequest().getMethod();
+  _log.info() << _client->getRequest().getMethod() << "\n";
   if (validateMethod(allowedMethods, method)) {
-    _initState(method);
+    _log.info() << "method is VALID\n";
     _initRequestPath();
+    _initState(method);
   } else {
+    _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
   }
 }
@@ -145,36 +157,43 @@ void ValidateRequest::_initState(const Request::Method& method)
       break;
     case Request::UNDEFINED:
       getContext()->getStateHandler().setState<PrepareResponse>();
+      getContext()->getStateHandler().setDone();
       break;
   }
 }
 
 void ValidateRequest::_initRequestPath()
 {
+  _log.info() << "init request path - path: " << _path << "\n";
   // 1. Decode URI
   std::string decoded = decodePath(_path);
   if (decoded.empty() && !_path.empty()) {
     endState(StatusCode::BadRequest);
     return;
   }
-
+  _log.info() << "decode uri - path: " << _path << "\n";
   // 2. check for illegal characters (NULL, control chars)
   if (!validateChars(decoded)) {
     endState(StatusCode::BadRequest);
     return;
   }
+  _log.info() << "validate chars - path: " << _path << "\n";
 
   // 3. Normalize Path (collapse . / .. / //)
   decoded = normalizePath(decoded);
+  _log.info() << "normalizePath - path: " << _path << "\n";
 
   // 4. Combine with root
   if (_location != FT_NULLPTR) {
     _path = removePrefix(_path, _location->getPath());
+    _log.info() << "remove Prefix - path: " << _path << "\n";
     _path = appendToRoot(_path, _location->getRoot());
   } else {
     _path = appendToRoot(_path, _server->getRoot());
   }
+  _log.info() << "appendToRoot - path: " << _path << "\n";
   _client->getResource().setPath(_path);
+  _log.info() << "_path: " << _path << "\n";
 }
 
 std::string ValidateRequest::decodePath(std::string& path)
