@@ -58,7 +58,6 @@ void ValidateRequest::run()
     if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
       getContext()->getStateHandler().setState<ReadBody>();
     } else {
-      // TODO: set errorpage here?
       getContext()->getStateHandler().setState<PrepareResponse>();
     }
   }
@@ -86,6 +85,7 @@ void ValidateRequest::_init()
     _initServer();
   }
   _path = _client->getRequest().getUri().getPath();
+  _client->getResource().setType(Resource::File);
   _initConfigs();
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
@@ -158,16 +158,16 @@ void ValidateRequest::_initRequestPath()
     return;
   }
 
-  // 2. check for illegal characters (NULL, control chars).
+  // 2. check for illegal characters (NULL, control chars)
   if (!validateChars(decoded)) {
     endState(StatusCode::BadRequest);
     return;
   }
 
-  // 3. Normalize Path (collapse . / .. / //).
+  // 3. Normalize Path (collapse . / .. / //)
   decoded = normalizePath(decoded);
 
-  // 4. Combine with root.
+  // 4. Combine with root
   if (_location != FT_NULLPTR) {
     _path = removePrefix(_path, _location->getPath());
     _path = appendToRoot(_path, _location->getRoot());
@@ -272,6 +272,8 @@ std::string ValidateRequest::appendToRoot(const std::string& uri,
 void ValidateRequest::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
-  _client->getResource().setType(Resource::Error);
-  _stateHandler.setDone();
+  if (status != StatusCode::Ok) {
+    _client->getResource().setType(Resource::Error);
+    _stateHandler.setDone();
+  }
 }

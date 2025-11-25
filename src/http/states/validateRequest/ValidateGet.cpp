@@ -55,12 +55,14 @@ void ValidateGet::validateFile()
   }
 
   if (_location != FT_NULLPTR && _location->isCgi()) {
-    // check file extension if file is cgi
-    // check if parent directory is executable
+    _client->getResource().setType(Resource::Cgi);
+    // TODO: check file extension if file is cgi?
+    // TODO: check if parent directory is executable
     if (!config::fileutils::isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
       return;
     }
+    // is CGI
     endState(StatusCode::Ok);
     return;
   }
@@ -75,7 +77,7 @@ void ValidateGet::validateDirectory()
   }
 
   if (!config::fileutils::isExecuteable(_path) ||
-      !!config::fileutils::isReadable(_path)) {
+      !config::fileutils::isReadable(_path)) {
     endState(StatusCode::Forbidden);
     return;
   }
@@ -87,8 +89,7 @@ void ValidateGet::validateDirectory()
     indexName = _server->getIndex();
   }
 
-  // TODO: check double slashes //
-  const std::string indexPath = _path + indexName;
+  const std::string indexPath = ValidateRequest::appendToRoot(indexName, _path);
 
   if (config::fileutils::isFile(indexPath) &&
       config::fileutils::isReadable(indexPath)) {
@@ -98,6 +99,7 @@ void ValidateGet::validateDirectory()
   }
 
   if (_location != FT_NULLPTR && _location->isAutoIndex()) {
+    _client->getResource().setType(Resource::Autoindex);
     endState(StatusCode::Ok);
     return;
   }
@@ -109,5 +111,7 @@ void ValidateGet::validateDirectory()
 void ValidateGet::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
-  _client->getResource().setType(Resource::Error);
+  if (status != StatusCode::Ok) {
+    _client->getResource().setType(Resource::Error);
+  }
 }

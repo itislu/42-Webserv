@@ -48,6 +48,7 @@ void ValidatePost::validate()
 
 void ValidatePost::validateCGI()
 {
+  _client->getResource().setType(Resource::Cgi);
   if (config::fileutils::isDirectory(_path)) {
     endState(StatusCode::Forbidden);
     return;
@@ -91,5 +92,7 @@ void ValidatePost::validateParentDirPermissions()
 void ValidatePost::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
-  _client->getResource().setType(Resource::Error);
+  if (status != StatusCode::Ok) {
+    _client->getResource().setType(Resource::Error);
+  }
 }

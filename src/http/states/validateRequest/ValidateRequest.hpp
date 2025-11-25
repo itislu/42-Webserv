@@ -27,6 +27,9 @@ public:
   const config::ServerConfig* getServer() const;
   const config::LocationConfig* getLocation() const;
 
+  static std::string appendToRoot(const std::string& uri,
+                                  const std::string& root);
+
 private:
   void _init();
   void _initServer();
@@ -34,8 +37,6 @@ private:
   void _initState(const Request::Method& method);
   void _initRequestPath();
 
-  static std::string appendToRoot(const std::string& uri,
-                                  const std::string& root);
   static std::string removePrefix(const std::string& uriPath,
                                   const std::string& locPath);
   static bool validateMethod(const std::set<std::string>& allowedMethods,

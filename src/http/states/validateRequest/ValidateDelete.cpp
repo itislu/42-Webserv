@@ -70,7 +70,9 @@ void ValidateDelete::validateParentDirPermissions()
 void ValidateDelete::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
-  _client->getResource().setType(Resource::Error);
+  if (status != StatusCode::Ok) {
+    _client->getResource().setType(Resource::Error);
+  }
 }
 
 /*
