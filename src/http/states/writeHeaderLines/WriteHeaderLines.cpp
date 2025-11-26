@@ -2,8 +2,13 @@
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
+#include <http/StatusCode.hpp>
 #include <http/http.hpp>
+#include <http/states/prepareResponse/HandleError.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeBody/WriteBody.hpp>
+#include <libftpp/utility.hpp>
+#include <stdexcept>
 #include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -27,10 +32,10 @@ WriteHeaderLines::WriteHeaderLines(Client* context)
 }
 
 void WriteHeaderLines::run()
-{
+try {
   Headers& headers = _client->getResponse().getHeaders();
   headers.addHeader("Date", _makeHttpDate());
-  headers.addHeader("Server", "webserv"); // TODO from config probaly ?
+  headers.addHeader("Server", "webserv"); // TODO from config probably ?
   headers.addHeader("Connection", "close");
 
   IBuffer& outBuffer = _client->getOutBuff();
@@ -38,6 +43,10 @@ void WriteHeaderLines::run()
   outBuffer.append(http::CRLF);
 
   _client->getStateHandler().setState<WriteBody>();
+} catch (const std::runtime_error& e) {
+  _log.error() << "WriteHeaderLines: " << e.what() << "\n";
+  _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+  throw e; // todo catch me if you can ;)
 }
 
 /* ************************************************************************** */
@@ -50,12 +59,16 @@ std::string WriteHeaderLines::_makeHttpDate()
 
   // Convert to GMT/UTC
   std::tm gmt = {};
-  gmt = *std::gmtime(&now);
+  if (gmtime_r(&now, &gmt) == FT_NULLPTR) {
+    throw std::runtime_error("WriteHeaderLines: failed to make http date\n");
+  }
 
   const int bufSize = 64;
   char buf[bufSize];
   // Format: "Sat, 15 Nov 2025 18:43:29 GMT"
-  (void)std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &gmt);
+  if (std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &gmt) == 0) {
+    throw std::runtime_error("WriteHeaderLines: failed to make http date\n");
+  }
   return std::string(buf);
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)

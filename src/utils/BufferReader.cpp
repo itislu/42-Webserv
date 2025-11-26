@@ -1,5 +1,6 @@
 #include "BufferReader.hpp"
 
+#include <algorithm>
 #include <libftpp/expected.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
@@ -45,10 +46,10 @@ void BufferReader::resetPosInBuff()
 
 void BufferReader::rewind(std::size_t bytes)
 {
-  assert(bytes <= _posInBuff);
   if (bytes == 0) {
     return;
   }
+  bytes = std::min(bytes, _posInBuff);
   setPosInBuff(_posInBuff - bytes);
 }
 

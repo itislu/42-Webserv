@@ -23,11 +23,9 @@ bool EndRule::matches()
   setEndPos(getBuffReader()->getPosInBuff());
   bool matches = false;
   std::size_t rewindCount = 1;
-  while (!matches && getBuffReader()->getPosInBuff() > getStartPos()) {
+  while (!matches && getBuffReader()->getPosInBuff() > getStartPos() &&
+         getBuffReader()->getPosInBuff() > 0) {
     getBuffReader()->rewind(rewindCount);
-    if (getBuffReader()->getPosInBuff() < 0) {
-      break;
-    }
     matches = _rule->matches();
     if (matches && getEndPos() == getBuffReader()->getPosInBuff()) {
       break;

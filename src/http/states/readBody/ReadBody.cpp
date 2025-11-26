@@ -220,6 +220,7 @@ void ReadBody::_readChunkInfo()
   if (!_chunkInfoRule().matches()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     _log.error() << "ReadBody: failed to parse chunk size\n";
+    return;
   }
 
   if (_chunkInfoRule().reachedEnd()) {
@@ -306,20 +307,23 @@ std::string ReadBody::_extractPart(const Rule::RuleId& ruleId)
 {
   const RuleResult& result = _results[ruleId];
   const std::size_t index = result.getEnd();
-  const IBuffer::ExpectStr res = _client->getInBuff().consumeFront(index);
+  const std::string res = _client->getInBuff().consumeFront(index);
   _buffReader.resetPosInBuff();
-  return *res;
+  return res;
 }
 
 void ReadBody::_addLineToHeaders(const std::string& line)
 {
   const std::size_t index = line.find(':');
-  if (index != std::string::npos) {
-    const std::string name = line.substr(0, index);
-    const std::string value = line.substr(index + 1, line.size());
-    Headers& headers = _client->getRequest().getHeaders();
-    headers.addHeader(name, value);
+  if (index == std::string::npos) {
+    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _log.error() << "ReadBody: invalid fieldline\n";
+    return;
   }
+  const std::string name = line.substr(0, index);
+  const std::string value = line.substr(index + 1, line.size());
+  Headers& headers = _client->getRequest().getHeaders();
+  headers.addHeader(name, value);
 }
 
 // NOLINTBEGIN(misc-const-correctness)
@@ -331,6 +335,7 @@ void ReadBody::_setChunkSize(const std::string& hexNum)
   if (end == hexNum.c_str() || value < 0) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     _log.error() << "ReadBody: failed to parse chunk size\n";
+    return;
   }
   _log.info() << "body size: " << value << '\n';
   _bodyLength = static_cast<std::size_t>(value);
@@ -362,8 +367,8 @@ void ReadBody::_readBody()
     return;
   }
 
-  const IBuffer::ExpectRaw rawBytes = inBuffer.consumeRawFront(toConsume);
-  request.getBody().append(*rawBytes, toConsume);
+  const IBuffer::RawBytes rawBytes = inBuffer.consumeRawFront(toConsume);
+  request.getBody().append(rawBytes, toConsume);
   _consumed += toConsume;
 }
 

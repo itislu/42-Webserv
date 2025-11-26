@@ -18,6 +18,9 @@ ft::optional<std::size_t> getFileSize(const std::string& filepath)
   if (stat(filepath.c_str(), &info) != 0) {
     return ft::nullopt;
   }
+  if (info.st_size < 0) {
+    return ft::nullopt;
+  }
 
   return static_cast<std::size_t>(info.st_size);
 }

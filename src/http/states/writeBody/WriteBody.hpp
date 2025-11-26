@@ -16,6 +16,7 @@ public:
   void run();
 
 private:
+  bool _fail();
   void _writeIntoOutBuffer();
 
   static Logger& _log;

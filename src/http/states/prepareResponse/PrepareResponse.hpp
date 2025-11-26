@@ -24,7 +24,6 @@ private:
   Client* _client;
   static Logger& _log;
   StateHandler<PrepareResponse> _stateHandler;
-  bool _initialized;
 };
 
 #endif

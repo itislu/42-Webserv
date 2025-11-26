@@ -55,7 +55,7 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
 void ReadHeaderLines::run()
 try {
   _readLines();
-  if (_done) {
+  if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
     _setNextState();
     return;
   }

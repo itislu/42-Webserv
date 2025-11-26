@@ -2,6 +2,8 @@
 
 #include <client/Client.hpp>
 #include <http/StatusCode.hpp>
+#include <http/states/prepareResponse/HandleError.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -25,24 +27,26 @@ WriteBody::WriteBody(Client* context)
   _log.info() << "WriteBody\n";
 }
 
-// NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
 void WriteBody::run()
 try {
   _writeIntoOutBuffer();
 
-  if (_done) {
-    _log.info() << "WriteBody: done\n";
-    _client->getStateHandler().setDone();
+  if (_done || _fail()) {
+    getContext()->getStateHandler().setDone();
   }
 } catch (const IBuffer::BufferException& e) {
   _log.error() << "WriteBody: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setDone();
 }
-// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
 
 /* ************************************************************************** */
 // PRIVATE
+
+bool WriteBody::_fail()
+{
+  return _client->getResponse().getStatusCode() != StatusCode::Ok;
+}
 
 void WriteBody::_writeIntoOutBuffer()
 {
@@ -51,7 +55,7 @@ void WriteBody::_writeIntoOutBuffer()
 
   if (!ifs.is_open()) {
     _log.info() << "no body\n";
-    _client->getStateHandler().setDone();
+    _done = true;
     return;
   }
 
@@ -62,6 +66,12 @@ void WriteBody::_writeIntoOutBuffer()
 
   IBuffer::RawBytes buff(_chunkSize);
   ifs.read(buff.data(), _chunkSize);
+  if (ifs.fail() && !ifs.eof()) {
+    _log.error() << "WriteBody: stream read error\n";
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    return;
+  }
+
   const std::streamsize readCount = ifs.gcount();
   if (readCount > 0) {
     outBuffer.append(buff, readCount);

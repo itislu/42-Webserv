@@ -1,5 +1,6 @@
 #include "Rule.hpp"
 
+#include <cassert>
 #include <libftpp/format.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
@@ -113,6 +114,10 @@ std::size_t Rule::getEndPos() const
 void Rule::rewindToStartPos()
 {
   const std::size_t currPos = getBuffReader()->getPosInBuff();
+  assert(currPos >= getStartPos());
+  if (getStartPos() > currPos) {
+    return;
+  }
   const std::size_t diff = currPos - getStartPos();
   getBuffReader()->rewind(diff);
 }

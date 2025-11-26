@@ -26,7 +26,7 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
       { UriTooLong, "URI Too Long" },
       { RequestHeaderFieldsTooLarge, "Request Header Fields Too Large" },
       { InternalServerError, "Internal Server Error" },
-      { NotImplemented, "Not implemented" } }
+      { NotImplemented, "Not Implemented" } }
 
   };
 

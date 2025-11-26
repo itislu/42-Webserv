@@ -93,7 +93,7 @@ void ParseMethod::_extractMethod()
 
 bool ParseMethod::_methodNotImplemented()
 {
-  if (_buffReader.getPosInBuff() > Request::MaxMethodLen) {
+  if (_buffReader.getPosInBuff() > Request::MaxMethodLen + 1) {
     _log.error() << "Method not implemented\n";
     _client->getResponse().setStatusCode(StatusCode::NotImplemented);
     return true;

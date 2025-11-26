@@ -1,5 +1,4 @@
 #include "IBuffer.hpp"
-#include "utils/printUtils.hpp"
 
 #include <cstddef>
 #include <exception>
@@ -10,19 +9,18 @@
 
 std::ostream& operator<<(std::ostream& out, IBuffer& buffer)
 {
-  const IBuffer::ExpectPos oldpos = buffer.pos();
-  std::size_t pos = *oldpos;
+  const std::size_t oldpos = buffer.pos();
+  std::size_t pos = oldpos;
 
   out << "'";
   while (pos < buffer.size()) {
-    const IBuffer::ExpectChr expectChr = buffer.get();
-    const char chr = *expectChr;
+    const char chr = buffer.get();
     // printEscapedChar(out, chr);
     out << chr;
     ++pos;
   }
   out << "'\n";
-  buffer.seek(*oldpos);
+  buffer.seek(oldpos);
 
   return out;
 }

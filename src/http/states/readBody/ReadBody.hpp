@@ -66,7 +66,7 @@ private:
 
   std::size_t _bodyLength;
   std::size_t _consumed;
-  std::size_t _chunkedState;
+  ChunkedState _chunkedState;
   std::string _chunkExtension;
 
   bool _fixedLengthBody;

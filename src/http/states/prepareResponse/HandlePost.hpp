@@ -19,8 +19,9 @@ public:
   void run();
 
 private:
-  static std::string _getFileName(const std::string& directory);
+  std::string _getFileName(const std::string& directory);
 
+  void _setNextState();
   void _createData();
 
   static Logger& _log;

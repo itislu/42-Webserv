@@ -3,7 +3,9 @@
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/StatusCode.hpp>
+#include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -29,11 +31,22 @@ HandlePost::HandlePost(PrepareResponse* context)
 void HandlePost::run()
 {
   _createData();
-  getContext()->getStateHandler().setDone();
+  _setNextState();
 }
 
 /* ************************************************************************** */
 // PRIVATE
+
+void HandlePost::_setNextState()
+{
+  const StatusCode& statusCode = _client->getResponse().getStatusCode();
+
+  if (statusCode == StatusCode::Ok) {
+    getContext()->getStateHandler().setDone();
+  } else {
+    getContext()->getStateHandler().setState<HandleError>();
+  }
+}
 
 std::string HandlePost::_getFileName(const std::string& directory)
 {
@@ -47,14 +60,16 @@ std::string HandlePost::_getFileName(const std::string& directory)
       return filename;
     }
   }
+  _log.error() << "HandlePost: no filename found\n";
+  _client->getResponse().setStatusCode(StatusCode::InternalServerError);
   return filename;
 }
 
 void HandlePost::_createData()
 {
+  // todo get path from resource
   const std::string directory = "./assets/testWebsite/upload/";
 
-  _client->getRequest().getBody();
   const std::string newFilePath = _getFileName(directory);
   _client->getRequest().getBody().moveBufferToFile(newFilePath);
   _client->getResponse().setStatusCode(StatusCode::Created);

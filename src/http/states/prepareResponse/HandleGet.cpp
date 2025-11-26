@@ -44,7 +44,7 @@ void HandleGet::run()
   if (!_fail()) {
     _openFile();
   }
-  getContext()->getStateHandler().setDone();
+  _setNextState();
 }
 
 /* ************************************************************************** */
