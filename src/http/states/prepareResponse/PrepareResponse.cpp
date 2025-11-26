@@ -27,7 +27,7 @@ PrepareResponse::PrepareResponse(Client* context)
   , _stateHandler(this)
   , _initialized(false)
 {
-  _log.info() << "Prepare response\n";
+  _log.info() << "PrepareResponse\n";
 }
 
 void PrepareResponse::run()

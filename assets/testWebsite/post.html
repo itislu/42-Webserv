@@ -1,32 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Get Tests</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #89f7fe, #66a6ff);
-      color: white;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post Tests</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #89f7fe, #66a6ff);
+        color: white;
+      }
 
-    a {
-      margin-top: 30px;
-      color: white;
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-  <h1>Post Tests</h1>
-  <p>This is the page for testing POST requests.</p>
-  <a href="index.html">⬅ Back to Home</a>
-</body>
+      a {
+        margin-top: 30px;
+        color: white;
+        text-decoration: underline;
+      }
+
+      form {
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 20px;
+        border-radius: 10px;
+        backdrop-filter: blur(4px);
+      }
+
+      input[type="file"] {
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Post Tests</h1>
+    <p>This page allows you to upload a file for POST testing.</p>
+
+    <form action="/post" method="POST" enctype="multipart/form-data">
+      <input type="file" name="testFile" required />
+      <br />
+      <button type="submit">Upload File</button>
+      <br />
+    </form>
+    <br />
+    <textarea id="rawInput" rows="6" cols="40">hello world</textarea>
+    <br />
+    <button onclick="sendRaw()">Send Raw POST</button>
+
+    <a href="index.html">⬅ Back to Home</a>
+  </body>
 </html>
+
+<script>
+  function sendRaw() {
+    const text = document.getElementById("rawInput").value;
+
+    fetch("/post", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+        "Content-Length": text.length,
+      },
+      body: text,
+    });
+  }
+</script>

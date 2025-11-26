@@ -25,6 +25,8 @@ int isDigit05(int chr);
 int isWhitespace(int chr);
 int isObsText(int chr);
 int isVchar(int chr);
+int isQdTextChar(int chr);
+int isQuotedPairChar(int chr);
 
 typedef std::map<std::string, std::string> ExtToTypeMap;
 const ExtToTypeMap& getExtToType();

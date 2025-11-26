@@ -1,13 +1,10 @@
 #include "FileBuffer.hpp"
 
 #include <libftpp/expected.hpp>
-#include <libftpp/string.hpp>
-#include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
+#include <utils/fileUtils.hpp>
 
-#include <algorithm>
 #include <cassert>
-#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -28,6 +25,8 @@ const char* const FileBuffer::errOutOfRange =
   "FbException: tried to access out of range";
 const char* const FileBuffer::errRead = "FbException: read failed";
 const char* const FileBuffer::errWrite = "FbException: write failed";
+const char* const FileBuffer::errTell = "FbException: tell position failed";
+const char* const FileBuffer::errRename = "FbException: rename file failed";
 
 /* ************************************************************************** */
 // PUBLIC
@@ -138,6 +137,24 @@ void FileBuffer::replace(RawBytes& rawData)
   append(rawData, rawData.size());
 }
 
+void FileBuffer::moveBufferToFile(const std::string& filepath)
+{
+  if (_fileName.empty()) {
+    throw BufferException(errRename);
+  }
+  if (_fs.is_open()) {
+    _fs.close();
+  }
+
+  const int res = std::rename(_fileName.c_str(), filepath.c_str());
+  if (res != 0) {
+    throw BufferException(errRename);
+  }
+
+  _fileName.clear();
+  _size = 0;
+}
+
 // Non-throwing versions
 
 IBuffer::ExpectChr FileBuffer::get(std::nothrow_t /*unused*/)
@@ -163,6 +180,15 @@ IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos, std::nothrow_t /*unused*/)
   try {
     seek(pos);
     return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectPos FileBuffer::pos(std::nothrow_t /*unused*/)
+{
+  try {
+    return pos();
   } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
@@ -264,6 +290,17 @@ IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData,
   }
 }
 
+IBuffer::ExpectVoid FileBuffer::moveBufferToFile(const std::string& filepath,
+                                                 std::nothrow_t /*unused*/)
+{
+  try {
+    moveBufferToFile(filepath);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
 bool FileBuffer::isEmpty() const
 {
   return _size == 0;
@@ -277,31 +314,13 @@ std::size_t FileBuffer::size() const
 /* ************************************************************************** */
 // PRIVATE
 
-// NOLINTBEGIN(bugprone-random-generator-seed, misc-predictable-rand)
-static std::string getRandomFileName()
-{
-  static bool seeded = false;
-
-  if (!seeded) {
-    seeded = true;
-    std::srand(std::time(FT_NULLPTR));
-  }
-
-  std::string filename;
-  filename.append(".tmpfile_");
-  filename.append(ft::to_string(std::rand()));
-  filename.append(ft::to_string(std::rand()));
-  return filename;
-}
-// NOLINTEND(bugprone-random-generator-seed, misc-predictable-rand)
-
 void FileBuffer::_openTmpFile()
 {
   assert(!_fs.is_open());
   const std::size_t countMax = 100;
   std::size_t count = 0;
   for (; count < countMax; ++count) {
-    _fileName = getRandomFileName();
+    _fileName = getRandomFileName(".tmp");
     _fs.open(_fileName.c_str(), std::ios::in);
     // check if file does not exist
     if (!_fs.is_open()) {

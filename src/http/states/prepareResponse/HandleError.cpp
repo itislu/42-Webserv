@@ -27,6 +27,8 @@ HandleError::HandleError(PrepareResponse* context)
 
 void HandleError::run()
 {
+  // todo get custom error page from config
+
   const StatusCode& statuscode = _client->getResponse().getStatusCode();
   _client->getOutBuff().append(_makeErrorBody(statuscode));
   getContext()->getStateHandler().setDone();

@@ -1,4 +1,5 @@
 #include "utils/SmartBuffer.hpp"
+#include "utils/abnfRules/RepetitionRule.hpp"
 #include <http/abnfRules/http11Rules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
@@ -55,7 +56,7 @@ TEST(Http11RulesTester, OriginForm)
     runParser("/app/v2/items/list?page=3&sort=desc&filter=on ", *seq));
 }
 
-/*
+/**
  * origin-form = absolute-path [ "?" query ]
  */
 TEST(Http11RulesTester, OriginFormInvalidCases)
@@ -76,7 +77,7 @@ TEST(Http11RulesTester, OriginFormInvalidCases)
   EXPECT_FALSE(runParser("/% ", *seq));
 }
 
-/*
+/**
  * absolute-form = absolute-URI
  * absolute-URI  = scheme ":" hier-part [ "?" query ]
  */
@@ -103,7 +104,7 @@ TEST(Http11RulesTester, AbsoluteForm)
     "https://example.org/long/path/to/resource?one=1&two=2&three=3 ", *seq));
 }
 
-/*
+/**
  * absolute-form = absolute-URI
  * absolute-URI  = scheme ":" hier-part [ "?" query ]
  */
@@ -120,6 +121,41 @@ TEST(Http11RulesTester, AbsoluteFormInvalid)
   EXPECT_FALSE(runParser("http://exa mple.com/path ", *seq));
   EXPECT_FALSE(runParser("http://example.com/space in path ", *seq));
   EXPECT_FALSE(runParser("https://example.com:port/path ", *seq));
+}
+
+/**
+ * chunk          = chunk-size [ chunk-ext ] CRLF
+ *                  chunk-data CRLF
+ *
+ * ! only first part
+ */
+TEST(Http11RulesTester, ChunkInfo)
+{
+  const ft::shared_ptr<SequenceRule> rule = chunkInfoRule();
+
+  EXPECT_TRUE(runParser("FF\r\n", *rule));
+  EXPECT_TRUE(runParser("A\r\n", *rule));
+  EXPECT_TRUE(runParser("0\r\n", *rule));
+  EXPECT_TRUE(runParser("1A\r\n", *rule));
+  EXPECT_TRUE(runParser("fFf\r\n", *rule));
+  EXPECT_TRUE(runParser("ABC123\r\n", *rule));
+
+  // With chunk extensions:
+  EXPECT_TRUE(runParser("A;foo\r\n", *rule));
+  EXPECT_TRUE(runParser("A;foo=bar\r\n", *rule));
+  EXPECT_TRUE(runParser("A;foo=bar;baz\r\n", *rule));
+  EXPECT_TRUE(runParser("FF;token;name=value\r\n", *rule));
+  EXPECT_TRUE(runParser("FF; token ; name = value\r\n", *rule));
+  EXPECT_TRUE(runParser("10;ext=\"quoted value\"\r\n", *rule));
+}
+
+/**
+ * chunk-size     = 1*HEXDIG
+ */
+TEST(Http11RulesTester, ChunkSize)
+{
+  const ft::shared_ptr<RepetitionRule> rule = chunkSizeRule();
+  EXPECT_TRUE(runParser("FF", *rule));
 }
 
 // Main function to run all tests

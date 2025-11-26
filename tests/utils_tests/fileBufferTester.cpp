@@ -1,5 +1,7 @@
 #include <utils/FileBuffer.hpp>
 
+#include <cstdio>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -46,6 +48,24 @@ TEST(FileBufferTester, GetPeekSeek)
   EXPECT_EQ(filebuffer.get(), '5');
   EXPECT_EQ(filebuffer.peek(), '6');
   EXPECT_EQ(filebuffer.peek(), '6');
+}
+
+TEST(FileBufferTester, MoveToFile)
+{
+  std::string testFilePath;
+  testFilePath.append(ASSETS_PATH);
+  testFilePath.append("TestFile_FileBufferTester.txt");
+
+  FileBuffer fileBuffer;
+  fileBuffer.append("HelloWorld");
+
+  fileBuffer.moveBufferToFile(testFilePath);
+
+  const std::fstream fstream(testFilePath);
+  EXPECT_TRUE(fstream.is_open());
+  EXPECT_EQ(fileBuffer.size(), 0);
+
+  (void)std::remove(testFilePath.c_str());
 }
 
 // Main function to run all tests

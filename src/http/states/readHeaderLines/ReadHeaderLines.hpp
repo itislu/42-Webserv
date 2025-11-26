@@ -10,6 +10,7 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <cstddef>
 #include <string>
 
 class Client;
@@ -30,15 +31,18 @@ private:
   bool _hasEndOfLine();
   std::string _extractPart(const Rule::RuleId& ruleId);
   void _addLineToHeaders(const std::string& line);
+  bool _headerTooLarge(std::size_t newBytes);
+
+  static Logger& _log;
 
   Client* _client;
-  ft::unique_ptr<SequenceRule> _fieldLine;
+  ft::shared_ptr<SequenceRule> _fieldLine;
   // Could be unique_ptr, but gets assigned from a function returning
   // shared_ptr.
   ft::shared_ptr<LiteralRule> _endOfLine;
   BufferReader _buffReader;
   Rule::ResultMap _results;
-  static Logger& _log;
+  std::size_t _sizeHeaders;
   bool _done;
 };
 

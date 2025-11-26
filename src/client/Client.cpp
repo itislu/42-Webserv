@@ -140,7 +140,7 @@ bool Client::sendTo()
 
   const ssize_t bytes = send(getFd(), buff.data(), buff.size(), 0);
   if (bytes > 0) {
-    _log.info() << "sent " << bytes << " bytes\n";
+    _log.info() << "sent " << bytes << " bytes\n\n'" << buff.data() << "'\n\n";
   } else if (bytes == 0) {
     _log.warning() << "no data sent to client fd=" << getFd() << "\n";
   } else {

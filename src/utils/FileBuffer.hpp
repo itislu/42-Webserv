@@ -20,6 +20,8 @@ public:
   static const char* const errOutOfRange;
   static const char* const errRead;
   static const char* const errWrite;
+  static const char* const errTell;
+  static const char* const errRename;
 
   FileBuffer();
   ~FileBuffer();
@@ -38,11 +40,13 @@ public:
   std::string getStr(std::size_t start, std::size_t bytes);
   RawBytes getRawBytes(std::size_t start, std::size_t bytes);
   void replace(RawBytes& rawData);
+  void moveBufferToFile(const std::string& filepath);
 
   // Interface IBuffer - Non-throwing versions
   ExpectChr get(std::nothrow_t /*unused*/);
   ExpectChr peek(std::nothrow_t /*unused*/);
   ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/);
+  ExpectPos pos(std::nothrow_t /*unused*/);
   ExpectVoid append(const std::string& data, std::nothrow_t /*unused*/);
   ExpectVoid append(const RawBytes& buffer,
                     std::size_t bytes,
@@ -58,6 +62,8 @@ public:
                         std::size_t bytes,
                         std::nothrow_t /*unused*/);
   ExpectVoid replace(RawBytes& rawData, std::nothrow_t /*unused*/);
+  ExpectVoid moveBufferToFile(const std::string& filepath,
+                              std::nothrow_t /*unused*/);
 
   bool isEmpty() const;
   std::size_t size() const;

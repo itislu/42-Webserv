@@ -11,7 +11,8 @@
 #include <new>
 #include <string>
 
-/* ************************************************************************** */
+/* **************************************************************************
+ */
 // INIT
 
 const char* const SmartBuffer::errAllocBuffer =
@@ -106,6 +107,12 @@ void SmartBuffer::replace(RawBytes& rawData)
   _buffer->replace(rawData);
 }
 
+void SmartBuffer::moveBufferToFile(const std::string& filepath)
+{
+  // todo maybe check size first
+  _buffer->moveBufferToFile(filepath);
+}
+
 // Non-throwing versions
 
 IBuffer::ExpectChr SmartBuffer::get(std::nothrow_t /*unused*/)
@@ -132,6 +139,15 @@ IBuffer::ExpectVoid SmartBuffer::seek(std::size_t pos,
   try {
     seek(pos);
     return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectPos SmartBuffer::pos(std::nothrow_t /*unused*/)
+{
+  try {
+    return pos();
   } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
@@ -227,6 +243,17 @@ IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData,
 {
   try {
     replace(rawData);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectVoid SmartBuffer::moveBufferToFile(const std::string& filepath,
+                                                  std::nothrow_t /*unused*/)
+{
+  try {
+    moveBufferToFile(filepath);
     return ExpectVoid();
   } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);

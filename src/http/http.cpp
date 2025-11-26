@@ -191,6 +191,30 @@ int isVchar(int chr)
   return static_cast<int>(chr >= begin && chr <= end);
 }
 
+/**
+ *qdtext         = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text
+ */
+int isQdTextChar(int chr)
+{
+  const char char1 = 0x21;
+  const char beg1 = 0x23;
+  const char end1 = 0x5B;
+  const char beg2 = 0x5D;
+  const char end2 = 0x7E;
+  return static_cast<int>(chr == '\t' || chr == ' ' || chr == char1 ||
+                          (chr >= beg1 && chr <= end1) ||
+                          (chr >= beg2 && chr <= end2) || isObsText(chr) != 0);
+}
+
+/**
+ * quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
+ */
+int isQuotedPairChar(int chr)
+{
+  return static_cast<int>(chr == '\t' || chr == ' ' || isVchar(chr) != 0 ||
+                          isObsText(chr) != 0);
+}
+
 const ExtToTypeMap& getExtToType()
 {
   static std::map<std::string, std::string> map;

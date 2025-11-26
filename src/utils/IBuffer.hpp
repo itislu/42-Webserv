@@ -23,6 +23,7 @@ public:
   typedef ft::expected<char, BufferException> ExpectChr;
   typedef ft::expected<std::string, BufferException> ExpectStr;
   typedef ft::expected<RawBytes, BufferException> ExpectRaw;
+  typedef ft::expected<std::size_t, BufferException> ExpectPos;
 
   IBuffer() {}
   virtual ~IBuffer() {}
@@ -41,11 +42,13 @@ public:
   virtual std::string getStr(std::size_t start, std::size_t end) = 0;
   virtual RawBytes getRawBytes(std::size_t start, std::size_t end) = 0;
   virtual void replace(RawBytes& rawData) = 0;
+  virtual void moveBufferToFile(const std::string& filepath) = 0;
 
   // Non-throwing versions
   virtual ExpectChr get(std::nothrow_t /*unused*/) = 0;
   virtual ExpectChr peek(std::nothrow_t /*unused*/) = 0;
   virtual ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/) = 0;
+  virtual ExpectPos pos(std::nothrow_t /*unused*/) = 0;
   virtual ExpectVoid append(const std::string& data,
                             std::nothrow_t /*unused*/) = 0;
   virtual ExpectVoid append(const RawBytes& buffer,
@@ -65,6 +68,8 @@ public:
                                 std::size_t end,
                                 std::nothrow_t /*unused*/) = 0;
   virtual ExpectVoid replace(RawBytes& rawData, std::nothrow_t /*unused*/) = 0;
+  virtual ExpectVoid moveBufferToFile(const std::string& filepath,
+                                      std::nothrow_t /*unused*/) = 0;
 
   virtual bool isEmpty() const = 0;
   virtual std::size_t size() const = 0;

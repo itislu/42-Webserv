@@ -14,9 +14,9 @@
 /**
  * field-line CRLF
  */
-ft::unique_ptr<SequenceRule> fieldLinePartRule()
+ft::shared_ptr<SequenceRule> fieldLinePartRule()
 {
-  ft::unique_ptr<SequenceRule> seq = ft::make_unique<SequenceRule>();
+  ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
   seq->addRule(fieldLineRule());
   seq->addRule(endOfLineRule());
 

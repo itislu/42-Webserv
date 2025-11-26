@@ -35,7 +35,12 @@ enum HttpRuleId
   HierPartPathEmpty,
 
   // HeaderLineIds
-  FieldLinePart
+  FieldLinePart,
+
+  // Body
+  ChunkInfo,
+  ChunkSize,
+  ChunkExt
 };
 
 std::string ruleIdtoString(HttpRuleId rid);

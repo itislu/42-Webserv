@@ -14,6 +14,7 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <cstddef>
 #include <ctype.h>
 #include <string>
 
@@ -65,10 +66,9 @@ void ParseVersion::run()
 
 void ParseVersion::_extractVersion()
 {
-  const long index = _buffReader.getPosInBuff();
-  std::string input = _client->getInBuff().consumeFront(index);
-  ft::trim(input);
-  _client->getRequest().setVersion(input);
+  const std::size_t index = _buffReader.getPosInBuff();
+  std::string version = _client->getInBuff().consumeFront(index);
+  _client->getRequest().setVersion(ft::trim(version));
 }
 
 /* ************************************************************************** */
