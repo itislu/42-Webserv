@@ -20,8 +20,6 @@ ValidateDelete::ValidateDelete(ValidateRequest* context)
   : IState<ValidateRequest>(context)
   , _client(context->getContext())
   , _path(context->getPath())
-  , _server(context->getServer())     // TODO: not used atm
-  , _location(context->getLocation()) // TODO: not used atm
 {
   _log.info() << "Validate DELETE\n";
 }

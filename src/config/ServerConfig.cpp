@@ -158,7 +158,7 @@ const LocationConfig* ServerConfig::getBestMatchLocation(
   for (std::vector<LocationConfig>::const_iterator it = locations.begin();
        it != locations.end();
        ++it) {
-    if (uri.rfind(it->getPath(), 0) == 0) {
+    if (ft::starts_with(uri, it->getPath())) {
       if (it->getPath().length() > bestMatchLen) {
         bestMatch = &*it;
         bestMatchLen = it->getPath().length();

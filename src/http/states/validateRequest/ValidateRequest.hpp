@@ -44,9 +44,9 @@ private:
   static bool validateMethod(const std::set<std::string>& allowedMethods,
                              Request::Method method);
 
-  static std::string decodePath(std::string& path);
+  static std::string decodePath(const std::string& path);
   static bool validateChars(const std::string& path);
-  static std::string normalizePath(std::string& path);
+  static std::string normalizePath(const std::string& path);
 
   void endState(StatusCode::Code status);
 

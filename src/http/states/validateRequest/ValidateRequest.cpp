@@ -192,26 +192,27 @@ void ValidateRequest::_initRequestPath()
 
   // 4. Combine with root
   if (_location != FT_NULLPTR) {
-    _path = removePrefix(_path, _location->getPath());
+    _path = removePrefix(decoded, _location->getPath());
     _log.info() << "remove Prefix - path: " << _path << "\n";
     _path = appendToRoot(_path, _location->getRoot());
   } else {
-    _path = appendToRoot(_path, _server->getRoot());
+    _path = appendToRoot(decoded, _server->getRoot());
   }
   _log.info() << "appendToRoot - path: " << _path << "\n";
   _client->getResource().setPath(_path);
   _log.info() << "_path: " << _path << "\n";
 }
 
-std::string ValidateRequest::decodePath(std::string& path)
+std::string ValidateRequest::decodePath(const std::string& path)
 {
   std::string decoded;
   decoded.reserve(path.size());
+  const int hexMult = 16;
 
   for (std::size_t i = 0; i < path.size(); ++i) {
     if (path[i] == '%') {
       // decode hex
-      if (path.size() < i + 2) {
+      if (path.size() <= i + 2) {
         return ""; // error
       }
       const int hex1 = config::convert::hexToInt(path[i + 1]);
@@ -219,6 +220,9 @@ std::string ValidateRequest::decodePath(std::string& path)
       if (hex1 < 0 || hex2 < 0) {
         return ""; // error
       }
+      const char decode = static_cast<char>((hex1 * hexMult) + hex2);
+      decoded += decode;
+      i += 2;
     } else {
       decoded += path[i];
     }
@@ -228,7 +232,7 @@ std::string ValidateRequest::decodePath(std::string& path)
 
 bool ValidateRequest::validateChars(const std::string& path)
 {
-  for (size_t i = 0; i < path.size(); ++i) {
+  for (std::size_t i = 0; i < path.size(); ++i) {
     const unsigned char chr = path[i];
     if (chr < ' ') {
       return false;
@@ -237,7 +241,7 @@ bool ValidateRequest::validateChars(const std::string& path)
   return true;
 }
 
-std::string ValidateRequest::normalizePath(std::string& path)
+std::string ValidateRequest::normalizePath(const std::string& path)
 {
   std::vector<std::string> segments;
   std::string token;
