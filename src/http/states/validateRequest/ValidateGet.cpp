@@ -73,10 +73,10 @@ void ValidateGet::validateFile()
 
 void ValidateGet::validateDirectory()
 {
-  if (_location != FT_NULLPTR && _location->isCgi()) {
-    endState(StatusCode::Forbidden);
-    return;
-  }
+  // if (_location != FT_NULLPTR && _location->isCgi()) {
+  //   endState(StatusCode::Forbidden);
+  //   return;
+  // }
 
   if (!config::fileutils::isExecuteable(_path) ||
       !config::fileutils::isReadable(_path)) {
