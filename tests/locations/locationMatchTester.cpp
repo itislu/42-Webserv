@@ -6,8 +6,8 @@
 #include <string>
 
 using config::Config;
-using config::LocationConfig;
 using config::ServerConfig;
+using config::LocationConfig;
 
 TEST(LocationMatchTest, SimplePrefixMatch)
 {
