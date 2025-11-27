@@ -1,4 +1,5 @@
 #include "Resource.hpp"
+#include "config/LocationConfig.hpp"
 #include <sstream>
 #include <string>
 
@@ -17,9 +18,29 @@ Resource::Type Resource::getType() const
   return _type;
 }
 
+const config::LocationConfig* Resource::getLocation()
+{
+  return _location;
+}
+
+const config::ServerConfig* Resource::getServer()
+{
+  return _server;
+}
+
 void Resource::setType(Type type)
 {
   _type = type;
+}
+
+void Resource::setLocation(const config::LocationConfig* location)
+{
+  _location = location;
+}
+
+void Resource::setServer(const config::ServerConfig* server)
+{
+  _server = server;
 }
 
 std::string Resource::_typeToString()
