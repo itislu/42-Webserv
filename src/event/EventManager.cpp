@@ -1,22 +1,25 @@
 #include "EventManager.hpp"
-#include "client/Client.hpp"
-#include "client/ClientManager.hpp"
-#include "client/TimeStamp.hpp"
-#include "config/Config.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/SocketManager.hpp"
-#include "utils/logger/Logger.hpp"
-#include "utils/state/StateHandler.hpp"
+
+#include <client/Client.hpp>
+#include <client/ClientManager.hpp>
+#include <client/TimeStamp.hpp>
+#include <config/Config.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <server/ServerManager.hpp>
+#include <socket/SocketManager.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/StateHandler.hpp>
+
 #include <cstddef>
 #include <exception>
 #include <iostream>
 #include <sys/poll.h>
 #include <vector>
 
-/* ************************************************************************** */
+/* **************************************************************************
+ */
 // INIT
 
 Logger& EventManager::_log = Logger::getInstance(LOG_SERVER);
@@ -56,6 +59,17 @@ bool EventManager::receiveFromClient(Client& client)
   return alive;
 }
 
+void EventManager::clientStateMachine(Client& client)
+{
+  StateHandler<Client>& handler = client.getStateHandler();
+
+  handler.setStateHasChanged(true);
+  while (!handler.isDone() && handler.stateHasChanged()) {
+    handler.setStateHasChanged(false);
+    handler.getState()->run();
+  }
+}
+
 bool EventManager::handleClient(Client* client, unsigned events)
 {
   if (client == FT_NULLPTR) {
@@ -66,7 +80,7 @@ bool EventManager::handleClient(Client* client, unsigned events)
     alive = receiveFromClient(*client);
   }
   if (alive) {
-    checkClientState(*client);
+    clientStateMachine(*client);
   }
   if (alive && client->hasDataToSend()) {
     _socketsManager->enablePollout(client->getFd());
@@ -79,16 +93,6 @@ bool EventManager::handleClient(Client* client, unsigned events)
     return false; // disconnect client
   }
   return alive;
-}
-
-void EventManager::checkClientState(Client& client)
-{
-  StateHandler<Client>& stateHandler = client.getStateHandler();
-  stateHandler.setStateHasChanged(true);
-  while (!stateHandler.isDone() && stateHandler.stateHasChanged()) {
-    stateHandler.setStateHasChanged(false);
-    stateHandler.getState()->run();
-  }
 }
 
 void EventManager::disconnectClient(Client* client)

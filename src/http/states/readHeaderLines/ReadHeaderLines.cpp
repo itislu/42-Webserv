@@ -9,6 +9,7 @@
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readBody/ReadBody.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
@@ -22,7 +23,8 @@
 #include <cstddef>
 #include <string>
 
-/* ************************************************************************** */
+/* **************************************************************************
+ */
 // INIT
 
 Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);
@@ -124,7 +126,7 @@ void ReadHeaderLines::_setNextState()
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
 
   if (statusCode == StatusCode::Ok) {
-    getContext()->getStateHandler().setState<ReadBody>();
+    getContext()->getStateHandler().setState<ValidateRequest>();
   } else {
     getContext()->getStateHandler().setState<PrepareResponse>();
   }

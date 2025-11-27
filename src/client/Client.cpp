@@ -2,6 +2,7 @@
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
 #include "http/Request.hpp"
+#include "http/Resource.hpp"
 #include "http/Response.hpp"
 #include "http/states/readRequestLine/ReadRequestLine.hpp"
 #include "libftpp/utility.hpp"
@@ -59,6 +60,11 @@ int Client::getFd() const
   return _fd.get();
 }
 
+bool Client::hasServer() const
+{
+  return (_server != FT_NULLPTR);
+}
+
 const std::string& Client::getHost() const
 {
   return _host;
@@ -89,6 +95,11 @@ Response& Client::getResponse()
   return _response;
 }
 
+Resource& Client::getResource()
+{
+  return _resource;
+}
+
 long Client::getTimeout() const
 {
   if (_server != FT_NULLPTR) {
@@ -112,6 +123,7 @@ bool Client::receive()
   static IBuffer::RawBytes buffer(_maxChunk);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
+    /* TODO: remove this! */
     std::cout << "Client " << getFd() << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     std::cout.write(reinterpret_cast<const char*>(buffer.data()),

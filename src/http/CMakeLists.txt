@@ -22,8 +22,11 @@ add_library(${LIB_NAME} STATIC
   states/readRequestLine/ParseUri.cpp
   states/readRequestLine/ParseVersion.cpp
   states/readRequestLine/ReadRequestLine.cpp
-  states/readRequestLine/ValidateRequest.cpp
   states/readHeaderLines/ReadHeaderLines.cpp
+  states/validateRequest/ValidateDelete.cpp
+  states/validateRequest/ValidateGet.cpp
+  states/validateRequest/ValidatePost.cpp
+  states/validateRequest/ValidateRequest.cpp
   states/writeBody/WriteBody.cpp
   states/writeHeaderLines/WriteHeaderLines.cpp
   states/writeStatusLine/WriteStatusLine.cpp
@@ -32,6 +35,7 @@ add_library(${LIB_NAME} STATIC
   http.cpp
   Request.cpp
   Response.cpp
+  Resource.cpp
   StatusCode.cpp
   Uri.cpp
 )

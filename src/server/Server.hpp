@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 
-// maybe just store a pointer to the ServerConfig here?
 class Server
 {
 public:
+  explicit Server(const config::ServerConfig& servConfig);
   Server(const config::ServerConfig& servConfig,
          const std::vector<const Socket*>& listeners);
 

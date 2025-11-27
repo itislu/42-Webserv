@@ -17,7 +17,9 @@ public:
     Created = 201,
     BadRequest = 400,
     Unauthorized = 401,
+    Forbidden = 403,
     NotFound = 404,
+    MethodNotAllowed = 405,
     NotAcceptable = 406,
     RequestTimeout = 408,
     LengthRequired = 411,
@@ -42,7 +44,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 13;
+  static const int _codes = 15;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;

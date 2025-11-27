@@ -1,10 +1,10 @@
 #ifndef EVENTMANAGER_HPP
 #define EVENTMANAGER_HPP
 
-#include "client/Client.hpp"
-#include "client/ClientManager.hpp"
-#include "socket/SocketManager.hpp"
-#include "utils/logger/Logger.hpp"
+#include <client/Client.hpp>
+#include <client/ClientManager.hpp>
+#include <socket/SocketManager.hpp>
+#include <utils/logger/Logger.hpp>
 
 class ServerManager;
 
@@ -26,7 +26,7 @@ private:
   bool receiveFromClient(Client& client);
   void disconnectClient(Client* client);
   void acceptClient(int fdes, unsigned events);
-  static void checkClientState(Client& client);
+  static void clientStateMachine(Client& client);
 
   /* TIMEOUT */
   int calculateTimeout() const;

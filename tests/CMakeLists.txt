@@ -120,3 +120,9 @@ add_my_test(requestTester
 add_my_test(configParserTester
   ${CMAKE_CURRENT_SOURCE_DIR}/config/configParserTester.cpp
 )
+
+# locations
+
+add_my_test(locationMatchTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/locations/locationMatchTester.cpp
+)
