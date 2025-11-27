@@ -1,5 +1,6 @@
 #include "Resource.hpp"
 #include "config/LocationConfig.hpp"
+#include "libftpp/utility.hpp"
 #include <sstream>
 #include <string>
 
@@ -55,6 +56,7 @@ std::string Resource::_typeToString()
     case Error:
       return "Error";
   }
+  FT_UNREACHABLE();
 }
 
 std::string Resource::toString()
