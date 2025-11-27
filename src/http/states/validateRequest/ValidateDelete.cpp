@@ -63,6 +63,7 @@ void ValidateDelete::validateParentDirPermissions()
     endState(StatusCode::Forbidden);
     return;
   }
+  endState(StatusCode::Ok);
 }
 
 void ValidateDelete::endState(StatusCode::Code status)

@@ -88,6 +88,7 @@ void ValidatePost::validateParentDirPermissions()
     endState(StatusCode::Forbidden);
     return;
   }
+  endState(StatusCode::Ok);
 }
 void ValidatePost::endState(StatusCode::Code status)
 {

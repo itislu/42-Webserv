@@ -164,7 +164,7 @@ void ValidateRequest::_initState(const Request::Method& method)
       break;
     case Request::UNDEFINED:
       getContext()->getStateHandler().setState<PrepareResponse>();
-      getContext()->getStateHandler().setDone();
+      _stateHandler.setDone();
       break;
   }
 }
