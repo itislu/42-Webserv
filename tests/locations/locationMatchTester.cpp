@@ -1,10 +1,8 @@
 #include "config/Config.hpp"
 #include "config/LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
-#include "libftpp/utility.hpp"
 #include <cstddef>
 #include <gtest/gtest.h>
-#include <stdexcept>
 #include <string>
 
 using config::Config;
@@ -143,17 +141,17 @@ TEST(LocationMatchTest, DeepNestedMatch)
 
   ServerConfig server(config);
 
-  LocationConfig a(server);
-  a.setPath("/a");
-  server.addLocation(a);
-  LocationConfig ab(server);
-  ab.setPath("/a/b");
-  server.addLocation(ab);
+  LocationConfig locA(server);
+  locA.setPath("/a");
+  server.addLocation(locA);
+  LocationConfig locAB(server);
+  locAB.setPath("/a/b");
+  server.addLocation(locAB);
   LocationConfig abc(server);
   abc.setPath("/a/b/c");
   server.addLocation(abc);
 
-  const LocationConfig* loc = server.getBestMatchLocation("/a/b/c/d/e");
+  const LocationConfig* const loc = server.getBestMatchLocation("/a/b/c/d/e");
   ASSERT_TRUE(loc != NULL);
   EXPECT_EQ(loc->getPath(), "/a/b/c");
 }
@@ -171,7 +169,7 @@ TEST(LocationMatchTest, SameLengthPrefixChoosing)
   loc2.setPath("/abd");
   server.addLocation(loc2);
 
-  const LocationConfig* loc = server.getBestMatchLocation("/abd/test");
+  const LocationConfig* const loc = server.getBestMatchLocation("/abd/test");
   ASSERT_TRUE(loc != NULL);
   EXPECT_EQ(loc->getPath(), "/abd");
 }

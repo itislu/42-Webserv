@@ -91,9 +91,11 @@ void ValidateRequest::_init()
   if (!_client->hasServer()) {
     _initServer();
   }
+
   _path = _client->getRequest().getUri().getPath();
-  _client->getResource().setType(Resource::File);
   _initConfigs();
+  _initResource();
+
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
@@ -139,6 +141,13 @@ void ValidateRequest::_initConfigs()
 {
   _server = &_client->getServer()->getConfig();
   _location = _server->getBestMatchLocation(_path);
+}
+
+void ValidateRequest::_initResource()
+{
+  _client->getResource().setType(Resource::File);
+  _client->getResource().setServer(_server);
+  _client->getResource().setLocation(_location);
 }
 
 void ValidateRequest::_initState(const Request::Method& method)

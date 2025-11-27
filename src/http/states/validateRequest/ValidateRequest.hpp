@@ -1,5 +1,4 @@
 #pragma once
-#include <set>
 #ifndef VALIDATE_REQUEST_HPP
 #define VALIDATE_REQUEST_HPP
 
@@ -7,6 +6,7 @@
 #include "http/Request.hpp"
 #include "http/StatusCode.hpp"
 #include "utils/state/StateHandler.hpp"
+#include <set>
 #include <string>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -33,6 +33,7 @@ public:
 
 private:
   void _init();
+  void _initResource();
   void _initServer();
   void _initConfigs();
   void _initState(const Request::Method& method);

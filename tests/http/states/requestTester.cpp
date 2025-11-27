@@ -1,3 +1,6 @@
+#include "config/Config.hpp"
+#include "config/ServerConfig.hpp"
+#include "server/Server.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
@@ -8,6 +11,7 @@
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <string>
+#include <vector>
 
 // NOLINTBEGIN
 
@@ -38,7 +42,11 @@ ft::unique_ptr<Client> requestTestCharByChar(std::string& rawBuffer)
  */
 ft::unique_ptr<Client> requestTest(std::string& rawBuffer)
 {
+  const config::Config config;
+  config::ServerConfig serverConfig(config);
+  const Server server(serverConfig);
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  client->setServer(&server);
   client->getStateHandler().setState<ReadRequestLine>();
   client->getInBuff().append(rawBuffer);
 

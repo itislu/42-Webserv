@@ -5,7 +5,6 @@
 #include <http/Request.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <libftpp/algorithm.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
