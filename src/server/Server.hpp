@@ -10,6 +10,7 @@
 class Server
 {
 public:
+  explicit Server(const config::ServerConfig& servConfig);
   Server(const config::ServerConfig& servConfig,
          const std::vector<const Socket*>& listeners);
 
