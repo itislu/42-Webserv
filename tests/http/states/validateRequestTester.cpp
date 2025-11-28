@@ -184,6 +184,17 @@ TEST(ValidateRequestTester, NormalizePath01)
   EXPECT_EQ(client->getResource().getPath(), "server_root/");
 }
 
+TEST(ValidateRequestTester, NormalizePathMidContent)
+{
+  Config config;
+  ServerConfig server(config);
+
+  ft::unique_ptr<Client> client =
+    requestValidate(Request::GET, "/mid/content=5/../6", server);
+
+  EXPECT_EQ(client->getResource().getPath(), "/mid/6");
+}
+
 // ============================================================================
 // Valid Tests
 // ============================================================================
