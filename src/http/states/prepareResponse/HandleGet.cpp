@@ -2,13 +2,12 @@
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
-#include <http/Request.hpp>
+#include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
 #include <http/http.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <libftpp/algorithm.hpp>
 #include <libftpp/optional.hpp>
 #include <libftpp/string.hpp>
 #include <utils/fileUtils.hpp>
@@ -33,16 +32,21 @@ HandleGet::HandleGet(PrepareResponse* context)
   , _client(_prepareResponse->getContext())
 {
   _log.info() << "HandleGet\n";
+  _log.info() << "HandleGet: " << _client->getResource().getPath() << "\n";
 }
 
 void HandleGet::run()
 {
-  _addContentLengthHeader();
-  if (!_fail()) {
-    _addContentType();
-  }
-  if (!_fail()) {
-    _openFile();
+  if (_client->getResource().getType() == Resource::Autoindex) {
+
+  } else {
+    _addContentLengthHeader();
+    if (!_fail()) {
+      _addContentType();
+    }
+    if (!_fail()) {
+      _openFile();
+    }
   }
   _setNextState();
 }
@@ -60,25 +64,9 @@ void HandleGet::_setNextState()
   }
 }
 
-std::string HandleGet::_getResource()
-{
-  // todo get actual resource
-  const std::string& path = _client->getRequest().getUri().getPath();
-  if (ft::contains_subrange(path, std::string("get"))) {
-    return "./assets/testWebsite/get.html";
-  }
-  if (ft::contains_subrange(path, std::string("post"))) {
-    return "./assets/testWebsite/post.html";
-  }
-  if (ft::contains_subrange(path, std::string("delete"))) {
-    return "./assets/testWebsite/delete.html";
-  }
-  return "./assets/testWebsite/index.html";
-}
-
 void HandleGet::_addContentLengthHeader()
 {
-  const std::string filePath = _getResource();
+  const std::string& filePath = _client->getResource().getPath();
   const ft::optional<std::size_t> optSize = getFileSize(filePath);
   if (!optSize.has_value()) {
     _client->getResponse().setStatusCode(StatusCode::InternalServerError);
@@ -93,7 +81,7 @@ void HandleGet::_addContentLengthHeader()
 
 void HandleGet::_addContentType()
 {
-  const std::string filePath = _getResource();
+  const std::string& filePath = _client->getResource().getPath();
   const std::string fileExt = getFileExtension(filePath);
   const http::ExtToTypeMap& extToType = http::getExtToType();
   const http::ExtToTypeMap::const_iterator type = extToType.find(fileExt);
@@ -108,7 +96,7 @@ void HandleGet::_addContentType()
 
 void HandleGet::_openFile()
 {
-  const std::string filepath = _getResource();
+  const std::string& filepath = _client->getResource().getPath();
   std::ifstream& body = _client->getResponse().getBody();
   body.open(filepath.c_str());
   if (!body.is_open()) {

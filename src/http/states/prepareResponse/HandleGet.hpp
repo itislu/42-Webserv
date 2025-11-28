@@ -4,8 +4,6 @@
 
 #include "utils/state/IState.hpp"
 
-#include <string>
-
 class Logger;
 class Client;
 class PrepareResponse;
@@ -20,7 +18,6 @@ public:
 
 private:
   void _setNextState();
-  std::string _getResource();
   void _addContentLengthHeader();
   void _addContentType();
   void _openFile();

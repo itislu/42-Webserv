@@ -67,8 +67,13 @@ std::string HandlePost::_getFileName(const std::string& directory)
 
 void HandlePost::_createData()
 {
-  // todo get path from resource
-  const std::string directory = "./assets/testWebsite/upload/";
+  std::string directory = _client->getResource().getPath();
+
+  // todo this should be done in validate request ?
+  if (directory.at(directory.size() - 1) != '/') {
+    directory.append("/");
+  }
+  _log.info() << "HandlePost: " << directory << '\n';
 
   const std::string newFilePath = _getFileName(directory);
   _client->getRequest().getBody().moveBufferToFile(newFilePath);
