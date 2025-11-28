@@ -104,13 +104,16 @@ void ValidateRequest::_init()
                             : _server->getAllowedMethods();
   const Request::Method method = _client->getRequest().getMethod();
   _log.info() << _client->getRequest().getMethod() << "\n";
-  if (validateMethod(allowedMethods, method)) {
-    _log.info() << "method is VALID\n";
-    _initRequestPath();
-    _initState(method);
-  } else {
+
+  if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
+  }
+  _log.info() << "method is VALID\n";
+
+  _initRequestPath();
+  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+    _initState(method);
   }
 }
 
