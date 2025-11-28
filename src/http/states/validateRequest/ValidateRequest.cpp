@@ -104,7 +104,9 @@ void ValidateRequest::_init()
   if (validateMethod(allowedMethods, method)) {
     _log.info() << "method is VALID\n";
     _initRequestPath();
-    _initState(method);
+    if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+      _initState(method);
+    }
   } else {
     _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
@@ -175,20 +177,21 @@ void ValidateRequest::_initRequestPath()
   // 1. Decode URI
   std::string decoded = decodePath(_path);
   if (decoded.empty() && !_path.empty()) {
+    _log.info() << "Error after decoding: [" << decoded << "]\n";
     endState(StatusCode::BadRequest);
     return;
   }
-  _log.info() << "decode uri - path: " << _path << "\n";
+  _log.info() << "decode uri - path: " << decoded << "\n";
   // 2. check for illegal characters (NULL, control chars)
   if (!validateChars(decoded)) {
     endState(StatusCode::BadRequest);
     return;
   }
-  _log.info() << "validate chars - path: " << _path << "\n";
+  _log.info() << "validate chars - path: " << decoded << "\n";
 
   // 3. Normalize Path (collapse . / .. / //)
   decoded = normalizePath(decoded);
-  _log.info() << "normalizePath - path: " << _path << "\n";
+  _log.info() << "normalizePath - path: " << decoded << "\n";
 
   // 4. Combine with root
   if (_location != FT_NULLPTR) {

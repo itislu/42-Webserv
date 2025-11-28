@@ -3,6 +3,7 @@
 #include "config/LocationConfig.hpp"
 #include "config/ServerConfig.hpp"
 #include "http/Request.hpp"
+#include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
 #include "http/Uri.hpp"
 #include "http/states/validateRequest/ValidateRequest.hpp"
@@ -20,7 +21,7 @@ using config::ServerConfig;
 
 ft::unique_ptr<Client> requestValidate(Request::Method method,
                                        const std::string& uriPath,
-                                       config::ServerConfig& serverConfig)
+                                       ServerConfig& serverConfig)
 {
   Uri uri;
   const Server server(serverConfig);
@@ -42,30 +43,131 @@ ft::unique_ptr<Client> requestValidate(Request::Method method,
   return ft::move(client);
 }
 
-TEST(ValidateRequestTester, RootAppend)
+ServerConfig createServConf()
 {
   config::Config config;
-  config::ServerConfig serverConfig(config);
-  serverConfig.setRoot("test/");
+  config::ServerConfig server(config);
+  server.setRoot(ASSETS_PATH);
+
+  return server;
+}
+
+TEST(ValidateRequestTester, RootAppend)
+{
+  ServerConfig conf = createServConf();
 
   ft::unique_ptr<Client> client =
-    requestValidate(Request::GET, "/foo/bar", serverConfig);
+    requestValidate(Request::GET, "/foo/bar", conf);
 
-  EXPECT_EQ(client->getResource().getPath(), "test/foo/bar");
+  std::string result = std::string(ASSETS_PATH) + "foo/bar";
+  EXPECT_EQ(client->getResource().getPath(), result);
 }
+
+// ============================================================================
+// Method Tests
+// ============================================================================
 
 TEST(ValidateRequestTester, MethodNotAllowed)
 {
-  config::Config config;
-  config::ServerConfig serverConfig(config);
-  serverConfig.setRoot("test/");
-  serverConfig.clearAllowedMethods();
-  serverConfig.addAllowedMethod("POST");
+  ServerConfig conf = createServConf();
+  conf.clearAllowedMethods();
+  conf.addAllowedMethod("POST");
 
   ft::unique_ptr<Client> client =
-    requestValidate(Request::GET, "/foo/bar", serverConfig);
+    requestValidate(Request::GET, "/foo/bar", conf);
 
-  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::MethodNotAllowed);
+  EXPECT_EQ(client->getResponse().getStatusCode(),
+            StatusCode::MethodNotAllowed);
+  EXPECT_EQ(client->getResource().getType(), Resource::Error);
+}
+
+// ============================================================================
+// Decode Tests
+// ============================================================================
+
+TEST(ValidateRequestTester, DecodePercentSpace)
+{
+  ServerConfig conf = createServConf();
+
+  ft::unique_ptr<Client> client =
+    requestValidate(Request::GET, "/hello%20world/test", conf);
+
+  const std::string& path = client->getResource().getPath();
+  std::string result = std::string(ASSETS_PATH) + "hello world/test";
+
+  EXPECT_EQ(path, result);
+  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::NotFound);
+}
+
+TEST(ValidateRequestTester, DecodeEmpty)
+{
+  ServerConfig conf = createServConf();
+
+  ft::unique_ptr<Client> client = requestValidate(Request::GET, "/te%", conf);
+
+  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
+  EXPECT_EQ(client->getResource().getType(), Resource::Error);
+}
+
+TEST(ValidateRequestTester, DecodeInvalid)
+{
+  ServerConfig conf = createServConf();
+
+  ft::unique_ptr<Client> client =
+    requestValidate(Request::GET, "/te%GGst", conf);
+
+  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
+  EXPECT_EQ(client->getResource().getType(), Resource::Error);
+}
+
+TEST(ValidateRequestTester, DecodeInvalidNull)
+{
+  ServerConfig conf = createServConf();
+
+  ft::unique_ptr<Client> client =
+    requestValidate(Request::GET, "/te%00st", conf);
+
+  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
+  EXPECT_EQ(client->getResource().getType(), Resource::Error);
+}
+
+TEST(ValidateRequestTester, DecodeInvalidOnlyOneHex)
+{
+  ServerConfig conf = createServConf();
+
+  ft::unique_ptr<Client> client = requestValidate(Request::GET, "/te%4", conf);
+
+  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
+  EXPECT_EQ(client->getResource().getType(), Resource::Error);
+}
+
+// ============================================================================
+// Normalize Path Tests
+// ============================================================================
+
+TEST(ValidateRequestTester, NormalizePath)
+{
+  Config config;
+  ServerConfig server(config);
+
+  ft::unique_ptr<Client> client =
+    requestValidate(Request::GET, "/a/b/c/./../../g", server);
+
+  EXPECT_EQ(client->getResource().getPath(), "/a/g");
+}
+
+// ============================================================================
+// Valid Tests
+// ============================================================================
+
+TEST(ValidateRequestTester, ValidFile)
+{
+  ServerConfig conf = createServConf();
+  std::string file = "valid/minimal.conf";
+
+  ft::unique_ptr<Client> client = requestValidate(Request::GET, file, conf);
+
+  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::Ok);
 }
 
 // NOLINTEND
