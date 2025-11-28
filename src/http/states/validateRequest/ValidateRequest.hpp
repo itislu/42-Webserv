@@ -5,6 +5,7 @@
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
 #include "http/StatusCode.hpp"
+#include "libftpp/optional.hpp"
 #include "utils/state/StateHandler.hpp"
 #include <set>
 #include <string>
@@ -44,9 +45,11 @@ private:
   static bool validateMethod(const std::set<std::string>& allowedMethods,
                              Request::Method method);
 
-  static std::string decodePath(const std::string& path);
+  static std::string decodePath(const std::string& path,
+                                int (*wantDecode)(int));
   static bool validateChars(const std::string& path);
-  static std::string normalizePath(const std::string& path);
+  static ft::optional<std::string> normalizePath(const std::string& path,
+                                                 bool isStrict);
 
   void endState(StatusCode::Code status);
 
