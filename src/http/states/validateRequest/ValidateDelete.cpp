@@ -51,10 +51,6 @@ void ValidateDelete::validateParentDirPermissions()
   if (dirPath.empty()) {
     dirPath = "/";
   }
-  if (!config::fileutils::isDirectory(dirPath)) {
-    endState(StatusCode::NotFound);
-    return;
-  }
   if (!config::fileutils::isExecuteable(dirPath)) {
     endState(StatusCode::NotFound);
     return;
