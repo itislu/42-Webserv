@@ -197,7 +197,7 @@ void ValidateRequest::_initRequestPath()
   _log.info() << "decode unreserved - path: " << decoded << "\n";
 
   // 2. Normalize path (collapse . | .. | //).
-  decoded = normalizePath(decoded, false).value();
+  decoded = normalizePath(decoded, CapAtRoot).value();
   _log.info() << "normalizePath - path: " << decoded << "\n";
 
   // 3. Decode all other characters.
@@ -211,7 +211,8 @@ void ValidateRequest::_initRequestPath()
   }
 
   // 5. Normalize again, but disallow going out of root.
-  const ft::optional<std::string> result = normalizePath(decoded, true);
+  const ft::optional<std::string> result =
+    normalizePath(decoded, FailAboveRoot);
   if (!result.has_value()) {
     endState(StatusCode::BadRequest);
     return;
@@ -268,7 +269,7 @@ bool ValidateRequest::validateChars(const std::string& path)
 
 ft::optional<std::string> ValidateRequest::normalizePath(
   const std::string& path,
-  bool isStrict)
+  NormalizationMode mode)
 {
   std::vector<std::string> segments;
   std::string token;
@@ -281,7 +282,7 @@ ft::optional<std::string> ValidateRequest::normalizePath(
     if (token == "..") {
       if (!segments.empty()) {
         segments.pop_back();
-      } else if (isStrict) {
+      } else if (mode == FailAboveRoot) {
         return ft::nullopt;
       }
     } else {
