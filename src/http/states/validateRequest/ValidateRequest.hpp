@@ -39,6 +39,11 @@ private:
   void _initState(const Request::Method& method);
   void _initRequestPath();
 
+  static void _splitHostHeader(const std::string& hostHeader,
+                        std::string& host,
+                        int& port);
+  void _setServerByHost(const std::string& hostHeader);
+
   static std::string removePrefix(const std::string& uriPath,
                                   const std::string& locPath);
   static bool validateMethod(const std::set<std::string>& allowedMethods,

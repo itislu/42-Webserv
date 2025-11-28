@@ -125,16 +125,59 @@ bool ValidateRequest::validateMethod(
   return false;
 }
 
+/*
+  TODO:
+  - check Request - headers - and find hostname
+  - get host from Request
+  - host should be in Uri -> authority -> getHost() - if empty
+  - look up servers from client socket and find matching servername -> host
+  - if no exact match, use default server for that socket
+  - set server in client
+*/
 void ValidateRequest::_initServer()
 {
-  /*
-    TODO:
-    - get host from Request
-    - host should be in Uri -> authority -> getHost()
-    - look up servers from client socket and find matching servername -> host
-    - if no exact match, use default server for that socket
-    - set server in client
-  */
+  std::string hostHeader = _client->getRequest().getHeaders().at("host");
+  _log.info() << "Host Header: [" << hostHeader << "]\n";
+
+  if (hostHeader.empty()) {
+    hostHeader = _client->getRequest().getUri().getAuthority().getHost();
+    _log.info() << "Uri Host: [" << hostHeader << "]\n"; // empty in 1.1
+  }
+  if (hostHeader.empty()) {
+    // TODO: set default sever
+  } else {
+    _setServerByHost(hostHeader);
+  }
+
+  /* TODO: remove this */
+  exit(EXIT_SUCCESS);
+}
+
+void ValidateRequest::_setServerByHost(const std::string& hostHeader)
+{
+  std::string host;
+  int port = 0;
+  _splitHostHeader(hostHeader, host, port);
+  _log.info() << "Split: \n";
+  _log.info() << "  Host: " << host << "\n";
+  _log.info() << "  Port: " << port << "\n";
+}
+
+void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
+                                       std::string& host,
+                                       int& port)
+{
+  const std::size_t pos = hostHeader.find(':');
+  if (pos != std::string::npos) {
+
+    host = hostHeader.substr(0, pos);
+    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
+    if (!portStr.empty()) {
+      port = config::convert::toPort(portStr);
+    }
+  } else {
+    host = hostHeader;
+  }
 }
 
 void ValidateRequest::_initConfigs()
