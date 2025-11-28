@@ -25,6 +25,7 @@ private:
   bool receiveFromClient(Client& client);
   void disconnectClient(Client* client);
   void acceptClient(int fdes, unsigned events);
+  static void clientStateMachine(Client& client);
 
   /* TIMEOUT */
   int calculateTimeout() const;

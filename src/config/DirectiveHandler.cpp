@@ -86,6 +86,8 @@ static void setAllowedImpl(const std::vector<std::string>& values,
     throw std::invalid_argument("allowed_methods: invalid number of arguments");
   }
 
+  config.clearAllowedMethods();
+
   for (std::size_t i = 0; i < values.size(); ++i) {
     if (!convert::isMethod(values[i])) {
       throw std::invalid_argument("allowed_methods: invalid method: " +

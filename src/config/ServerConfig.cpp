@@ -1,6 +1,7 @@
 #include "ServerConfig.hpp"
 #include "Config.hpp"
 #include "LocationConfig.hpp"
+#include "libftpp/utility.hpp"
 #include <cstddef>
 #include <libftpp/algorithm.hpp>
 #include <libftpp/string.hpp>
@@ -13,10 +14,14 @@
 namespace config {
 
 ServerConfig::ServerConfig(const Config& global)
-  : _errorPages(global.getErrorPages())
+  : _index("index.html")
+  , _errorPages(global.getErrorPages())
   , _maxBodySize(global.getMaxBodySize())
   , _timeOut(global.getTimeout())
 {
+  _allowedMethods.insert("GET");
+  _allowedMethods.insert("POST");
+  _allowedMethods.insert("DELETE");
 }
 
 // GETTERS
@@ -43,6 +48,17 @@ const std::string& ServerConfig::getIndex() const
 const std::map<int, std::string>& ServerConfig::getErrorPages() const
 {
   return _errorPages;
+}
+
+const std::string& ServerConfig::getErrorPage(int code) const
+{
+  const std::map<int, std::string>::const_iterator iter =
+    _errorPages.find(code);
+  if (iter != _errorPages.end()) {
+    return iter->second;
+  }
+  static const std::string empty;
+  return empty;
 }
 
 const std::set<std::string>& ServerConfig::getAllowedMethods() const
@@ -110,6 +126,11 @@ void ServerConfig::addAllowedMethod(const std::string& method)
   _allowedMethods.insert(method);
 }
 
+void ServerConfig::clearAllowedMethods()
+{
+  _allowedMethods.clear();
+}
+
 void ServerConfig::setTimeout(long time)
 {
   _timeOut = time;
@@ -127,11 +148,24 @@ void ServerConfig::checkPortDuplicate(int port)
   }
 }
 
-/* const LocationConfig& ServerConfig::getLocationForPath(const std::string&
-uri) const
+const LocationConfig* ServerConfig::getBestMatchLocation(
+  const std::string& uri) const
 {
+  std::size_t bestMatchLen = 0;
+  const LocationConfig* bestMatch = FT_NULLPTR;
 
+  const std::vector<LocationConfig>& locations = getLocations();
+  for (std::vector<LocationConfig>::const_iterator it = locations.begin();
+       it != locations.end();
+       ++it) {
+    if (ft::starts_with(uri, it->getPath())) {
+      if (it->getPath().length() > bestMatchLen) {
+        bestMatch = &*it;
+        bestMatchLen = it->getPath().length();
+      }
+    }
+  }
+  return bestMatch;
 }
- */
 
 } // namespace config
