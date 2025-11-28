@@ -99,6 +99,22 @@ TEST(ValidateRequestTester, DecodePercentSpace)
   EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::NotFound);
 }
 
+TEST(ValidateRequestTester, DecodeAlot)
+{
+  ServerConfig conf = createServConf();
+
+  ft::unique_ptr<Client> client = requestValidate(
+    Request::GET,
+    "%2F%74%65%73%74%74%68%65%64%65%63%6F%64%65%66%75%6E%63%74%69%6F%6E",
+    conf);
+
+  const std::string& path = client->getResource().getPath();
+  std::string result = std::string(ASSETS_PATH) + "testthedecodefunction";
+
+  EXPECT_EQ(path, result);
+  EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::NotFound);
+}
+
 TEST(ValidateRequestTester, DecodeEmpty)
 {
   ServerConfig conf = createServConf();
@@ -154,6 +170,18 @@ TEST(ValidateRequestTester, NormalizePath)
     requestValidate(Request::GET, "/a/b/c/./../../g", server);
 
   EXPECT_EQ(client->getResource().getPath(), "/a/g");
+}
+
+TEST(ValidateRequestTester, NormalizePath01)
+{
+  Config config;
+  ServerConfig server(config);
+  server.setRoot("server_root/");
+
+  ft::unique_ptr<Client> client =
+    requestValidate(Request::GET, "/a/../.././..//////..//", server);
+
+  EXPECT_EQ(client->getResource().getPath(), "server_root/");
 }
 
 // ============================================================================
