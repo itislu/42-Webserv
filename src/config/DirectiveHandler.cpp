@@ -67,7 +67,7 @@ static void setTimeoutImpl(const std::vector<std::string>& values,
   }
   long timeout = 0;
   try {
-    timeout = utils::toLong(values[0]);
+    timeout = utils::toNumber<long>(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
