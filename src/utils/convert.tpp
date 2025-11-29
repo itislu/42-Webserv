@@ -4,9 +4,10 @@
 #include "convert.hpp"
 #endif
 
-#include <libftpp/utility.hpp>
+#include <libftpp/expected.hpp>
+#include <libftpp/string.hpp>
 
-#include <sstream>
+#include <new>
 #include <stdexcept>
 #include <string>
 
@@ -15,16 +16,18 @@ namespace utils {
 template<typename To>
 To toNumber(const std::string& str)
 {
-  std::istringstream sstream(str);
-  To value = 0;
-  sstream >> value;
+  std::string::size_type validChars = 0;
+  const ft::expected<To, ft::from_string_exception> number =
+    ft::from_string<To>(str, std::nothrow, &validChars);
 
-  if (sstream.fail() || !sstream.eof()) {
-    throw std::invalid_argument("invalid " + ft::demangle(typeid(To)) + ": " +
-                                str);
+  if (!number.has_value()) {
+    throw std::invalid_argument("invalid number: " + str);
+  }
+  if (validChars != str.size()) {
+    throw std::invalid_argument("excess characters after number: " + str);
   }
 
-  return value;
+  return *number;
 }
 
 } // namespace utils
