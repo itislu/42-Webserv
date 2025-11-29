@@ -11,6 +11,7 @@
 #include "http/states/validateRequest/ValidateDelete.hpp"
 #include "http/states/validateRequest/ValidateGet.hpp"
 #include "http/states/validateRequest/ValidatePost.hpp"
+#include "libftpp/algorithm.hpp"
 #include "libftpp/optional.hpp"
 #include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
@@ -184,7 +185,7 @@ static int alwaysDecode(int /*unused*/)
  * 1. Decode unreserved characters.
  * 2. Normalize path (collapse . | .. | //).
  * 3. Decode all other characters (first decoding cannot produce more '%').
- * 4. Check for illegal characters (NUL, control chars).
+ * 4. Check for illegal characters (NUL).
  * 5. Normalize again, but disallow going out of root.
  * 6. Combine with root.
  */
@@ -204,7 +205,7 @@ void ValidateRequest::_initRequestPath()
   decoded = decodePath(decoded, alwaysDecode);
   _log.info() << "decode all - path: " << decoded << "\n";
 
-  // 4. Check for illegal characters (NUL, control chars).
+  // 4. Check for illegal characters (NUL).
   if (!validateChars(decoded)) {
     endState(StatusCode::BadRequest);
     return;
@@ -258,13 +259,7 @@ std::string ValidateRequest::decodePath(const std::string& path,
 
 bool ValidateRequest::validateChars(const std::string& path)
 {
-  for (std::size_t i = 0; i < path.size(); ++i) {
-    const unsigned char chr = path[i];
-    if (chr < ' ') {
-      return false;
-    }
-  }
-  return true;
+  return !ft::contains(path, '\0');
 }
 
 ft::optional<std::string> ValidateRequest::normalizePath(
