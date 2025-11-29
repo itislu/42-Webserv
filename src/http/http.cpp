@@ -7,6 +7,9 @@ namespace http {
 
 const char* const CRLF = "\r\n";
 
+/**
+ * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+ */
 bool isSchemeChar(char chr)
 {
   if (ft::isalnum(chr)) {
@@ -29,6 +32,9 @@ bool isAuthChar(char chr)
   return ft::contains(specialAuthorityChars, chr);
 }
 
+/**
+ * reserved    = gen-delims / sub-delims
+ */
 bool isReserved(char chr)
 {
   return isGenDelim(chr) || isSubDelim(chr);

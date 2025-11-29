@@ -7,6 +7,16 @@
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc5234#appendix-B.1
+ *
+ * CRLF           =  CR LF
+ *                        ; Internet standard newline
+ * CR             =  %x0D
+ *                        ; carriage return
+ * LF             =  %x0A
+ *                        ; linefeed
+ */
 ft::shared_ptr<LiteralRule> endOfLineRule()
 {
   const ft::shared_ptr<LiteralRule> seq = ft::make_shared<LiteralRule>("\r\n");
