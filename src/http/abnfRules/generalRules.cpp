@@ -7,6 +7,12 @@
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc5234#appendix-B.1
+ *
+ * CRLF           =  CR LF
+ *                ; Internet standard newline
+ */
 ft::shared_ptr<LiteralRule> endOfLineRule()
 {
   const ft::shared_ptr<LiteralRule> seq =
