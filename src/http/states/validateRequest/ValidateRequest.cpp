@@ -186,7 +186,7 @@ static int alwaysDecode(int /*unused*/)
  * 2. Normalize path (collapse . | .. | //).
  * 3. Decode all other characters (first decoding cannot produce more '%').
  * 4. Check for illegal characters (NUL).
- * 5. Normalize again, but disallow going out of root.
+ * 5. Check that path is not going out of root.
  * 6. Combine with root.
  */
 void ValidateRequest::_initRequestPath()
@@ -211,22 +211,19 @@ void ValidateRequest::_initRequestPath()
     return;
   }
 
-  // 5. Normalize again, but disallow going out of root.
-  const ft::optional<std::string> result =
-    normalizePath(decoded, FailAboveRoot);
-  if (!result.has_value()) {
+  // 5. Check that path is not going out of root.
+  if (!normalizePath(decoded, FailAboveRoot).has_value()) {
     endState(StatusCode::BadRequest);
     return;
   }
-  _log.info() << "normalizePath strict - path: " << *result << "\n";
 
   // 6. Combine with root.
   if (_location != FT_NULLPTR) {
-    _path = removePrefix(*result, _location->getPath());
+    _path = removePrefix(decoded, _location->getPath());
     _log.info() << "remove Prefix - path: " << _path << "\n";
     _path = appendToRoot(_path, _location->getRoot());
   } else {
-    _path = appendToRoot(*result, _server->getRoot());
+    _path = appendToRoot(decoded, _server->getRoot());
   }
   _log.info() << "appendToRoot - path: " << _path << "\n";
   _client->getResource().setPath(_path);
