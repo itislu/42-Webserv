@@ -8,6 +8,7 @@
 #include <libftpp/utility.hpp>
 #include <stdexcept>
 #include <string>
+#include <utils/convert.hpp>
 #include <vector>
 
 namespace config {
@@ -66,7 +67,7 @@ static void setTimeoutImpl(const std::vector<std::string>& values,
   }
   long timeout = 0;
   try {
-    timeout = convert::toLong(values[0]);
+    timeout = utils::toLong(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("keepalive_timeout: invalid argument: ") + e.what());
