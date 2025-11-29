@@ -7,9 +7,14 @@
 namespace utils {
 
 /**
- * Returns `-1` if `chr` is not a valid hexadecimal character.
+ * @returns `-1` If `chr` is not a valid hexadecimal character.
  */
 int hexToInt(char chr);
+
+/**
+ * @throws std::invalid_argument If `str` cannot be fully converted to type
+ * `To`.
+ */
 template<typename To>
 To toNumber(const std::string& str);
 
