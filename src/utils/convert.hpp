@@ -7,9 +7,17 @@
 namespace utils {
 
 /**
- * Returns `-1` if `chr` is not a valid hexadecimal character.
+ * @returns `-1` If `chr` is not a valid hexadecimal character.
  */
 int hexToInt(char chr);
+
+/**
+ * The difference to `ft::from_string` is that this function throws an exception
+ * if there are excess characters after the parsed number.
+ *
+ * @throws std::invalid_argument If `str` contains invalid or excess characters,
+ * or the parsed number would be out of range for type `To`.
+ */
 template<typename To>
 To toNumber(const std::string& str);
 
