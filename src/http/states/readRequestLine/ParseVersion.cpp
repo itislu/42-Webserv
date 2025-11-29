@@ -6,6 +6,7 @@
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <http/states/readRequestLine/ValidateRequest.hpp>
+#include <libftpp/ctype.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/BufferReader.hpp>
@@ -14,7 +15,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <ctype.h>
 #include <string>
 
 /* ************************************************************************** */
@@ -80,9 +80,9 @@ void ParseVersion::_init()
 
   // _sequence.addRule(owsRule());
   _sequence.addRule(ft::make_shared<LiteralRule>("HTTP/"));
-  _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
+  _sequence.addRule(ft::make_shared<RangeRule>(ft::isdigit));
   _sequence.addRule(ft::make_shared<LiteralRule>("."));
-  _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
+  _sequence.addRule(ft::make_shared<RangeRule>(ft::isdigit));
   _sequence.addRule(endOfLineRule());
   _sequence.setBufferReader(&_buffReader);
 }
