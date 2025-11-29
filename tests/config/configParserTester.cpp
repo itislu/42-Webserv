@@ -703,6 +703,22 @@ TEST(ValidConfigTester, DuplicateMethods)
   ConfigParser parser(configPath.c_str());
   Config config;
   EXPECT_NO_THROW(config = parser.parseConfig());
+
+  ASSERT_EQ(config.getServers().size(), 1);
+  const ServerConfig& srv = config.getServers()[0];
+  ASSERT_EQ(srv.getLocations().size(), 2);
+
+  const LocationConfig& loc1 = srv.getLocations()[0];
+  EXPECT_EQ(loc1.getAllowedMethods().size(), 2);
+  EXPECT_EQ(loc1.getAllowedMethods().count("GET"), 1);
+  EXPECT_EQ(loc1.getAllowedMethods().count("POST"), 1);
+  EXPECT_EQ(loc1.getAllowedMethods().count("DELETE"), 0);
+
+  const LocationConfig& loc2 = srv.getLocations()[1];
+  EXPECT_EQ(loc2.getAllowedMethods().size(), 1);
+  EXPECT_EQ(loc2.getAllowedMethods().count("GET"), 1);
+  EXPECT_EQ(loc2.getAllowedMethods().count("POST"), 0);
+  EXPECT_EQ(loc2.getAllowedMethods().count("DELETE"), 0);
 }
 
 TEST(ValidConfigTester, EmptyLinesSemicolon)
