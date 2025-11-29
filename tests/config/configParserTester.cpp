@@ -891,9 +891,9 @@ TEST(ValidConfigTester, TestAllValues)
   EXPECT_EQ(srv1.getIndex(), "index.html");
   EXPECT_EQ(srv1.getMaxBodySize(), 4096);
   EXPECT_EQ(srv1.getErrorPages().at(403), "/errors/403.html");
-  EXPECT_TRUE(srv1.getAllowedMethods().count("GET"));
-  EXPECT_TRUE(srv1.getAllowedMethods().count("POST"));
-  EXPECT_TRUE(srv1.getAllowedMethods().count("DELETE"));
+  EXPECT_EQ(srv1.getAllowedMethods().count("GET"), 1);
+  EXPECT_EQ(srv1.getAllowedMethods().count("POST"), 1);
+  EXPECT_EQ(srv1.getAllowedMethods().count("DELETE"), 1);
 
   const LocationConfig& loc1 = srv1.getLocations()[0];
   EXPECT_EQ(loc1.getPath(), "/");
