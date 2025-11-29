@@ -53,7 +53,7 @@ std::size_t toMaxBodySize(const std::string& str)
 // 65535
 int toPort(const std::string& str)
 {
-  const int port = utils::toInt(str);
+  const int port = utils::toNumber<int>(str);
   const int maxPort = 65535;
   if (port > 0 && port <= maxPort) {
     return port;
@@ -64,7 +64,7 @@ int toPort(const std::string& str)
 // 300 - 599
 int toCode(const std::string& str)
 {
-  const int code = utils::toInt(str);
+  const int code = utils::toNumber<int>(str);
   const int minCode = 300;
   const int maxCode = 599;
   if (code >= minCode && code <= maxCode) {
