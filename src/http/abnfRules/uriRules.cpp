@@ -251,8 +251,8 @@ ft::shared_ptr<SequenceRule> ipvFutureRule()
   seq->addRule(ft::make_shared<LiteralRule>("v"));
 
   // 1*HEXDIG
-  ft::shared_ptr<RepetitionRule> hexRep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isHexDigit));
+  ft::shared_ptr<RepetitionRule> hexRep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isxdigit));
   hexRep->setMin(1);
   seq->addRule(ft::move(hexRep));
 
@@ -457,8 +457,8 @@ ft::shared_ptr<AlternativeRule> ipv6AddressRule()
  */
 ft::shared_ptr<RepetitionRule> h16Rule()
 {
-  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isHexDigit));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isxdigit));
   rep->setMin(1);
   rep->setMax(4);
   rep->setDebugTag("h16Rule");
@@ -779,8 +779,8 @@ ft::shared_ptr<SequenceRule> pctRule()
 {
   const ft::shared_ptr<SequenceRule> pctSeq = ft::make_shared<SequenceRule>();
   pctSeq->addRule(ft::make_shared<LiteralRule>("%"));
-  pctSeq->addRule(ft::make_shared<RangeRule>(http::isHexDigit));
-  pctSeq->addRule(ft::make_shared<RangeRule>(http::isHexDigit));
+  pctSeq->addRule(ft::make_shared<RangeRule>(ft::isxdigit));
+  pctSeq->addRule(ft::make_shared<RangeRule>(ft::isxdigit));
 
   pctSeq->setDebugTag("pctRule");
   return pctSeq;

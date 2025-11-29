@@ -93,11 +93,6 @@ bool isTchar(char chr)
   return ft::contains(specialTokenChars, chr);
 }
 
-bool isHexDigit(char chr)
-{
-  return ft::isxdigit(chr);
-}
-
 /**
  * https://datatracker.ietf.org/doc/html/rfc3986#autoid-69
  *

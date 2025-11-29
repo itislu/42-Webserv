@@ -16,7 +16,6 @@ bool isGenDelim(char chr);
 bool isSubDelim(char chr);
 bool isPchar(char chr);
 bool isTchar(char chr);
-bool isHexDigit(char chr);
 bool isQueryChar(char chr);
 bool isFragmentChar(char chr);
 bool isDigit19(char chr);
