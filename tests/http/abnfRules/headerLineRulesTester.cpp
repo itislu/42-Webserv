@@ -6,7 +6,6 @@
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
-#include <cctype>
 #include <gtest/gtest.h>
 #include <string>
 

@@ -1,8 +1,8 @@
 #include "http.hpp"
 
 #include <libftpp/algorithm.hpp>
+#include <libftpp/ctype.hpp>
 
-#include <ctype.h>
 #include <map>
 #include <string>
 
@@ -10,77 +10,71 @@ namespace http {
 
 const char* const CRLF = "\r\n";
 
-int isSchemeChar(int chr)
+bool isSchemeChar(char chr)
 {
-  if (::isalnum(chr) != 0) {
-    return 1;
+  if (ft::isalnum(chr)) {
+    return true;
   }
 
   static const char specialSchemeChars[] = "+-.";
-  return static_cast<int>(
-    ft::contains(specialSchemeChars, static_cast<char>(chr)));
+  return ft::contains(specialSchemeChars, chr);
 }
 
-int isAuthChar(int chr)
+bool isAuthChar(char chr)
 {
-  if (::isalnum(chr) != 0) {
-    return 1;
+  if (ft::isalnum(chr)) {
+    return true;
   }
 
   static const char specialAuthorityChars[] = "-._~"
                                               "!$&'()*+,;=:@"
                                               "[]";
-  return static_cast<int>(
-    ft::contains(specialAuthorityChars, static_cast<char>(chr)));
+  return ft::contains(specialAuthorityChars, chr);
 }
 
-int isReserved(int chr)
+bool isReserved(char chr)
 {
-  return static_cast<int>(isGenDelim(chr) != 0 || isSubDelim(chr) != 0);
+  return isGenDelim(chr) || isSubDelim(chr);
 }
 
 /**
  * unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
  */
-int isUnreserved(int chr)
+bool isUnreserved(char chr)
 {
-  if (::isalnum(chr) != 0) {
-    return 1;
+  if (ft::isalnum(chr)) {
+    return true;
   }
 
   static const char specialUnreservedChars[] = "-._~";
-  if (ft::contains(specialUnreservedChars, static_cast<char>(chr))) {
-    return 1;
-  }
-  return 0;
+  return ft::contains(specialUnreservedChars, chr);
 }
 
 /**
  * gen-delims    = ":" / "/" / "?" / "#" / "[" / "]" / "@"
  */
-int isGenDelim(int chr)
+bool isGenDelim(char chr)
 {
   static const char genDelims[] = ":/?#[]@";
-  return static_cast<int>(ft::contains(genDelims, static_cast<char>(chr)));
+  return ft::contains(genDelims, chr);
 }
 
 /**
  * sub-delims = "!" / "$" / "&" / "'" / "(" / ")" /
  *              "*" / "+" / "," / ";" / "="
  */
-int isSubDelim(int chr)
+bool isSubDelim(char chr)
 {
   static const char subDelims[] = "!$&'()*+,;=";
-  return static_cast<int>(ft::contains(subDelims, static_cast<char>(chr)));
+  return ft::contains(subDelims, chr);
 }
 
 /**
  * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
  */
-int isPchar(int chr)
+bool isPchar(char chr)
 {
-  return static_cast<int>((isUnreserved(chr) != 0) || (isSubDelim(chr) != 0) ||
-                          chr == ':' || chr == '@');
+  return isUnreserved(chr) || isSubDelim(chr) || chr == ':' || chr == '@';
 }
 
 /**
@@ -89,29 +83,19 @@ int isPchar(int chr)
  *         / DIGIT / ALPHA
  *         ; any VCHAR, except delimiters
  */
-int isTchar(int chr)
+bool isTchar(char chr)
 {
-  if (::isalnum(chr) != 0) {
-    return 1;
+  if (ft::isalnum(chr)) {
+    return true;
   }
 
   static const char specialTokenChars[] = "!#$%&'*+-.^_`|~";
-  return static_cast<int>(
-    ft::contains(specialTokenChars, static_cast<char>(chr)));
+  return ft::contains(specialTokenChars, chr);
 }
 
-int isHexDigit(int chr)
+bool isHexDigit(char chr)
 {
-  static const char hexDigitsLower[] = "0123456789abcdef";
-  static const char hexDigitsUpper[] = "0123456789ABCDEF";
-
-  if (ft::contains(hexDigitsLower, static_cast<char>(chr))) {
-    return 1;
-  }
-  if (ft::contains(hexDigitsUpper, static_cast<char>(chr))) {
-    return 1;
-  }
-  return 0;
+  return ft::isxdigit(chr);
 }
 
 /**
@@ -119,9 +103,9 @@ int isHexDigit(int chr)
  *
  * query = *( pchar / "/" / "?" )
  */
-int isQueryChar(int chr)
+bool isQueryChar(char chr)
 {
-  return static_cast<int>(chr == '/' || chr == '?');
+  return chr == '/' || chr == '?';
 }
 
 /**
@@ -129,41 +113,41 @@ int isQueryChar(int chr)
  *
  * fragment = *( pchar / "/" / "?" )
  */
-int isFragmentChar(int chr)
+bool isFragmentChar(char chr)
 {
-  return static_cast<int>(chr == '/' || chr == '?');
+  return chr == '/' || chr == '?';
 }
 
 /**
  * digit 1-9
  */
-int isDigit19(int chr)
+bool isDigit19(char chr)
 {
-  return static_cast<int>(chr >= '1' && chr <= '9');
+  return chr >= '1' && chr <= '9';
 }
 
 /**
  * digit 0-4
  */
-int isDigit04(int chr)
+bool isDigit04(char chr)
 {
-  return static_cast<int>(chr >= '0' && chr <= '4');
+  return chr >= '0' && chr <= '4';
 }
 
 /**
  * digit 0-5
  */
-int isDigit05(int chr)
+bool isDigit05(char chr)
 {
-  return static_cast<int>(chr >= '0' && chr <= '5');
+  return chr >= '0' && chr <= '5';
 }
 
 /**
  * ( SP / HTAB )
  */
-int isWhitespace(int chr)
+bool isWhitespace(char chr)
 {
-  return static_cast<int>(chr == ' ' || chr == '\t');
+  return chr == ' ' || chr == '\t';
 }
 
 /**
@@ -171,11 +155,12 @@ int isWhitespace(int chr)
  *
  * obs-text = %x80-FF
  */
-int isObsText(int chr)
+bool isObsText(char chr)
 {
-  const int begin = 0x80;
-  const int end = 0xFF;
-  return static_cast<int>(chr >= begin && chr <= end);
+  const unsigned char begin = 0x80;
+  const unsigned char end = 0xFF;
+  const unsigned char uchr = static_cast<unsigned char>(chr);
+  return uchr >= begin && uchr <= end;
 }
 
 /**
@@ -184,35 +169,34 @@ int isObsText(int chr)
  * VCHAR =  %x21-7E
  *          ; visible (printing) characters
  */
-int isVchar(int chr)
+bool isVchar(char chr)
 {
   const char begin = 0x21;
   const char end = 0x7E;
-  return static_cast<int>(chr >= begin && chr <= end);
+  return chr >= begin && chr <= end;
 }
 
 /**
  *qdtext         = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text
  */
-int isQdTextChar(int chr)
+bool isQdTextChar(char chr)
 {
   const char char1 = 0x21;
   const char beg1 = 0x23;
   const char end1 = 0x5B;
   const char beg2 = 0x5D;
   const char end2 = 0x7E;
-  return static_cast<int>(chr == '\t' || chr == ' ' || chr == char1 ||
-                          (chr >= beg1 && chr <= end1) ||
-                          (chr >= beg2 && chr <= end2) || isObsText(chr) != 0);
+  return chr == '\t' || chr == ' ' || chr == char1 ||
+         (chr >= beg1 && chr <= end1) || (chr >= beg2 && chr <= end2) ||
+         isObsText(chr);
 }
 
 /**
  * quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
  */
-int isQuotedPairChar(int chr)
+bool isQuotedPairChar(char chr)
 {
-  return static_cast<int>(chr == '\t' || chr == ' ' || isVchar(chr) != 0 ||
-                          isObsText(chr) != 0);
+  return chr == '\t' || chr == ' ' || isVchar(chr) || isObsText(chr);
 }
 
 const ExtToTypeMap& getExtToType()
