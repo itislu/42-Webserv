@@ -19,7 +19,7 @@ public:
   typedef ft::optional<std::string> OptionStr;
   typedef void (T::*FuncPtr)(const std::string&);
 
-  void addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr);
+  Extractor& addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr);
   void run(T& obj, const Rule::ResultMap& resultMap, IBuffer& buffer) const;
 
 private:

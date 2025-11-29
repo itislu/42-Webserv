@@ -103,39 +103,29 @@ bool ParseUri::_isAbsoluteForm(const Rule::ResultMap& results)
 
 Extractor<Uri>& ParseUri::_uriExtractorOriginForm()
 {
-  static Extractor<Uri> extractor;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    extractor.addMapItem(AbsolutePath, &Uri::setPath);
-    extractor.addMapItem(Query, &Uri::setQuery);
-  }
+  static Extractor<Uri> extractor = Extractor<Uri>()
+                                      .addMapItem(AbsolutePath, &Uri::setPath)
+                                      .addMapItem(Query, &Uri::setQuery);
   return extractor;
 }
 
 Extractor<Uri>& ParseUri::_uriExtractorAbsoluteForm()
 {
-  static Extractor<Uri> extractor;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    extractor.addMapItem(Scheme, &Uri::setScheme);
-    extractor.addMapItem(HierPartPathAbEmpty, &Uri::setPath);
-    extractor.addMapItem(Query, &Uri::setQuery);
-  }
+  static Extractor<Uri> extractor =
+    Extractor<Uri>()
+      .addMapItem(Scheme, &Uri::setScheme)
+      .addMapItem(HierPartPathAbEmpty, &Uri::setPath)
+      .addMapItem(Query, &Uri::setQuery);
   return extractor;
 }
 
 Extractor<Authority>& ParseUri::_authExtractor()
 {
-  static Extractor<Authority> extractor;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    extractor.addMapItem(UserInfo, &Authority::setUserinfo);
-    extractor.addMapItem(Host, &Authority::setHost);
-    extractor.addMapItem(Port, &Authority::setPort);
-  }
+  static Extractor<Authority> extractor =
+    Extractor<Authority>()
+      .addMapItem(UserInfo, &Authority::setUserinfo)
+      .addMapItem(Host, &Authority::setHost)
+      .addMapItem(Port, &Authority::setPort);
   return extractor;
 }
 

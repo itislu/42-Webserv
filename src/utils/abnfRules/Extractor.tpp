@@ -14,12 +14,13 @@
 // PUBLIC
 
 template<typename T>
-void Extractor<T>::addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr)
+Extractor<T>& Extractor<T>::addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr)
 {
   SetterPair pair;
   pair.first = ruleId;
   pair.second = funcPtr;
   _setters.push_back(pair);
+  return *this;
 }
 
 template<typename T>
