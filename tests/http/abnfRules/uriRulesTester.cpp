@@ -5,7 +5,6 @@
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
-#include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -830,9 +829,7 @@ TEST(UriAbnfTest, Fragment)
 TEST(UriAbnfTest, PercentEncoded)
 {
   SequenceRule sequence;
-  sequence.addRule(ft::make_shared<LiteralRule>("%"));
-  sequence.addRule(ft::make_shared<RangeRule>(http::isHexDigit));
-  sequence.addRule(ft::make_shared<RangeRule>(http::isHexDigit));
+  sequence.addRule(pctRule());
 
   // Valid
   EXPECT_TRUE(runParser("%aB", sequence));
