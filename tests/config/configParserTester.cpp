@@ -1,7 +1,10 @@
-#include "config/Config.hpp"
-#include "config/ConfigParser.hpp"
-#include "config/LocationConfig.hpp"
-#include "config/ServerConfig.hpp"
+#include <config/Config.hpp>
+#include <config/ConfigParser.hpp>
+#include <config/LocationConfig.hpp>
+#include <config/ServerConfig.hpp>
+
+#include <libftpp/algorithm.hpp>
+
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <string>
@@ -710,15 +713,15 @@ TEST(ValidConfigTester, DuplicateMethods)
 
   const LocationConfig& loc1 = srv.getLocations()[0];
   EXPECT_EQ(loc1.getAllowedMethods().size(), 2);
-  EXPECT_EQ(loc1.getAllowedMethods().count("GET"), 1);
-  EXPECT_EQ(loc1.getAllowedMethods().count("POST"), 1);
-  EXPECT_EQ(loc1.getAllowedMethods().count("DELETE"), 0);
+  EXPECT_TRUE(ft::contains(loc1.getAllowedMethods(), "GET"));
+  EXPECT_TRUE(ft::contains(loc1.getAllowedMethods(), "POST"));
+  EXPECT_FALSE(ft::contains(loc1.getAllowedMethods(), "DELETE"));
 
   const LocationConfig& loc2 = srv.getLocations()[1];
   EXPECT_EQ(loc2.getAllowedMethods().size(), 1);
-  EXPECT_EQ(loc2.getAllowedMethods().count("GET"), 1);
-  EXPECT_EQ(loc2.getAllowedMethods().count("POST"), 0);
-  EXPECT_EQ(loc2.getAllowedMethods().count("DELETE"), 0);
+  EXPECT_TRUE(ft::contains(loc2.getAllowedMethods(), "GET"));
+  EXPECT_FALSE(ft::contains(loc2.getAllowedMethods(), "POST"));
+  EXPECT_FALSE(ft::contains(loc2.getAllowedMethods(), "DELETE"));
 }
 
 TEST(ValidConfigTester, EmptyLinesSemicolon)
@@ -898,9 +901,9 @@ TEST(ValidConfigTester, TestAllValues)
   EXPECT_EQ(srv1.getIndex(), "index.html");
   EXPECT_EQ(srv1.getMaxBodySize(), 4096);
   EXPECT_EQ(srv1.getErrorPages().at(403), "/errors/403.html");
-  EXPECT_TRUE(srv1.getAllowedMethods().count("GET"));
-  EXPECT_TRUE(srv1.getAllowedMethods().count("POST"));
-  EXPECT_TRUE(srv1.getAllowedMethods().count("DELETE"));
+  EXPECT_TRUE(ft::contains(srv1.getAllowedMethods(), "GET"));
+  EXPECT_TRUE(ft::contains(srv1.getAllowedMethods(), "POST"));
+  EXPECT_TRUE(ft::contains(srv1.getAllowedMethods(), "DELETE"));
 
   const LocationConfig& loc1 = srv1.getLocations()[0];
   EXPECT_EQ(loc1.getPath(), "/");
