@@ -3,14 +3,14 @@
 #define SMART_BUFFER_HPP
 
 #include <libftpp/memory.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/IInOutBuffer.hpp>
 
 #include <cstddef>
 #include <new>
 #include <string>
 
 /* ************************************************************************** */
-class SmartBuffer : public IBuffer
+class SmartBuffer : public IInOutBuffer
 {
 public:
   static const char* const errAllocBuffer;
@@ -18,7 +18,7 @@ public:
   SmartBuffer();
   ~SmartBuffer() {}
 
-  // Interface IBuffer - Throwing versions
+  // Interface IInOutBuffer - Throwing versions
   char get();
   char peek();
   void seek(std::size_t pos);
@@ -34,7 +34,7 @@ public:
   void replace(RawBytes& rawData);
   void moveBufferToFile(const std::string& filepath);
 
-  // Interface IBuffer - Non-throwing versions
+  // Interface IInOutBuffer - Non-throwing versions
   ExpectChr get(std::nothrow_t /*unused*/);
   ExpectChr peek(std::nothrow_t /*unused*/);
   ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/);
@@ -54,9 +54,9 @@ public:
                         std::size_t bytes,
                         std::nothrow_t /*unused*/);
   ExpectVoid replace(RawBytes& rawData, std::nothrow_t /*unused*/);
+
   ExpectVoid moveBufferToFile(const std::string& filepath,
                               std::nothrow_t /*unused*/);
-
   bool isEmpty() const;
   std::size_t size() const;
 
@@ -69,7 +69,7 @@ private:
   bool _fileNeeded(std::size_t newBytes);
   void _switchToFileBuffer();
 
-  ft::unique_ptr<IBuffer> _buffer;
+  ft::unique_ptr<IInOutBuffer> _buffer;
   bool _usesFile;
 };
 

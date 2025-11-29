@@ -3,6 +3,8 @@
 #include <client/Client.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <libftpp/memory.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -30,7 +32,9 @@ void HandleError::run()
   // todo get custom error page from config
 
   const StatusCode& statuscode = _client->getResponse().getStatusCode();
-  _client->getOutBuff().append(_makeErrorBody(statuscode));
+  const ft::shared_ptr<SmartBuffer> buff = ft::make_shared<SmartBuffer>();
+  buff->append(_makeErrorBody(statuscode));
+  _client->getOutBuffQueue().append(buff);
   getContext()->getStateHandler().setDone();
 }
 

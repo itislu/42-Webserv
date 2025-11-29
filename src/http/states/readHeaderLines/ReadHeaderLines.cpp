@@ -13,10 +13,10 @@
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
-#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 

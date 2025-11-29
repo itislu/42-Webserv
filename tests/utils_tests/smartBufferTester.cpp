@@ -1,4 +1,4 @@
-#include <utils/SmartBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 
 #include <gtest/gtest.h>
 #include <string>

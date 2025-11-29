@@ -1,17 +1,21 @@
 #include "Client.hpp"
-#include "client/TimeStamp.hpp"
-#include "config/Config.hpp"
-#include "http/Request.hpp"
-#include "http/Resource.hpp"
-#include "http/Response.hpp"
-#include "http/states/readRequestLine/ReadRequestLine.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "socket/AutoFd.hpp"
-#include "utils/IBuffer.hpp"
-#include "utils/SmartBuffer.hpp"
-#include "utils/logger/Logger.hpp"
-#include "utils/state/StateHandler.hpp"
+
+#include <client/TimeStamp.hpp>
+#include <config/Config.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <socket/AutoFd.hpp>
+#include <utils/buffer/BufferQueue.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/StateHandler.hpp>
+
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>
@@ -75,9 +79,9 @@ SmartBuffer& Client::getInBuff()
   return _inBuff;
 }
 
-SmartBuffer& Client::getOutBuff()
+BufferQueue& Client::getOutBuffQueue()
 {
-  return _outBuff;
+  return _outBuffQueue;
 }
 
 StateHandler<Client>& Client::getStateHandler()
@@ -120,7 +124,7 @@ void Client::setServer(const Server* server)
 
 bool Client::receive()
 {
-  static IBuffer::RawBytes buffer(_maxChunk);
+  static IInBuffer::RawBytes buffer(_maxChunk);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
     /* TODO: remove this! */
@@ -144,13 +148,12 @@ bool Client::receive()
 
 bool Client::sendTo()
 {
-  const std::size_t toSend = std::min(_outBuff.size(), _maxChunk);
   // todo handle exception
-  _log.info() << "outbuf size before: " << _outBuff.size() << "\n";
-  const IBuffer::RawBytes buff = _outBuff.consumeRawFront(toSend);
-  _log.info() << "outbuf size after : " << _outBuff.size() << "\n";
-
-  const ssize_t bytes = send(getFd(), buff.data(), buff.size(), 0);
+  IInBuffer::RawBytes buff = _outBuffQueue.read(_maxChunk);
+  ssize_t bytes = 0;
+  if (!buff.empty()) {
+    bytes = send(getFd(), buff.data(), buff.size(), 0);
+  }
   if (bytes > 0) {
     _log.info() << "sent " << bytes << " bytes\n";
   } else if (bytes == 0) {
@@ -176,5 +179,5 @@ void Client::updateLastActivity()
 
 bool Client::hasDataToSend() const
 {
-  return !_outBuff.isEmpty();
+  return !_outBuffQueue.isEmpty();
 }

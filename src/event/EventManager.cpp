@@ -43,7 +43,7 @@ EventManager::EventManager(ClientManager& clients,
 bool EventManager::sendToClient(Client& client)
 {
   const bool alive = client.sendTo();
-  if (alive && !client.hasDataToSend() && client.getStateHandler().isDone()) {
+  if (alive && !client.hasDataToSend()) {
     _socketsManager->disablePollout(client.getFd());
     _log.info() << "Pollout disabled\n";
   }
@@ -82,11 +82,12 @@ bool EventManager::handleClient(Client* client, unsigned events)
   if (alive) {
     clientStateMachine(*client);
   }
-  if (alive && client->hasDataToSend()) {
+  const bool polloutEnabled = (events & POLLOUT) != 0;
+  if (!polloutEnabled && alive && client->hasDataToSend()) {
     _socketsManager->enablePollout(client->getFd());
     _log.info() << "Pollout enabled\n";
   }
-  if ((events & POLLOUT) != 0 && alive) { // Send Data
+  if (polloutEnabled && alive) { // Send Data
     alive = sendToClient(*client);
   }
   if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 && alive) {

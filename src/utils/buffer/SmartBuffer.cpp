@@ -3,16 +3,15 @@
 #include <libftpp/expected.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/FileBuffer.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/FileBuffer.hpp>
+#include <utils/buffer/IBuffer.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <new>
 #include <string>
 
-/* **************************************************************************
- */
+/* ************************************************************************** */
 // INIT
 
 const char* const SmartBuffer::errAllocBuffer =

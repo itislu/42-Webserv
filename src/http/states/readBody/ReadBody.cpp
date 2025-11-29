@@ -1,6 +1,5 @@
 #include "ReadBody.hpp"
 
-#include "libftpp/utility.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
@@ -13,11 +12,13 @@
 #include <libftpp/algorithm.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
-#include <utils/IBuffer.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInOutBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -354,7 +355,7 @@ void ReadBody::_setChunkExt(const std::string& value)
  */
 void ReadBody::_readBody()
 {
-  IBuffer& inBuffer = _client->getInBuff();
+  IInOutBuffer& inBuffer = _client->getInBuff();
   Request& request = _client->getRequest();
 
   std::size_t toConsume = std::min(_readChunkSize, _bodyLength - _consumed);

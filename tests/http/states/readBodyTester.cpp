@@ -1,8 +1,8 @@
 #include "http/Response.hpp"
 #include "http/StatusCode.hpp"
 #include "http/states/readBody/ReadBody.hpp"
-#include "utils/IBuffer.hpp"
-#include "utils/SmartBuffer.hpp"
+#include "utils/buffer/IBuffer.hpp"
+#include "utils/buffer/SmartBuffer.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>

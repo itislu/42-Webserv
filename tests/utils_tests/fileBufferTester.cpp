@@ -1,4 +1,6 @@
-#include <utils/FileBuffer.hpp>
+#include "utils/buffer/StaticFileBuffer.hpp"
+#include <exception>
+#include <utils/buffer/FileBuffer.hpp>
 
 #include <cstdio>
 #include <fstream>
@@ -66,6 +68,29 @@ TEST(FileBufferTester, MoveToFile)
   EXPECT_EQ(fileBuffer.size(), 0);
 
   (void)std::remove(testFilePath.c_str());
+}
+
+TEST(FileBufferTester, StaticFileBuffer)
+{
+  std::string testFilePath;
+  try {
+    testFilePath.append(ASSETS_PATH);
+    testFilePath.append("TestFile_FileBufferTester.txt");
+    FileBuffer fileBuffer;
+    fileBuffer.append("HelloWorld");
+    fileBuffer.moveBufferToFile(testFilePath);
+
+    StaticFileBuffer sfb(testFilePath);
+    sfb.consumeRawFront(sfb.size() / 2);
+    sfb.consumeRawFront(sfb.size());
+    EXPECT_TRUE(sfb.isEmpty());
+    EXPECT_EQ(sfb.size(), 0);
+    (void)std::remove(testFilePath.c_str());
+  } catch (const std::exception& e) {
+    if (!testFilePath.empty()) {
+      (void)std::remove(testFilePath.c_str());
+    }
+  }
 }
 
 // Main function to run all tests

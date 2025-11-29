@@ -7,7 +7,7 @@
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>

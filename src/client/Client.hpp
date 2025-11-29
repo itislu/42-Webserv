@@ -7,7 +7,8 @@
 #include <http/Response.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
-#include <utils/SmartBuffer.hpp>
+#include <utils/buffer/BufferQueue.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/StateHandler.hpp>
 
@@ -25,7 +26,7 @@ public:
   bool hasServer() const;
   const std::string& getHost() const;
   SmartBuffer& getInBuff();
-  SmartBuffer& getOutBuff();
+  BufferQueue& getOutBuffQueue();
   const Server* getServer() const;
   StateHandler<Client>& getStateHandler();
   Request& getRequest();
@@ -52,7 +53,7 @@ private:
   std::string _host;
   TimeStamp _lastActivity;
   SmartBuffer _inBuff;
-  SmartBuffer _outBuff;
+  BufferQueue _outBuffQueue;
   StateHandler<Client> _stateHandler;
   Request _request;
   Response _response;
