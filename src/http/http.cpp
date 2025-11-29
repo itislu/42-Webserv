@@ -154,14 +154,6 @@ bool isDigit05(char chr)
 }
 
 /**
- * ( SP / HTAB )
- */
-bool isWhitespace(char chr)
-{
-  return chr == ' ' || chr == '\t';
-}
-
-/**
  * https://datatracker.ietf.org/doc/html/rfc9110/#name-field-values
  *
  * obs-text = %x80-FF

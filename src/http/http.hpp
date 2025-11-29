@@ -21,7 +21,6 @@ bool isFragmentChar(char chr);
 bool isDigit19(char chr);
 bool isDigit04(char chr);
 bool isDigit05(char chr);
-bool isWhitespace(char chr);
 bool isObsText(char chr);
 bool isVchar(char chr);
 bool isQdTextChar(char chr);

@@ -29,8 +29,8 @@ ft::shared_ptr<LiteralRule> endOfLineRule()
  */
 ft::shared_ptr<RepetitionRule> owsRule()
 {
-  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isWhitespace));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(" \t"));
 
   rep->setDebugTag("owsRule");
   return rep;
@@ -42,8 +42,8 @@ ft::shared_ptr<RepetitionRule> owsRule()
  */
 ft::shared_ptr<RepetitionRule> rwsRule()
 {
-  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isWhitespace));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(" \t"));
   rep->setMin(1);
 
   rep->setDebugTag("rwsRule");
