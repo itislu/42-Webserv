@@ -7,15 +7,13 @@
 #include <utils/buffer/IBuffer.hpp>
 
 #include <cstddef>
-#include <exception>
-#include <new>
 #include <string>
 
 /* ************************************************************************** */
 // INIT
 
 const char* const SmartBuffer::errAllocBuffer =
-  "SbException: failed to initialize buffer";
+  "SmartBuffer exception: failed to initialize buffer";
 
 /* ************************************************************************** */
 // PUBLIC

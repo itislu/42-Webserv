@@ -17,15 +17,18 @@
 /* ************************************************************************** */
 // INIT
 
-const char* const StaticFileBuffer::errOpen = "FbException: open failed";
-const char* const StaticFileBuffer::errSeek = "FbException: seek failed";
-const char* const StaticFileBuffer::errFileEmpty = "FbException: file is empty";
+const char* const StaticFileBuffer::errOpen =
+  "StaticFileBuffer exception: open failed";
+const char* const StaticFileBuffer::errSeek =
+  "StaticFileBuffer exception: seek failed";
+const char* const StaticFileBuffer::errFileEmpty =
+  "StaticFileBuffer exception: file is empty";
 const char* const StaticFileBuffer::errOutOfRange =
-  "FbException: tried to access out of range";
-const char* const StaticFileBuffer::errRead = "FbException: read failed";
-const char* const StaticFileBuffer::errWrite = "FbException: write failed";
+  "StaticFileBuffer exception: tried to access out of range";
+const char* const StaticFileBuffer::errRead =
+  "StaticFileBuffer exception: read failed";
 const char* const StaticFileBuffer::errTell =
-  "FbException: tell position failed";
+  "StaticFileBuffer exception: tell position failed";
 
 /* ************************************************************************** */
 // PUBLIC

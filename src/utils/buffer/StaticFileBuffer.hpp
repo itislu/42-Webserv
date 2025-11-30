@@ -18,7 +18,6 @@ public:
   static const char* const errFileEmpty;
   static const char* const errOutOfRange;
   static const char* const errRead;
-  static const char* const errWrite;
   static const char* const errTell;
 
   StaticFileBuffer();

@@ -15,15 +15,18 @@
 /* ************************************************************************** */
 // INIT
 
-const char* const FileBuffer::errOpen = "FbException: open failed";
-const char* const FileBuffer::errSeek = "FbException: seek failed";
-const char* const FileBuffer::errFileEmpty = "FbException: file is empty";
+const char* const FileBuffer::errOpen = "FileBuffer exception: open failed";
+const char* const FileBuffer::errSeek = "FileBuffer exception: seek failed";
+const char* const FileBuffer::errFileEmpty =
+  "FileBuffer exception: file is empty";
 const char* const FileBuffer::errOutOfRange =
-  "FbException: tried to access out of range";
-const char* const FileBuffer::errRead = "FbException: read failed";
-const char* const FileBuffer::errWrite = "FbException: write failed";
-const char* const FileBuffer::errTell = "FbException: tell position failed";
-const char* const FileBuffer::errRename = "FbException: rename file failed";
+  "FileBuffer exception: tried to access out of range";
+const char* const FileBuffer::errRead = "FileBuffer exception: read failed";
+const char* const FileBuffer::errWrite = "FileBuffer exception: write failed";
+const char* const FileBuffer::errTell =
+  "FileBuffer exception: tell position failed";
+const char* const FileBuffer::errRename =
+  "FileBuffer exception: rename file failed";
 
 /* ************************************************************************** */
 // PUBLIC
