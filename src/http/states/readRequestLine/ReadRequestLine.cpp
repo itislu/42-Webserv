@@ -24,7 +24,7 @@ ReadRequestLine::ReadRequestLine(Client* context)
   : IState(context)
   , _stateHandler(this)
 {
-  _log.info() << "ReadRequestLine\n";
+  _log.info() << *context << " ReadRequestLine\n";
   _stateHandler.setState<ParseMethod>();
 }
 
@@ -46,7 +46,7 @@ try {
     return;
   }
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "ReadRequestLine: " << e.what() << '\n';
+  _log.error() << *getContext() << " ReadRequestLine: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setState<PrepareResponse>();
 }

@@ -39,7 +39,7 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
   , _sizeHeaders(0)
   , _done(false)
 {
-  _log.info() << "ReadHeaderLines\n";
+  _log.info() << *_client << " ReadHeaderLines\n";
   _init();
 }
 
@@ -62,7 +62,7 @@ try {
     return;
   }
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "ReadHeaderLines: " << e.what() << "\n";
+  _log.error() << *_client << " ReadHeaderLines: " << e.what() << "\n";
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setState<PrepareResponse>();
 }

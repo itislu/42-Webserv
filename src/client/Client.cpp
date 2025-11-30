@@ -16,7 +16,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/StateHandler.hpp>
 
-#include <algorithm>
 #include <cerrno>
 #include <cstddef>
 #include <cstring>
@@ -180,4 +179,10 @@ void Client::updateLastActivity()
 bool Client::hasDataToSend() const
 {
   return !_outBuffQueue.isEmpty();
+}
+
+std::ostream& operator<<(std::ostream& out, const Client& client)
+{
+  out << "Client(" << client.getFd() << ")";
+  return out;
 }

@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -49,7 +50,7 @@ ReadBody::ReadBody(Client* context)
   , _chunkedBody(false)
   , _done(false)
 {
-  _log.info() << "ReadBody\n";
+  _log.info() << *_client << " ReadBody\n";
 
   _determineBodyFraming();
   _buffReader.init(&_client->getInBuff());
@@ -63,7 +64,7 @@ ReadBody::ReadBody(Client* context)
 }
 
 void ReadBody::run()
-{
+try {
   if (_fixedLengthBody) {
     _readFixedLengthBody();
   } else if (_chunkedBody) {
@@ -73,6 +74,10 @@ void ReadBody::run()
   if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
     getContext()->getStateHandler().setState<PrepareResponse>();
   }
+} catch (const std::exception& e) {
+  _log.error() << *_client << " ReadBody: " << e.what() << "\n";
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 /* ************************************************************************** */

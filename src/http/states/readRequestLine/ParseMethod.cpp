@@ -33,7 +33,7 @@ ParseMethod::ParseMethod(ReadRequestLine* context)
   , _client(context->getContext())
   , _buffReader()
 {
-  _log.info() << "ParseMethod\n";
+  _log.info() << *_client << " ParseMethod\n";
   _init();
 }
 

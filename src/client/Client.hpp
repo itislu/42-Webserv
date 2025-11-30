@@ -5,6 +5,7 @@
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
+#include <ostream>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
 #include <utils/buffer/BufferQueue.hpp>
@@ -59,5 +60,7 @@ private:
   Response _response;
   Resource _resource;
 };
+
+std::ostream& operator<<(std::ostream& out, const Client& client);
 
 #endif

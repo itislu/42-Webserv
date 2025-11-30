@@ -13,6 +13,7 @@
 #include <utils/state/IState.hpp>
 
 #include <ctime>
+#include <exception>
 #include <stdexcept>
 #include <string>
 
@@ -43,10 +44,10 @@ try {
   _buffer->append(http::CRLF);
 
   _client->getStateHandler().setState<WriteBody>();
-} catch (const std::runtime_error& e) {
-  _log.error() << "WriteHeaderLines: " << e.what() << "\n";
+} catch (const std::exception& e) {
+  _log.error() << *_client << " WriteHeaderLines: " << e.what() << "\n";
   _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-  throw e; // todo catch me if you can ;)
+  throw;
 }
 
 /* ************************************************************************** */

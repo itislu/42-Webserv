@@ -20,13 +20,17 @@ public:
 
 private:
   /* EVENTS */
+  static void clientStateMachine(Client& client);
+  static bool pollInEnabled(unsigned events);
+  static bool pollOutEnabled(unsigned events);
+  static void handleException(Client* client);
+
   void checkActivity();
   bool handleClient(Client* client, unsigned events);
   bool sendToClient(Client& client);
   bool receiveFromClient(Client& client);
   void disconnectClient(Client* client);
   void acceptClient(int fdes, unsigned events);
-  static void clientStateMachine(Client& client);
 
   /* TIMEOUT */
   int calculateTimeout() const;
