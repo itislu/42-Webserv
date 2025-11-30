@@ -78,7 +78,7 @@ void FileBuffer::seek(std::size_t pos)
 std::size_t FileBuffer::pos()
 {
   const std::streampos pos = _fs.tellg();
-  if (pos < std::streampos(0)) {
+  if (pos == std::streampos(-1)) {
     throw BufferException(errTell);
   }
   return static_cast<std::size_t>(pos);
