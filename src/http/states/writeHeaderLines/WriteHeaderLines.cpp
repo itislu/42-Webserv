@@ -46,7 +46,7 @@ try {
 } catch (const std::runtime_error& e) {
   _log.error() << "WriteHeaderLines: " << e.what() << "\n";
   _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-  throw e; // todo catch me if you can ;)
+  throw;
 }
 
 /* ************************************************************************** */
@@ -55,18 +55,18 @@ try {
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 std::string WriteHeaderLines::_makeHttpDate()
 {
-  const std::time_t now = std::time(0);
+  const std::time_t now = std::time(FT_NULLPTR);
 
   // Convert to GMT/UTC
-  std::tm gmt = {};
-  if (gmtime_r(&now, &gmt) == FT_NULLPTR) {
+  const std::tm* const gmt = std::gmtime(&now);
+  if (gmt == FT_NULLPTR) {
     throw std::runtime_error("WriteHeaderLines: failed to make http date\n");
   }
 
   const int bufSize = 64;
   char buf[bufSize];
   // Format: "Sat, 15 Nov 2025 18:43:29 GMT"
-  if (std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &gmt) == 0) {
+  if (std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmt) == 0) {
     throw std::runtime_error("WriteHeaderLines: failed to make http date\n");
   }
   return std::string(buf);

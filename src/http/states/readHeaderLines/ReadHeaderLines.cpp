@@ -152,12 +152,10 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 void ReadHeaderLines::_addLineToHeaders(const std::string& line)
 {
   const std::size_t index = line.find(':');
-  if (index != std::string::npos) {
-    const std::string name = line.substr(0, index);
-    const std::string value = line.substr(index + 1, line.size());
-    Headers& headers = _client->getRequest().getHeaders();
-    headers.addHeader(name, value);
-  }
+  const std::string name = line.substr(0, index);
+  const std::string value = line.substr(index + 1, line.size());
+  Headers& headers = _client->getRequest().getHeaders();
+  headers.addHeader(name, value);
 }
 
 bool ReadHeaderLines::_headerTooLarge(std::size_t newBytes)

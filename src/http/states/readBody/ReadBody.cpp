@@ -1,6 +1,5 @@
 #include "ReadBody.hpp"
 
-#include "libftpp/utility.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
@@ -15,6 +14,7 @@
 #include <libftpp/string.hpp>
 #include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Extractor.hpp>
+#include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -22,6 +22,7 @@
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -85,24 +86,14 @@ void ReadBody::run()
  */
 SequenceRule& ReadBody::_chunkInfoRule()
 {
-  static SequenceRule rule;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    rule.addRule(chunkInfoRule());
-  }
-  return rule;
+  static const ft::shared_ptr<SequenceRule> rule = chunkInfoRule();
+  return *rule;
 }
 
-SequenceRule& ReadBody::_endOfLineRule()
+LiteralRule& ReadBody::_endOfLineRule()
 {
-  static SequenceRule rule;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    rule.addRule(endOfLineRule());
-  }
-  return rule;
+  static const ft::shared_ptr<LiteralRule> rule = endOfLineRule();
+  return *rule;
 }
 
 /**
@@ -110,13 +101,8 @@ SequenceRule& ReadBody::_endOfLineRule()
  */
 SequenceRule& ReadBody::_fieldLineRule()
 {
-  static SequenceRule rule;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    rule.addRule(fieldLinePartRule());
-  }
-  return rule;
+  static const ft::shared_ptr<SequenceRule> rule = fieldLinePartRule();
+  return *rule;
 }
 
 Extractor<ReadBody>& ReadBody::_chunkExtractor()
@@ -159,11 +145,8 @@ void ReadBody::_determineBodyFraming()
 void ReadBody::_validateContentLength()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  std::istringstream strBodyLen(headers.at("Content-Length"));
-  strBodyLen >> _bodyLength;
-  if (strBodyLen.fail() || !strBodyLen.eof()) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: invalid Content-Length\n";
+  const std::string strLen = headers.at("Content-Length");
+  if (!_setBodyLength(strLen, std::ios::dec)) {
     return;
   }
   if (_bodyLength == 0) {
@@ -315,32 +298,16 @@ std::string ReadBody::_extractPart(const Rule::RuleId& ruleId)
 void ReadBody::_addLineToHeaders(const std::string& line)
 {
   const std::size_t index = line.find(':');
-  if (index == std::string::npos) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: invalid fieldline\n";
-    return;
-  }
   const std::string name = line.substr(0, index);
   const std::string value = line.substr(index + 1, line.size());
   Headers& headers = _client->getRequest().getHeaders();
   headers.addHeader(name, value);
 }
 
-// NOLINTBEGIN(misc-const-correctness)
 void ReadBody::_setChunkSize(const std::string& hexNum)
 {
-  char* end = FT_NULLPTR;
-  const short base = 16;
-  const long value = std::strtol(hexNum.c_str(), &end, base);
-  if (end == hexNum.c_str() || value < 0) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: failed to parse chunk size\n";
-    return;
-  }
-  _log.info() << "body size: " << value << '\n';
-  _bodyLength = static_cast<std::size_t>(value);
+  _setBodyLength(hexNum, std::ios::hex);
 }
-// NOLINTEND(misc-const-correctness)
 
 void ReadBody::_setChunkExt(const std::string& value)
 {
@@ -386,4 +353,26 @@ bool ReadBody::_contentTooLarge(std::size_t newBytes)
     return true;
   }
   return false;
+}
+
+bool ReadBody::_setBodyLength(const std::string& numStr, std::ios::fmtflags fmt)
+{
+  std::istringstream iss(numStr);
+  iss.flags(fmt);
+  iss >> _bodyLength;
+  if (iss.fail()) {
+    // Overflow is the only possible error since grammar ensures valid digits.
+    _client->getResponse().setStatusCode(StatusCode::ContentTooLarge);
+    _log.error() << "ReadBody: body length too large\n";
+    return false;
+  }
+  // todo get from config ?
+  const std::size_t maxBodySize = 2147483647;
+  if (_bodyLength > maxBodySize) {
+    _client->getResponse().setStatusCode(StatusCode::ContentTooLarge);
+    _log.error() << "ReadBody: body length bigger than max body size\n";
+    return false;
+  }
+  _log.info() << "body length: " << _bodyLength << '\n';
+  return true;
 }

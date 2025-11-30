@@ -40,7 +40,7 @@ EventManager::EventManager(ClientManager& clients,
 bool EventManager::sendToClient(Client& client)
 {
   const bool alive = client.sendTo();
-  if (alive && !client.hasDataToSend() && client.getStateHandler().isDone()) {
+  if (alive && !client.hasDataToSend()) {
     _socketsManager->disablePollout(client.getFd());
     _log.info() << "Pollout disabled\n";
   }

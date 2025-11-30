@@ -4,12 +4,14 @@
 
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Extractor.hpp>
+#include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <cstddef>
+#include <ios>
 #include <string>
 
 class Client;
@@ -32,7 +34,7 @@ private:
   };
 
   static SequenceRule& _chunkInfoRule();
-  static SequenceRule& _endOfLineRule();
+  static LiteralRule& _endOfLineRule();
   static SequenceRule& _fieldLineRule();
   static Extractor<ReadBody>& _chunkExtractor();
 
@@ -56,6 +58,7 @@ private:
 
   void _readBody();
   bool _contentTooLarge(std::size_t newBytes);
+  bool _setBodyLength(const std::string& numStr, std::ios::fmtflags fmt);
 
   static Logger& _log;
   static const std::size_t _readChunkSize = 1024;
