@@ -27,7 +27,7 @@ Logger& ParseVersion::_log = Logger::getInstance(LOG_HTTP);
 ParseVersion::ParseVersion(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _buffReader()
+  , _buffReader(_client->getInBuff())
 {
   _log.info() << "ParseVersion\n";
   _init();
@@ -75,8 +75,6 @@ void ParseVersion::_extractVersion()
 
 void ParseVersion::_init()
 {
-  _buffReader.init(&_client->getInBuff());
-
   // _sequence.addRule(owsRule());
   _sequence.addRule(ft::make_shared<LiteralRule>("HTTP/"));
   _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));

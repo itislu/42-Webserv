@@ -13,7 +13,11 @@ public:
   typedef IBuffer::ExpectChr ExpectChr;
   typedef IBuffer::ExpectVoid ExpectVoid;
 
-  void init(IBuffer* buffer);
+  // Requires `init()` to be called before use.
+  BufferReader();
+  ExpectVoid init(IBuffer& buffer);
+  // Throws if seeking buffer to beginning fails.
+  explicit BufferReader(IBuffer& buffer);
 
   // Throwing versions
   char getNextChar();

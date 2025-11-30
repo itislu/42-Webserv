@@ -34,7 +34,7 @@ Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);
 ReadHeaderLines::ReadHeaderLines(Client* context)
   : IState(context)
   , _client(context)
-  , _buffReader()
+  , _buffReader(_client->getInBuff())
   , _done(false)
 {
   _log.info() << "ReadHeaderLines\n";
@@ -67,8 +67,6 @@ try {
 
 void ReadHeaderLines::_init()
 {
-  _buffReader.init(&_client->getInBuff());
-
   _fieldLine = fieldLinePartRule();
   _fieldLine->setBufferReader(&_buffReader);
   _fieldLine->setResultMap(&_results);
