@@ -1,20 +1,17 @@
 #include "StaticFileBuffer.hpp"
-#include "libftpp/optional.hpp"
-#include "utils/fileUtils.hpp"
 
-#include <cstddef>
-#include <libftpp/expected.hpp>
+#include <libftpp/optional.hpp>
 #include <utils/buffer/IBuffer.hpp>
+#include <utils/fileUtils.hpp>
 
 #include <cassert>
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <exception>
 #include <ios>
 #include <iosfwd>
 #include <iostream>
-#include <new>
 #include <string>
 
 /* ************************************************************************** */
@@ -101,7 +98,7 @@ void StaticFileBuffer::seek(std::size_t pos)
 std::size_t StaticFileBuffer::pos()
 {
   const std::streampos pos = _fs.tellg();
-  if (pos < std::streampos(0)) {
+  if (pos == std::streampos(-1)) {
     throw BufferException(errTell);
   }
   return static_cast<std::size_t>(pos);
@@ -131,97 +128,6 @@ StaticFileBuffer::RawBytes StaticFileBuffer::getRawBytes(std::size_t start,
                                                          std::size_t bytes)
 {
   return _getData<RawBytes>(start, bytes);
-}
-
-// Non-throwing versions
-
-IBuffer::ExpectChr StaticFileBuffer::get(std::nothrow_t /*unused*/)
-{
-  try {
-    return get();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectChr StaticFileBuffer::peek(std::nothrow_t /*unused*/)
-{
-  try {
-    return peek();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid StaticFileBuffer::seek(std::size_t pos,
-                                           std::nothrow_t /*unused*/)
-{
-  try {
-    seek(pos);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectPos StaticFileBuffer::pos(std::nothrow_t /*unused*/)
-{
-  try {
-    return pos();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectStr StaticFileBuffer::consumeFront(std::size_t bytes,
-                                                  std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeFront(bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw StaticFileBuffer::consumeRawFront(std::size_t bytes,
-                                                     std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeRawFront(bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw StaticFileBuffer::consumeAll(std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeAll();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectStr StaticFileBuffer::getStr(std::size_t start,
-                                            std::size_t bytes,
-                                            std::nothrow_t /*unused*/)
-{
-  try {
-    return getStr(start, bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw StaticFileBuffer::getRawBytes(std::size_t start,
-                                                 std::size_t bytes,
-                                                 std::nothrow_t /*unused*/)
-{
-  try {
-    return getRawBytes(start, bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
 }
 
 bool StaticFileBuffer::isEmpty() const

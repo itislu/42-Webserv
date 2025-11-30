@@ -28,21 +28,19 @@ public:
   virtual RawBytes getRawBytes(std::size_t start, std::size_t end) = 0;
 
   // Non-throwing versions
-  virtual ExpectChr get(std::nothrow_t /*unused*/) = 0;
-  virtual ExpectChr peek(std::nothrow_t /*unused*/) = 0;
-  virtual ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/) = 0;
-  virtual ExpectPos pos(std::nothrow_t /*unused*/) = 0;
-  virtual ExpectStr consumeFront(std::size_t bytes,
-                                 std::nothrow_t /*unused*/) = 0;
-  virtual ExpectRaw consumeAll(std::nothrow_t /*unused*/) = 0;
-  virtual ExpectStr getStr(std::size_t start,
-                           std::size_t end,
-                           std::nothrow_t /*unused*/) = 0;
-  virtual ExpectRaw getRawBytes(std::size_t start,
-                                std::size_t end,
-                                std::nothrow_t /*unused*/) = 0;
-  virtual ExpectRaw consumeRawFront(std::size_t bytes,
-                                    std::nothrow_t /*unused*/) = 0;
+  ExpectChr get(std::nothrow_t /*unused*/);
+  ExpectChr peek(std::nothrow_t /*unused*/);
+  ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/);
+  ExpectPos pos(std::nothrow_t /*unused*/);
+  ExpectStr consumeFront(std::size_t bytes, std::nothrow_t /*unused*/);
+  ExpectRaw consumeAll(std::nothrow_t /*unused*/);
+  ExpectStr getStr(std::size_t start,
+                   std::size_t bytes,
+                   std::nothrow_t /*unused*/);
+  ExpectRaw getRawBytes(std::size_t start,
+                        std::size_t bytes,
+                        std::nothrow_t /*unused*/);
+  ExpectRaw consumeRawFront(std::size_t bytes, std::nothrow_t /*unused*/);
 
 private:
   IInBuffer(const IInBuffer& other);

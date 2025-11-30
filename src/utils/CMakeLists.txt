@@ -17,6 +17,8 @@ add_library(${LIB_NAME} STATIC
   buffer/BufferQueue.cpp
   buffer/FileBuffer.cpp
   buffer/IBuffer.cpp
+  buffer/IInBuffer.cpp
+  buffer/IOutBuffer.cpp
   buffer/SmartBuffer.cpp
   buffer/StaticFileBuffer.cpp
 

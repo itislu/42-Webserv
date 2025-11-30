@@ -1,6 +1,5 @@
 #include "FileBuffer.hpp"
 
-#include <libftpp/expected.hpp>
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/fileUtils.hpp>
 
@@ -8,11 +7,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <exception>
 #include <ios>
 #include <iosfwd>
 #include <iostream>
-#include <new>
 #include <string>
 
 /* ************************************************************************** */
@@ -78,7 +75,7 @@ void FileBuffer::seek(std::size_t pos)
 std::size_t FileBuffer::pos()
 {
   const std::streampos pos = _fs.tellg();
-  if (pos < std::streampos(0)) {
+  if (pos == std::streampos(-1)) {
     throw BufferException(errTell);
   }
   return static_cast<std::size_t>(pos);
@@ -153,152 +150,6 @@ void FileBuffer::moveBufferToFile(const std::string& filepath)
 
   _fileName.clear();
   _size = 0;
-}
-
-// Non-throwing versions
-
-IBuffer::ExpectChr FileBuffer::get(std::nothrow_t /*unused*/)
-{
-  try {
-    return get();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectChr FileBuffer::peek(std::nothrow_t /*unused*/)
-{
-  try {
-    return peek();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos, std::nothrow_t /*unused*/)
-{
-  try {
-    seek(pos);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectPos FileBuffer::pos(std::nothrow_t /*unused*/)
-{
-  try {
-    return pos();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::append(const std::string& data,
-                                       std::nothrow_t /*unused*/)
-{
-  try {
-    append(data);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
-                                       std::size_t bytes,
-                                       std::nothrow_t /*unused*/)
-{
-  try {
-    append(buffer, bytes);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes,
-                                            std::nothrow_t /*unused*/)
-{
-  try {
-    removeFront(bytes);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes,
-                                            std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeFront(bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw FileBuffer::consumeRawFront(std::size_t bytes,
-                                               std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeRawFront(bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw FileBuffer::consumeAll(std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeAll();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectStr FileBuffer::getStr(std::size_t start,
-                                      std::size_t bytes,
-                                      std::nothrow_t /*unused*/)
-{
-  try {
-    return getStr(start, bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw FileBuffer::getRawBytes(std::size_t start,
-                                           std::size_t bytes,
-                                           std::nothrow_t /*unused*/)
-{
-  try {
-    return getRawBytes(start, bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData,
-                                        std::nothrow_t /*unused*/)
-{
-  try {
-    replace(rawData);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::moveBufferToFile(const std::string& filepath,
-                                                 std::nothrow_t /*unused*/)
-{
-  try {
-    moveBufferToFile(filepath);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
 }
 
 bool FileBuffer::isEmpty() const

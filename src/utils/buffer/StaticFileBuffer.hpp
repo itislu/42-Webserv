@@ -7,7 +7,6 @@
 
 #include <cstddef>
 #include <fstream>
-#include <new>
 #include <string>
 
 /* ************************************************************************** */
@@ -36,21 +35,6 @@ public:
   RawBytes consumeAll();
   std::string getStr(std::size_t start, std::size_t bytes);
   RawBytes getRawBytes(std::size_t start, std::size_t bytes);
-
-  // Interface IInBuffer - Non-throwing versions
-  ExpectChr get(std::nothrow_t /*unused*/);
-  ExpectChr peek(std::nothrow_t /*unused*/);
-  ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/);
-  ExpectPos pos(std::nothrow_t /*unused*/);
-  ExpectStr consumeFront(std::size_t bytes, std::nothrow_t /*unused*/);
-  ExpectRaw consumeRawFront(std::size_t bytes, std::nothrow_t /*unused*/);
-  ExpectRaw consumeAll(std::nothrow_t /*unused*/);
-  ExpectStr getStr(std::size_t start,
-                   std::size_t bytes,
-                   std::nothrow_t /*unused*/);
-  ExpectRaw getRawBytes(std::size_t start,
-                        std::size_t bytes,
-                        std::nothrow_t /*unused*/);
 
   bool isEmpty() const;
   std::size_t size() const;

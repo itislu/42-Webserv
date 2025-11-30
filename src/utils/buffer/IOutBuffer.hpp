@@ -23,16 +23,14 @@ public:
   virtual void moveBufferToFile(const std::string& filepath) = 0;
 
   // Non-throwing versions
-  virtual ExpectVoid append(const std::string& data,
-                            std::nothrow_t /*unused*/) = 0;
-  virtual ExpectVoid append(const RawBytes& buffer,
-                            std::size_t bytes,
-                            std::nothrow_t /*unused*/) = 0;
-  virtual ExpectVoid removeFront(std::size_t bytes,
-                                 std::nothrow_t /*unused*/) = 0;
-  virtual ExpectVoid replace(RawBytes& rawData, std::nothrow_t /*unused*/) = 0;
-  virtual ExpectVoid moveBufferToFile(const std::string& filepath,
-                                      std::nothrow_t /*unused*/) = 0;
+  ExpectVoid append(const std::string& data, std::nothrow_t /*unused*/);
+  ExpectVoid append(const RawBytes& buffer,
+                    std::size_t bytes,
+                    std::nothrow_t /*unused*/);
+  ExpectVoid removeFront(std::size_t bytes, std::nothrow_t /*unused*/);
+  ExpectVoid replace(RawBytes& rawData, std::nothrow_t /*unused*/);
+  ExpectVoid moveBufferToFile(const std::string& filepath,
+                              std::nothrow_t /*unused*/);
 
 private:
   IOutBuffer(const IOutBuffer& other);
