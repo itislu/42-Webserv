@@ -70,7 +70,7 @@ void HandlePost::_createData()
   std::string directory = _client->getResource().getPath();
 
   // todo this should be done in validate request ?
-  if (directory.at(directory.size() - 1) != '/') {
+  if (!ft::ends_with(directory, '/')) {
     directory.append("/");
   }
   _log.info() << "HandlePost: " << directory << '\n';
