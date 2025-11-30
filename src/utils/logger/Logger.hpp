@@ -29,7 +29,6 @@ public:
   static void disableLogging();
 
 private:
-  static bool _loggerEnabled;
   typedef std::map<std::string, ft::shared_ptr<Logger> > InstanceMap;
 
   enum LogLevel
@@ -48,8 +47,11 @@ private:
   std::ostream& _log(LogLevel level);
   static InstanceMap& _instances();
   static std::string _currentTime();
+  static bool _initLoggingFromEnv() throw();
 
   static const int _widthLevelStr = 7;
+  static const char* const _envVar;
+  static bool _loggerEnabled;
 
   std::ofstream _file;
   std::string _filename;
