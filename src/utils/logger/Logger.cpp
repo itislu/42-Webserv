@@ -3,6 +3,8 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 
+#include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -14,7 +16,8 @@
 /* ************************************************************************** */
 // INIT
 
-bool Logger::_loggerEnabled = false;
+const char* const Logger::_envVar = "WEBSERV_LOGGING";
+bool Logger::_loggerEnabled = Logger::_initLoggingFromEnv();
 
 /* ************************************************************************** */
 // PUBLIC
@@ -144,3 +147,23 @@ std::string Logger::_currentTime()
   return buff;
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
+bool Logger::_initLoggingFromEnv() throw()
+{
+  const char* const envValue = std::getenv(_envVar);
+  if (envValue == FT_NULLPTR) {
+    return false;
+  }
+
+  const char* const enablers[] = {
+    "1", "true", "True", "TRUE", "on", "On", "ON"
+  };
+  for (unsigned i = 0; i < FT_COUNTOF(enablers); ++i) {
+    if (std::strcmp(envValue, enablers[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
