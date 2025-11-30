@@ -8,6 +8,7 @@
 #include "server/Server.hpp"
 #include "server/ServerManager.hpp"
 #include "socket/SocketManager.hpp"
+#include "utils/state/StateHandler.hpp"
 #include <cstddef>
 #include <exception>
 #include <iostream>
@@ -46,6 +47,17 @@ bool EventManager::receiveFromClient(Client& client)
   return alive;
 }
 
+void EventManager::clientStateMachine(Client& client)
+{
+  StateHandler<Client>& handler = client.getStateHandler();
+  handler.setStateHasChanged(true);
+
+  while (!handler.isDone() && handler.stateHasChanged()) {
+    handler.setStateHasChanged(false);
+    handler.getState()->run();
+  }
+}
+
 bool EventManager::handleClient(Client* client, unsigned events)
 {
   if (client == FT_NULLPTR) {
@@ -54,6 +66,9 @@ bool EventManager::handleClient(Client* client, unsigned events)
   bool alive = true;
   if ((events & POLLIN) != 0 && alive) { // Receive Data
     alive = receiveFromClient(*client);
+  }
+  if (alive) {
+    EventManager::clientStateMachine(*client);
   }
   if ((events & POLLOUT) != 0 && alive) { // Send Data
     alive = sendToClient(*client);

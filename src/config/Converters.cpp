@@ -112,6 +112,20 @@ int toCode(const std::string& str)
                               " (must be between 300 and 599)");
 }
 
+int hexToInt(char chr)
+{
+  if (chr >= 'A' && chr <= 'F') {
+    return chr - 'A' + 10;
+  }
+  if (chr >= 'a' && chr <= 'f') {
+    return chr - 'a' + 10;
+  }
+  if (chr >= '0' && chr <= '9') {
+    return chr - '0';
+  }
+  return -1;
+}
+
 bool toBool(const std::string& str)
 {
   const std::string lower = ft::to_lower(str);

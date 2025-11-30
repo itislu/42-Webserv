@@ -2,6 +2,7 @@
 #include "client/TimeStamp.hpp"
 #include "config/Config.hpp"
 #include "http/Request.hpp"
+#include "http/Resource.hpp"
 #include "http/Response.hpp"
 #include "http/states/readRequestLine/ReadRequestLine.hpp"
 #include "libftpp/utility.hpp"
@@ -49,6 +50,11 @@ int Client::getFd() const
   return _fd.get();
 }
 
+bool Client::hasServer() const
+{
+  return (_server != FT_NULLPTR);
+}
+
 const std::string& Client::getHost() const
 {
   return _host;
@@ -79,6 +85,11 @@ Response& Client::getResponse()
   return _response;
 }
 
+Resource& Client::getResource()
+{
+  return _resource;
+}
+
 long Client::getTimeout() const
 {
   if (_server != FT_NULLPTR) {
@@ -102,18 +113,13 @@ bool Client::receive()
   static IBuffer::RawBytes buffer(MAX_CHUNK);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
+    /* TODO: remove this! */
     std::cout << "Client " << getFd() << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     std::cout.write(reinterpret_cast<const char*>(buffer.data()),
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
     _inBuff.append(buffer, bytes);
-    // TODO: STATEMACHINE/PARSING
-    _stateHandler.setStateHasChanged(true);
-    while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
-      _stateHandler.setStateHasChanged(false);
-      _stateHandler.getState()->run();
-    }
   } else if (bytes == 0) {
     std::cout << "[CLIENT] wants to disconnect\n";
     return false;
@@ -135,12 +141,10 @@ bool Client::sendTo()
     // todo error
   }
   const ssize_t bytes = send(getFd(), &buff, toSend, 0);
-  if (bytes > 0) {
-    // todo ok
-  }
   if (bytes == 0) {
     std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
-  } else {
+  }
+  if (bytes < 0) {
     std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
               << std::strerror(errno) << "\n";
     return false;

@@ -16,9 +16,11 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
   StatusCode::_codeMap = { { { Ok, "Ok" },
                              { BadRequest, "Bad Request" },
                              { Unauthorized, "Unauthorized" },
-                             { InternalServerError, "Internal Server Error" } }
-
-  };
+                             { Forbidden, "Forbidden" },
+                             { NotFound, "Not Found" },
+                             { MethodNotAllowed, "Method not allowed" },
+                             { InternalServerError,
+                               "Internal Server Error" } } };
 
 /* ***************************************************************************/
 // PUBLIC

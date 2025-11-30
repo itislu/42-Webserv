@@ -4,6 +4,12 @@
 #include <string>
 #include <vector>
 
+Server::Server(const config::ServerConfig& servConfig)
+  : _config(&servConfig)
+  , _timeOut(servConfig.getTimeout())
+{
+}
+
 Server::Server(const config::ServerConfig& config,
                const std::vector<const Socket*>& listeners)
   : _config(&config)
