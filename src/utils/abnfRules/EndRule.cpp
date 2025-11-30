@@ -1,10 +1,11 @@
 #include "EndRule.hpp"
 #include "Rule.hpp"
 
-#include <cstddef>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/BufferReader.hpp>
+#include <utils/buffer/IInBuffer.hpp>
+
+#include <cstddef>
 
 /* ************************************************************************** */
 // PUBLIC
@@ -20,14 +21,14 @@ EndRule::EndRule(ft::shared_ptr<Rule> rule)
 bool EndRule::matches()
 {
   debugPrintRuleEntry();
-  setEndPos(getBuffReader()->getPosInBuff());
+  setEndPos(getBuffReader()->pos());
   bool matches = false;
   std::size_t rewindCount = 1;
-  while (!matches && getBuffReader()->getPosInBuff() > getStartPos() &&
-         getBuffReader()->getPosInBuff() > 0) {
-    getBuffReader()->rewind(rewindCount);
+  while (!matches && getBuffReader()->pos() > getStartPos() &&
+         getBuffReader()->pos() > 0) {
+    getBuffReader()->seek(getBuffReader()->pos() - rewindCount);
     matches = _rule->matches();
-    if (matches && getEndPos() == getBuffReader()->getPosInBuff()) {
+    if (matches && getEndPos() == getBuffReader()->pos()) {
       break;
     }
     moveToEndPos();
@@ -46,7 +47,7 @@ void EndRule::reset()
   _rule->reset();
 }
 
-void EndRule::setBufferReader(BufferReader* bufferReader)
+void EndRule::setBufferReader(IInBuffer* bufferReader)
 {
   Rule::setBufferReader(bufferReader);
   _rule->setBufferReader(bufferReader);

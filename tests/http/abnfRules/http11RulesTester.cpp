@@ -2,7 +2,6 @@
 #include "utils/buffer/SmartBuffer.hpp"
 #include <http/abnfRules/http11Rules.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -21,12 +20,11 @@ bool runParser(const std::string& str, Rule& rule)
 {
   SmartBuffer buffer;
   buffer.append(str);
-  BufferReader reader = BufferReader();
-  reader.init(&buffer);
-  rule.setBufferReader(&reader);
+  buffer.seek(0);
+  rule.setBufferReader(&buffer);
   rule.reset();
   bool matches = rule.matches();
-  if (!reader.reachedEnd()) {
+  if (buffer.pos() < buffer.size()) {
     matches = false;
   }
   return matches;

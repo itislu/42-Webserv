@@ -8,7 +8,6 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
@@ -31,7 +30,6 @@ Logger& ParseMethod::_log = Logger::getInstance(LOG_HTTP);
 ParseMethod::ParseMethod(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _buffReader()
 {
   _log.info() << *_client << " ParseMethod\n";
   _init();
@@ -45,7 +43,7 @@ ParseMethod::ParseMethod(ReadRequestLine* context)
 void ParseMethod::run()
 {
   _sequence.reset();
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   if (!_sequence.matches()) {
     _log.error() << "ParseMethod: BadRequest\n";
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
@@ -70,14 +68,12 @@ void ParseMethod::run()
 
 void ParseMethod::_init()
 {
-  _buffReader.init(&_client->getInBuff());
-
   ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(::isupper));
   _sequence.addRule(ft::move(rep));
   _sequence.addRule(ft::make_shared<LiteralRule>(" "));
 
-  _sequence.setBufferReader(&_buffReader);
+  _sequence.setBufferReader(&_client->getInBuff());
 }
 
 /**
@@ -85,7 +81,7 @@ void ParseMethod::_init()
  */
 void ParseMethod::_extractMethod()
 {
-  const std::size_t index = _buffReader.getPosInBuff();
+  const std::size_t index = _client->getInBuff().pos();
   std::string methodStr = _client->getInBuff().consumeFront(index);
   const Request::Method method = Request::strToMethod(ft::trim(methodStr));
   _client->getRequest().setMethod(method);
@@ -93,7 +89,7 @@ void ParseMethod::_extractMethod()
 
 bool ParseMethod::_methodNotImplemented()
 {
-  if (_buffReader.getPosInBuff() > Request::MaxMethodLen + 1) {
+  if (_client->getInBuff().pos() > Request::MaxMethodLen + 1) {
     _log.error() << "Method not implemented\n";
     _client->getResponse().setStatusCode(StatusCode::NotImplemented);
     return true;

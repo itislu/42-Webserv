@@ -12,7 +12,6 @@
 #include <http/states/validateRequest/ValidateRequest.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -35,7 +34,6 @@ Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);
 ReadHeaderLines::ReadHeaderLines(Client* context)
   : IState(context)
   , _client(context)
-  , _buffReader()
   , _sizeHeaders(0)
   , _done(false)
 {
@@ -69,14 +67,12 @@ try {
 
 void ReadHeaderLines::_init()
 {
-  _buffReader.init(&_client->getInBuff());
-
   _fieldLine = fieldLinePartRule();
-  _fieldLine->setBufferReader(&_buffReader);
+  _fieldLine->setBufferReader(&_client->getInBuff());
   _fieldLine->setResultMap(&_results);
 
   _endOfLine = endOfLineRule();
-  _endOfLine->setBufferReader(&_buffReader);
+  _endOfLine->setBufferReader(&_client->getInBuff());
   _endOfLine->setResultMap(&_results);
 }
 
@@ -86,7 +82,7 @@ bool ReadHeaderLines::_readingOk()
   if (statuscode != StatusCode::Ok) {
     return false;
   }
-  if (_buffReader.reachedEnd()) {
+  if (_client->getInBuff().pos() >= _client->getInBuff().size()) {
     return false;
   }
   return true;
@@ -94,7 +90,7 @@ bool ReadHeaderLines::_readingOk()
 
 void ReadHeaderLines::_readLines()
 {
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   while (_readingOk()) {
     _results.clear();
     _fieldLine->reset();
@@ -134,7 +130,7 @@ void ReadHeaderLines::_setNextState()
 
 bool ReadHeaderLines::_hasEndOfLine()
 {
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   return _endOfLine->matches();
 }
 
@@ -147,7 +143,7 @@ std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
     return "";
   }
   const std::string part = _client->getInBuff().consumeFront(index);
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   return part;
 }
 

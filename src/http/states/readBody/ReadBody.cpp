@@ -42,7 +42,6 @@ const std::size_t ReadBody::_readChunkSize;
 ReadBody::ReadBody(Client* context)
   : IState<Client>(context)
   , _client(context)
-  , _buffReader()
   , _bodyLength(0)
   , _consumed(0)
   , _chunkedState(ReadChunkInfo)
@@ -53,10 +52,9 @@ ReadBody::ReadBody(Client* context)
   _log.info() << *_client << " ReadBody\n";
 
   _determineBodyFraming();
-  _buffReader.init(&_client->getInBuff());
-  _chunkInfoRule().setBufferReader(&_buffReader);
-  _endOfLineRule().setBufferReader(&_buffReader);
-  _fieldLineRule().setBufferReader(&_buffReader);
+  _chunkInfoRule().setBufferReader(&_client->getInBuff());
+  _endOfLineRule().setBufferReader(&_client->getInBuff());
+  _fieldLineRule().setBufferReader(&_client->getInBuff());
 
   _chunkInfoRule().setResultMap(&_results);
   _endOfLineRule().setResultMap(&_results);
@@ -221,7 +219,7 @@ void ReadBody::_readChunkedBody()
 void ReadBody::_readChunkInfo()
 {
   _results.clear();
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   _chunkInfoRule().reset();
   if (!_chunkInfoRule().matches()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
@@ -230,8 +228,9 @@ void ReadBody::_readChunkInfo()
   }
 
   if (_chunkInfoRule().reachedEnd()) {
+    const std::size_t posInBuff = _client->getInBuff().pos();
     _chunkExtractor().run(*this, _results, _client->getInBuff());
-    _client->getInBuff().removeFront(_buffReader.getPosInBuff());
+    _client->getInBuff().removeFront(posInBuff);
 
     // last-chunk ?
     if (_bodyLength == 0) {
@@ -253,7 +252,7 @@ void ReadBody::_readChunkData()
 
 void ReadBody::_readChunkDataEnd()
 {
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   _endOfLineRule().reset();
   if (!_endOfLineRule().matches()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
@@ -262,13 +261,13 @@ void ReadBody::_readChunkDataEnd()
 
   if (_endOfLineRule().reachedEnd()) {
     _chunkedState = ReadChunkInfo;
-    _client->getInBuff().removeFront(_buffReader.getPosInBuff());
+    _client->getInBuff().removeFront(_client->getInBuff().pos());
   }
 }
 
 void ReadBody::_readTrailerSection()
 {
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   while (_readingOk()) {
     _results.clear();
     _fieldLineRule().reset();
@@ -300,12 +299,15 @@ bool ReadBody::_readingOk()
   if (statuscode != StatusCode::Ok) {
     return false;
   }
-  return !_done && !_buffReader.reachedEnd();
+  if (_client->getInBuff().pos() >= _client->getInBuff().size()) {
+    return false;
+  }
+  return !_done;
 }
 
 bool ReadBody::_hasEndOfLine()
 {
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   return _endOfLineRule().matches();
 }
 
@@ -314,7 +316,7 @@ std::string ReadBody::_extractPart(const Rule::RuleId& ruleId)
   const RuleResult& result = _results[ruleId];
   const std::size_t index = result.getEnd();
   const std::string res = _client->getInBuff().consumeFront(index);
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   return res;
 }
 

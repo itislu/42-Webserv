@@ -2,7 +2,6 @@
 #ifndef PARSE_VERSION_HPP
 #define PARSE_VERSION_HPP
 
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -23,7 +22,6 @@ private:
   void _extractVersion();
 
   Client* _client;
-  BufferReader _buffReader;
   SequenceRule _sequence;
   static Logger& _log;
 };

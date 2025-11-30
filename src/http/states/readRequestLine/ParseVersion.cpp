@@ -7,7 +7,6 @@
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/logger/Logger.hpp>
@@ -28,7 +27,6 @@ Logger& ParseVersion::_log = Logger::getInstance(LOG_HTTP);
 ParseVersion::ParseVersion(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _buffReader()
 {
   _log.info() << *_client << " ParseVersion\n";
   _init();
@@ -47,8 +45,10 @@ ParseVersion::ParseVersion(ReadRequestLine* context)
  */
 void ParseVersion::run()
 {
+  _log.error() << _client->getInBuff() << "###\n";
+
   _sequence.reset();
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
   if (!_sequence.matches()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     _log.info() << "ParseVersion: no match\n";
@@ -65,7 +65,7 @@ void ParseVersion::run()
 
 void ParseVersion::_extractVersion()
 {
-  const std::size_t index = _buffReader.getPosInBuff();
+  const std::size_t index = _client->getInBuff().pos();
   std::string version = _client->getInBuff().consumeFront(index);
   _client->getRequest().setVersion(ft::trim(version));
 }
@@ -75,13 +75,11 @@ void ParseVersion::_extractVersion()
 
 void ParseVersion::_init()
 {
-  _buffReader.init(&_client->getInBuff());
-
   // _sequence.addRule(owsRule());
   _sequence.addRule(ft::make_shared<LiteralRule>("HTTP/"));
   _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
   _sequence.addRule(ft::make_shared<LiteralRule>("."));
   _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
   _sequence.addRule(endOfLineRule());
-  _sequence.setBufferReader(&_buffReader);
+  _sequence.setBufferReader(&_client->getInBuff());
 }

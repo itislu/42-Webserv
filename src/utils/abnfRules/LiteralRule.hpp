@@ -4,7 +4,7 @@
 
 #include "Rule.hpp"
 
-#include "utils/BufferReader.hpp"
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstddef>
 #include <string>
@@ -18,7 +18,7 @@ public:
 
   bool matches();
   void reset();
-  void setBufferReader(BufferReader* bufferReader);
+  void setBufferReader(IInBuffer* bufferReader);
   void setResultMap(ResultMap* results);
 
 private:

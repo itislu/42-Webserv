@@ -1,11 +1,11 @@
 #include "Rule.hpp"
 
-#include <cassert>
 #include <libftpp/format.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
+#include <cassert>
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -43,7 +43,7 @@ void Rule::reset()
   _reachedEnd = false;
 }
 
-void Rule::setBufferReader(BufferReader* bufferReader)
+void Rule::setBufferReader(IInBuffer* bufferReader)
 {
   _buffReader = bufferReader;
 }
@@ -86,7 +86,7 @@ void Rule::setReachedEnd(bool value)
   _reachedEnd = value;
 }
 
-BufferReader* Rule::getBuffReader()
+IInBuffer* Rule::getBuffReader()
 {
   return _buffReader;
 }
@@ -113,18 +113,17 @@ std::size_t Rule::getEndPos() const
 
 void Rule::rewindToStartPos()
 {
-  const std::size_t currPos = getBuffReader()->getPosInBuff();
-  assert(currPos >= getStartPos());
-  if (getStartPos() > currPos) {
+  const std::size_t currPos = getBuffReader()->pos();
+  assert(currPos >= _startPos);
+  if (_startPos > currPos) {
     return;
   }
-  const std::size_t diff = currPos - getStartPos();
-  getBuffReader()->rewind(diff);
+  getBuffReader()->seek(_startPos);
 }
 
 void Rule::moveToEndPos()
 {
-  getBuffReader()->setPosInBuff(getEndPos());
+  getBuffReader()->seek(getEndPos());
 }
 
 void Rule::addRuleResult(bool matches)
@@ -162,6 +161,11 @@ void Rule::debugPrintMatchStatus(bool matches)
     std::cout << "  (" << _debugMatchReason << ")";
   }
   std::cout << "\n";
+}
+
+bool Rule::bufferReachedEnd()
+{
+  return _buffReader->pos() >= _buffReader->size();
 }
 
 /* ************************************************************************** */

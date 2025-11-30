@@ -9,7 +9,6 @@
 #include <http/states/readRequestLine/ParseVersion.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -32,10 +31,8 @@ std::size_t ParseUri::_maxUriLength = _defaultMaxUriLength;
 ParseUri::ParseUri(ReadRequestLine* context)
   : IState<ReadRequestLine>(context)
   , _client(context->getContext())
-  , _buffReader()
 {
   _log.info() << *_client << " ParseUri\n";
-  _buffReader.init(&_client->getInBuff());
 }
 
 void ParseUri::run()
@@ -43,9 +40,9 @@ void ParseUri::run()
   Rule::ResultMap results;
 
   _sequence().reset();
-  _sequence().setBufferReader(&_buffReader);
+  _sequence().setBufferReader(&_client->getInBuff());
   _sequence().setResultMap(&results);
-  _buffReader.resetPosInBuff();
+  _client->getInBuff().seek(0);
 
   if (!_sequence().matches()) {
     _log.error() << "Invalid request target\n";
@@ -141,6 +138,8 @@ Extractor<Authority>& ParseUri::_authExtractor()
 
 void ParseUri::_extractParts(const Rule::ResultMap& results)
 {
+  const std::size_t posInBuff = _client->getInBuff().pos();
+
   if (_isAbsoluteForm(results)) {
     _uriExtractorAbsoluteForm().run(_tmpUri, results, _client->getInBuff());
   } else {
@@ -149,13 +148,12 @@ void ParseUri::_extractParts(const Rule::ResultMap& results)
   _authExtractor().run(_tmpUri.getAuthority(), results, _client->getInBuff());
 
   // remove bytes from buffer
-  const std::size_t posInBuff = _buffReader.getPosInBuff();
   _client->getInBuff().removeFront(posInBuff);
 }
 
 bool ParseUri::_uriTooLong()
 {
-  if (_buffReader.getPosInBuff() > _maxUriLength) {
+  if (_client->getInBuff().pos() > _maxUriLength) {
     _log.error() << "ParseUri: uri too long\n";
     _client->getResponse().setStatusCode(StatusCode::UriTooLong);
     return true;

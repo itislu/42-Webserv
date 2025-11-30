@@ -4,7 +4,6 @@
 
 #include <http/Authority.hpp>
 #include <http/Uri.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -40,7 +39,6 @@ private:
   static const std::size_t _defaultMaxUriLength = 8042;
   static std::size_t _maxUriLength;
   Client* _client;
-  BufferReader _buffReader;
   Uri _tmpUri;
 
   Rule::ResultMap _results;

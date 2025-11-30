@@ -2,7 +2,6 @@
 #ifndef PARSE_METHOD_HPP
 #define PARSE_METHOD_HPP
 
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -24,7 +23,6 @@ private:
   bool _methodNotImplemented();
 
   Client* _client;
-  BufferReader _buffReader;
   SequenceRule _sequence;
   static Logger& _log;
 };

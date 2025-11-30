@@ -1,7 +1,7 @@
 #include "LiteralRule.hpp"
 
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 /* ************************************************************************** */
 // PUBLIC
@@ -17,11 +17,11 @@ LiteralRule::~LiteralRule() {}
 
 bool LiteralRule::matches()
 {
-  setStartPos(getBuffReader()->getPosInBuff());
+  setStartPos(getBuffReader()->pos());
   debugPrintRuleEntry();
   bool matches = true;
-  while (!getBuffReader()->reachedEnd()) {
-    const char chr = getBuffReader()->getNextChar();
+  while (!bufferReachedEnd()) {
+    const char chr = getBuffReader()->get();
     matches = chr == _literal[_pos];
     _pos++;
     if (_pos >= _literal.size()) {
@@ -32,7 +32,7 @@ bool LiteralRule::matches()
       break;
     }
   }
-  setEndPos(getBuffReader()->getPosInBuff());
+  setEndPos(getBuffReader()->pos());
   addRuleResult(matches);
   debugPrintMatchStatus(matches);
   return matches;
@@ -44,7 +44,7 @@ void LiteralRule::reset()
   setReachedEnd(false);
 }
 
-void LiteralRule::setBufferReader(BufferReader* bufferReader)
+void LiteralRule::setBufferReader(IInBuffer* bufferReader)
 {
   Rule::setBufferReader(bufferReader);
 }

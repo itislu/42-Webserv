@@ -5,7 +5,7 @@
 #include "Rule.hpp"
 
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -19,7 +19,7 @@ public:
 
   bool matches();
   void reset();
-  void setBufferReader(BufferReader* bufferReader);
+  void setBufferReader(IInBuffer* bufferReader);
   void setResultMap(ResultMap* results);
 
   void addRule(ft::shared_ptr<Rule> rule);

@@ -2,8 +2,8 @@
 #ifndef RULE_HPP
 #define RULE_HPP
 
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstddef>
 #include <map>
@@ -20,7 +20,7 @@ public:
 
   virtual bool matches() = 0;
   virtual void reset() = 0;
-  virtual void setBufferReader(BufferReader* bufferReader) = 0;
+  virtual void setBufferReader(IInBuffer* bufferReader) = 0;
   virtual void setResultMap(ResultMap* results) = 0;
 
   bool reachedEnd() const;
@@ -33,7 +33,7 @@ public:
 
 protected:
   void setReachedEnd(bool value);
-  BufferReader* getBuffReader();
+  IInBuffer* getBuffReader();
 
   void setStartPos(std::size_t pos);
   std::size_t getStartPos() const;
@@ -48,12 +48,14 @@ protected:
   void debugPrintRuleEntry();
   void debugPrintMatchStatus(bool matches);
 
+  bool bufferReachedEnd();
+
 private:
   Rule(const Rule& other);
   Rule& operator=(const Rule& other);
 
   bool _reachedEnd;
-  BufferReader* _buffReader;
+  IInBuffer* _buffReader;
 
   std::size_t _startPos;
   std::size_t _endPos;

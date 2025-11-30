@@ -4,7 +4,7 @@
 
 #include "Rule.hpp"
 
-#include "utils/BufferReader.hpp"
+#include <utils/buffer/IInBuffer.hpp>
 
 /* ************************************************************************** */
 class RangeRule : public Rule
@@ -16,7 +16,7 @@ public:
 
   bool matches();
   void reset();
-  void setBufferReader(BufferReader* bufferReader);
+  void setBufferReader(IInBuffer* bufferReader);
   void setResultMap(ResultMap* results);
 
 private:

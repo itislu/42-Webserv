@@ -2,7 +2,6 @@
 #ifndef READ_BODY_HPP
 #define READ_BODY_HPP
 
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -61,7 +60,6 @@ private:
   static const std::size_t _readChunkSize = 1024;
 
   Client* _client;
-  BufferReader _buffReader;
   Rule::ResultMap _results;
 
   std::size_t _bodyLength;

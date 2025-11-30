@@ -1,11 +1,11 @@
 #include "RepetitionRule.hpp"
 #include "Rule.hpp"
 
-#include <cstddef>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/BufferReader.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
+#include <cstddef>
 #include <limits>
 
 /* ************************************************************************** */
@@ -26,11 +26,11 @@ RepetitionRule::~RepetitionRule() {}
 bool RepetitionRule::matches()
 {
   debugPrintRuleEntry();
-  const std::size_t ogStartPos = getBuffReader()->getPosInBuff();
+  const std::size_t ogStartPos = getBuffReader()->pos();
 
-  while (!getBuffReader()->reachedEnd()) {
+  while (!bufferReachedEnd()) {
 
-    setStartPos(getBuffReader()->getPosInBuff());
+    setStartPos(getBuffReader()->pos());
 
     const bool matches = _rule->matches();
     _rule->reset();
@@ -38,8 +38,7 @@ bool RepetitionRule::matches()
       _incrementReps();
       _reachedMin = _currReps >= _minReps;
 
-      if (_currReps >= _maxReps ||
-          getStartPos() == getBuffReader()->getPosInBuff()) {
+      if (_currReps >= _maxReps || getStartPos() == getBuffReader()->pos()) {
         break;
       }
     } else {
@@ -54,7 +53,7 @@ bool RepetitionRule::matches()
   }
   setReachedEnd(_reachedMin);
   setStartPos(ogStartPos);
-  setEndPos(getBuffReader()->getPosInBuff());
+  setEndPos(getBuffReader()->pos());
   addRuleResult(_reachedMin);
   debugPrintMatchStatus(_reachedMin);
   return _reachedMin;
@@ -68,7 +67,7 @@ void RepetitionRule::reset()
   _rule->reset();
 }
 
-void RepetitionRule::setBufferReader(BufferReader* bufferReader)
+void RepetitionRule::setBufferReader(IInBuffer* bufferReader)
 {
   Rule::setBufferReader(bufferReader);
   _rule->setBufferReader(bufferReader);

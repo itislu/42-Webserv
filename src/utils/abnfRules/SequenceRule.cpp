@@ -2,9 +2,9 @@
 
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstddef>
 
@@ -22,9 +22,9 @@ SequenceRule::~SequenceRule() {}
 bool SequenceRule::matches()
 {
   debugPrintRuleEntry();
-  setStartPos(getBuffReader()->getPosInBuff());
+  setStartPos(getBuffReader()->pos());
   bool matches = true;
-  while (matches && !getBuffReader()->reachedEnd()) {
+  while (matches && !bufferReachedEnd()) {
     matches = _rules[_currRule]->matches();
 
     if (matches) {
@@ -37,11 +37,11 @@ bool SequenceRule::matches()
     }
   }
 
-  if (getBuffReader()->reachedEnd() && !reachedEnd()) {
+  if (bufferReachedEnd() && !reachedEnd()) {
     setDebugMatchReason("end of buffer; not end of seq");
   }
 
-  setEndPos(getBuffReader()->getPosInBuff());
+  setEndPos(getBuffReader()->pos());
   addRuleResult(matches);
   debugPrintMatchStatus(matches);
   return matches;
@@ -56,7 +56,7 @@ void SequenceRule::reset()
   setReachedEnd(false);
 }
 
-void SequenceRule::setBufferReader(BufferReader* bufferReader)
+void SequenceRule::setBufferReader(IInBuffer* bufferReader)
 {
   Rule::setBufferReader(bufferReader);
   for (std::size_t i = 0; i < _rules.size(); i++) {

@@ -1,9 +1,9 @@
 #include "utils/buffer/SmartBuffer.hpp"
+#include <cstddef>
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
@@ -25,14 +25,13 @@ bool runParser(const std::string& str, Rule& rule)
 {
   SmartBuffer buffer;
   buffer.append(str);
-
-  BufferReader reader = BufferReader();
-  reader.init(&buffer);
-
-  rule.setBufferReader(&reader);
+  buffer.seek(0);
+  rule.setBufferReader(&buffer);
   rule.reset();
   bool matches = rule.matches();
-  if (!reader.reachedEnd()) {
+  const std::size_t pos = buffer.pos();
+  const std::size_t size = buffer.size();
+  if (pos < size) {
     matches = false;
   }
   return matches;

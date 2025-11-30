@@ -1,8 +1,8 @@
 #include "RangeRule.hpp"
 
 #include <libftpp/utility.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstring>
 
@@ -35,10 +35,10 @@ RangeRule::~RangeRule() {}
 bool RangeRule::matches()
 {
   debugPrintRuleEntry();
-  if (getBuffReader()->reachedEnd()) {
+  if (bufferReachedEnd()) {
     return true;
   }
-  const char chr = getBuffReader()->getNextChar();
+  const char chr = getBuffReader()->get();
 
   bool matches = false;
   switch (_range.type) {
@@ -61,7 +61,7 @@ void RangeRule::reset()
   setReachedEnd(false);
 }
 
-void RangeRule::setBufferReader(BufferReader* bufferReader)
+void RangeRule::setBufferReader(IInBuffer* bufferReader)
 {
   Rule::setBufferReader(bufferReader);
 }

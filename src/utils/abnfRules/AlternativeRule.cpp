@@ -2,8 +2,8 @@
 
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstddef>
 
@@ -45,7 +45,7 @@ void AlternativeRule::reset()
   setReachedEnd(false);
 }
 
-void AlternativeRule::setBufferReader(BufferReader* bufferReader)
+void AlternativeRule::setBufferReader(IInBuffer* bufferReader)
 {
   Rule::setBufferReader(bufferReader);
   for (std::size_t i = 0; i < _rules.size(); i++) {
@@ -76,14 +76,14 @@ void AlternativeRule::setMatchMode(AlternativeMode mode)
 
 bool AlternativeRule::_firstMatchMode()
 {
-  setStartPos(getBuffReader()->getPosInBuff());
+  setStartPos(getBuffReader()->pos());
   setEndPos(0);
   bool matches = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
     matches = _rules[i]->matches();
     if (matches) {
       setReachedEnd(_rules[i]->reachedEnd());
-      setEndPos(getBuffReader()->getPosInBuff());
+      setEndPos(getBuffReader()->pos());
       break;
     }
     rewindToStartPos();
@@ -93,14 +93,14 @@ bool AlternativeRule::_firstMatchMode()
 
 bool AlternativeRule::_greedyMode()
 {
-  setStartPos(getBuffReader()->getPosInBuff());
+  setStartPos(getBuffReader()->pos());
   setEndPos(0);
   bool somethingMatched = false;
   for (std::size_t i = 0; i < _rules.size(); i++) {
     if (_rules[i]->matches()) {
-      if (!somethingMatched || getBuffReader()->getPosInBuff() > getEndPos()) {
+      if (!somethingMatched || getBuffReader()->pos() > getEndPos()) {
         setReachedEnd(_rules[i]->reachedEnd());
-        setEndPos(getBuffReader()->getPosInBuff());
+        setEndPos(getBuffReader()->pos());
       }
       somethingMatched = true;
     }

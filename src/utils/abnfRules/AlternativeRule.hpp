@@ -3,8 +3,8 @@
 #define ALTERNATIVE_RULE_HPP
 
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <vector>
 
@@ -23,7 +23,7 @@ public:
 
   bool matches();
   void reset();
-  void setBufferReader(BufferReader* bufferReader);
+  void setBufferReader(IInBuffer* bufferReader);
   void setResultMap(ResultMap* results);
 
   void addRule(ft::shared_ptr<Rule> rule);

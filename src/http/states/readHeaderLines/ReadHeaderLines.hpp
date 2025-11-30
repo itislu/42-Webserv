@@ -3,7 +3,6 @@
 #define READ_HEADER_LINES_HPP
 
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
@@ -40,7 +39,6 @@ private:
   // Could be unique_ptr, but gets assigned from a function returning
   // shared_ptr.
   ft::shared_ptr<LiteralRule> _endOfLine;
-  BufferReader _buffReader;
   Rule::ResultMap _results;
   std::size_t _sizeHeaders;
   bool _done;

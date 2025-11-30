@@ -17,14 +17,13 @@ add_library(${LIB_NAME} STATIC
   buffer/BufferQueue.cpp
   buffer/FileBuffer.cpp
   buffer/IBuffer.cpp
+  buffer/IInBuffer.cpp
   buffer/SmartBuffer.cpp
   buffer/StaticFileBuffer.cpp
 
   logger/Logger.cpp
   printUtils.cpp
   fileUtils.cpp
-
-  BufferReader.cpp
 )
 
 target_link_libraries(${LIB_NAME} 
