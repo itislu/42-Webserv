@@ -66,18 +66,47 @@ void Logger::disableLogging()
 
 /* ***************************************************************************/
 // PRIVATE
-Logger::Logger(const std::string& filename)
+
+Logger::Logger() throw()
+  : _isFileCreated(false)
 {
-  _file.open(filename.c_str(), std::ios::out | std::ios::trunc);
-  _file << std::unitbuf; // enables automatic flush
-  if (!_file) {
-    std::cerr << "Failed to open log file: " << filename << '\n';
+  _file << std::unitbuf;
+}
+
+Logger::Logger(const std::string& filename)
+  : _filename(filename)
+  , _isFileCreated(false)
+{
+  _file << std::unitbuf;
+  _openFile();
+}
+
+bool Logger::_openFile()
+{
+  if (!_loggerEnabled) {
+    if (_file.is_open()) {
+      _file.close();
+    }
+    return false;
   }
+  if (_file.is_open()) {
+    return true;
+  }
+
+  _file.open(_filename.c_str(),
+             _isFileCreated ? std::ios::app : std::ios::trunc);
+  if (!_file.is_open()) {
+    std::cerr << "Failed to open log file: " << _filename << '\n';
+    return false;
+  }
+
+  _isFileCreated = true;
+  return true;
 }
 
 std::ostream& Logger::_log(LogLevel level)
 {
-  if (!_file.is_open() || !_loggerEnabled) {
+  if (!_openFile()) {
     return _file;
   }
   std::string levelStr;

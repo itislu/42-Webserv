@@ -39,11 +39,12 @@ private:
     ERROR
   };
 
-  Logger() throw() {}
+  Logger() throw();
   explicit Logger(const std::string& filename);
   Logger(const Logger& other);
   Logger& operator=(const Logger& other);
 
+  bool _openFile();
   std::ostream& _log(LogLevel level);
   static InstanceMap& _instances();
   static std::string _currentTime();
@@ -51,6 +52,8 @@ private:
   static const int _widthLevelStr = 7;
 
   std::ofstream _file;
+  std::string _filename;
+  bool _isFileCreated;
 };
 
 #endif
