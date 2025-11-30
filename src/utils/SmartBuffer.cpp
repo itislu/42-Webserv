@@ -11,7 +11,8 @@
 #include <new>
 #include <string>
 
-/* ************************************************************************** */
+/* **************************************************************************
+ */
 // INIT
 
 const char* const SmartBuffer::errAllocBuffer =
@@ -44,6 +45,11 @@ void SmartBuffer::seek(std::size_t pos)
   _buffer->seek(pos);
 }
 
+std::size_t SmartBuffer::pos()
+{
+  return _buffer->pos();
+}
+
 void SmartBuffer::append(const std::string& data)
 {
   if (!_usesFile && _fileNeeded(data.size())) {
@@ -72,6 +78,12 @@ std::string SmartBuffer::consumeFront(std::size_t bytes)
   return _buffer->consumeFront(bytes);
 }
 
+SmartBuffer::RawBytes SmartBuffer::consumeRawFront(std::size_t bytes)
+{
+  // todo switch to memory buffer if possible
+  return _buffer->consumeRawFront(bytes);
+}
+
 SmartBuffer::RawBytes SmartBuffer::consumeAll()
 {
   // todo switch to memory buffer
@@ -93,6 +105,12 @@ void SmartBuffer::replace(RawBytes& rawData)
 {
   // todo maybe check size first
   _buffer->replace(rawData);
+}
+
+void SmartBuffer::moveBufferToFile(const std::string& filepath)
+{
+  // todo maybe check size first
+  _buffer->moveBufferToFile(filepath);
 }
 
 // Non-throwing versions
@@ -121,6 +139,15 @@ IBuffer::ExpectVoid SmartBuffer::seek(std::size_t pos,
   try {
     seek(pos);
     return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
+IBuffer::ExpectPos SmartBuffer::pos(std::nothrow_t /*unused*/)
+{
+  try {
+    return pos();
   } catch (const std::exception& e) {
     return ft::unexpected<BufferException>(e);
   }
@@ -170,6 +197,16 @@ IBuffer::ExpectStr SmartBuffer::consumeFront(std::size_t bytes,
   }
 }
 
+IBuffer::ExpectRaw SmartBuffer::consumeRawFront(std::size_t bytes,
+                                                std::nothrow_t /*unused*/)
+{
+  try {
+    return consumeRawFront(bytes);
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
 IBuffer::ExpectRaw SmartBuffer::consumeAll(std::nothrow_t /*unused*/)
 {
   try {
@@ -212,6 +249,17 @@ IBuffer::ExpectVoid SmartBuffer::replace(RawBytes& rawData,
   }
 }
 
+IBuffer::ExpectVoid SmartBuffer::moveBufferToFile(const std::string& filepath,
+                                                  std::nothrow_t /*unused*/)
+{
+  try {
+    moveBufferToFile(filepath);
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
 bool SmartBuffer::isEmpty() const
 {
   return _buffer->isEmpty();
@@ -220,11 +268,6 @@ bool SmartBuffer::isEmpty() const
 std::size_t SmartBuffer::size() const
 {
   return _buffer->size();
-}
-
-void SmartBuffer::print()
-{
-  _buffer->print();
 }
 
 /* ************************************************************************** */

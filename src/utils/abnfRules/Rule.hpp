@@ -5,6 +5,7 @@
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 
+#include <cstddef>
 #include <map>
 
 /* ************************************************************************** */
@@ -34,10 +35,10 @@ protected:
   void setReachedEnd(bool value);
   BufferReader* getBuffReader();
 
-  void setStartPos(long pos);
-  long getStartPos() const;
-  void setEndPos(long pos);
-  long getEndPos() const;
+  void setStartPos(std::size_t pos);
+  std::size_t getStartPos() const;
+  void setEndPos(std::size_t pos);
+  std::size_t getEndPos() const;
 
   void rewindToStartPos();
   void moveToEndPos();
@@ -54,8 +55,8 @@ private:
   bool _reachedEnd;
   BufferReader* _buffReader;
 
-  long _startPos;
-  long _endPos;
+  std::size_t _startPos;
+  std::size_t _endPos;
 
   static const RuleId _ruleIdUndefined = -1;
   RuleId _ruleId;

@@ -11,20 +11,25 @@
 
 #define LOG_GENERAL "./log/general.log"
 #define LOG_HTTP "./log/http.log"
+#define LOG_SERVER "./log/server.log"
 
 /* ************************************************************************** */
 class Logger
 {
 public:
+  ~Logger() {}
+
   static Logger& getInstance(const char* filename) throw();
 
   std::ostream& info();
   std::ostream& warning();
   std::ostream& error();
 
-  ~Logger() {}
+  static void enableLogging();
+  static void disableLogging();
 
 private:
+  static bool _loggerEnabled;
   typedef std::map<std::string, ft::shared_ptr<Logger> > InstanceMap;
 
   enum LogLevel

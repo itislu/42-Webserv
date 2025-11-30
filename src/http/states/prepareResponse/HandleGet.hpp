@@ -17,9 +17,11 @@ public:
   void run();
 
 private:
+  void _setNextState();
   void _addContentLengthHeader();
   void _addContentType();
   void _openFile();
+  bool _fail();
 
   PrepareResponse* _prepareResponse;
   Client* _client;

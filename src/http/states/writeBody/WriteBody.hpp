@@ -16,8 +16,15 @@ public:
   void run();
 
 private:
-  Client* _client;
+  bool _fail();
+  void _writeIntoOutBuffer();
+
   static Logger& _log;
+  static const int _outBufferLimit = 4096;
+  static const int _chunkSize = 1024;
+  Client* _client;
+
+  bool _done;
 };
 
 #endif

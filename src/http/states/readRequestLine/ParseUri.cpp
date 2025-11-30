@@ -23,6 +23,8 @@
 // INIT
 
 Logger& ParseUri::_log = Logger::getInstance(LOG_HTTP);
+const std::size_t ParseUri::_defaultMaxUriLength;
+std::size_t ParseUri::_maxUriLength = _defaultMaxUriLength;
 
 /* ************************************************************************** */
 // PUBLIC
@@ -52,12 +54,27 @@ void ParseUri::run()
     return;
   }
 
+  if (_uriTooLong()) {
+    getContext()->getStateHandler().setDone();
+    return;
+  }
+
   if (_sequence().reachedEnd()) {
     _extractParts(results);
     _client->getRequest().setUri(_tmpUri);
     getContext()->getStateHandler().setState<ParseVersion>();
     return;
   }
+}
+
+void ParseUri::setMaxUriLength(std::size_t value)
+{
+  _maxUriLength = value;
+}
+
+void ParseUri::resetMaxUriLength()
+{
+  _maxUriLength = _defaultMaxUriLength;
 }
 
 /* ************************************************************************** */
@@ -134,4 +151,14 @@ void ParseUri::_extractParts(const Rule::ResultMap& results)
   // remove bytes from buffer
   const std::size_t posInBuff = _buffReader.getPosInBuff();
   _client->getInBuff().removeFront(posInBuff);
+}
+
+bool ParseUri::_uriTooLong()
+{
+  if (_buffReader.getPosInBuff() > _maxUriLength) {
+    _log.error() << "ParseUri: uri too long\n";
+    _client->getResponse().setStatusCode(StatusCode::UriTooLong);
+    return true;
+  }
+  return false;
 }

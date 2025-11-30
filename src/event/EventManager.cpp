@@ -1,19 +1,30 @@
 #include "EventManager.hpp"
-#include "client/Client.hpp"
-#include "client/ClientManager.hpp"
-#include "client/TimeStamp.hpp"
-#include "config/Config.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/SocketManager.hpp"
-#include "utils/state/StateHandler.hpp"
+
+#include <client/Client.hpp>
+#include <client/ClientManager.hpp>
+#include <client/TimeStamp.hpp>
+#include <config/Config.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <server/ServerManager.hpp>
+#include <socket/SocketManager.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/StateHandler.hpp>
+
 #include <cstddef>
 #include <exception>
 #include <iostream>
 #include <sys/poll.h>
 #include <vector>
+
+/* **************************************************************************
+ */
+// INIT
+
+Logger& EventManager::_log = Logger::getInstance(LOG_SERVER);
+
+/* ************************************************************************** */
 
 // Handles the main poll loop:
 // Calls poll()
@@ -34,6 +45,7 @@ bool EventManager::sendToClient(Client& client)
   const bool alive = client.sendTo();
   if (alive && !client.hasDataToSend()) {
     _socketsManager->disablePollout(client.getFd());
+    _log.info() << "Pollout disabled\n";
   }
   return alive;
 }
@@ -50,8 +62,8 @@ bool EventManager::receiveFromClient(Client& client)
 void EventManager::clientStateMachine(Client& client)
 {
   StateHandler<Client>& handler = client.getStateHandler();
-  handler.setStateHasChanged(true);
 
+  handler.setStateHasChanged(true);
   while (!handler.isDone() && handler.stateHasChanged()) {
     handler.setStateHasChanged(false);
     handler.getState()->run();
@@ -68,7 +80,11 @@ bool EventManager::handleClient(Client* client, unsigned events)
     alive = receiveFromClient(*client);
   }
   if (alive) {
-    EventManager::clientStateMachine(*client);
+    clientStateMachine(*client);
+  }
+  if (alive && client->hasDataToSend()) {
+    _socketsManager->enablePollout(client->getFd());
+    _log.info() << "Pollout enabled\n";
   }
   if ((events & POLLOUT) != 0 && alive) { // Send Data
     alive = sendToClient(*client);

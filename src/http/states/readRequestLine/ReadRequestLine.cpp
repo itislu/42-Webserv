@@ -1,13 +1,13 @@
 #include "ReadRequestLine.hpp"
 #include "ParseMethod.hpp"
-#include "http/states/prepareResponse/HandleError.hpp"
-#include "utils/IBuffer.hpp"
 
 #include <client/Client.hpp>
 #include <http/StatusCode.hpp>
+#include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
+#include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
@@ -42,13 +42,7 @@ try {
   }
 
   if (_stateHandler.isDone()) {
-    _log.info() << "ReadRequestLine result\n"
-                << getContext()->getRequest().toString() << "\n";
-    if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
-      getContext()->getStateHandler().setState<ReadHeaderLines>();
-    } else {
-      getContext()->getStateHandler().setState<PrepareResponse>();
-    }
+    _setNextState();
     return;
   }
 } catch (const IBuffer::BufferException& e) {
@@ -64,3 +58,14 @@ StateHandler<ReadRequestLine>& ReadRequestLine::getStateHandler()
 
 /* ************************************************************************** */
 // PRIVATE
+
+void ReadRequestLine::_setNextState()
+{
+  const StatusCode& statusCode = getContext()->getResponse().getStatusCode();
+
+  if (statusCode == StatusCode::Ok) {
+    getContext()->getStateHandler().setState<ReadHeaderLines>();
+  } else {
+    getContext()->getStateHandler().setState<PrepareResponse>();
+  }
+}
