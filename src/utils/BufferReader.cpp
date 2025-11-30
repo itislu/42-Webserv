@@ -1,10 +1,11 @@
 #include "BufferReader.hpp"
 
-#include <algorithm>
 #include <libftpp/expected.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <exception>
@@ -13,7 +14,7 @@
 /* ************************************************************************** */
 // PUBLIC
 
-void BufferReader::init(IBuffer* buffer)
+void BufferReader::init(IInBuffer* buffer)
 {
   assert(buffer != FT_NULLPTR);
   _buffer = buffer;

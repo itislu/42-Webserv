@@ -1,5 +1,5 @@
-#include "utils/SmartBuffer.hpp"
 #include "utils/abnfRules/RepetitionRule.hpp"
+#include "utils/buffer/SmartBuffer.hpp"
 #include <http/abnfRules/http11Rules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>

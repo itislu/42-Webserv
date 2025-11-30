@@ -4,7 +4,7 @@
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/SmartBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 
 #include <algorithm>
 #include <cstddef>

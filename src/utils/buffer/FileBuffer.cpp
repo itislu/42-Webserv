@@ -1,7 +1,7 @@
 #include "FileBuffer.hpp"
 
 #include <libftpp/expected.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/fileUtils.hpp>
 
 #include <cassert>

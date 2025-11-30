@@ -30,7 +30,7 @@ ParseVersion::ParseVersion(ReadRequestLine* context)
   , _client(context->getContext())
   , _buffReader()
 {
-  _log.info() << "ParseVersion\n";
+  _log.info() << *_client << " ParseVersion\n";
   _init();
 }
 

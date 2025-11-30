@@ -4,8 +4,9 @@
 
 #include <http/Headers.hpp>
 #include <http/StatusCode.hpp>
+#include <libftpp/memory.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
-#include <fstream>
 #include <string>
 
 /* ************************************************************************** */
@@ -13,20 +14,19 @@ class Response
 {
 public:
   const std::string& getVersion() const;
-  void setVersion(const std::string& version);
-
   const StatusCode& getStatusCode() const;
-  void setStatusCode(StatusCode::Code code);
-
   Headers& getHeaders();
+  ft::shared_ptr<IInBuffer>& getBody();
 
-  std::ifstream& getBody();
+  void setVersion(const std::string& version);
+  void setStatusCode(StatusCode::Code code);
 
 private:
   std::string _version;
   StatusCode _statuscode;
   Headers _headers;
-  std::ifstream _body; // todo convert to Buffer type
+
+  ft::shared_ptr<IInBuffer> _body;
 };
 
 #endif

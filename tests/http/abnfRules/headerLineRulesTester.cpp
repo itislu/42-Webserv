@@ -1,10 +1,10 @@
-#include "utils/SmartBuffer.hpp"
 #include <http/abnfRules/headerLineRules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 
 #include <cctype>
 #include <gtest/gtest.h>
