@@ -33,6 +33,12 @@ public:
   StateHandler<ValidateRequest>& getStateHandler();
 
 private:
+  enum NormalizationMode
+  {
+    CapAtRoot,
+    FailAboveRoot
+  };
+
   void _init();
   void _initResource();
   void _initServer();
@@ -49,7 +55,7 @@ private:
                                 bool (*wantDecode)(char));
   static bool validateChars(const std::string& path);
   static ft::optional<std::string> normalizePath(const std::string& path,
-                                                 bool isStrict);
+                                                 NormalizationMode mode);
 
   void endState(StatusCode::Code status);
 

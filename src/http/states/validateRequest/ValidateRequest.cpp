@@ -11,6 +11,7 @@
 #include "http/states/validateRequest/ValidateDelete.hpp"
 #include "http/states/validateRequest/ValidateGet.hpp"
 #include "http/states/validateRequest/ValidatePost.hpp"
+#include "libftpp/algorithm.hpp"
 #include "libftpp/optional.hpp"
 #include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
@@ -184,8 +185,8 @@ static bool alwaysDecode(char /*unused*/)
  * 1. Decode unreserved characters.
  * 2. Normalize path (collapse . | .. | //).
  * 3. Decode all other characters (first decoding cannot produce more '%').
- * 4. Check for illegal characters (NUL, control chars).
- * 5. Normalize again, but disallow going out of root.
+ * 4. Check for illegal characters (NUL).
+ * 5. Check that path is not going out of root.
  * 6. Combine with root.
  */
 void ValidateRequest::_initRequestPath()
@@ -197,34 +198,32 @@ void ValidateRequest::_initRequestPath()
   _log.info() << "decode unreserved - path: " << decoded << "\n";
 
   // 2. Normalize path (collapse . | .. | //).
-  decoded = normalizePath(decoded, false).value();
+  decoded = normalizePath(decoded, CapAtRoot).value();
   _log.info() << "normalizePath - path: " << decoded << "\n";
 
   // 3. Decode all other characters.
   decoded = decodePath(decoded, alwaysDecode);
   _log.info() << "decode all - path: " << decoded << "\n";
 
-  // 4. Check for illegal characters (NUL, control chars).
+  // 4. Check for illegal characters (NUL).
   if (!validateChars(decoded)) {
     endState(StatusCode::BadRequest);
     return;
   }
 
-  // 5. Normalize again, but disallow going out of root.
-  const ft::optional<std::string> result = normalizePath(decoded, true);
-  if (!result.has_value()) {
+  // 5. Check that path is not going out of root.
+  if (!normalizePath(decoded, FailAboveRoot).has_value()) {
     endState(StatusCode::BadRequest);
     return;
   }
-  _log.info() << "normalizePath strict - path: " << *result << "\n";
 
   // 6. Combine with root.
   if (_location != FT_NULLPTR) {
-    _path = removePrefix(*result, _location->getPath());
+    _path = removePrefix(decoded, _location->getPath());
     _log.info() << "remove Prefix - path: " << _path << "\n";
     _path = appendToRoot(_path, _location->getRoot());
   } else {
-    _path = appendToRoot(*result, _server->getRoot());
+    _path = appendToRoot(decoded, _server->getRoot());
   }
   _log.info() << "appendToRoot - path: " << _path << "\n";
   _client->getResource().setPath(_path);
@@ -257,18 +256,12 @@ std::string ValidateRequest::decodePath(const std::string& path,
 
 bool ValidateRequest::validateChars(const std::string& path)
 {
-  for (std::size_t i = 0; i < path.size(); ++i) {
-    const unsigned char chr = path[i];
-    if (chr < ' ') {
-      return false;
-    }
-  }
-  return true;
+  return !ft::contains(path, '\0');
 }
 
 ft::optional<std::string> ValidateRequest::normalizePath(
   const std::string& path,
-  bool isStrict)
+  NormalizationMode mode)
 {
   std::vector<std::string> segments;
   std::string token;
@@ -281,7 +274,7 @@ ft::optional<std::string> ValidateRequest::normalizePath(
     if (token == "..") {
       if (!segments.empty()) {
         segments.pop_back();
-      } else if (isStrict) {
+      } else if (mode == FailAboveRoot) {
         return ft::nullopt;
       }
     } else {
