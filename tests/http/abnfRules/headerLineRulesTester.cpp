@@ -1,6 +1,7 @@
 #include "utils/SmartBuffer.hpp"
 #include <http/abnfRules/headerLineRules.hpp>
 #include <libftpp/memory.hpp>
+#include <testUtils.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -8,6 +9,8 @@
 
 #include <gtest/gtest.h>
 #include <string>
+
+using testUtils::makeString;
 
 /**
  * Reference:
@@ -52,10 +55,10 @@ TEST(HeaderLinesTester, FieldContentRule)
   EXPECT_TRUE(runParser("\xC0\xC1\xFE\xFF\n", *rule));
 
   // Invalid
-  // EXPECT_FALSE(runParser("\x00\n", *rule)); // NUL // TODO
+  EXPECT_FALSE(runParser(makeString("\0\n"), *rule));
+  EXPECT_FALSE(runParser(makeString("test\0\n"), *rule));
   EXPECT_FALSE(runParser("\x1F\n", *rule)); // control char
   EXPECT_FALSE(runParser("\x7F\n", *rule)); // DEL
-  // EXPECT_FALSE(runParser("test\x00\n", *rule)); // TODO
   EXPECT_FALSE(runParser("test\x01\n", *rule));
   EXPECT_FALSE(runParser("test\x1F\n", *rule));
   EXPECT_FALSE(runParser("test\x7F\n", *rule));

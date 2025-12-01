@@ -8,10 +8,13 @@
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
+#include <testUtils.hpp>
 #include <utils/state/IState.hpp>
 
 #include <gtest/gtest.h>
 #include <string>
+
+using testUtils::makeString;
 
 // NOLINTBEGIN
 
@@ -93,6 +96,76 @@ TEST(ReadHeaderLinesTester, DISABLED_HeadersTooLarge)
   const StatusCode& statusCode = response.getStatusCode();
 
   EXPECT_EQ(statusCode, StatusCode::RequestHeaderFieldsTooLarge);
+}
+
+TEST(ReadHeaderLinesTester, NulByteInHeaderName)
+{
+  std::string line = makeString("Host: webserv\r\n"
+                                "Header\0Name: value\r\n"
+                                "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, NulByteInHeaderValue)
+{
+  std::string line = makeString("Host: webserv\r\n"
+                                "Content-Type: text\0/html\r\n"
+                                "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, NulByteAtStartOfHeader)
+{
+  std::string line = makeString("\0Host: webserv\r\n"
+                                "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, NulByteBeforeColon)
+{
+  std::string line = makeString("Host: webserv\r\n"
+                                "Content-Length\0: 7\r\n"
+                                "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, NulByteInHostHeader)
+{
+  std::string line = makeString("Host: web\0serv\r\n"
+                                "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, NulByteInContentLengthHeader)
+{
+  std::string line = makeString("Host: webserv\r\n"
+                                "Content-Length: \0007\r\n"
+                                "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
 }
 
 // NOLINTEND
