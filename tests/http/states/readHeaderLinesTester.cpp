@@ -19,6 +19,7 @@ using testUtils::makeString;
 // NOLINTBEGIN
 
 namespace {
+
 ft::unique_ptr<Client> StateTest(const std::string& requestLine)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
@@ -27,7 +28,8 @@ ft::unique_ptr<Client> StateTest(const std::string& requestLine)
   client->getStateHandler().getState()->run();
   return ft::move(client);
 }
-}
+
+} // namespace
 
 TEST(ReadHeaderLinesTester, BasicHeaders)
 {

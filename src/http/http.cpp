@@ -224,4 +224,5 @@ const ExtToTypeMap& getExtToType()
   }
   return map;
 }
-}
+
+} // namespace http

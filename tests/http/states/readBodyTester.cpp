@@ -18,13 +18,15 @@
 using testUtils::makeString;
 
 namespace {
+
 void StateTest(Client& client, const std::string& bodyLines)
 {
   client.getInBuff().append(bodyLines);
   client.getStateHandler().setState<ReadBody>();
   client.getStateHandler().getState()->run();
 }
-}
+
+} // namespace
 
 TEST(ReadBodyTester, Chunked)
 {
