@@ -48,8 +48,6 @@ public:
   void clearAllowedMethods();
 
   const LocationConfig* getBestMatchLocation(const std::string& uri) const;
-  static std::size_t getMatchLength(const std::string& uri,
-                                    const std::string& path);
 
 private:
   void checkPortDuplicate(int port);
