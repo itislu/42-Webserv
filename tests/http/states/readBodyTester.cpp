@@ -48,11 +48,8 @@ TEST(ReadBodyTester, Chunked)
   Request& request = client->getRequest();
   SmartBuffer& buff = request.getBody();
   const std::string data = data1 + data2;
-  IBuffer::ExpectStr body = buff.consumeFront(buff.size());
-  EXPECT_TRUE(body.has_value());
-  if (body.has_value()) {
-    EXPECT_EQ(*body, data);
-  }
+  const std::string body = buff.consumeFront(buff.size());
+  EXPECT_EQ(body, data);
 }
 
 TEST(ReadBodyTester, ChunkedSingleChunk)
@@ -71,11 +68,8 @@ TEST(ReadBodyTester, ChunkedSingleChunk)
   StateTest(*client, line);
   Request& request = client->getRequest();
   SmartBuffer& buff = request.getBody();
-  IBuffer::ExpectStr body = buff.consumeFront(buff.size());
-  EXPECT_TRUE(body.has_value());
-  if (body.has_value()) {
-    EXPECT_EQ(*body, data1);
-  }
+  const std::string body = buff.consumeFront(buff.size());
+  EXPECT_EQ(body, data1);
 }
 
 TEST(ReadBodyTester, ChunkedWithTrailer)
@@ -101,11 +95,8 @@ TEST(ReadBodyTester, ChunkedWithTrailer)
   Request& request = client->getRequest();
   SmartBuffer& buff = request.getBody();
   const std::string data = data1 + data2;
-  IBuffer::ExpectStr body = buff.consumeFront(buff.size());
-  EXPECT_TRUE(body.has_value());
-  if (body.has_value()) {
-    EXPECT_EQ(*body, data);
-  }
+  const std::string body = buff.consumeFront(buff.size());
+  EXPECT_EQ(body, data);
 
   const Headers& headers = request.getHeaders();
   std::string value;
@@ -125,11 +116,8 @@ TEST(ReadBodyTester, FixedLength)
   Request& request = client->getRequest();
   SmartBuffer& buff = request.getBody();
   const std::string data = "0123456789";
-  IBuffer::ExpectStr body = buff.consumeFront(buff.size());
-  EXPECT_TRUE(body.has_value());
-  if (body.has_value()) {
-    EXPECT_EQ(*body, data);
-  }
+  const std::string body = buff.consumeFront(buff.size());
+  EXPECT_EQ(body, data);
 }
 
 TEST(ReadBodyTester, FixedLengthSpecialBytes)
@@ -148,11 +136,8 @@ TEST(ReadBodyTester, FixedLengthSpecialBytes)
   StateTest(*client, data);
   Request& request = client->getRequest();
   SmartBuffer& buff = request.getBody();
-  IBuffer::ExpectStr body = buff.consumeFront(buff.size());
-  EXPECT_TRUE(body.has_value());
-  if (body.has_value()) {
-    EXPECT_EQ(*body, data);
-  }
+  const std::string body = buff.consumeFront(buff.size());
+  EXPECT_EQ(body, data);
 }
 
 TEST(ReadBodyTester, ChunkedSpecialBytes)
@@ -177,11 +162,8 @@ TEST(ReadBodyTester, ChunkedSpecialBytes)
   SmartBuffer& buff = request.getBody();
   const std::string expectedData = chunk1 + chunk2;
   ASSERT_TRUE(expectedData.size() == (chunk1.size() + chunk2.size()));
-  IBuffer::ExpectStr body = buff.consumeFront(buff.size());
-  EXPECT_TRUE(body.has_value());
-  if (body.has_value()) {
-    EXPECT_EQ(*body, expectedData);
-  }
+  const std::string body = buff.consumeFront(buff.size());
+  EXPECT_EQ(body, expectedData);
 }
 
 TEST(ReadBodyTester, FixedLengthInvalid)
