@@ -9,7 +9,8 @@
 
 ft::shared_ptr<LiteralRule> endOfLineRule()
 {
-  const ft::shared_ptr<LiteralRule> seq = ft::make_shared<LiteralRule>("\r\n");
+  const ft::shared_ptr<LiteralRule> seq =
+    ft::make_shared<LiteralRule>(http::CRLF);
 
   seq->setDebugTag("endOfLineRule");
   seq->setRuleId(EndOfLine);
@@ -31,7 +32,7 @@ ft::shared_ptr<RepetitionRule> owsRule()
 
 /**
  * RWS            = 1*( SP / HTAB )
- * ; required whitespace
+ *                ; required whitespace
  */
 ft::shared_ptr<RepetitionRule> rwsRule()
 {
@@ -40,5 +41,17 @@ ft::shared_ptr<RepetitionRule> rwsRule()
   rep->setMin(1);
 
   rep->setDebugTag("rwsRule");
+  return rep;
+}
+
+/**
+ * BWS            = OWS
+ *                ; bad whitespace
+ */
+ft::shared_ptr<RepetitionRule> bwsRule()
+{
+  const ft::shared_ptr<RepetitionRule> rep = owsRule();
+
+  rep->setDebugTag("bwsRule");
   return rep;
 }

@@ -99,6 +99,10 @@ add_my_test(uriRulesTester
 
 # http/states
 
+add_my_test(readBodyTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readBodyTester.cpp
+)
+
 add_my_test(readHeaderLinesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/readHeaderLinesTester.cpp
 )

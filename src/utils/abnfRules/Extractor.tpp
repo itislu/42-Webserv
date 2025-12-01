@@ -50,9 +50,9 @@ typename Extractor<T>::OptionStr Extractor<T>::_getString(
   const RuleResult& result,
   IBuffer& buffer)
 {
-  const long start = result.getStart();
-  const long end = result.getEnd();
-  if (start >= end || start < 0) {
+  const std::size_t start = result.getStart();
+  const std::size_t end = result.getEnd();
+  if (start >= end) {
     return ft::nullopt;
   }
   const std::size_t bytes = end - start;

@@ -1,6 +1,4 @@
 #include "ReadHeaderLines.hpp"
-#include "http/states/prepareResponse/PrepareResponse.hpp"
-#include "http/states/validateRequest/ValidateRequest.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -9,7 +7,9 @@
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readBody/ReadBody.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
@@ -23,7 +23,8 @@
 #include <cstddef>
 #include <string>
 
-/* ************************************************************************** */
+/* **************************************************************************
+ */
 // INIT
 
 Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);
@@ -35,6 +36,7 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
   : IState(context)
   , _client(context)
   , _buffReader()
+  , _sizeHeaders(0)
   , _done(false)
 {
   _log.info() << "ReadHeaderLines\n";
@@ -55,7 +57,7 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
 void ReadHeaderLines::run()
 try {
   _readLines();
-  if (_done) {
+  if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
     _setNextState();
     return;
   }
@@ -121,7 +123,13 @@ void ReadHeaderLines::_readLines()
 
 void ReadHeaderLines::_setNextState()
 {
-  _client->getStateHandler().setState<ValidateRequest>();
+  const StatusCode& statusCode = _client->getResponse().getStatusCode();
+
+  if (statusCode == StatusCode::Ok) {
+    getContext()->getStateHandler().setState<ValidateRequest>();
+  } else {
+    getContext()->getStateHandler().setState<PrepareResponse>();
+  }
 }
 
 bool ReadHeaderLines::_hasEndOfLine()
@@ -133,19 +141,45 @@ bool ReadHeaderLines::_hasEndOfLine()
 std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 {
   const RuleResult& result = _results[ruleId];
-  const long index = result.getEnd();
-  const std::string input = _client->getInBuff().consumeFront(index);
+  const std::size_t index = result.getEnd();
+
+  if (_headerTooLarge(index)) {
+    return "";
+  }
+  const std::string part = _client->getInBuff().consumeFront(index);
   _buffReader.resetPosInBuff();
-  return input;
+  return part;
 }
 
 void ReadHeaderLines::_addLineToHeaders(const std::string& line)
 {
   const std::size_t index = line.find(':');
-  if (index != std::string::npos) {
-    const std::string name = line.substr(0, index);
-    const std::string value = line.substr(index + 1, line.size());
-    Headers& headers = _client->getRequest().getHeaders();
-    headers.addHeader(name, value);
+  const std::string name = line.substr(0, index);
+  const std::string value = line.substr(index + 1, line.size());
+  Headers& headers = _client->getRequest().getHeaders();
+  headers.addHeader(name, value);
+}
+
+bool ReadHeaderLines::_headerTooLarge(std::size_t newBytes)
+{
+  // todo values from config ??
+
+  const std::size_t maxFieldLineSize = 4242;
+  if (newBytes > maxFieldLineSize) {
+    _client->getResponse().setStatusCode(
+      StatusCode::RequestHeaderFieldsTooLarge);
+    _log.error() << "ReadHeaderLines: field line too large\n";
+    return true;
   }
+
+  const std::size_t maxHeaderSize = 8042;
+  if (_sizeHeaders + newBytes > maxHeaderSize) {
+    _client->getResponse().setStatusCode(
+      StatusCode::RequestHeaderFieldsTooLarge);
+    _log.error() << "ReadHeaderLines: header too large\n";
+    return true;
+  }
+
+  _sizeHeaders += newBytes;
+  return false;
 }

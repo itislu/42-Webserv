@@ -1,13 +1,15 @@
 #include "WriteBody.hpp"
-#include "http/StatusCode.hpp"
 
 #include <client/Client.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/prepareResponse/HandleError.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <utils/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <fstream>
-#include <sstream>
+#include <ios>
 
 /* ************************************************************************** */
 // INIT
@@ -20,34 +22,62 @@ Logger& WriteBody::_log = Logger::getInstance(LOG_HTTP);
 WriteBody::WriteBody(Client* context)
   : IState<Client>(context)
   , _client(context)
+  , _done(false)
 {
   _log.info() << "WriteBody\n";
-  _log.info() << getContext()->getRequest().toString() << "\n";
 }
 
 void WriteBody::run()
 try {
-  std::ifstream& ifs = _client->getResponse().getBody();
+  _writeIntoOutBuffer();
 
-  if (!ifs.is_open()) {
-    _log.error() << "Failed to open file\n";
-    _client->getStateHandler().setDone();
-    return;
+  if (_done || _fail()) {
+    getContext()->getStateHandler().setDone();
   }
-
-  std::ostringstream oss;
-  oss << ifs.rdbuf();
-
-  IBuffer& outBuffer = _client->getOutBuff();
-  outBuffer.append(oss.str());
-
-  // _log.info(_client->getOutBuff().toString());
-  _client->getStateHandler().setDone();
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "ReadRequestLine: " << e.what() << '\n';
+  _log.error() << "WriteBody: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setDone();
 }
 
 /* ************************************************************************** */
 // PRIVATE
+
+bool WriteBody::_fail()
+{
+  return _client->getResponse().getStatusCode() != StatusCode::Ok;
+}
+
+void WriteBody::_writeIntoOutBuffer()
+{
+  std::ifstream& ifs = _client->getResponse().getBody();
+  _log.info() << "WriteBody: run\n";
+
+  if (!ifs.is_open()) {
+    _log.info() << "no body\n";
+    _done = true;
+    return;
+  }
+
+  IBuffer& outBuffer = _client->getOutBuff();
+  if (outBuffer.size() >= _outBufferLimit) {
+    return;
+  }
+
+  IBuffer::RawBytes buff(_chunkSize);
+  ifs.read(buff.data(), _chunkSize);
+  if (ifs.fail() && !ifs.eof()) {
+    _log.error() << "WriteBody: stream read error\n";
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+    return;
+  }
+
+  const std::streamsize readCount = ifs.gcount();
+  if (readCount > 0) {
+    outBuffer.append(buff, readCount);
+  }
+
+  if (ifs.eof()) {
+    _done = true;
+  }
+}
