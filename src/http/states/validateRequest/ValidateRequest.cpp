@@ -42,6 +42,12 @@ Logger& ValidateRequest::_log = Logger::getInstance(LOG_HTTP);
 /* ************************************************************************** */
 // PUBLIC
 
+/*
+
+
+
+*/
+
 ValidateRequest::ValidateRequest(Client* context)
   : IState<Client>(context)
   , _client(context)
@@ -97,6 +103,7 @@ StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
 
 void ValidateRequest::_init()
 {
+  /* TODO: split this into server init and host header validation */
   if (!_client->hasServer()) {
     _initServer();
     if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
@@ -328,15 +335,7 @@ void ValidateRequest::endState(StatusCode::Code status)
   }
 }
 
-/*
-  TODO:
-  - check Request - headers - and find hostname
-  - get host from Request
-  - host should be in Uri -> authority -> getHost() - if empty
-  - look up servers from client socket and find matching servername -> host
-  - if no exact match, use default server for that socket
-  - set server in client
-*/
+/* TODO: check if there is only one host header and not multiple */
 void ValidateRequest::_initServer()
 {
   std::string hostHeader = _client->getRequest().getHeaders().at("host");
@@ -346,11 +345,12 @@ void ValidateRequest::_initServer()
     hostHeader = _client->getRequest().getUri().getAuthority().getHost();
     _log.info() << "Uri Host: [" << hostHeader << "]\n"; // empty in 1.1
   }
+
+  /* TODO: RFC says there has to be one host header */
   if (!hostHeader.empty()) {
-    _setServerByHost(hostHeader); // TODO: set default sever - make Managers
-                                  // singletons to do this
+    _setServerByHost(hostHeader);
   } else {
-    // TODO: Default server
+    endState(StatusCode::BadRequest);
   }
 }
 
@@ -368,19 +368,15 @@ void ValidateRequest::_setServerByHost(const std::string& hostHeader)
   const Socket& socket =
     SocketManager::getInstance().getSocketFromClientFd(_client->getFd());
 
-  // if (socket.getPort() != port) {
-  //   // Something very wrong here
-  // }
+  // Note: check if this is possible
+  if (socket.getPort() != port) {
+    // Something very wrong here
+  }
 
   const Server* const server =
     ServerManager::getInstance().getServerByHost(&socket, host);
-  if (server != FT_NULLPTR) {
-    _log.info() << "Found server for host: " << host << "\n";
-    _client->setServer(server);
-  } else {
-    _log.info() << "Found no server for host: " << host << "\n";
-    // TODO: set default server
-  }
+  _log.info() << "Found server for host: " << host << "\n";
+  _client->setServer(server);
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
