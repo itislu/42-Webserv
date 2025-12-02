@@ -9,5 +9,6 @@
 ft::shared_ptr<LiteralRule> endOfLineRule();
 ft::shared_ptr<RepetitionRule> owsRule();
 ft::shared_ptr<RepetitionRule> rwsRule();
+ft::shared_ptr<RepetitionRule> bwsRule();
 
 #endif

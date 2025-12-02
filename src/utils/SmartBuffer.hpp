@@ -22,25 +22,30 @@ public:
   char get();
   char peek();
   void seek(std::size_t pos);
+  std::size_t pos();
   void append(const std::string& data);
   void append(const RawBytes& buffer, std::size_t bytes);
   void removeFront(std::size_t bytes);
   std::string consumeFront(std::size_t bytes);
+  RawBytes consumeRawFront(std::size_t bytes);
   RawBytes consumeAll();
   std::string getStr(std::size_t start, std::size_t bytes);
   RawBytes getRawBytes(std::size_t start, std::size_t bytes);
   void replace(RawBytes& rawData);
+  void moveBufferToFile(const std::string& filepath);
 
   // Interface IBuffer - Non-throwing versions
   ExpectChr get(std::nothrow_t /*unused*/);
   ExpectChr peek(std::nothrow_t /*unused*/);
   ExpectVoid seek(std::size_t pos, std::nothrow_t /*unused*/);
+  ExpectPos pos(std::nothrow_t /*unused*/);
   ExpectVoid append(const std::string& data, std::nothrow_t /*unused*/);
   ExpectVoid append(const RawBytes& buffer,
                     std::size_t bytes,
                     std::nothrow_t /*unused*/);
   ExpectVoid removeFront(std::size_t bytes, std::nothrow_t /*unused*/);
   ExpectStr consumeFront(std::size_t bytes, std::nothrow_t /*unused*/);
+  ExpectRaw consumeRawFront(std::size_t bytes, std::nothrow_t /*unused*/);
   ExpectRaw consumeAll(std::nothrow_t /*unused*/);
   ExpectStr getStr(std::size_t start,
                    std::size_t bytes,
@@ -49,10 +54,11 @@ public:
                         std::size_t bytes,
                         std::nothrow_t /*unused*/);
   ExpectVoid replace(RawBytes& rawData, std::nothrow_t /*unused*/);
+  ExpectVoid moveBufferToFile(const std::string& filepath,
+                              std::nothrow_t /*unused*/);
 
   bool isEmpty() const;
   std::size_t size() const;
-  void print();
 
 private:
   SmartBuffer(const SmartBuffer& other);

@@ -25,17 +25,17 @@ PrepareResponse::PrepareResponse(Client* context)
   : IState<Client>(context)
   , _client(context)
   , _stateHandler(this)
-  , _initialized(false)
 {
-  _log.info() << "Prepare response\n";
+  _log.info() << "PrepareResponse\n";
+  _init();
+
+  // todo remove this log after testing
+  _log.info() << "PrepareResponse Request:\n\n"
+              << getContext()->getRequest().toString() << "\n\n";
 }
 
 void PrepareResponse::run()
 try {
-  if (!_initialized) {
-    _init();
-  }
-
   _stateHandler.setStateHasChanged(true);
   while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
     _stateHandler.setStateHasChanged(false);
@@ -61,8 +61,6 @@ StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
 
 void PrepareResponse::_init()
 {
-  _initialized = true;
-
   if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
     _stateHandler.setState<HandleError>();
   } else {

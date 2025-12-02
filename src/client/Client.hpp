@@ -1,19 +1,18 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "client/TimeStamp.hpp"
-#include "http/Request.hpp"
-#include "http/Resource.hpp"
-#include "http/Response.hpp"
-#include "server/Server.hpp"
-#include "socket/AutoFd.hpp"
-#include "utils/SmartBuffer.hpp"
-#include "utils/state/StateHandler.hpp"
-#include <string>
+#include <client/TimeStamp.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
+#include <server/Server.hpp>
+#include <socket/AutoFd.hpp>
+#include <utils/SmartBuffer.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/StateHandler.hpp>
 
-#ifndef MAX_CHUNK
-#define MAX_CHUNK 1024
-#endif
+#include <cstddef>
+#include <string>
 
 class Client
 {
@@ -44,6 +43,9 @@ public:
 
 private:
   void updateLastActivity();
+
+  static Logger& _log;
+  static const std::size_t _maxChunk = 1024;
 
   AutoFd _fd;
   const Server* _server;

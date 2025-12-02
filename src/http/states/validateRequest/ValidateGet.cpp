@@ -1,13 +1,14 @@
-
 #include "ValidateGet.hpp"
-#include "client/Client.hpp"
-#include "config/FileUtils.hpp"
-#include "http/Resource.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/validateRequest/ValidateRequest.hpp"
-#include "libftpp/utility.hpp"
-#include "utils/logger/Logger.hpp"
-#include "utils/state/IState.hpp"
+
+#include <client/Client.hpp>
+#include <http/Resource.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
+#include <libftpp/utility.hpp>
+#include <utils/fileUtils.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+
 #include <string>
 
 /* ************************************************************************** */
@@ -36,12 +37,12 @@ void ValidateGet::run()
 
 void ValidateGet::validate()
 {
-  if (config::fileutils::isFile(_path)) {
+  if (isFile(_path)) {
     _log.info() << "is a file\n";
     validateFile();
     return;
   }
-  if (config::fileutils::isDirectory(_path)) {
+  if (isDirectory(_path)) {
     _log.info() << "is a directory\n";
     validateDirectory();
     return;
@@ -51,7 +52,7 @@ void ValidateGet::validate()
 
 void ValidateGet::validateFile()
 {
-  if (!config::fileutils::isReadable(_path)) {
+  if (!isReadable(_path)) {
     endState(StatusCode::Forbidden);
     return;
   }
@@ -60,7 +61,7 @@ void ValidateGet::validateFile()
     _client->getResource().setType(Resource::Cgi);
     // TODO??: check file extension if file is cgi
     // TODO??: check if parent directory is executable
-    if (!config::fileutils::isExecuteable(_path)) {
+    if (!isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
       return;
     }
@@ -78,8 +79,7 @@ void ValidateGet::validateDirectory()
   //   return;
   // }
 
-  if (!config::fileutils::isExecuteable(_path) ||
-      !config::fileutils::isReadable(_path)) {
+  if (!isExecuteable(_path) || !isReadable(_path)) {
     endState(StatusCode::Forbidden);
     return;
   }
@@ -96,8 +96,7 @@ void ValidateGet::validateDirectory()
   const std::string indexPath = ValidateRequest::appendToRoot(indexName, _path);
   _log.info() << "indexPath: " << indexPath << "\n";
 
-  if (config::fileutils::isFile(indexPath) &&
-      config::fileutils::isReadable(indexPath)) {
+  if (isFile(indexPath) && isReadable(indexPath)) {
     _client->getResource().setPath(indexPath);
     endState(StatusCode::Ok);
     return;

@@ -6,7 +6,6 @@ set(LIB_NAME http)
 
 add_library(${LIB_NAME} STATIC
   abnfRules/generalRules.cpp
-  abnfRules/headerLineRules.cpp
   abnfRules/http11Rules.cpp
   abnfRules/requestLineRules.cpp
   abnfRules/ruleIds.cpp
@@ -43,6 +42,7 @@ add_library(${LIB_NAME} STATIC
 
 target_link_libraries(${LIB_NAME} 
   PRIVATE
+  config
   ftpp
   utils
 )

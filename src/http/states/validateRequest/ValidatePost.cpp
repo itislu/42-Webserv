@@ -1,13 +1,15 @@
 
 #include "ValidatePost.hpp"
-#include "client/Client.hpp"
-#include "config/FileUtils.hpp"
-#include "http/Resource.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/validateRequest/ValidateRequest.hpp"
-#include "libftpp/utility.hpp"
-#include "utils/logger/Logger.hpp"
-#include "utils/state/IState.hpp"
+
+#include <client/Client.hpp>
+#include <http/Resource.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
+#include <libftpp/utility.hpp>
+#include <utils/fileUtils.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+
 #include <string>
 
 /* ************************************************************************** */
@@ -49,15 +51,15 @@ void ValidatePost::validate()
 void ValidatePost::validateCGI()
 {
   _client->getResource().setType(Resource::Cgi);
-  if (config::fileutils::isDirectory(_path)) {
+  if (isDirectory(_path)) {
     endState(StatusCode::Forbidden);
     return;
   }
-  if (!config::fileutils::isFile(_path)) {
+  if (!isFile(_path)) {
     endState(StatusCode::NotFound);
     return;
   }
-  if (!config::fileutils::isExecuteable(_path)) {
+  if (!isExecuteable(_path)) {
     endState(StatusCode::Forbidden);
     return;
   }
@@ -76,20 +78,21 @@ void ValidatePost::validateParentDirPermissions()
   if (dirPath.empty()) {
     dirPath = "/";
   }
-  if (!config::fileutils::isDirectory(dirPath)) {
+  if (!isDirectory(dirPath)) {
     endState(StatusCode::NotFound);
     return;
   }
-  if (!config::fileutils::isExecuteable(dirPath)) {
+  if (!isExecuteable(dirPath)) {
     endState(StatusCode::NotFound);
     return;
   }
-  if (!config::fileutils::isWriteable(dirPath)) {
+  if (!isWriteable(dirPath)) {
     endState(StatusCode::Forbidden);
     return;
   }
   endState(StatusCode::Ok);
 }
+
 void ValidatePost::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);

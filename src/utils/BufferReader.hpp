@@ -4,6 +4,7 @@
 
 #include "utils/IBuffer.hpp"
 
+#include <cstddef>
 #include <new>
 
 /* ************************************************************************** */
@@ -17,22 +18,22 @@ public:
 
   // Throwing versions
   char getNextChar();
-  void setPosInBuff(long pos);
+  std::size_t getPosInBuff() const;
+  void setPosInBuff(std::size_t pos);
   void resetPosInBuff();
-  void rewind(long bytes);
+  void rewind(std::size_t bytes);
 
   // Non-throwing versions
   ExpectChr getNextChar(std::nothrow_t /*unused*/);
-  ExpectVoid setPosInBuff(long pos, std::nothrow_t /*unused*/);
+  ExpectVoid setPosInBuff(std::size_t pos, std::nothrow_t /*unused*/);
   ExpectVoid resetPosInBuff(std::nothrow_t /*unused*/);
-  ExpectVoid rewind(long bytes, std::nothrow_t /*unused*/);
+  ExpectVoid rewind(std::size_t bytes, std::nothrow_t /*unused*/);
 
   bool reachedEnd() const;
-  long getPosInBuff() const;
 
 private:
   IBuffer* _buffer;
-  long _posInBuff;
+  std::size_t _posInBuff;
 };
 
 #endif

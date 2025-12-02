@@ -1,6 +1,7 @@
 #include "RepetitionRule.hpp"
 #include "Rule.hpp"
 
+#include <cstddef>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/BufferReader.hpp>
@@ -25,7 +26,7 @@ RepetitionRule::~RepetitionRule() {}
 bool RepetitionRule::matches()
 {
   debugPrintRuleEntry();
-  const long ogStartPos = getBuffReader()->getPosInBuff();
+  const std::size_t ogStartPos = getBuffReader()->getPosInBuff();
 
   while (!getBuffReader()->reachedEnd()) {
 

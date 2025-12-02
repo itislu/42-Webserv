@@ -1,5 +1,6 @@
 #include "BufferReader.hpp"
 
+#include <algorithm>
 #include <libftpp/expected.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/IBuffer.hpp>
@@ -29,7 +30,7 @@ char BufferReader::getNextChar()
   return chr;
 }
 
-void BufferReader::setPosInBuff(long pos)
+void BufferReader::setPosInBuff(std::size_t pos)
 {
   assert(_buffer != FT_NULLPTR);
   _buffer->seek(pos);
@@ -43,14 +44,13 @@ void BufferReader::resetPosInBuff()
   _posInBuff = 0;
 }
 
-void BufferReader::rewind(long bytes)
+void BufferReader::rewind(std::size_t bytes)
 {
-  if (bytes <= 0) {
+  if (bytes == 0) {
     return;
   }
-  const long newPos = _posInBuff - bytes;
-  assert(newPos >= 0);
-  setPosInBuff(newPos);
+  bytes = std::min(bytes, _posInBuff);
+  setPosInBuff(_posInBuff - bytes);
 }
 
 // Non-throwing versions
@@ -64,7 +64,7 @@ BufferReader::ExpectChr BufferReader::getNextChar(std::nothrow_t /*unused*/)
   }
 }
 
-BufferReader::ExpectVoid BufferReader::setPosInBuff(long pos,
+BufferReader::ExpectVoid BufferReader::setPosInBuff(std::size_t pos,
                                                     std::nothrow_t /*unused*/)
 {
   try {
@@ -85,7 +85,7 @@ BufferReader::ExpectVoid BufferReader::resetPosInBuff(std::nothrow_t /*unused*/)
   }
 }
 
-BufferReader::ExpectVoid BufferReader::rewind(long bytes,
+BufferReader::ExpectVoid BufferReader::rewind(std::size_t bytes,
                                               std::nothrow_t /*unused*/)
 {
   try {
@@ -99,13 +99,10 @@ BufferReader::ExpectVoid BufferReader::rewind(long bytes,
 bool BufferReader::reachedEnd() const
 {
   assert(_buffer != FT_NULLPTR);
-  if (_posInBuff < 0) {
-    return false;
-  }
-  return (static_cast<std::size_t>(_posInBuff) >= _buffer->size());
+  return (_posInBuff >= _buffer->size());
 }
 
-long BufferReader::getPosInBuff() const
+std::size_t BufferReader::getPosInBuff() const
 {
   return _posInBuff;
 }

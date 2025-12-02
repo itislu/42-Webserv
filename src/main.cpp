@@ -9,6 +9,8 @@
 
 int main(int argc, char* argv[])
 {
+  Logger::enableLogging();
+
   if (argc != 2) {
     std::cerr << "Error: Usage: ./webserv [configuration file]\n";
     return 1;

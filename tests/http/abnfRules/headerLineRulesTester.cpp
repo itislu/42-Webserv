@@ -80,7 +80,7 @@ TEST(HeaderLinesTester, FieldLineRule)
  */
 TEST(HeaderLinesTester, FieldLinePartRule)
 {
-  const ft::unique_ptr<SequenceRule> rule = fieldLinePartRule();
+  const ft::shared_ptr<SequenceRule> rule = fieldLinePartRule();
 
   EXPECT_TRUE(runParser("host: test, hallo\r\n", *rule));
 }

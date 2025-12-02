@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 
 /* ************************************************************************** */
 class Headers
@@ -18,11 +19,14 @@ public:
   bool contains(const std::string& key) const;
 
 private:
-  typedef std::map<std::string, std::string> HeaderMap;
+  // the HeaderMap contains the header name in lowercase as key
+  // and the HeaderPair contains the original header name + value
+  typedef std::pair<std::string, std::string> HeaderPair;
+  typedef std::map<std::string, HeaderPair> HeaderMap;
 
-  static void _formatInput(std::string& key, std::string& value);
-  void _addNew(const std::string& key, const std::string& value);
-  void _addExisting(const std::string& key, const std::string& value);
+  static void _formatInput(std::string& key, HeaderPair& headerPair);
+  void _addNew(const std::string& key, const HeaderPair& headerPair);
+  void _addExisting(const std::string& key, const HeaderPair& headerPair);
 
   HeaderMap _headers;
 };
