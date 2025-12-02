@@ -1,6 +1,5 @@
 #include "ValidateRequest.hpp"
 #include "client/Client.hpp"
-#include "config/Converters.hpp"
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
@@ -25,6 +24,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <utils/convert.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <vector>
@@ -240,8 +240,8 @@ std::string ValidateRequest::decodePath(const std::string& path,
   for (std::size_t i = 0; i < path.size(); ++i) {
     if (path[i] == '%') {
       // decode hex
-      const int hex1 = config::convert::hexToInt(path[i + 1]);
-      const int hex2 = config::convert::hexToInt(path[i + 2]);
+      const int hex1 = utils::hexToInt(path[i + 1]);
+      const int hex2 = utils::hexToInt(path[i + 2]);
       const char decode = static_cast<char>((hex1 * hexMult) + hex2);
       if (wantDecode(decode) != 0) {
         decoded += decode;
