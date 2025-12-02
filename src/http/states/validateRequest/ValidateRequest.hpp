@@ -39,7 +39,7 @@ private:
   void _initState(const Request::Method& method);
   void _initRequestPath();
 
-  static void _splitHostHeader(const std::string& hostHeader,
+  void _splitHostHeader(const std::string& hostHeader,
                         std::string& host,
                         int& port);
   void _setServerByHost(const std::string& hostHeader);

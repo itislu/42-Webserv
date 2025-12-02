@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <iostream>
 #include <set>
@@ -90,6 +91,9 @@ void ValidateRequest::_init()
 {
   if (!_client->hasServer()) {
     _initServer();
+    if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+      return;
+    }
   }
 
   _path = _client->getRequest().getUri().getPath();
@@ -144,11 +148,10 @@ void ValidateRequest::_initServer()
     _log.info() << "Uri Host: [" << hostHeader << "]\n"; // empty in 1.1
   }
   if (hostHeader.empty()) {
-    // TODO: set default sever
+    // TODO: set default sever - make Managers singletons to do this
   } else {
     _setServerByHost(hostHeader);
   }
-
   /* TODO: remove this */
   exit(EXIT_SUCCESS);
 }
@@ -158,9 +161,11 @@ void ValidateRequest::_setServerByHost(const std::string& hostHeader)
   std::string host;
   int port = 0;
   _splitHostHeader(hostHeader, host, port);
-  _log.info() << "Split: \n";
-  _log.info() << "  Host: " << host << "\n";
-  _log.info() << "  Port: " << port << "\n";
+  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+    _log.info() << "Split: \n";
+    _log.info() << "  Host: " << host << "\n";
+    _log.info() << "  Port: " << port << "\n";
+  }
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
@@ -173,7 +178,12 @@ void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
     host = hostHeader.substr(0, pos);
     const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
     if (!portStr.empty()) {
-      port = config::convert::toPort(portStr);
+      try {
+        port = config::convert::toPort(portStr);
+      } catch (const std::exception& e) {
+        // TODO: Bad Request? - confirm with testing
+        endState(StatusCode::BadRequest);
+      }
     }
   } else {
     host = hostHeader;
