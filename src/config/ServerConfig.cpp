@@ -14,7 +14,8 @@
 namespace config {
 
 ServerConfig::ServerConfig(const Config& global)
-  : _index("index.html")
+  : _root(global.getRoot())
+  , _index("index.html")
   , _errorPages(global.getErrorPages())
   , _maxBodySize(global.getMaxBodySize())
   , _timeOut(global.getTimeout())
