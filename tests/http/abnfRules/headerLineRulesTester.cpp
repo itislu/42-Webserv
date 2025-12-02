@@ -70,9 +70,11 @@ TEST(HeaderLinesTester, FieldLineRule)
   EXPECT_TRUE(runParser("host: test, hallo\n", *seqRule));
   EXPECT_TRUE(runParser("host: test, hallo \n", *seqRule));
   EXPECT_TRUE(runParser("host:test, hallo \n", *seqRule));
+  EXPECT_TRUE(runParser("host: host: test\n", *seqRule));
 
   // Invalid
   EXPECT_FALSE(runParser("host :test, hallo \n", *seqRule));
+  EXPECT_FALSE(runParser(" : host: test\n", *seqRule));
 }
 
 /**
