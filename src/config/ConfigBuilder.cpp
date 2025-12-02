@@ -29,15 +29,14 @@ void ConfigBuilder::buildServers(const std::vector<ParsedServer>& servers,
   }
 }
 
-Config ConfigBuilder::build(const ParsedConfig& parsed)
+void ConfigBuilder::build(const ParsedConfig& parsed)
 {
-  Config config;
+  Config::getInstance();
 
-  DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(), config);
-  buildServers(parsed.getServers(), config);
-  config.setDefaultTimeout();
-
-  return config;
+  DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(),
+                                            Config::getInstance());
+  buildServers(parsed.getServers(), Config::getInstance());
+  Config::getInstance().setDefaultTimeout();
 }
 
 } // namespace config

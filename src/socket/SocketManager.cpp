@@ -22,6 +22,14 @@ SocketManager::SocketManager(const config::Config& config)
   createListeningSockets(config.getServers());
 }
 
+// SocketManager& SocketManager::getInstance()
+// {
+//   if (_instance == FT_NULLPTR) {
+//     _instance = new SocketManager(config::Config::getInstance());
+//   }
+//   return *_instance;
+// }
+
 // only call in the constructor - because no exception guarantee
 void SocketManager::createListeningSockets(
   const std::vector<config::ServerConfig>& configs)

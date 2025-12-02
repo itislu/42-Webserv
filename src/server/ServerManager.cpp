@@ -15,6 +15,7 @@
 #include <vector>
 
 static volatile std::sig_atomic_t g_running = 0;
+ServerManager* ServerManager::_instance = FT_NULLPTR;
 
 static void error(const std::string& msg)
 {
@@ -26,15 +27,30 @@ extern "C" void sigIntHandler(int /*sigNum*/)
   g_running = 0;
 }
 
-ServerManager::ServerManager(const config::Config& config)
-  : _config(&config)
-  , _socketManager(config)
-  , _eventManager(_clientManager, _socketManager, *this)
+void ServerManager::init(const config::Config& config)
 {
+  if (_instance != FT_NULLPTR) {
+    return;
+  }
+  _instance = new ServerManager(config);
   if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
   }
-  createServers(_config->getServers());
+}
+
+ServerManager& ServerManager::getInstance()
+{
+  if (_instance == FT_NULLPTR) {
+    throw std::runtime_error("ServerManager is not initialized.");
+  }
+  return *_instance;
+}
+
+ServerManager::ServerManager(const config::Config& config)
+  : _socketManager(config)
+  , _eventManager(ClientManager &clients, SocketManager &sockets, ServerManager &servers)
+{
+  createServers(config.getServers());
 }
 
 void ServerManager::createServers(
