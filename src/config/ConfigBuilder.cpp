@@ -4,6 +4,7 @@
 #include "config/ParsedConfig.hpp"
 #include "config/ParsedServer.hpp"
 #include "config/ServerBuilder.hpp"
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -36,6 +37,7 @@ void ConfigBuilder::build(const ParsedConfig& parsed)
   DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(),
                                             Config::getConfig());
   buildServers(parsed.getServers(), Config::getConfig());
+
   Config::getConfig().setDefaultTimeout();
 }
 

@@ -35,10 +35,11 @@ private:
   void addServer(const config::ServerConfig& config,
                  const std::vector<const Socket*>& listeners);
   void createServers(const std::vector<config::ServerConfig>& configs);
-  static std::vector<const Socket*> createListeners(
-    const std::vector<int>& ports);
   void mapServerToSocket(const Server& server,
                          const std::vector<const Socket*>& listeners);
+
+  static std::vector<const Socket*> createListeners(
+    const std::vector<int>& ports);
 
   explicit ServerManager(const config::Config& config);
   ServerManager(const ServerManager& other);
