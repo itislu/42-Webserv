@@ -8,7 +8,6 @@
 
 class ServerManager;
 
-/* TODO: change this to namespace? */
 class EventManager
 {
 public:

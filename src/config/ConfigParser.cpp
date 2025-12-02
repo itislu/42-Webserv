@@ -1,5 +1,4 @@
 #include "ConfigParser.hpp"
-#include "config/Config.hpp"
 #include "config/ConfigBuilder.hpp"
 #include "config/ConfigTypes.hpp"
 #include "config/Converters.hpp"
