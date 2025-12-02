@@ -1,5 +1,6 @@
 #include "ValidateRequest.hpp"
 #include "client/Client.hpp"
+#include "config/Converters.hpp"
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
@@ -15,6 +16,9 @@
 #include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
+#include "server/ServerManager.hpp"
+#include "socket/Socket.hpp"
+#include "socket/SocketManager.hpp"
 #include "utils/state/StateHandler.hpp"
 
 #include <cstddef>
@@ -104,6 +108,8 @@ void ValidateRequest::_init()
   _initConfigs();
   _initResource();
 
+  _log.info() << "Root: " << _server->getRoot() << "\n";
+
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
@@ -134,67 +140,6 @@ bool ValidateRequest::validateMethod(
     }
   }
   return false;
-}
-
-/*
-  TODO:
-  - check Request - headers - and find hostname
-  - get host from Request
-  - host should be in Uri -> authority -> getHost() - if empty
-  - look up servers from client socket and find matching servername -> host
-  - if no exact match, use default server for that socket
-  - set server in client
-*/
-void ValidateRequest::_initServer()
-{
-  std::string hostHeader = _client->getRequest().getHeaders().at("host");
-  _log.info() << "Host Header: [" << hostHeader << "]\n";
-
-  if (hostHeader.empty()) {
-    hostHeader = _client->getRequest().getUri().getAuthority().getHost();
-    _log.info() << "Uri Host: [" << hostHeader << "]\n"; // empty in 1.1
-  }
-  if (hostHeader.empty()) {
-    // TODO: set default sever - make Managers singletons to do this
-  } else {
-    _setServerByHost(hostHeader);
-  }
-  /* TODO: remove this */
-  exit(EXIT_SUCCESS);
-}
-
-void ValidateRequest::_setServerByHost(const std::string& hostHeader)
-{
-  std::string host;
-  int port = 0;
-  _splitHostHeader(hostHeader, host, port);
-  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
-    _log.info() << "Split: \n";
-    _log.info() << "  Host: " << host << "\n";
-    _log.info() << "  Port: " << port << "\n";
-  }
-}
-
-void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
-                                       std::string& host,
-                                       int& port)
-{
-  const std::size_t pos = hostHeader.find(':');
-  if (pos != std::string::npos) {
-
-    host = hostHeader.substr(0, pos);
-    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
-    if (!portStr.empty()) {
-      try {
-        port = config::convert::toPort(portStr);
-      } catch (const std::exception& e) {
-        // TODO: Bad Request? - confirm with testing
-        endState(StatusCode::BadRequest);
-      }
-    }
-  } else {
-    host = hostHeader;
-  }
 }
 
 void ValidateRequest::_initConfigs()
@@ -380,5 +325,83 @@ void ValidateRequest::endState(StatusCode::Code status)
   if (status != StatusCode::Ok) {
     _client->getResource().setType(Resource::Error);
     _stateHandler.setDone();
+  }
+}
+
+/*
+  TODO:
+  - check Request - headers - and find hostname
+  - get host from Request
+  - host should be in Uri -> authority -> getHost() - if empty
+  - look up servers from client socket and find matching servername -> host
+  - if no exact match, use default server for that socket
+  - set server in client
+*/
+void ValidateRequest::_initServer()
+{
+  std::string hostHeader = _client->getRequest().getHeaders().at("host");
+  _log.info() << "Host Header: [" << hostHeader << "]\n";
+
+  if (hostHeader.empty()) {
+    hostHeader = _client->getRequest().getUri().getAuthority().getHost();
+    _log.info() << "Uri Host: [" << hostHeader << "]\n"; // empty in 1.1
+  }
+  if (!hostHeader.empty()) {
+    _setServerByHost(hostHeader); // TODO: set default sever - make Managers
+                                  // singletons to do this
+  } else {
+    // TODO: Default server
+  }
+}
+
+void ValidateRequest::_setServerByHost(const std::string& hostHeader)
+{
+  std::string host;
+  int port = 0;
+  _splitHostHeader(hostHeader, host, port);
+  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+    _log.info() << "Split: \n";
+    _log.info() << "  Host: " << host << "\n";
+    _log.info() << "  Port: " << port << "\n";
+  }
+
+  const Socket& socket =
+    SocketManager::getInstance().getSocketFromClientFd(_client->getFd());
+
+  // if (socket.getPort() != port) {
+  //   // Something very wrong here
+  // }
+
+  const Server* const server =
+    ServerManager::getInstance().getServerByHost(&socket, host);
+  if (server != FT_NULLPTR) {
+    _log.info() << "Found server for host: " << host << "\n";
+    _client->setServer(server);
+  } else {
+    _log.info() << "Found no server for host: " << host << "\n";
+    // TODO: set default server
+  }
+}
+
+void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
+                                       std::string& host,
+                                       int& port)
+{
+  const std::size_t pos = hostHeader.find(':');
+  if (pos != std::string::npos) {
+
+    host = hostHeader.substr(0, pos);
+    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
+    if (!portStr.empty()) {
+      try {
+        port = config::convert::toPort(portStr);
+      } catch (const std::exception& e) {
+        // NOTE: not sure if this is even possible
+        // Bad Request? - confirm with testing
+        endState(StatusCode::BadRequest);
+      }
+    }
+  } else {
+    host = hostHeader;
   }
 }

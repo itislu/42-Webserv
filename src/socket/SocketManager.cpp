@@ -154,6 +154,14 @@ const Socket& SocketManager::getSocket(int fdes) const
   return *iter->second;
 }
 
+const Socket& SocketManager::getSocketFromClientFd(int fdes) const
+{
+  const const_FdToSockIter iter = _fdToSocket.find(fdes);
+  assert(iter != _listeners.end() &&
+         "SocketManager::getSocketFromClientFd: fd not found");
+  return *iter->second;
+}
+
 const Socket& SocketManager::getListener(int port) const
 {
   for (const_FdToSockIter it = _listeners.begin(); it != _listeners.end();
