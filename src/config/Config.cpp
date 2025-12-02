@@ -30,6 +30,19 @@ Config& Config::getConfig()
   return config;
 }
 
+/* Use this for tests to reset the config back to default and not carry over
+ * values from previous test */
+void Config::reset()
+{
+  Config& config = getConfig();
+
+  config._errorPages.clear();
+  config._servers.clear();
+  config.setRoot(defaultRoot);
+  config.setMaxBodySize(defaultMaxBodySize);
+  config.setTimeout(defaultTimeout);
+}
+
 const std::vector<ServerConfig>& Config::getServers() const
 {
   return _servers;
