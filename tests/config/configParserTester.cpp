@@ -22,6 +22,7 @@ TEST(DuplicatesTester, DupAllowedMethodLocation)
     std::string(ASSETS_PATH) + "duplicates/dup_allowed_method.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(DuplicatesTester, DupDirectiveGlobal)
@@ -30,6 +31,7 @@ TEST(DuplicatesTester, DupDirectiveGlobal)
     std::string(ASSETS_PATH) + "duplicates/dup_directive_global.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(DuplicatesTester, DupDirectiveLocation)
@@ -38,6 +40,7 @@ TEST(DuplicatesTester, DupDirectiveLocation)
     std::string(ASSETS_PATH) + "duplicates/dup_directive_location.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(DuplicatesTester, DupDirectiveServer)
@@ -46,6 +49,7 @@ TEST(DuplicatesTester, DupDirectiveServer)
     std::string(ASSETS_PATH) + "duplicates/dup_directive_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(DuplicatesTester, DupLocations)
@@ -54,6 +58,7 @@ TEST(DuplicatesTester, DupLocations)
     std::string(ASSETS_PATH) + "duplicates/dup_locations.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(DuplicatesTester, DupPortDifferentLine)
@@ -62,6 +67,7 @@ TEST(DuplicatesTester, DupPortDifferentLine)
     std::string(ASSETS_PATH) + "duplicates/dup_port_different_line.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(DuplicatesTester, DupPortSameLine)
@@ -70,6 +76,7 @@ TEST(DuplicatesTester, DupPortSameLine)
     std::string(ASSETS_PATH) + "duplicates/dup_port_same_line.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 // =================================================================
@@ -82,6 +89,7 @@ TEST(EmptyConfigTester, CommentsOnly)
     std::string(ASSETS_PATH) + "empty/comments_only.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(EmptyConfigTester, EmptyFile)
@@ -90,6 +98,7 @@ TEST(EmptyConfigTester, EmptyFile)
     std::string(ASSETS_PATH) + "empty/empty_file.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(EmptyConfigTester, EmptyLines)
@@ -98,6 +107,7 @@ TEST(EmptyConfigTester, EmptyLines)
     std::string(ASSETS_PATH) + "empty/empty_lines.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(EmptyConfigTester, EmptyServer)
@@ -106,6 +116,7 @@ TEST(EmptyConfigTester, EmptyServer)
     std::string(ASSETS_PATH) + "empty/empty_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 // =================================================================
@@ -118,6 +129,7 @@ TEST(InvalidFilesTester, InvalidExtensionConfig)
     std::string(ASSETS_PATH) + "invalid_files/invalid_extension.config";
   EXPECT_THROW(const ConfigParser parser(configPath.c_str()),
                std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidFilesTester, InvalidExtensionTxt)
@@ -126,6 +138,7 @@ TEST(InvalidFilesTester, InvalidExtensionTxt)
     std::string(ASSETS_PATH) + "invalid_files/invalid_extension.txt";
   EXPECT_THROW(const ConfigParser parser(configPath.c_str()),
                std::invalid_argument);
+  Config::reset();
 }
 
 // =================================================================
@@ -138,6 +151,7 @@ TEST(InvalidValuesTester, ErrorCodeNonNumber)
     std::string(ASSETS_PATH) + "invalid_values/error_code_non_number.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorCodeTooHigh)
@@ -146,6 +160,7 @@ TEST(InvalidValuesTester, ErrorCodeTooHigh)
     std::string(ASSETS_PATH) + "invalid_values/error_code_too_high.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorCodeTooLow)
@@ -154,6 +169,7 @@ TEST(InvalidValuesTester, ErrorCodeTooLow)
     std::string(ASSETS_PATH) + "invalid_values/error_code_too_low.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorCodeTrailingText)
@@ -162,6 +178,7 @@ TEST(InvalidValuesTester, ErrorCodeTrailingText)
     std::string(ASSETS_PATH) + "invalid_values/error_code_trailing_text.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorPageExtraCodeAfter)
@@ -171,6 +188,7 @@ TEST(InvalidValuesTester, ErrorPageExtraCodeAfter)
     "invalid_values/error_page_extra_code_after.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorPageMultiCodesPaths)
@@ -180,6 +198,7 @@ TEST(InvalidValuesTester, ErrorPageMultiCodesPaths)
     "invalid_values/error_page_multi_codes_paths.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorPageNoCode)
@@ -188,6 +207,7 @@ TEST(InvalidValuesTester, ErrorPageNoCode)
     std::string(ASSETS_PATH) + "invalid_values/error_page_no_code.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorPageNoPath)
@@ -196,6 +216,7 @@ TEST(InvalidValuesTester, ErrorPageNoPath)
     std::string(ASSETS_PATH) + "invalid_values/error_page_no_path.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ErrorPagePathBeforeCode)
@@ -205,6 +226,7 @@ TEST(InvalidValuesTester, ErrorPagePathBeforeCode)
     "invalid_values/error_page_path_before_code.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, InvalidBodysizeMultiplier)
@@ -214,6 +236,7 @@ TEST(InvalidValuesTester, InvalidBodysizeMultiplier)
     "invalid_values/invalid_bodysize_multiplier.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, InvalidDirectiveGlobal)
@@ -222,6 +245,7 @@ TEST(InvalidValuesTester, InvalidDirectiveGlobal)
     std::string(ASSETS_PATH) + "invalid_values/invalid_directive_global.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, InvalidDirectiveLocation)
@@ -230,6 +254,7 @@ TEST(InvalidValuesTester, InvalidDirectiveLocation)
     std::string(ASSETS_PATH) + "invalid_values/invalid_directive_location.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, InvalidDirectiveServer)
@@ -238,6 +263,7 @@ TEST(InvalidValuesTester, InvalidDirectiveServer)
     std::string(ASSETS_PATH) + "invalid_values/invalid_directive_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, InvalidMethodLocation)
@@ -246,6 +272,7 @@ TEST(InvalidValuesTester, InvalidMethodLocation)
     std::string(ASSETS_PATH) + "invalid_values/invalid_method_location.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, InvalidMethodServer)
@@ -254,6 +281,7 @@ TEST(InvalidValuesTester, InvalidMethodServer)
     std::string(ASSETS_PATH) + "invalid_values/invalid_method_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, NegativeBodySize)
@@ -262,6 +290,7 @@ TEST(InvalidValuesTester, NegativeBodySize)
     std::string(ASSETS_PATH) + "invalid_values/negative_bodysize.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, NegativePort)
@@ -270,6 +299,7 @@ TEST(InvalidValuesTester, NegativePort)
     std::string(ASSETS_PATH) + "invalid_values/negative_port.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, NegativeZeroTimeout)
@@ -278,6 +308,7 @@ TEST(InvalidValuesTester, NegativeZeroTimeout)
     std::string(ASSETS_PATH) + "invalid_values/negative_zero_timeout.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, PortNonNumber)
@@ -286,6 +317,7 @@ TEST(InvalidValuesTester, PortNonNumber)
     std::string(ASSETS_PATH) + "invalid_values/port_non_number.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, PortNonNumberIncluded)
@@ -294,6 +326,7 @@ TEST(InvalidValuesTester, PortNonNumberIncluded)
     std::string(ASSETS_PATH) + "invalid_values/port_non_number_included.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, PortTooHigh)
@@ -302,6 +335,7 @@ TEST(InvalidValuesTester, PortTooHigh)
     std::string(ASSETS_PATH) + "invalid_values/port_too_high.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, TimeoutTrailingText)
@@ -310,6 +344,7 @@ TEST(InvalidValuesTester, TimeoutTrailingText)
     std::string(ASSETS_PATH) + "invalid_values/timeout_trailing_text.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(InvalidValuesTester, ZeroPort)
@@ -318,6 +353,7 @@ TEST(InvalidValuesTester, ZeroPort)
     std::string(ASSETS_PATH) + "invalid_values/zero_port.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 // =================================================================
@@ -330,6 +366,7 @@ TEST(MissingRequiredTester, MissingDirective)
     std::string(ASSETS_PATH) + "missing_required/missing_directive.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(MissingRequiredTester, MissingListen)
@@ -338,6 +375,7 @@ TEST(MissingRequiredTester, MissingListen)
     std::string(ASSETS_PATH) + "missing_required/missing_listen.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(MissingRequiredTester, MissingLocation)
@@ -346,6 +384,7 @@ TEST(MissingRequiredTester, MissingLocation)
     std::string(ASSETS_PATH) + "missing_required/missing_location.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(MissingRequiredTester, MissingServer)
@@ -354,6 +393,7 @@ TEST(MissingRequiredTester, MissingServer)
     std::string(ASSETS_PATH) + "missing_required/missing_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(MissingRequiredTester, MissingServernames)
@@ -362,6 +402,7 @@ TEST(MissingRequiredTester, MissingServernames)
     std::string(ASSETS_PATH) + "missing_required/missing_servernames.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(MissingRequiredTester, MissingTimeoutValue)
@@ -370,6 +411,7 @@ TEST(MissingRequiredTester, MissingTimeoutValue)
     std::string(ASSETS_PATH) + "missing_required/missing_timeout_value.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 // =================================================================
@@ -382,6 +424,7 @@ TEST(OverflowTester, OverflowBodysize)
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_B)
@@ -390,6 +433,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_B)
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_B.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_G)
@@ -398,6 +442,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_G)
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_G.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::overflow_error);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_K)
@@ -406,6 +451,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_K)
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_K.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::overflow_error);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_M)
@@ -414,6 +460,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_M)
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_M.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::overflow_error);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowErrorCode)
@@ -422,6 +469,7 @@ TEST(OverflowTester, OverflowErrorCode)
     std::string(ASSETS_PATH) + "overflow/overflow_error_code.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowIntMax)
@@ -430,6 +478,7 @@ TEST(OverflowTester, OverflowIntMax)
     std::string(ASSETS_PATH) + "overflow/overflow_int_max.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowIntMin)
@@ -438,6 +487,7 @@ TEST(OverflowTester, OverflowIntMin)
     std::string(ASSETS_PATH) + "overflow/overflow_int_min.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowLocationBodysize)
@@ -446,6 +496,7 @@ TEST(OverflowTester, OverflowLocationBodysize)
     std::string(ASSETS_PATH) + "overflow/overflow_location_bodysize.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowLongMax)
@@ -454,6 +505,7 @@ TEST(OverflowTester, OverflowLongMax)
     std::string(ASSETS_PATH) + "overflow/overflow_long_max.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowLongMin)
@@ -462,6 +514,7 @@ TEST(OverflowTester, OverflowLongMin)
     std::string(ASSETS_PATH) + "overflow/overflow_long_min.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowPort)
@@ -470,6 +523,7 @@ TEST(OverflowTester, OverflowPort)
     std::string(ASSETS_PATH) + "overflow/overflow_port.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowRedirectCode)
@@ -478,6 +532,7 @@ TEST(OverflowTester, OverflowRedirectCode)
     std::string(ASSETS_PATH) + "overflow/overflow_redirect_code.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowServerBodysize)
@@ -486,6 +541,7 @@ TEST(OverflowTester, OverflowServerBodysize)
     std::string(ASSETS_PATH) + "overflow/overflow_server_bodysize.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowServerTimeout)
@@ -494,6 +550,7 @@ TEST(OverflowTester, OverflowServerTimeout)
     std::string(ASSETS_PATH) + "overflow/overflow_server_timeout.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowSizeTMax)
@@ -502,6 +559,7 @@ TEST(OverflowTester, OverflowSizeTMax)
     std::string(ASSETS_PATH) + "overflow/overflow_sizet_max.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(OverflowTester, OverflowTimeout)
@@ -510,6 +568,7 @@ TEST(OverflowTester, OverflowTimeout)
     std::string(ASSETS_PATH) + "overflow/overflow_timeout.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 // =================================================================
@@ -522,6 +581,7 @@ TEST(SyntaxErrorsTester, AdditionalLBrace)
     std::string(ASSETS_PATH) + "syntax_errors/additional_lbrace.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, AdditionalRBrace)
@@ -530,6 +590,7 @@ TEST(SyntaxErrorsTester, AdditionalRBrace)
     std::string(ASSETS_PATH) + "syntax_errors/additional_rbrace.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, AdditionalSemicolon)
@@ -538,6 +599,7 @@ TEST(SyntaxErrorsTester, AdditionalSemicolon)
     std::string(ASSETS_PATH) + "syntax_errors/additional_semicolon.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, DoubleBraces)
@@ -546,6 +608,7 @@ TEST(SyntaxErrorsTester, DoubleBraces)
     std::string(ASSETS_PATH) + "syntax_errors/double_braces.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, MissingLBrace)
@@ -554,6 +617,7 @@ TEST(SyntaxErrorsTester, MissingLBrace)
     std::string(ASSETS_PATH) + "syntax_errors/missing_lbrace.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, MissingLocationLBrace)
@@ -562,6 +626,7 @@ TEST(SyntaxErrorsTester, MissingLocationLBrace)
     std::string(ASSETS_PATH) + "syntax_errors/missing_location_lbrace.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, MissingLocationRBrace)
@@ -570,6 +635,7 @@ TEST(SyntaxErrorsTester, MissingLocationRBrace)
     std::string(ASSETS_PATH) + "syntax_errors/missing_location_rbrace.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, MissingRBrace)
@@ -578,6 +644,7 @@ TEST(SyntaxErrorsTester, MissingRBrace)
     std::string(ASSETS_PATH) + "syntax_errors/missing_rbrace.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, MissingSemicolon)
@@ -586,6 +653,7 @@ TEST(SyntaxErrorsTester, MissingSemicolon)
     std::string(ASSETS_PATH) + "syntax_errors/missing_semicolon.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 TEST(SyntaxErrorsTester, SemicolonBeforeDirective)
@@ -594,6 +662,7 @@ TEST(SyntaxErrorsTester, SemicolonBeforeDirective)
     std::string(ASSETS_PATH) + "syntax_errors/semicolon_before_directive.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
+  Config::reset();
 }
 
 // =================================================================
@@ -628,6 +697,7 @@ TEST(ValidConfigTester, BodySizeMultipliers)
   EXPECT_EQ(servers[6].getMaxBodySize(), 7UL * 1024 * 1024 * 1024);
   // G (gigabytes)
   EXPECT_EQ(servers[7].getMaxBodySize(), 8UL * 1024 * 1024 * 1024);
+  Config::reset();
 }
 
 TEST(ValidConfigTester, CommentsInValue)
@@ -636,6 +706,7 @@ TEST(ValidConfigTester, CommentsInValue)
     std::string(ASSETS_PATH) + "valid/comments_in_value.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, DuplicateMethods)
@@ -644,6 +715,7 @@ TEST(ValidConfigTester, DuplicateMethods)
     std::string(ASSETS_PATH) + "valid/duplicate_methods.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, EmptyLinesSemicolon)
@@ -652,6 +724,7 @@ TEST(ValidConfigTester, EmptyLinesSemicolon)
     std::string(ASSETS_PATH) + "valid/empty_lines_semicolon.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, EmptyLocation)
@@ -660,6 +733,7 @@ TEST(ValidConfigTester, EmptyLocation)
     std::string(ASSETS_PATH) + "valid/empty_location.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, ErrorPages)
@@ -668,6 +742,7 @@ TEST(ValidConfigTester, ErrorPages)
     std::string(ASSETS_PATH) + "valid/error_pages.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, GlobalRoot)
@@ -676,6 +751,7 @@ TEST(ValidConfigTester, GlobalRoot)
     std::string(ASSETS_PATH) + "valid/global_root.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, LargeValues)
@@ -684,6 +760,7 @@ TEST(ValidConfigTester, LargeValues)
     std::string(ASSETS_PATH) + "valid/large_values.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, Minimal)
@@ -692,6 +769,7 @@ TEST(ValidConfigTester, Minimal)
     std::string(ASSETS_PATH) + "valid/minimal.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, MultinameServer)
@@ -700,6 +778,7 @@ TEST(ValidConfigTester, MultinameServer)
     std::string(ASSETS_PATH) + "valid/multiname_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, MultipleLocations)
@@ -708,6 +787,7 @@ TEST(ValidConfigTester, MultipleLocations)
     std::string(ASSETS_PATH) + "valid/multiple_locations.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, MultipleServers)
@@ -716,6 +796,7 @@ TEST(ValidConfigTester, MultipleServers)
     std::string(ASSETS_PATH) + "valid/multiple_servers.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, MultiportServer)
@@ -724,6 +805,7 @@ TEST(ValidConfigTester, MultiportServer)
     std::string(ASSETS_PATH) + "valid/multiport_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, NewlinesInDirectives)
@@ -732,6 +814,7 @@ TEST(ValidConfigTester, NewlinesInDirectives)
     std::string(ASSETS_PATH) + "valid/newlines_in_directives.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, OverlappingHostnames)
@@ -740,6 +823,7 @@ TEST(ValidConfigTester, OverlappingHostnames)
     std::string(ASSETS_PATH) + "valid/overlapping_hostnames.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, OverlappingPorts)
@@ -748,6 +832,7 @@ TEST(ValidConfigTester, OverlappingPorts)
     std::string(ASSETS_PATH) + "valid/overlapping_ports.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, OverwriteErrorcodeLocation)
@@ -756,6 +841,7 @@ TEST(ValidConfigTester, OverwriteErrorcodeLocation)
     std::string(ASSETS_PATH) + "valid/overwrite_errorcode_location.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, OverwriteErrorcodeServer)
@@ -764,6 +850,7 @@ TEST(ValidConfigTester, OverwriteErrorcodeServer)
     std::string(ASSETS_PATH) + "valid/overwrite_errorcode_server.conf";
   ConfigParser parser(configPath.c_str());
   EXPECT_NO_THROW(parser.parseConfig());
+  Config::reset();
 }
 
 TEST(ValidConfigTester, Simple)
@@ -780,6 +867,7 @@ TEST(ValidConfigTester, Simple)
   EXPECT_EQ(config.getServers().size(), 1);
   EXPECT_EQ(config.getServers()[0].getPorts()[0], 8080);
   EXPECT_EQ(config.getServers()[0].getHostnames()[0], "serv1");
+  Config::reset();
 }
 
 TEST(ValidConfigTester, TestAllValues)
@@ -838,10 +926,12 @@ TEST(ValidConfigTester, TestAllValues)
   EXPECT_EQ(srv2.getRoot(), "/var/www/api/");
   EXPECT_EQ(srv2.getMaxBodySize(), 16384);
   EXPECT_EQ(srv2.getTimeout(), 60);
+  Config::reset();
 }
 
 int main(int argc, char* argv[])
 {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
+  Config::reset();
 }

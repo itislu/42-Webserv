@@ -4,7 +4,6 @@
 
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
-#include "libftpp/memory.hpp"
 #include <cstddef>
 #include <map>
 #include <ostream>
@@ -20,6 +19,7 @@ public:
   typedef std::vector<ServerConfig>::const_iterator const_ServConfIter;
 
   static Config& getConfig();
+  static void reset();
 
   // Getters
   const std::vector<ServerConfig>& getServers() const;
