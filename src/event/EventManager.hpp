@@ -1,40 +1,39 @@
 #ifndef EVENTMANAGER_HPP
 #define EVENTMANAGER_HPP
 
+#include "client/ClientManager.hpp"
+#include "socket/SocketManager.hpp"
 #include <client/Client.hpp>
-#include <client/ClientManager.hpp>
-#include <socket/SocketManager.hpp>
 #include <utils/logger/Logger.hpp>
 
 class ServerManager;
 
+/* TODO: change this to namespace? */
 class EventManager
 {
 public:
-  EventManager(ClientManager& clients,
-               SocketManager& sockets,
-               ServerManager& servers);
-
-  int check();
-  void checkTimeouts();
+  static int check();
+  static void checkTimeouts();
 
 private:
+  EventManager();
+  static ClientManager& _clientManager();
+  static ServerManager& _serverManager();
+  static SocketManager& _socketManager();
+
   /* EVENTS */
-  void checkActivity();
-  bool handleClient(Client* client, unsigned events);
-  bool sendToClient(Client& client);
-  bool receiveFromClient(Client& client);
-  void disconnectClient(Client* client);
-  void acceptClient(int fdes, unsigned events);
+  static void checkActivity();
+  static bool handleClient(Client* client, unsigned events);
+  static bool sendToClient(Client& client);
+  static bool receiveFromClient(Client& client);
   static void clientStateMachine(Client& client);
+  static void disconnectClient(Client* client);
+  static void acceptClient(int fdes, unsigned events);
 
   /* TIMEOUT */
-  int calculateTimeout() const;
+  static int calculateTimeout();
 
   static Logger& _log;
-  ClientManager* _clientsManager;
-  SocketManager* _socketsManager;
-  ServerManager* _serverManager;
 };
 
 #endif

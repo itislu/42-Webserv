@@ -217,13 +217,13 @@ void ConfigParser::parse()
   }
 }
 
-Config ConfigParser::parseConfig()
+void ConfigParser::parseConfig()
 {
   // parse
   parse();
 
   // build
-  return ConfigBuilder::build(_parsed);
+  ConfigBuilder::build(_parsed);
 }
 
 } // namespace config

@@ -31,20 +31,26 @@ Logger& EventManager::_log = Logger::getInstance(LOG_SERVER);
 // Calls checkActivity() (or delegate to ClientManager/SocketManager)
 // Checks timeouts
 
-EventManager::EventManager(ClientManager& clients,
-                           SocketManager& sockets,
-                           ServerManager& servers)
-  : _clientsManager(&clients)
-  , _socketsManager(&sockets)
-  , _serverManager(&servers)
+ClientManager& EventManager::_clientManager()
 {
+  return ClientManager::getInstance();
+}
+
+ServerManager& EventManager::_serverManager()
+{
+  return ServerManager::getInstance();
+}
+
+SocketManager& EventManager::_socketManager()
+{
+  return SocketManager::getInstance();
 }
 
 bool EventManager::sendToClient(Client& client)
 {
   const bool alive = client.sendTo();
   if (alive && !client.hasDataToSend()) {
-    _socketsManager->disablePollout(client.getFd());
+    _socketManager().disablePollout(client.getFd());
     _log.info() << "Pollout disabled\n";
   }
   return alive;
@@ -54,7 +60,7 @@ bool EventManager::receiveFromClient(Client& client)
 {
   const bool alive = client.receive();
   if (alive && client.hasDataToSend()) {
-    _socketsManager->enablePollout(client.getFd());
+    _socketManager().enablePollout(client.getFd());
   }
   return alive;
 }
@@ -83,7 +89,7 @@ bool EventManager::handleClient(Client* client, unsigned events)
     clientStateMachine(*client);
   }
   if (alive && client->hasDataToSend()) {
-    _socketsManager->enablePollout(client->getFd());
+    _socketManager().enablePollout(client->getFd());
     _log.info() << "Pollout enabled\n";
   }
   if ((events & POLLOUT) != 0 && alive) { // Send Data
@@ -102,10 +108,10 @@ void EventManager::disconnectClient(Client* client)
   }
   const int clientFd = client->getFd();
   // Remove corresponding pollfd
-  _socketsManager->removeFd(clientFd);
+  _socketManager().removeFd(clientFd);
 
   // remove from client map
-  _clientsManager->removeClient(clientFd);
+  _clientManager().removeClient(clientFd);
 
   std::cout << "[SERVER] Client fd=" << clientFd << " disconnected\n";
 }
@@ -116,10 +122,10 @@ void EventManager::acceptClient(int fdes, const unsigned events)
     return;
   }
 
-  const int clientFd = _socketsManager->acceptClient(fdes);
+  const int clientFd = _socketManager().acceptClient(fdes);
   if (clientFd > 0) {
-    const Server* const server = _serverManager->getInitServer(fdes);
-    _clientsManager->addClient(clientFd, server);
+    const Server* const server = _serverManager().getInitServer(fdes);
+    _clientManager().addClient(clientFd, server);
     std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
     std::cerr << "[SERVER] accepting new client failed\n";
@@ -128,14 +134,15 @@ void EventManager::acceptClient(int fdes, const unsigned events)
 
 void EventManager::checkActivity()
 {
-  const std::vector<pollfd>& pfds = _socketsManager->getPfds();
+  const SocketManager& socketManager = _socketManager();
+  const std::vector<pollfd>& pfds = socketManager.getPfds();
   for (std::size_t i = 0; i < pfds.size();) {
     const unsigned events = static_cast<unsigned>(pfds[i].revents);
-    if (_socketsManager->isListener(pfds[i].fd)) {
+    if (socketManager.isListener(pfds[i].fd)) {
       acceptClient(pfds[i].fd, events);
       i++;
     } else {
-      Client* const client = _clientsManager->getClient(pfds[i].fd);
+      Client* const client = _clientManager().getClient(pfds[i].fd);
       if (!handleClient(client, events)) {
         disconnectClient(client);
       } else {
@@ -145,17 +152,17 @@ void EventManager::checkActivity()
   }
 }
 
-int EventManager::calculateTimeout() const
+int EventManager::calculateTimeout()
 {
   // No clients yet, get default
-  if (!_clientsManager->hasClients()) {
+  if (!_clientManager().hasClients()) {
     const long timeout = config::Config::getDefaultTimeout();
     const int timeoutMs = convertSecondsToMs(timeout);
     std::cout << "No clients - use default timeout: " << timeoutMs << "ms\n";
     return timeoutMs;
   }
 
-  const long minRemaining = _clientsManager->getMinTimeout();
+  const long minRemaining = _clientManager().getMinTimeout();
   const int timeoutMs = convertSecondsToMs(minRemaining);
   std::cout << "using client min remaining timeout: " << timeoutMs << "ms\n";
 
@@ -165,7 +172,7 @@ int EventManager::calculateTimeout() const
 void EventManager::checkTimeouts()
 {
   std::vector<ft::shared_ptr<Client> > timedOut;
-  _clientsManager->getTimedOutClients(timedOut);
+  _clientManager().getTimedOutClients(timedOut);
   for (std::size_t i = 0; i < timedOut.size(); ++i) {
     std::cout << "[SERVER] Client fd=" << timedOut[i]->getFd()
               << " timed out.\n";
@@ -177,7 +184,7 @@ int EventManager::check()
 {
   const int timeout = calculateTimeout();
   const int ready = poll(
-    _socketsManager->getPfdStart(), _socketsManager->getPfdsSize(), timeout);
+    _socketManager().getPfdStart(), _socketManager().getPfdsSize(), timeout);
   if (ready <= 0) {
     return ready;
   }

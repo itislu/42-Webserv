@@ -4,6 +4,7 @@
 #include "config/ParsedConfig.hpp"
 #include "config/ParsedServer.hpp"
 #include "config/ServerBuilder.hpp"
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -29,15 +30,15 @@ void ConfigBuilder::buildServers(const std::vector<ParsedServer>& servers,
   }
 }
 
-Config ConfigBuilder::build(const ParsedConfig& parsed)
+void ConfigBuilder::build(const ParsedConfig& parsed)
 {
-  Config config;
+  Config::getConfig();
 
-  DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(), config);
-  buildServers(parsed.getServers(), config);
-  config.setDefaultTimeout();
+  DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(),
+                                            Config::getConfig());
+  buildServers(parsed.getServers(), Config::getConfig());
 
-  return config;
+  Config::getConfig().setDefaultTimeout();
 }
 
 } // namespace config

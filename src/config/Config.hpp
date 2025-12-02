@@ -4,6 +4,7 @@
 
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
+#include "libftpp/memory.hpp"
 #include <cstddef>
 #include <map>
 #include <ostream>
@@ -15,9 +16,10 @@ namespace config {
 class Config
 {
 public:
-  explicit Config();
   typedef std::vector<ServerConfig>::iterator ServConfIter;
   typedef std::vector<ServerConfig>::const_iterator const_ServConfIter;
+
+  static Config& getConfig();
 
   // Getters
   const std::vector<ServerConfig>& getServers() const;
@@ -47,6 +49,8 @@ public:
                                            const std::string& path) const;
 
 private:
+  explicit Config();
+
   static const char* const defaultRoot;
   static const std::size_t defaultMaxBodySize;
   static const int defaultTimeout;

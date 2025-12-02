@@ -23,6 +23,13 @@ Config::Config()
 {
 }
 
+Config& Config::getConfig()
+{
+  static Config config;
+
+  return config;
+}
+
 const std::vector<ServerConfig>& Config::getServers() const
 {
   return _servers;

@@ -17,15 +17,14 @@ int main(int argc, char* argv[])
   }
 
   try {
-
     Logger::getInstance(LOG_GENERAL).info() << "webserv started\n";
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    const config::Config config = config::ConfigParser(argv[1]).parseConfig();
-    std::cout << config;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)d
+    config::ConfigParser(argv[1]).parseConfig();
+    std::cout << config::Config::getConfig();
 
-    ServerManager serverManager(config);
-    serverManager.run();
+    ServerManager::getInstance();
+    ServerManager::run();
 
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";

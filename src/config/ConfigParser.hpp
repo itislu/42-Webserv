@@ -1,7 +1,6 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
-#include "config/Config.hpp"
 #include "config/ConfigTypes.hpp"
 #include "config/Lexer.hpp"
 #include "config/ParsedConfig.hpp"
@@ -16,7 +15,7 @@ class ConfigParser
 {
 public:
   explicit ConfigParser(const char* path);
-  Config parseConfig();
+  void parseConfig();
 
 private:
   void parse();
