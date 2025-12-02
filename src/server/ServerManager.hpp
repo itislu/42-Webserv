@@ -2,12 +2,10 @@
 #define SERVERMANAGER_HPP
 
 #include "Server.hpp"
-#include "client/ClientManager.hpp"
 #include "config/ServerConfig.hpp"
 #include "event/EventManager.hpp"
 #include "libftpp/memory.hpp"
 #include "socket/Socket.hpp"
-#include "socket/SocketManager.hpp"
 #include <cstddef>
 #include <map>
 #include <vector>
@@ -24,7 +22,7 @@ public:
   const std::vector<ft::shared_ptr<const Server> >& getServers() const;
   const Server* getInitServer(int fdes) const;
 
-  void run();
+  static void run();
 
   std::size_t serverCount() const;
 
@@ -37,7 +35,8 @@ private:
   void addServer(const config::ServerConfig& config,
                  const std::vector<const Socket*>& listeners);
   void createServers(const std::vector<config::ServerConfig>& configs);
-  std::vector<const Socket*> createListeners(const std::vector<int>& ports);
+  static std::vector<const Socket*> createListeners(
+    const std::vector<int>& ports);
   void mapServerToSocket(const Server& server,
                          const std::vector<const Socket*>& listeners);
 
@@ -45,11 +44,6 @@ private:
   ServerManager(const ServerManager& other);
   ServerManager& operator=(const ServerManager& other);
 
-  static ServerManager* _instance;
-
-  SocketManager _socketManager;
-  ClientManager _clientManager;
-  EventManager _eventManager;
   std::vector<ft::shared_ptr<const Server> > _servers;
   std::map<const Socket*, std::vector<const Server*> > _socketToServers;
 };

@@ -1,7 +1,6 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "config/LocationConfig.hpp"
-#include "libftpp/utility.hpp"
 #include <algorithm>
 #include <climits>
 #include <cstddef>
@@ -12,7 +11,6 @@
 
 namespace config {
 
-Config* Config::_instance = FT_NULLPTR;
 int Config::_defaultTimeout = 0;
 const char* const Config::defaultRoot = "/var/www";
 const std::size_t Config::defaultMaxBodySize = 1024L * 1024;
@@ -25,12 +23,11 @@ Config::Config()
 {
 }
 
-Config& Config::getInstance()
+Config& Config::getConfig()
 {
-  if (_instance == FT_NULLPTR) {
-    _instance = new Config();
-  }
-  return *_instance;
+  static Config config;
+
+  return config;
 }
 
 const std::vector<ServerConfig>& Config::getServers() const

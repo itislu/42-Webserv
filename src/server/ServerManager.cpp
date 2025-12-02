@@ -1,6 +1,7 @@
 #include "ServerManager.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
+#include "event/EventManager.hpp"
 #include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
@@ -15,7 +16,6 @@
 #include <vector>
 
 static volatile std::sig_atomic_t g_running = 0;
-ServerManager* ServerManager::_instance = FT_NULLPTR;
 
 static void error(const std::string& msg)
 {
@@ -27,29 +27,18 @@ extern "C" void sigIntHandler(int /*sigNum*/)
   g_running = 0;
 }
 
-void ServerManager::init(const config::Config& config)
-{
-  if (_instance != FT_NULLPTR) {
-    return;
-  }
-  _instance = new ServerManager(config);
-  if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
-    throw std::runtime_error("Failed to set SIGINT handler");
-  }
-}
-
 ServerManager& ServerManager::getInstance()
 {
-  if (_instance == FT_NULLPTR) {
-    throw std::runtime_error("ServerManager is not initialized.");
-  }
-  return *_instance;
+  static ServerManager serverManager(config::Config::getConfig());
+
+  return serverManager;
 }
 
 ServerManager::ServerManager(const config::Config& config)
-  : _socketManager(config)
-  , _eventManager(ClientManager &clients, SocketManager &sockets, ServerManager &servers)
 {
+  if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
+    throw std::runtime_error("Failed to set SIGINT handler");
+  }
   createServers(config.getServers());
 }
 
@@ -71,10 +60,11 @@ std::vector<const Socket*> ServerManager::createListeners(
 {
   std::vector<const Socket*> listeners;
   listeners.reserve(ports.size());
+  const SocketManager& socketManager = SocketManager::getInstance();
   for (std::vector<int>::const_iterator it = ports.begin(); it != ports.end();
        ++it) {
     const int port = *it;
-    const Socket& sock = _socketManager.getListener(port);
+    const Socket& sock = socketManager.getListener(port);
     listeners.push_back(&sock);
   }
   return listeners;
@@ -125,7 +115,7 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
 */
 const Server* ServerManager::getInitServer(int fdes) const
 {
-  const Socket& socket = _socketManager.getSocket(fdes);
+  const Socket& socket = SocketManager::getInstance().getSocket(fdes);
   const const_SockToServIter iter = _socketToServers.find(&socket);
   if (iter != _socketToServers.end() && iter->second.size() == 1) {
     return iter->second[0];
@@ -148,7 +138,7 @@ void ServerManager::run()
 {
   g_running = 1;
   while (g_running == 1) {
-    const int res = _eventManager.check();
+    const int res = EventManager::check();
     if (res == 0) {
       std::cout << "poll: timeout\n";
     }
@@ -158,7 +148,7 @@ void ServerManager::run()
       }
       break;
     }
-    _eventManager.checkTimeouts();
+    EventManager::checkTimeouts();
   }
   std::cout << "Shutting down servers...\n";
 }

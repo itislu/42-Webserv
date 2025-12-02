@@ -31,12 +31,12 @@ void ConfigBuilder::buildServers(const std::vector<ParsedServer>& servers,
 
 void ConfigBuilder::build(const ParsedConfig& parsed)
 {
-  Config::getInstance();
+  Config::getConfig();
 
   DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(),
-                                            Config::getInstance());
-  buildServers(parsed.getServers(), Config::getInstance());
-  Config::getInstance().setDefaultTimeout();
+                                            Config::getConfig());
+  buildServers(parsed.getServers(), Config::getConfig());
+  Config::getConfig().setDefaultTimeout();
 }
 
 } // namespace config

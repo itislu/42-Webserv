@@ -21,12 +21,10 @@ int main(int argc, char* argv[])
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     config::ConfigParser(argv[1]).parseConfig();
-    std::cout << config::Config::getInstance();
+    std::cout << config::Config::getConfig();
 
-    return 0;
-
-    // ServerManager& serverManager = ServerManager::getInstance();
-    // serverManager.run();
+    ServerManager::getInstance();
+    ServerManager::run();
 
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";

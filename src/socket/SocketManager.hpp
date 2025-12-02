@@ -13,7 +13,7 @@
 class SocketManager
 {
 public:
-  explicit SocketManager(const config::Config& config);
+  static SocketManager& getInstance();
   ~SocketManager() {}
 
   bool isListener(int fdes) const;
@@ -47,6 +47,7 @@ private:
   void removePfd(int fdes);
   void removeFdFromMap(int fdes);
 
+  explicit SocketManager(const config::Config& config);
   SocketManager(const SocketManager& other);
   SocketManager& operator=(const SocketManager& other);
 

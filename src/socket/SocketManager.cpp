@@ -22,13 +22,12 @@ SocketManager::SocketManager(const config::Config& config)
   createListeningSockets(config.getServers());
 }
 
-// SocketManager& SocketManager::getInstance()
-// {
-//   if (_instance == FT_NULLPTR) {
-//     _instance = new SocketManager(config::Config::getInstance());
-//   }
-//   return *_instance;
-// }
+SocketManager& SocketManager::getInstance()
+{
+  static SocketManager socketManager(config::Config::getConfig());
+
+  return socketManager;
+}
 
 // only call in the constructor - because no exception guarantee
 void SocketManager::createListeningSockets(

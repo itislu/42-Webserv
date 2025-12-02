@@ -15,7 +15,7 @@ public:
   typedef std::map<int, ft::shared_ptr<Client> >::const_iterator
     const_FdToClientIter;
 
-  ClientManager() {}
+  static ClientManager& getInstance();
   ~ClientManager() {}
 
   Client* getClient(int fdes) const;
@@ -30,6 +30,7 @@ public:
   void getTimedOutClients(std::vector<ft::shared_ptr<Client> >& timedOut) const;
 
 private:
+  ClientManager() {}
   ClientManager(const ClientManager& other);
   ClientManager& operator=(const ClientManager& other);
 
