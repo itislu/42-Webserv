@@ -56,7 +56,6 @@ StaticFileBuffer::StaticFileBuffer(const std::string& filepath)
     throw BufferException(errOpen);
   }
   _size = *optSize;
-  seek(0);
 }
 
 StaticFileBuffer::~StaticFileBuffer()

@@ -1,6 +1,5 @@
 #include "IBuffer.hpp"
 
-#include <cstddef>
 #include <exception>
 
 /* ************************************************************************** */

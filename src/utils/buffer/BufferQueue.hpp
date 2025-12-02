@@ -3,7 +3,6 @@
 #define BUFFER_QUEUE_HPP
 
 #include <libftpp/memory.hpp>
-#include <utils/buffer/IBuffer.hpp>
 #include <utils/buffer/IInBuffer.hpp>
 #include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>

@@ -12,7 +12,6 @@
 #include <libftpp/algorithm.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
-#include <libftpp/utility.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
