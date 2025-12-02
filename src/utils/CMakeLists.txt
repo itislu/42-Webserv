@@ -23,10 +23,11 @@ add_library(${LIB_NAME} STATIC
   buffer/StaticFileBuffer.cpp
 
   logger/Logger.cpp
-  printUtils.cpp
-  fileUtils.cpp
 
   BufferReader.cpp
+  convert.cpp
+  fileUtils.cpp
+  printUtils.cpp
 )
 
 target_link_libraries(${LIB_NAME} 
