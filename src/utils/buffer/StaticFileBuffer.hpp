@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <fstream>
 #include <string>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 class StaticFileBuffer : public IInBuffer
@@ -37,6 +38,7 @@ public:
 
   bool isEmpty() const;
   std::size_t size() const;
+  ssize_t send(int fdes, std::size_t bytes);
 
 private:
   StaticFileBuffer(const StaticFileBuffer& other);
@@ -51,7 +53,7 @@ private:
   std::fstream _fs;
   std::string _fileName;
   std::size_t _size;
-  std::size_t _consumendFront;
+  std::size_t _consumedFront;
 };
 
 #endif

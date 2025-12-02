@@ -24,8 +24,8 @@ public:
   virtual std::string consumeFront(std::size_t bytes) = 0;
   virtual RawBytes consumeRawFront(std::size_t bytes) = 0;
   virtual RawBytes consumeAll() = 0;
-  virtual std::string getStr(std::size_t start, std::size_t end) = 0;
-  virtual RawBytes getRawBytes(std::size_t start, std::size_t end) = 0;
+  virtual std::string getStr(std::size_t start, std::size_t bytes) = 0;
+  virtual RawBytes getRawBytes(std::size_t start, std::size_t bytes) = 0;
 
   // Non-throwing versions
   ExpectChr get(std::nothrow_t /*unused*/);

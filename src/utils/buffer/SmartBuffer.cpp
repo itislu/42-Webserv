@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <string>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 // INIT
@@ -118,6 +119,11 @@ bool SmartBuffer::isEmpty() const
 std::size_t SmartBuffer::size() const
 {
   return _buffer->size();
+}
+
+ssize_t SmartBuffer::send(int fdes, std::size_t bytes)
+{
+  return _buffer->send(fdes, bytes);
 }
 
 /* ************************************************************************** */

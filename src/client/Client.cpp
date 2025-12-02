@@ -147,12 +147,7 @@ bool Client::receive()
 
 bool Client::sendTo()
 {
-  // todo handle exception
-  IInBuffer::RawBytes buff = _outBuffQueue.read(_maxChunk);
-  ssize_t bytes = 0;
-  if (!buff.empty()) {
-    bytes = send(getFd(), buff.data(), buff.size(), 0);
-  }
+  const ssize_t bytes = _outBuffQueue.send(getFd(), _maxChunk);
   if (bytes > 0) {
     _log.info() << "sent " << bytes << " bytes\n";
   } else if (bytes == 0) {

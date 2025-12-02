@@ -2,14 +2,12 @@
 
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/buffer/IBuffer.hpp>
 #include <utils/buffer/IInBuffer.hpp>
 #include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 
-#include <algorithm>
 #include <cstddef>
-#include <stdexcept>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 // INIT
@@ -24,22 +22,26 @@ void BufferQueue::append(const ft::shared_ptr<IInBuffer>& buffer)
   _queue.push_back(buffer);
 }
 
-IBuffer::RawBytes BufferQueue::read(std::size_t bytes)
+ssize_t BufferQueue::send(int fdes, std::size_t bytes)
 {
   if (_queue.empty()) {
-    throw std::runtime_error("BufferQueue: queue is empty");
+    return 0;
   }
+
   if (_queue.front()->size() == 0) {
     _queue.pop_front();
     _log.warning() << "BufferQueue: empty buffer found\n";
-    return IBuffer::RawBytes();
+    // One skip should be enough, should only skip empty body files for example
+    if (_queue.empty() || _queue.front()->size() == 0) {
+      _log.warning() << "BufferQueue: next buffer is still empty\n";
+      return 0;
+    }
   }
-  const std::size_t toRead = std::min(bytes, _queue.front()->size());
-  const IBuffer::RawBytes rawBytes = _queue.front()->consumeRawFront(toRead);
+  const ssize_t bytesSent = _queue.front()->send(fdes, bytes);
   if (_queue.front()->isEmpty()) {
     _queue.pop_front();
   }
-  return rawBytes;
+  return bytesSent;
 }
 
 bool BufferQueue::isEmpty() const

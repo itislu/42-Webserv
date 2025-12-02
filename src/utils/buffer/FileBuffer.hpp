@@ -8,6 +8,7 @@
 #include <fstream>
 #include <ios>
 #include <string>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 class FileBuffer : public IInOutBuffer
@@ -43,6 +44,7 @@ public:
 
   bool isEmpty() const;
   std::size_t size() const;
+  ssize_t send(int fdes, std::size_t bytes);
 
 private:
   FileBuffer(const FileBuffer& other);

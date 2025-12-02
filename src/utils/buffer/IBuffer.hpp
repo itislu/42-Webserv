@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <exception>
 #include <string>
+#include <sys/types.h>
 #include <vector>
 
 /* ************************************************************************** */
@@ -27,6 +28,7 @@ public:
 
   virtual bool isEmpty() const = 0;
   virtual std::size_t size() const = 0;
+  virtual ssize_t send(int fdes, std::size_t bytes) = 0;
 
 private:
   IBuffer(const IBuffer& other);

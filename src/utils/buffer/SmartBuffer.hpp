@@ -6,8 +6,8 @@
 #include <utils/buffer/IInOutBuffer.hpp>
 
 #include <cstddef>
-#include <new>
 #include <string>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 class SmartBuffer : public IInOutBuffer
@@ -36,6 +36,7 @@ public:
 
   bool isEmpty() const;
   std::size_t size() const;
+  ssize_t send(int fdes, std::size_t bytes);
 
 private:
   SmartBuffer(const SmartBuffer& other);

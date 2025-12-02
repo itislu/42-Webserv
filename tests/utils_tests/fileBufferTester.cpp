@@ -82,6 +82,11 @@ TEST(FileBufferTester, StaticFileBuffer)
 
     StaticFileBuffer sfb(testFilePath);
     sfb.consumeRawFront(sfb.size() / 2);
+
+    sfb.seek(3);
+    EXPECT_EQ(sfb.pos(), 3);
+    sfb.seek(0);
+
     sfb.consumeRawFront(sfb.size());
     EXPECT_TRUE(sfb.isEmpty());
     EXPECT_EQ(sfb.size(), 0);
@@ -90,6 +95,7 @@ TEST(FileBufferTester, StaticFileBuffer)
     if (!testFilePath.empty()) {
       (void)std::remove(testFilePath.c_str());
     }
+    FAIL() << e.what() << '\n';
   }
 }
 

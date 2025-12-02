@@ -51,7 +51,7 @@ try {
 }
 
 /* ************************************************************************** */
-// PRIVAT
+// PRIVATE
 
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 std::string WriteHeaderLines::_makeHttpDate()

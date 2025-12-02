@@ -4,6 +4,7 @@
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/fileUtils.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdio>
@@ -13,6 +14,8 @@
 #include <iosfwd>
 #include <iostream>
 #include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 // INIT
@@ -35,16 +38,16 @@ const char* const StaticFileBuffer::errTell =
 
 StaticFileBuffer::StaticFileBuffer()
   : _size(0)
-  , _consumendFront(0)
+  , _consumedFront(0)
 {
 }
 
 StaticFileBuffer::StaticFileBuffer(const std::string& filepath)
   : _fileName(filepath)
   , _size(0)
-  , _consumendFront(0)
+  , _consumedFront(0)
 {
-  _fs.open(filepath.c_str(), std::ios::in | std::ios::out | std::ios::binary);
+  _fs.open(filepath.c_str(), std::ios::in | std::ios::binary);
   if (!_fs.is_open()) {
     throw BufferException(errOpen);
   }
@@ -81,7 +84,7 @@ char StaticFileBuffer::peek()
  */
 void StaticFileBuffer::seek(std::size_t pos)
 {
-  pos += _consumendFront;
+  pos += _consumedFront;
   if (pos > _size) {
     if (_size == 0) {
       throw BufferException(errFileEmpty);
@@ -104,7 +107,11 @@ std::size_t StaticFileBuffer::pos()
   if (pos == std::streampos(-1)) {
     throw BufferException(errTell);
   }
-  return static_cast<std::size_t>(pos);
+  const std::size_t sizetPos = static_cast<std::size_t>(pos);
+  if (_consumedFront >= sizetPos) {
+    return 0;
+  }
+  return sizetPos - _consumedFront;
 }
 
 std::string StaticFileBuffer::consumeFront(std::size_t bytes)
@@ -140,7 +147,19 @@ bool StaticFileBuffer::isEmpty() const
 
 std::size_t StaticFileBuffer::size() const
 {
-  return _size - _consumendFront;
+  return _size - _consumedFront;
+}
+
+ssize_t StaticFileBuffer::send(int fdes, std::size_t bytes)
+{
+  bytes = std::min(bytes, size());
+  IBuffer::RawBytes buff = _getData<RawBytes>(0, bytes);
+  const ssize_t bytesSent = ::send(fdes, buff.data(), buff.size(), 0);
+
+  if (bytesSent > 0) {
+    _consumedFront += bytesSent;
+  }
+  return bytesSent;
 }
 
 /* ************************************************************************** */
@@ -167,10 +186,9 @@ template<typename ContigContainer>
 ContigContainer StaticFileBuffer::_consumeFront(std::size_t bytes)
 {
   // read bytes from the beginning
-  const ContigContainer front =
-    _getData<ContigContainer>(_consumendFront, bytes);
+  const ContigContainer front = _getData<ContigContainer>(0, bytes);
   assert(front.size() == bytes); // Unexpected EOF should not happen
-  _consumendFront += front.size();
+  _consumedFront += front.size();
   return front;
 }
 
@@ -187,6 +205,8 @@ ContigContainer StaticFileBuffer::_getData(std::size_t start, std::size_t bytes)
   if (bytes == 0) {
     return ContigContainer();
   }
+
+  seek(start);
 
   ContigContainer front;
   front.resize(bytes);

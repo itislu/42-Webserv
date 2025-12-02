@@ -3,6 +3,7 @@
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/fileUtils.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -11,6 +12,8 @@
 #include <iosfwd>
 #include <iostream>
 #include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 // INIT
@@ -163,6 +166,17 @@ bool FileBuffer::isEmpty() const
 std::size_t FileBuffer::size() const
 {
   return _size;
+}
+
+ssize_t FileBuffer::send(int fdes, std::size_t bytes)
+{
+  bytes = std::min(bytes, size());
+  IBuffer::RawBytes buff = _getData<RawBytes>(0, bytes);
+  const ssize_t bytesSent = ::send(fdes, buff.data(), buff.size(), 0);
+  if (bytesSent > 0) {
+    removeFront(bytesSent);
+  }
+  return bytesSent;
 }
 
 /* ************************************************************************** */
