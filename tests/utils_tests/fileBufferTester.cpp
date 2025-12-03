@@ -1,8 +1,8 @@
-#include "utils/buffer/StaticFileBuffer.hpp"
-#include <exception>
 #include <utils/buffer/FileBuffer.hpp>
+#include <utils/buffer/StaticFileBuffer.hpp>
 
 #include <cstdio>
+#include <exception>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <string>
