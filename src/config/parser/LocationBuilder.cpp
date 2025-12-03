@@ -1,8 +1,8 @@
 #include "LocationBuilder.hpp"
-#include "config/DirectiveHandler.hpp"
-#include "config/LocationConfig.hpp"
-#include "config/ParsedLocation.hpp"
-#include "config/ServerConfig.hpp"
+#include "DirectiveHandler.hpp"
+#include "ParsedLocation.hpp"
+#include <config/LocationConfig.hpp>
+#include <config/ServerConfig.hpp>
 
 namespace config {
 

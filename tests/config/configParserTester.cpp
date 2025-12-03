@@ -1,7 +1,8 @@
-#include "config/Config.hpp"
-#include "config/ConfigParser.hpp"
-#include "config/LocationConfig.hpp"
-#include "config/ServerConfig.hpp"
+#include <config/Config.hpp>
+#include <config/LocationConfig.hpp>
+#include <config/ServerConfig.hpp>
+#include <config/parser/ConfigParser.hpp>
+
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <string>

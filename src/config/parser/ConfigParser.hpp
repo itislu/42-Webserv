@@ -1,11 +1,11 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
-#include "config/ConfigTypes.hpp"
-#include "config/Lexer.hpp"
-#include "config/ParsedConfig.hpp"
-#include "config/ParsedServer.hpp"
-#include "config/Token.hpp"
+#include "ConfigTypes.hpp"
+#include "Lexer.hpp"
+#include "ParsedConfig.hpp"
+#include "ParsedServer.hpp"
+#include "Token.hpp"
 #include <string>
 #include <vector>
 

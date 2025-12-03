@@ -1,6 +1,6 @@
 #include "ParsedServer.hpp"
-#include "config/ConfigTypes.hpp"
-#include "config/ParsedLocation.hpp"
+#include "ConfigTypes.hpp"
+#include "ParsedLocation.hpp"
 #include <vector>
 
 namespace config {

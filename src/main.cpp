@@ -1,7 +1,7 @@
-#include "config/Config.hpp"
-#include "config/ConfigParser.hpp"
-#include "config/ServerConfig.hpp"
-#include "server/ServerManager.hpp"
+#include <config/Config.hpp>
+#include <config/ServerConfig.hpp>
+#include <config/parser/ConfigParser.hpp>
+#include <server/ServerManager.hpp>
 #include <utils/logger/Logger.hpp>
 
 #include <exception>

@@ -1,8 +1,8 @@
 #ifndef PARSEDSERVER_HPP
 #define PARSEDSERVER_HPP
 
+#include "ConfigTypes.hpp"
 #include "ParsedLocation.hpp"
-#include "config/ConfigTypes.hpp"
 #include <vector>
 
 namespace config {
