@@ -7,10 +7,7 @@
 #include <string>
 #include <vector>
 
-using config::Config;
 using config::ConfigParser;
-using config::LocationConfig;
-using config::ServerConfig;
 
 namespace {
 

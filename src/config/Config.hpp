@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 class Config
 {
 public:
@@ -64,7 +62,5 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const Config& config);
-
-} // namespace config
 
 #endif

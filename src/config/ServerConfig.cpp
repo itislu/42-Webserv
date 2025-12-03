@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 ServerConfig::ServerConfig(const Config& global)
   : _index("index.html")
   , _errorPages(global.getErrorPages())
@@ -167,5 +165,3 @@ const LocationConfig* ServerConfig::getBestMatchLocation(
   }
   return bestMatch;
 }
-
-} // namespace config

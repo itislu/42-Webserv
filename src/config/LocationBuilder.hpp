@@ -3,10 +3,9 @@
 
 #include "config/LocationConfig.hpp"
 #include "config/ParsedLocation.hpp"
+#include "config/ServerConfig.hpp"
 
 namespace config {
-
-class ServerConfig;
 
 class LocationBuilder
 {
