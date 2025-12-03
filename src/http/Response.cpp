@@ -3,6 +3,7 @@
 #include <http/Headers.hpp>
 #include <http/StatusCode.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/buffer/IInBuffer.hpp>
 
 #include <string>
@@ -20,7 +21,7 @@ const StatusCode& Response::getStatusCode() const
   return _statuscode;
 }
 
-ft::shared_ptr<IInBuffer>& Response::getBody()
+const ft::shared_ptr<IInBuffer>& Response::getBody() const
 {
   return _body;
 }
@@ -38,6 +39,11 @@ void Response::setVersion(const std::string& version)
 void Response::setStatusCode(StatusCode::Code code)
 {
   _statuscode = code;
+}
+
+void Response::setBody(ft::shared_ptr<IInBuffer> body)
+{
+  _body = ft::move(body);
 }
 
 /* ************************************************************************** */

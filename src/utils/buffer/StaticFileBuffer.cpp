@@ -107,9 +107,7 @@ std::size_t StaticFileBuffer::pos()
     throw BufferException(errTell);
   }
   const std::size_t sizetPos = static_cast<std::size_t>(pos);
-  if (_consumedFront >= sizetPos) {
-    return 0;
-  }
+  assert(_consumedFront <= sizetPos);
   return sizetPos - _consumedFront;
 }
 

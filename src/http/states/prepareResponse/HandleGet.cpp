@@ -98,8 +98,7 @@ void HandleGet::_addContentType()
 void HandleGet::_openFile()
 {
   const std::string& filepath = _client->getResource().getPath();
-  _client->getResponse().getBody() =
-    ft::make_shared<StaticFileBuffer>(filepath);
+  _client->getResponse().setBody(ft::make_shared<StaticFileBuffer>(filepath));
 }
 
 bool HandleGet::_fail()

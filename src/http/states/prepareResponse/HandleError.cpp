@@ -1,6 +1,7 @@
 #include "HandleError.hpp"
 
 #include <client/Client.hpp>
+#include <exception>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <libftpp/memory.hpp>
@@ -28,7 +29,7 @@ HandleError::HandleError(PrepareResponse* context)
 }
 
 void HandleError::run()
-{
+try {
   // todo get custom error page from config
 
   const StatusCode& statuscode = _client->getResponse().getStatusCode();
@@ -36,6 +37,10 @@ void HandleError::run()
   buff->append(_makeErrorBody(statuscode));
   _client->getOutBuffQueue().append(buff);
   getContext()->getStateHandler().setDone();
+} catch (const std::exception& e) {
+  _log.error() << *_client << " HandleError: " << e.what() << '\n';
+  _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+  throw;
 }
 
 /* ************************************************************************** */
