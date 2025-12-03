@@ -1,13 +1,13 @@
+#include "libftpp/ctype.hpp"
 #include "libftpp/string.hpp"
 #include <algorithm>
-#include <ctype.h>
 #include <string>
 
 namespace ft {
 
 std::string& to_upper(std::string& str)
 {
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+	std::transform(str.begin(), str.end(), str.begin(), ft::toupper);
 	return str;
 }
 
