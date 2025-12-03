@@ -6,6 +6,7 @@
 #include <string>
 
 namespace http {
+
 extern const char* const CRLF;
 
 bool isSchemeChar(char chr);
@@ -29,6 +30,6 @@ bool isQuotedPairChar(char chr);
 typedef std::map<std::string, std::string> ExtToTypeMap;
 const ExtToTypeMap& getExtToType();
 
-}
+} // namespace http
 
 #endif

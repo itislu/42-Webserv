@@ -43,6 +43,10 @@ function(add_my_test test_name)
     PRIVATE ASSETS_PATH="${PROJECT_SOURCE_DIR}/tests/assets/"
   )
 
+  target_include_directories(${test_name}
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/testUtils
+  )
+
   target_link_libraries(${test_name}
     PRIVATE
     GTest::gtest

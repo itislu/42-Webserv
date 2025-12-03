@@ -46,7 +46,7 @@ bool RangeRule::matches()
       matches = _range.func(chr);
       break;
     case Charset:
-      matches = std::strchr(_range.set, chr) != FT_NULLPTR;
+      matches = (chr != '\0') && (std::strchr(_range.set, chr) != FT_NULLPTR);
       break;
   }
 
