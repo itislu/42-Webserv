@@ -49,8 +49,8 @@ private:
   SmartBuffer(const SmartBuffer& other);
   SmartBuffer& operator=(const SmartBuffer& other);
 
-  static const std::size_t _defautlMemoryToFileThreshold = 4096;
-  static const std::size_t _defautlFileToMemoryThreshold = 1024;
+  static const std::size_t _defaultMemoryToFileThreshold = 4096;
+  static const std::size_t _defaultFileToMemoryThreshold = 1024;
   static std::size_t _memoryToFileThreshold;
   static std::size_t _fileToMemoryThreshold;
 

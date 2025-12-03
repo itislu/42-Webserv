@@ -35,14 +35,14 @@ MemoryBuffer::MemoryBuffer(const std::string& data)
   : _pos(0)
 {
   _data.reserve(_startSize);
-  append(data);
+  MemoryBuffer::append(data);
 }
 
 MemoryBuffer::MemoryBuffer(const RawBytes& buffer, std::size_t bytes)
   : _pos(0)
 {
   _data.reserve(_startSize);
-  append(buffer, bytes);
+  MemoryBuffer::append(buffer, bytes);
 }
 
 MemoryBuffer::~MemoryBuffer() {}
@@ -119,7 +119,7 @@ void MemoryBuffer::append(const RawBytes& buffer, std::size_t bytes)
 {
   _data.insert(_data.end(),
                buffer.begin(),
-               buffer.begin() + static_cast<std::streamsize>(bytes));
+               buffer.begin() + static_cast<RawBytes::difference_type>(bytes));
 }
 
 void MemoryBuffer::removeFront(std::size_t bytes)
@@ -127,7 +127,7 @@ void MemoryBuffer::removeFront(std::size_t bytes)
   // seek to check buffer limits and set _pos
   seek(bytes);
   _data.erase(_data.begin(),
-              _data.begin() + static_cast<std::streamsize>(_pos));
+              _data.begin() + static_cast<RawBytes::difference_type>(_pos));
   _pos = 0;
 }
 
@@ -204,8 +204,10 @@ ContigContainer MemoryBuffer::_getData(std::size_t start, std::size_t bytes)
   if (bytes == 0) {
     return ContigContainer();
   }
-  ContigContainer front(_data.begin() + static_cast<std::streamsize>(start),
-                        _data.begin() +
-                          static_cast<std::streamsize>(start + bytes));
+  ContigContainer front(
+    _data.begin() +
+      static_cast<typename ContigContainer::difference_type>(start),
+    _data.begin() +
+      static_cast<typename ContigContainer::difference_type>(start + bytes));
   return front;
 }

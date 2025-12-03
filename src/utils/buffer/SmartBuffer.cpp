@@ -17,12 +17,12 @@
 const char* const SmartBuffer::errAllocBuffer =
   "SmartBuffer exception: failed to initialize buffer";
 
-const std::size_t SmartBuffer::_defautlMemoryToFileThreshold;
-const std::size_t SmartBuffer::_defautlFileToMemoryThreshold;
+const std::size_t SmartBuffer::_defaultMemoryToFileThreshold;
+const std::size_t SmartBuffer::_defaultFileToMemoryThreshold;
 std::size_t SmartBuffer::_memoryToFileThreshold =
-  SmartBuffer::_defautlMemoryToFileThreshold;
+  SmartBuffer::_defaultMemoryToFileThreshold;
 std::size_t SmartBuffer::_fileToMemoryThreshold =
-  SmartBuffer::_defautlFileToMemoryThreshold;
+  SmartBuffer::_defaultFileToMemoryThreshold;
 
 /* ************************************************************************** */
 // PUBLIC
