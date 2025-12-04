@@ -1,10 +1,14 @@
 #include "ruleUtils.hpp"
 
 #include <http/abnfRules/ruleIds.hpp>
+#include <libftpp/utility.hpp>
+#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
+#include <utils/buffer/MemoryBuffer.hpp>
 
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 void printRuleResults(const Rule::ResultMap& results)
 {
@@ -18,4 +22,19 @@ void printRuleResults(const Rule::ResultMap& results)
     std::cout << iter->second.getStart() << ", ";
     std::cout << iter->second.getEnd() << "\n";
   }
+}
+
+bool isValidString(Rule& rule, const std::string& value)
+{
+  MemoryBuffer buff(value);
+  BufferReader reader = BufferReader();
+  reader.init(&buff);
+  rule.reset();
+  rule.setBufferReader(&reader);
+  const bool matches = rule.matches();
+  const bool ruleReachedEnd = rule.reachedEnd();
+  const bool readerReachedEnd = reader.reachedEnd();
+
+  rule.setBufferReader(FT_NULLPTR);
+  return matches && ruleReachedEnd && readerReachedEnd;
 }

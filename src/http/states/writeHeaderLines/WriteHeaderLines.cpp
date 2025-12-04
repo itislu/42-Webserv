@@ -7,6 +7,7 @@
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeBody/WriteBody.hpp>
+#include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
@@ -38,7 +39,8 @@ try {
   Headers& headers = _client->getResponse().getHeaders();
   headers.addHeader("Date", _makeHttpDate());
   headers.addHeader("Server", "webserv"); // TODO from config probably ?
-  headers.addHeader("Connection", "close");
+
+  _setConnectionHeader();
 
   _buffer->append(headers.toString());
   _buffer->append(http::CRLF);
@@ -73,3 +75,24 @@ std::string WriteHeaderLines::_makeHttpDate()
   return std::string(buf);
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+
+void WriteHeaderLines::_setConnectionHeader()
+{
+  const Headers& reqHeaders = _client->getRequest().getHeaders();
+  Headers& headers = _client->getResponse().getHeaders();
+
+  // previously set
+  if (headers.contains("Connection")) {
+    return;
+  }
+  if (reqHeaders.contains("Connection")) {
+    const std::string& conn = reqHeaders.at("Connection");
+    if (ft::to_lower(conn) == "keep-alive") {
+      headers.addHeader("Connection", "keep-alive");
+    } else {
+      headers.addHeader("Connection", "close");
+    }
+  } else {
+    headers.addHeader("Connection", "close");
+  }
+}

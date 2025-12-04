@@ -1,6 +1,4 @@
 #include "HandleGet.hpp"
-#include "libftpp/memory.hpp"
-#include "utils/buffer/StaticFileBuffer.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -10,8 +8,10 @@
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
+#include <libftpp/memory.hpp>
 #include <libftpp/optional.hpp>
 #include <libftpp/string.hpp>
+#include <utils/buffer/StaticFileBuffer.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
