@@ -6,7 +6,6 @@ set(LIB_NAME http)
 
 add_library(${LIB_NAME} STATIC
   abnfRules/generalRules.cpp
-  abnfRules/headerLineRules.cpp
   abnfRules/http11Rules.cpp
   abnfRules/requestLineRules.cpp
   abnfRules/ruleIds.cpp
@@ -23,8 +22,11 @@ add_library(${LIB_NAME} STATIC
   states/readRequestLine/ParseUri.cpp
   states/readRequestLine/ParseVersion.cpp
   states/readRequestLine/ReadRequestLine.cpp
-  states/readRequestLine/ValidateRequest.cpp
   states/readHeaderLines/ReadHeaderLines.cpp
+  states/validateRequest/ValidateDelete.cpp
+  states/validateRequest/ValidateGet.cpp
+  states/validateRequest/ValidatePost.cpp
+  states/validateRequest/ValidateRequest.cpp
   states/writeBody/WriteBody.cpp
   states/writeHeaderLines/WriteHeaderLines.cpp
   states/writeStatusLine/WriteStatusLine.cpp
@@ -33,12 +35,14 @@ add_library(${LIB_NAME} STATIC
   http.cpp
   Request.cpp
   Response.cpp
+  Resource.cpp
   StatusCode.cpp
   Uri.cpp
 )
 
 target_link_libraries(${LIB_NAME} 
   PRIVATE
+  config
   ftpp
   utils
 )

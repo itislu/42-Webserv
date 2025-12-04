@@ -12,6 +12,11 @@
 #include <string>
 
 /* ************************************************************************** */
+// INIT
+
+bool Logger::_loggerEnabled = false;
+
+/* ************************************************************************** */
 // PUBLIC
 
 Logger& Logger::getInstance(const char* filename) throw()
@@ -49,6 +54,16 @@ std::ostream& Logger::error()
   return _log(ERROR);
 }
 
+void Logger::enableLogging()
+{
+  _loggerEnabled = true;
+}
+
+void Logger::disableLogging()
+{
+  _loggerEnabled = false;
+}
+
 /* ***************************************************************************/
 // PRIVATE
 Logger::Logger(const std::string& filename)
@@ -62,7 +77,7 @@ Logger::Logger(const std::string& filename)
 
 std::ostream& Logger::_log(LogLevel level)
 {
-  if (!_file.is_open()) {
+  if (!_file.is_open() || !_loggerEnabled) {
     return _file;
   }
   std::string levelStr;

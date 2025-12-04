@@ -1,3 +1,4 @@
+#include "http/states/readRequestLine/ParseUri.hpp"
 #include <client/Client.hpp>
 #include <http/Request.hpp>
 #include <http/Response.hpp>
@@ -191,16 +192,49 @@ TEST(ReadRequestLineTester, PathQuery)
   EXPECT_EQ(request.getVersion(), "HTTP/1.1");
 }
 
-// TODO Enable when bad request handling is implemented.
-TEST(ReadRequestLineTester, DISABLED_PathBadRequest)
+TEST(ReadRequestLineTester, Path1)
+{
+  std::string line("GET "
+                   "/www.example.org "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "");
+  EXPECT_EQ(request.getUri().getAuthority().getHost(), "");
+  EXPECT_EQ(request.getUri().getPath(), "/www.example.org");
+  EXPECT_EQ(request.getUri().getQuery(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
+
+TEST(ReadRequestLineTester, Path2)
 {
   std::string line("GET "
                    "//www.example.org "
                    "HTTP/1.1\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
-  Response& response = client->getResponse();
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "");
+  EXPECT_EQ(request.getUri().getAuthority().getHost(), "");
+  EXPECT_EQ(request.getUri().getPath(), "//www.example.org");
+  EXPECT_EQ(request.getUri().getQuery(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+}
 
-  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
+TEST(ReadRequestLineTester, Path3)
+{
+  std::string line("GET "
+                   "///www.example.org "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Request& request = client->getRequest();
+  EXPECT_EQ(request.getMethod(), Request::GET);
+  EXPECT_EQ(request.getUri().getScheme(), "");
+  EXPECT_EQ(request.getUri().getAuthority().getHost(), "");
+  EXPECT_EQ(request.getUri().getPath(), "///www.example.org");
+  EXPECT_EQ(request.getUri().getQuery(), "");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
 }
 
 // TODO Enable when bad request handling is implemented.
@@ -213,6 +247,37 @@ TEST(ReadRequestLineTester, DISABLED_QueryBadRequest)
   Response& response = client->getResponse();
 
   EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadRequestLineTester, NotImplemented)
+{
+  std::string line("DELETEA "
+                   "//www.example.org "
+                   "HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::NotImplemented);
+}
+
+TEST(ReadRequestLineTester, UriTooLong)
+{
+  {
+    ParseUri::setMaxUriLength(10);
+    std::string line("GET /123456789 HTTP/1.1\r\n");
+    ft::unique_ptr<Client> client = StateTest(line);
+    Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::UriTooLong);
+  }
+  {
+    ParseUri::setMaxUriLength(11);
+    std::string line("GET /123456789 HTTP/1.1\r\n");
+    ft::unique_ptr<Client> client = StateTest(line);
+    Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::Ok);
+  }
+
+  ParseUri::resetMaxUriLength();
 }
 
 // NOLINTEND

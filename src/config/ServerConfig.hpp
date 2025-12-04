@@ -8,8 +8,6 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 class Config;
 
 class ServerConfig
@@ -25,6 +23,7 @@ public:
 
   const std::string& getRoot() const;
   const std::string& getIndex() const;
+  const std::string& getErrorPage(int code) const;
   const std::map<int, std::string>& getErrorPages() const;
   std::size_t getMaxBodySize() const;
   const std::set<std::string>& getAllowedMethods() const;
@@ -44,7 +43,9 @@ public:
   void addErrorPage(int code, const std::string& path);
   void addAllowedMethod(const std::string& method);
 
-  const LocationConfig& getLocationForPath(const std::string& uri) const;
+  void clearAllowedMethods();
+
+  const LocationConfig* getBestMatchLocation(const std::string& uri) const;
 
 private:
   void checkPortDuplicate(int port);
@@ -61,7 +62,5 @@ private:
 
   std::vector<LocationConfig> _locations;
 };
-
-} // namespace config
 
 #endif

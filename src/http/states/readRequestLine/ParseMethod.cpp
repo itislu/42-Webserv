@@ -5,6 +5,7 @@
 #include <http/StatusCode.hpp>
 #include <http/states/readRequestLine/ParseUri.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/ctype.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
@@ -16,7 +17,7 @@
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
 
-#include <ctype.h>
+#include <cstddef>
 #include <string>
 
 /* ************************************************************************** */
@@ -32,7 +33,7 @@ ParseMethod::ParseMethod(ReadRequestLine* context)
   , _client(context->getContext())
   , _buffReader()
 {
-  _log.info() << "ParseMethod\n";
+  _log.info() << *_client << " ParseMethod\n";
   _init();
 }
 
@@ -46,8 +47,13 @@ void ParseMethod::run()
   _sequence.reset();
   _buffReader.resetPosInBuff();
   if (!_sequence.matches()) {
-    _log.error() << "Bad Request\n";
+    _log.error() << "ParseMethod: BadRequest\n";
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    getContext()->getStateHandler().setDone();
+    return;
+  }
+
+  if (_methodNotImplemented()) {
     getContext()->getStateHandler().setDone();
     return;
   }
@@ -67,8 +73,7 @@ void ParseMethod::_init()
   _buffReader.init(&_client->getInBuff());
 
   ft::shared_ptr<RepetitionRule> rep =
-    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(::isupper));
-  rep->setMax(static_cast<int>(Request::MaxMethodLen));
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isupper));
   _sequence.addRule(ft::move(rep));
   _sequence.addRule(ft::make_shared<LiteralRule>(" "));
 
@@ -80,9 +85,18 @@ void ParseMethod::_init()
  */
 void ParseMethod::_extractMethod()
 {
-  const long index = _buffReader.getPosInBuff();
-  std::string input = _client->getInBuff().consumeFront(index);
-  ft::trim(input);
-  const Request::Method method = Request::strToMethod(input);
+  const std::size_t index = _buffReader.getPosInBuff();
+  std::string methodStr = _client->getInBuff().consumeFront(index);
+  const Request::Method method = Request::strToMethod(ft::trim(methodStr));
   _client->getRequest().setMethod(method);
+}
+
+bool ParseMethod::_methodNotImplemented()
+{
+  if (_buffReader.getPosInBuff() > Request::MaxMethodLen + 1) {
+    _log.error() << "Method not implemented\n";
+    _client->getResponse().setStatusCode(StatusCode::NotImplemented);
+    return true;
+  }
+  return false;
 }

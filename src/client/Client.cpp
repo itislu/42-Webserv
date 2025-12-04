@@ -1,24 +1,38 @@
 #include "Client.hpp"
-#include "client/TimeStamp.hpp"
-#include "config/Config.hpp"
-#include "http/Request.hpp"
-#include "http/Response.hpp"
-#include "http/states/readRequestLine/ReadRequestLine.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "socket/AutoFd.hpp"
-#include "utils/IBuffer.hpp"
-#include "utils/SmartBuffer.hpp"
-#include "utils/state/StateHandler.hpp"
-#include <algorithm>
+
+#include <client/TimeStamp.hpp>
+#include <config/Config.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <socket/AutoFd.hpp>
+#include <utils/buffer/BufferQueue.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/StateHandler.hpp>
+
 #include <cerrno>
 #include <cstddef>
 #include <cstring>
 #include <iostream>
-#include <new>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
+
+/* **************************************************************************
+ */
+// Init
+
+Logger& Client::_log = Logger::getInstance(LOG_SERVER);
+
+const std::size_t Client::_maxChunk;
+
+/* ************************************************************************** */
 
 Client::Client()
   : _fd(-1)
@@ -49,6 +63,11 @@ int Client::getFd() const
   return _fd.get();
 }
 
+bool Client::hasServer() const
+{
+  return (_server != FT_NULLPTR);
+}
+
 const std::string& Client::getHost() const
 {
   return _host;
@@ -59,9 +78,9 @@ SmartBuffer& Client::getInBuff()
   return _inBuff;
 }
 
-SmartBuffer& Client::getOutBuff()
+BufferQueue& Client::getOutBuffQueue()
 {
-  return _outBuff;
+  return _outBuffQueue;
 }
 
 StateHandler<Client>& Client::getStateHandler()
@@ -79,12 +98,17 @@ Response& Client::getResponse()
   return _response;
 }
 
+Resource& Client::getResource()
+{
+  return _resource;
+}
+
 long Client::getTimeout() const
 {
   if (_server != FT_NULLPTR) {
     return _server->getTimeout();
   }
-  return config::Config::getDefaultTimeout();
+  return Config::getDefaultTimeout();
 }
 
 const Server* Client::getServer() const
@@ -99,21 +123,16 @@ void Client::setServer(const Server* server)
 
 bool Client::receive()
 {
-  static IBuffer::RawBytes buffer(MAX_CHUNK);
+  static IInBuffer::RawBytes buffer(_maxChunk);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
+    /* TODO: remove this! */
     std::cout << "Client " << getFd() << ": ";
     // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
     std::cout.write(reinterpret_cast<const char*>(buffer.data()),
                     static_cast<std::streamsize>(bytes));
     // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
     _inBuff.append(buffer, bytes);
-    // TODO: STATEMACHINE/PARSING
-    _stateHandler.setStateHasChanged(true);
-    while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
-      _stateHandler.setStateHasChanged(false);
-      _stateHandler.getState()->run();
-    }
   } else if (bytes == 0) {
     std::cout << "[CLIENT] wants to disconnect\n";
     return false;
@@ -128,21 +147,14 @@ bool Client::receive()
 
 bool Client::sendTo()
 {
-  const std::size_t toSend =
-    std::min(_outBuff.size(), static_cast<std::size_t>(MAX_CHUNK));
-  const IBuffer::ExpectStr buff = _outBuff.consumeFront(toSend, std::nothrow);
-  if (!buff.has_value()) {
-    // todo error
-  }
-  const ssize_t bytes = send(getFd(), &buff, toSend, 0);
+  const ssize_t bytes = _outBuffQueue.send(getFd(), _maxChunk);
   if (bytes > 0) {
-    // todo ok
-  }
-  if (bytes == 0) {
-    std::cout << "[SERVER] no data sent to client fd=" << getFd() << "\n";
+    _log.info() << "sent " << bytes << " bytes\n";
+  } else if (bytes == 0) {
+    _log.warning() << "no data sent to client fd=" << getFd() << "\n";
   } else {
-    std::cerr << "[SERVER] send error for client fd=" << getFd() << ": "
-              << std::strerror(errno) << "\n";
+    _log.error() << "send error for client fd=" << getFd() << ": "
+                 << std::strerror(errno) << "\n";
     return false;
   }
   updateLastActivity();
@@ -161,5 +173,11 @@ void Client::updateLastActivity()
 
 bool Client::hasDataToSend() const
 {
-  return !_outBuff.isEmpty();
+  return !_outBuffQueue.isEmpty();
+}
+
+std::ostream& operator<<(std::ostream& out, const Client& client)
+{
+  out << "Client(" << client.getFd() << ")";
+  return out;
 }

@@ -1,3 +1,5 @@
+#include "http/Response.hpp"
+#include "http/StatusCode.hpp"
 #include "http/http.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -61,6 +63,36 @@ TEST(ReadHeaderLinesTester, HeaderList)
   EXPECT_EQ(value, "webserv");
   EXPECT_NO_THROW(value = headers.at("sec-ch-ua"));
   EXPECT_EQ(value, headerValue);
+}
+
+TEST(ReadHeaderLinesTester, DISABLED_HeaderValueTooLarge)
+{
+  // todo set max HeaderFieldLineLength
+
+  std::string line("Host: webserv\r\n"
+                   "Header_test: loooooooooooooooooooong\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::RequestHeaderFieldsTooLarge);
+}
+
+TEST(ReadHeaderLinesTester, DISABLED_HeadersTooLarge)
+{
+  // todo set max HeaderLength
+
+  std::string line("Host: webserv\r\n"
+                   "Header1: loooooooooooooooooooong\r\n"
+                   "Header2: loooooooooooooooooooong\r\n"
+                   "Header3: loooooooooooooooooooong\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::RequestHeaderFieldsTooLarge);
 }
 
 // NOLINTEND

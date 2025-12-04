@@ -14,9 +14,20 @@ public:
   enum Code
   {
     Ok = 200,
+    Created = 201,
     BadRequest = 400,
     Unauthorized = 401,
-    InternalServerError = 500
+    Forbidden = 403,
+    NotFound = 404,
+    MethodNotAllowed = 405,
+    NotAcceptable = 406,
+    RequestTimeout = 408,
+    LengthRequired = 411,
+    ContentTooLarge = 413,
+    UriTooLong = 414,
+    RequestHeaderFieldsTooLarge = 431,
+    InternalServerError = 500,
+    NotImplemented = 501
   };
 
   StatusCode();
@@ -33,7 +44,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 4;
+  static const int _codes = 15;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;
