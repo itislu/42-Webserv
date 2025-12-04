@@ -52,7 +52,7 @@ private:
                              Request::Method method);
 
   static std::string decodePath(const std::string& path,
-                                int (*wantDecode)(int));
+                                bool (*wantDecode)(char));
   static bool validateChars(const std::string& path);
   static ft::optional<std::string> normalizePath(const std::string& path,
                                                  NormalizationMode mode);
