@@ -127,12 +127,6 @@ void ReadBody::_determineBodyFraming()
   const Headers& headers = _client->getRequest().getHeaders();
   const bool hasTransferEncoding = headers.contains("Transfer-Encoding");
   const bool hasContentLength = headers.contains("Content-Length");
-  // todo add grammar rules for these headers
-  if (hasContentLength && hasTransferEncoding) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
-    return;
-  }
   if (hasContentLength) {
     _validateContentLength();
     return;
