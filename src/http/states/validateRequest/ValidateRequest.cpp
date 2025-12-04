@@ -1,4 +1,5 @@
 #include "ValidateRequest.hpp"
+
 #include "client/Client.hpp"
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
@@ -44,7 +45,7 @@ ValidateRequest::ValidateRequest(Client* context)
   , _server()
   , _location()
 {
-  _log.info() << "ValidateRequest\n";
+  _log.info() << *_client << " ValidateRequest\n";
 }
 
 void ValidateRequest::run()
@@ -176,9 +177,9 @@ void ValidateRequest::_initState(const Request::Method& method)
   }
 }
 
-static int alwaysDecode(int /*unused*/)
+static bool alwaysDecode(char /*unused*/)
 {
-  return 1;
+  return true;
 }
 
 /**
@@ -231,7 +232,7 @@ void ValidateRequest::_initRequestPath()
 }
 
 std::string ValidateRequest::decodePath(const std::string& path,
-                                        int (*wantDecode)(int))
+                                        bool (*wantDecode)(char))
 {
   std::string decoded;
   decoded.reserve(path.size());
@@ -243,7 +244,7 @@ std::string ValidateRequest::decodePath(const std::string& path,
       const int hex1 = utils::hexToInt(path[i + 1]);
       const int hex2 = utils::hexToInt(path[i + 2]);
       const char decode = static_cast<char>((hex1 * hexMult) + hex2);
-      if (wantDecode(decode) != 0) {
+      if (wantDecode(decode)) {
         decoded += decode;
         i += 2;
         continue;

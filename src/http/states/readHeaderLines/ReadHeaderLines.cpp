@@ -13,10 +13,10 @@
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
-#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -39,7 +39,7 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
   , _sizeHeaders(0)
   , _done(false)
 {
-  _log.info() << "ReadHeaderLines\n";
+  _log.info() << *_client << " ReadHeaderLines\n";
   _init();
 }
 
@@ -62,7 +62,7 @@ try {
     return;
   }
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "ReadHeaderLines: " << e.what() << "\n";
+  _log.error() << *_client << " ReadHeaderLines: " << e.what() << "\n";
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setState<PrepareResponse>();
 }

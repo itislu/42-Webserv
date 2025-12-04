@@ -1,12 +1,11 @@
-#include "utils/SmartBuffer.hpp"
 #include <http/abnfRules/headerLineRules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 
-#include <cctype>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -42,8 +41,24 @@ TEST(HeaderLinesTester, FieldContentRule)
   const ft::shared_ptr<SequenceRule> rule = fieldContentRule();
   rule->addRule(ft::make_shared<RangeRule>("\n"));
 
+  // Valid
   EXPECT_TRUE(runParser("tes t\n", *rule));
   EXPECT_TRUE(runParser("test  \n", *rule));
+  EXPECT_TRUE(runParser("test\t\n", *rule));
+  EXPECT_TRUE(runParser("!#$%&'*+-.^_`|~\n", *rule));
+  EXPECT_TRUE(runParser("\x80\n", *rule));
+  EXPECT_TRUE(runParser("\xFF\n", *rule));
+  EXPECT_TRUE(runParser("test\x80value\n", *rule));
+  EXPECT_TRUE(runParser("\xC0\xC1\xFE\xFF\n", *rule));
+
+  // Invalid
+  // EXPECT_FALSE(runParser("\x00\n", *rule)); // NUL // TODO
+  EXPECT_FALSE(runParser("\x1F\n", *rule)); // control char
+  EXPECT_FALSE(runParser("\x7F\n", *rule)); // DEL
+  // EXPECT_FALSE(runParser("test\x00\n", *rule)); // TODO
+  EXPECT_FALSE(runParser("test\x01\n", *rule));
+  EXPECT_FALSE(runParser("test\x1F\n", *rule));
+  EXPECT_FALSE(runParser("test\x7F\n", *rule));
 }
 
 /**
@@ -70,6 +85,11 @@ TEST(HeaderLinesTester, FieldLineRule)
   EXPECT_TRUE(runParser("host: test, hallo\n", *seqRule));
   EXPECT_TRUE(runParser("host: test, hallo \n", *seqRule));
   EXPECT_TRUE(runParser("host:test, hallo \n", *seqRule));
+  EXPECT_TRUE(runParser("host: va:lue\n", *seqRule));
+  EXPECT_TRUE(runParser("host:va:lue\n", *seqRule));
+  EXPECT_TRUE(runParser("host:::\n", *seqRule));
+  EXPECT_TRUE(runParser("X-Custom-Header!#$%:value\n", *seqRule));
+  EXPECT_TRUE(runParser("accept:*/*\n", *seqRule));
 
   // Invalid
   EXPECT_FALSE(runParser("host :test, hallo \n", *seqRule));
