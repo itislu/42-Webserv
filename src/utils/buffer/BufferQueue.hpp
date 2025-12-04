@@ -18,7 +18,7 @@ public:
   void append(ft::shared_ptr<IInBuffer> buffer);
   ssize_t send(int fdes, std::size_t bytes);
   bool isEmpty() const;
-  SmartBuffer* getSmartBuffer();
+  SmartBuffer& getSmartBuffer();
 
 private:
   static Logger& _log;

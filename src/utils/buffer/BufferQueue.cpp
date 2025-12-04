@@ -49,23 +49,21 @@ bool BufferQueue::isEmpty() const
   return _queue.empty();
 }
 
-// NOLINTBEGIN(misc-const-correctness)
-SmartBuffer* BufferQueue::getSmartBuffer()
+SmartBuffer& BufferQueue::getSmartBuffer()
 {
   if (!_queue.empty()) {
     const ft::shared_ptr<IInBuffer>& base = _queue.back();
     IInBuffer* const raw = base.get();
     SmartBuffer* const derived = dynamic_cast<SmartBuffer*>(raw);
     if (derived != FT_NULLPTR) {
-      return derived;
+      return *derived;
     }
   }
 
   const ft::shared_ptr<SmartBuffer> sbuff = ft::make_shared<SmartBuffer>();
   _queue.push_back(sbuff);
-  return sbuff.get(); // call to shared_ptr<SmartBuffer>::get()
+  return *sbuff.get(); // call to shared_ptr<SmartBuffer>::get()
 }
-// NOLINTEND(misc-const-correctness)
 
 /* ************************************************************************** */
 // PRIVATE

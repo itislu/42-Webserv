@@ -22,7 +22,7 @@ Logger& WriteStatusLine::_log = Logger::getInstance(LOG_HTTP);
 WriteStatusLine::WriteStatusLine(Client* context)
   : IState(context)
   , _client(context)
-  , _buffer(_client->getOutBuffQueue().getSmartBuffer())
+  , _buffer(&_client->getOutBuffQueue().getSmartBuffer())
 {
   _log.info() << "WriteStatusLine\n";
 }

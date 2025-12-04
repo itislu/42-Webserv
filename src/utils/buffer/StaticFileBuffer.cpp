@@ -36,12 +36,6 @@ const char* const StaticFileBuffer::errTell =
 /* ************************************************************************** */
 // PUBLIC
 
-StaticFileBuffer::StaticFileBuffer()
-  : _size(0)
-  , _consumedFront(0)
-{
-}
-
 StaticFileBuffer::StaticFileBuffer(const std::string& filepath)
   : _fileName(filepath)
   , _size(0)
@@ -56,13 +50,6 @@ StaticFileBuffer::StaticFileBuffer(const std::string& filepath)
     throw BufferException(errOpen);
   }
   _size = *optSize;
-}
-
-StaticFileBuffer::~StaticFileBuffer()
-{
-  if (_fs.is_open()) {
-    _fs.close();
-  }
 }
 
 // Throwing versions
@@ -83,18 +70,17 @@ char StaticFileBuffer::peek()
  */
 void StaticFileBuffer::seek(std::size_t pos)
 {
-  pos += _consumedFront;
-  if (pos > _size) {
-    if (_size == 0) {
+  if (pos > size()) {
+    if (size() == 0) {
       throw BufferException(errFileEmpty);
     }
     throw BufferException(errOutOfRange);
   }
-  if (_size == 0) {
+  if (size() == 0) {
     return;
   }
 
-  _fs.seekg(static_cast<std::streamoff>(pos));
+  _fs.seekg(static_cast<std::streamoff>(pos + _consumedFront));
   if (_fs.fail()) {
     throw BufferException(errSeek);
   }
@@ -123,7 +109,7 @@ StaticFileBuffer::RawBytes StaticFileBuffer::consumeRawFront(std::size_t bytes)
 
 StaticFileBuffer::RawBytes StaticFileBuffer::consumeAll()
 {
-  return _consumeFront<RawBytes>(_size);
+  return _consumeFront<RawBytes>(size());
 }
 
 std::string StaticFileBuffer::getStr(std::size_t start, std::size_t bytes)
@@ -162,9 +148,9 @@ ssize_t StaticFileBuffer::send(int fdes, std::size_t bytes)
 /* ************************************************************************** */
 // PRIVATE
 
-char StaticFileBuffer::_getChr(std::fstream::int_type (std::fstream::*func)())
+char StaticFileBuffer::_getChr(std::fstream::int_type (std::ifstream::*func)())
 {
-  if (_size == 0) {
+  if (size() == 0) {
     throw BufferException(errFileEmpty);
   }
 
@@ -193,8 +179,8 @@ ContigContainer StaticFileBuffer::_consumeFront(std::size_t bytes)
 template<typename ContigContainer>
 ContigContainer StaticFileBuffer::_getData(std::size_t start, std::size_t bytes)
 {
-  if (start >= _size || bytes > _size - start) {
-    if (_size == 0) {
+  if (start >= size() || bytes > size() - start) {
+    if (size() == 0) {
       throw BufferException(errFileEmpty);
     }
     throw BufferException(errOutOfRange);

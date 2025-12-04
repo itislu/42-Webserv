@@ -21,9 +21,8 @@ public:
   static const char* const errRead;
   static const char* const errTell;
 
-  StaticFileBuffer();
   explicit StaticFileBuffer(const std::string& filepath);
-  ~StaticFileBuffer();
+  ~StaticFileBuffer() {}
 
   // Interface IInBuffer - Throwing versions
   char get();
@@ -41,16 +40,17 @@ public:
   ssize_t send(int fdes, std::size_t bytes);
 
 private:
+  StaticFileBuffer();
   StaticFileBuffer(const StaticFileBuffer& other);
   StaticFileBuffer& operator=(const StaticFileBuffer& other);
 
-  char _getChr(std::fstream::int_type (std::fstream::*func)());
+  char _getChr(std::fstream::int_type (std::ifstream::*func)());
   template<typename ContigContainer>
   ContigContainer _consumeFront(std::size_t bytes);
   template<typename ContigContainer>
   ContigContainer _getData(std::size_t start, std::size_t bytes);
 
-  std::fstream _fs;
+  std::ifstream _fs;
   std::string _fileName;
   std::size_t _size;
   std::size_t _consumedFront;
