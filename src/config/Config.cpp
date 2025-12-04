@@ -23,6 +23,20 @@ Config::Config()
 {
 }
 
+Config& Config::getConfig()
+{
+  static Config config;
+
+  return config;
+}
+
+/* Use this for tests to reset the config back to default and not carry over
+ * values from previous test */
+void Config::reset()
+{
+  getConfig() = Config();
+}
+
 const std::vector<ServerConfig>& Config::getServers() const
 {
   return _servers;

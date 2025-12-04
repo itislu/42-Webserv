@@ -11,7 +11,7 @@ namespace config {
 class ConfigBuilder
 {
 public:
-  static Config build(const ParsedConfig& parsed);
+  static void build(const ParsedConfig& parsed);
 
 private:
   static void buildServers(const std::vector<ParsedServer>& servers,

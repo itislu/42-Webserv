@@ -1,5 +1,4 @@
 #include "ConfigParser.hpp"
-#include "config/Config.hpp"
 #include "config/ConfigBuilder.hpp"
 #include "config/ConfigTypes.hpp"
 #include "config/Converters.hpp"
@@ -217,13 +216,13 @@ void ConfigParser::parse()
   }
 }
 
-Config ConfigParser::parseConfig()
+void ConfigParser::parseConfig()
 {
   // parse
   parse();
 
   // build
-  return ConfigBuilder::build(_parsed);
+  ConfigBuilder::build(_parsed);
 }
 
 } // namespace config

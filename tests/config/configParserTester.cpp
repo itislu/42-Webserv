@@ -12,17 +12,26 @@ using config::ConfigParser;
 using config::LocationConfig;
 using config::ServerConfig;
 
-// ============================================================================
-// Duplicates Tests
-// ============================================================================
+namespace {
+
+class ValidConfigTester : public ::testing::Test
+{
+protected:
+  void SetUp() override { Config::reset(); }
+};
+
+}
+
+// =================================================================
+// ======================= Duplicates Tests ========================
+// =================================================================
 
 TEST(DuplicatesTester, DupAllowedMethodLocation)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "duplicates/dup_allowed_method.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
 TEST(DuplicatesTester, DupDirectiveGlobal)
@@ -30,8 +39,7 @@ TEST(DuplicatesTester, DupDirectiveGlobal)
   const std::string configPath =
     std::string(ASSETS_PATH) + "duplicates/dup_directive_global.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(DuplicatesTester, DupDirectiveLocation)
@@ -39,8 +47,7 @@ TEST(DuplicatesTester, DupDirectiveLocation)
   const std::string configPath =
     std::string(ASSETS_PATH) + "duplicates/dup_directive_location.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(DuplicatesTester, DupDirectiveServer)
@@ -48,8 +55,7 @@ TEST(DuplicatesTester, DupDirectiveServer)
   const std::string configPath =
     std::string(ASSETS_PATH) + "duplicates/dup_directive_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(DuplicatesTester, DupLocations)
@@ -57,8 +63,7 @@ TEST(DuplicatesTester, DupLocations)
   const std::string configPath =
     std::string(ASSETS_PATH) + "duplicates/dup_locations.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(DuplicatesTester, DupPortDifferentLine)
@@ -66,8 +71,7 @@ TEST(DuplicatesTester, DupPortDifferentLine)
   const std::string configPath =
     std::string(ASSETS_PATH) + "duplicates/dup_port_different_line.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(DuplicatesTester, DupPortSameLine)
@@ -75,21 +79,19 @@ TEST(DuplicatesTester, DupPortSameLine)
   const std::string configPath =
     std::string(ASSETS_PATH) + "duplicates/dup_port_same_line.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
-// ============================================================================
-// Empty Config Tests
-// ============================================================================
+// =================================================================
+// ====================== Empty Config Tests =======================
+// =================================================================
 
 TEST(EmptyConfigTester, CommentsOnly)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "empty/comments_only.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(EmptyConfigTester, EmptyFile)
@@ -97,8 +99,7 @@ TEST(EmptyConfigTester, EmptyFile)
   const std::string configPath =
     std::string(ASSETS_PATH) + "empty/empty_file.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(EmptyConfigTester, EmptyLines)
@@ -106,8 +107,7 @@ TEST(EmptyConfigTester, EmptyLines)
   const std::string configPath =
     std::string(ASSETS_PATH) + "empty/empty_lines.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(EmptyConfigTester, EmptyServer)
@@ -115,15 +115,14 @@ TEST(EmptyConfigTester, EmptyServer)
   const std::string configPath =
     std::string(ASSETS_PATH) + "empty/empty_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
-// ============================================================================
-// Invalid Files Tests
-// ============================================================================
+// =================================================================
+// ====================== Invalid File Tests =======================
+// =================================================================
 
-TEST(InvalidFilesTester, InvalidExtensionConfig)
+TEST(InvalidFileTester, InvalidExtensionConfig)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_files/invalid_extension.config";
@@ -131,7 +130,7 @@ TEST(InvalidFilesTester, InvalidExtensionConfig)
                std::invalid_argument);
 }
 
-TEST(InvalidFilesTester, InvalidExtensionTxt)
+TEST(InvalidFileTester, InvalidExtensionTxt)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_files/invalid_extension.txt";
@@ -139,17 +138,16 @@ TEST(InvalidFilesTester, InvalidExtensionTxt)
                std::invalid_argument);
 }
 
-// ============================================================================
-// Invalid Values Tests
-// ============================================================================
+// =================================================================
+// ===================== Invalid Values Tests ======================
+// =================================================================
 
 TEST(InvalidValuesTester, ErrorCodeNonNumber)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/error_code_non_number.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorCodeTooHigh)
@@ -157,8 +155,7 @@ TEST(InvalidValuesTester, ErrorCodeTooHigh)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/error_code_too_high.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorCodeTooLow)
@@ -166,8 +163,7 @@ TEST(InvalidValuesTester, ErrorCodeTooLow)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/error_code_too_low.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorCodeTrailingText)
@@ -175,8 +171,7 @@ TEST(InvalidValuesTester, ErrorCodeTrailingText)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/error_code_trailing_text.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorPageExtraCodeAfter)
@@ -185,8 +180,7 @@ TEST(InvalidValuesTester, ErrorPageExtraCodeAfter)
     std::string(ASSETS_PATH) +
     "invalid_values/error_page_extra_code_after.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorPageMultiCodesPaths)
@@ -195,8 +189,7 @@ TEST(InvalidValuesTester, ErrorPageMultiCodesPaths)
     std::string(ASSETS_PATH) +
     "invalid_values/error_page_multi_codes_paths.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorPageNoCode)
@@ -204,8 +197,7 @@ TEST(InvalidValuesTester, ErrorPageNoCode)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/error_page_no_code.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorPageNoPath)
@@ -213,8 +205,7 @@ TEST(InvalidValuesTester, ErrorPageNoPath)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/error_page_no_path.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ErrorPagePathBeforeCode)
@@ -223,8 +214,7 @@ TEST(InvalidValuesTester, ErrorPagePathBeforeCode)
     std::string(ASSETS_PATH) +
     "invalid_values/error_page_path_before_code.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, InvalidBodysizeMultiplier)
@@ -233,8 +223,7 @@ TEST(InvalidValuesTester, InvalidBodysizeMultiplier)
     std::string(ASSETS_PATH) +
     "invalid_values/invalid_bodysize_multiplier.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, InvalidDirectiveGlobal)
@@ -242,8 +231,7 @@ TEST(InvalidValuesTester, InvalidDirectiveGlobal)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/invalid_directive_global.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, InvalidDirectiveLocation)
@@ -251,8 +239,7 @@ TEST(InvalidValuesTester, InvalidDirectiveLocation)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/invalid_directive_location.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, InvalidDirectiveServer)
@@ -260,8 +247,7 @@ TEST(InvalidValuesTester, InvalidDirectiveServer)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/invalid_directive_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, InvalidMethodLocation)
@@ -269,8 +255,7 @@ TEST(InvalidValuesTester, InvalidMethodLocation)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/invalid_method_location.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, InvalidMethodServer)
@@ -278,8 +263,7 @@ TEST(InvalidValuesTester, InvalidMethodServer)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/invalid_method_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, NegativeBodySize)
@@ -287,8 +271,7 @@ TEST(InvalidValuesTester, NegativeBodySize)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/negative_bodysize.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, NegativePort)
@@ -296,8 +279,7 @@ TEST(InvalidValuesTester, NegativePort)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/negative_port.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, NegativeZeroTimeout)
@@ -305,8 +287,7 @@ TEST(InvalidValuesTester, NegativeZeroTimeout)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/negative_zero_timeout.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, PortNonNumber)
@@ -314,8 +295,7 @@ TEST(InvalidValuesTester, PortNonNumber)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/port_non_number.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, PortNonNumberIncluded)
@@ -323,8 +303,7 @@ TEST(InvalidValuesTester, PortNonNumberIncluded)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/port_non_number_included.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, PortTooHigh)
@@ -332,8 +311,7 @@ TEST(InvalidValuesTester, PortTooHigh)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/port_too_high.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, TimeoutTrailingText)
@@ -341,8 +319,7 @@ TEST(InvalidValuesTester, TimeoutTrailingText)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/timeout_trailing_text.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(InvalidValuesTester, ZeroPort)
@@ -350,21 +327,19 @@ TEST(InvalidValuesTester, ZeroPort)
   const std::string configPath =
     std::string(ASSETS_PATH) + "invalid_values/zero_port.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
-// ============================================================================
-// Missing Required Tests
-// ============================================================================
+// =================================================================
+// ==================== Missing Required Tests =====================
+// =================================================================
 
 TEST(MissingRequiredTester, MissingDirective)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "missing_required/missing_directive.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(MissingRequiredTester, MissingListen)
@@ -372,8 +347,7 @@ TEST(MissingRequiredTester, MissingListen)
   const std::string configPath =
     std::string(ASSETS_PATH) + "missing_required/missing_listen.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(MissingRequiredTester, MissingLocation)
@@ -381,8 +355,7 @@ TEST(MissingRequiredTester, MissingLocation)
   const std::string configPath =
     std::string(ASSETS_PATH) + "missing_required/missing_location.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(MissingRequiredTester, MissingServer)
@@ -390,8 +363,7 @@ TEST(MissingRequiredTester, MissingServer)
   const std::string configPath =
     std::string(ASSETS_PATH) + "missing_required/missing_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(MissingRequiredTester, MissingServernames)
@@ -399,8 +371,7 @@ TEST(MissingRequiredTester, MissingServernames)
   const std::string configPath =
     std::string(ASSETS_PATH) + "missing_required/missing_servernames.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(MissingRequiredTester, MissingTimeoutValue)
@@ -408,21 +379,19 @@ TEST(MissingRequiredTester, MissingTimeoutValue)
   const std::string configPath =
     std::string(ASSETS_PATH) + "missing_required/missing_timeout_value.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
-// ============================================================================
-// Overflow Tests
-// ============================================================================
+// =================================================================
+// ======================== Overflow Tests =========================
+// =================================================================
 
 TEST(OverflowTester, OverflowBodysize)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_B)
@@ -430,8 +399,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_B)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_B.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_G)
@@ -439,8 +407,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_G)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_G.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::overflow_error);
+  EXPECT_THROW(parser.parseConfig(), std::overflow_error);
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_K)
@@ -448,8 +415,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_K)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_K.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::overflow_error);
+  EXPECT_THROW(parser.parseConfig(), std::overflow_error);
 }
 
 TEST(OverflowTester, OverflowBodysizeMultiplier_M)
@@ -457,8 +423,7 @@ TEST(OverflowTester, OverflowBodysizeMultiplier_M)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_bodysize_multiplier_M.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::overflow_error);
+  EXPECT_THROW(parser.parseConfig(), std::overflow_error);
 }
 
 TEST(OverflowTester, OverflowErrorCode)
@@ -466,8 +431,7 @@ TEST(OverflowTester, OverflowErrorCode)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_error_code.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowIntMax)
@@ -475,8 +439,7 @@ TEST(OverflowTester, OverflowIntMax)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_int_max.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowIntMin)
@@ -484,8 +447,7 @@ TEST(OverflowTester, OverflowIntMin)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_int_min.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowLocationBodysize)
@@ -493,8 +455,7 @@ TEST(OverflowTester, OverflowLocationBodysize)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_location_bodysize.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowLongMax)
@@ -502,8 +463,7 @@ TEST(OverflowTester, OverflowLongMax)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_long_max.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowLongMin)
@@ -511,8 +471,7 @@ TEST(OverflowTester, OverflowLongMin)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_long_min.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowPort)
@@ -520,8 +479,7 @@ TEST(OverflowTester, OverflowPort)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_port.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowRedirectCode)
@@ -529,8 +487,7 @@ TEST(OverflowTester, OverflowRedirectCode)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_redirect_code.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowServerBodysize)
@@ -538,8 +495,7 @@ TEST(OverflowTester, OverflowServerBodysize)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_server_bodysize.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowServerTimeout)
@@ -547,8 +503,7 @@ TEST(OverflowTester, OverflowServerTimeout)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_server_timeout.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowSizeTMax)
@@ -556,8 +511,7 @@ TEST(OverflowTester, OverflowSizeTMax)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_sizet_max.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(OverflowTester, OverflowTimeout)
@@ -565,21 +519,19 @@ TEST(OverflowTester, OverflowTimeout)
   const std::string configPath =
     std::string(ASSETS_PATH) + "overflow/overflow_timeout.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
-// ============================================================================
-// Syntax Errors Tests
-// ============================================================================
+// =================================================================
+// ====================== Syntax Error Tests =======================
+// =================================================================
 
 TEST(SyntaxErrorsTester, AdditionalLBrace)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/additional_lbrace.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, AdditionalRBrace)
@@ -587,8 +539,7 @@ TEST(SyntaxErrorsTester, AdditionalRBrace)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/additional_rbrace.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, AdditionalSemicolon)
@@ -596,8 +547,7 @@ TEST(SyntaxErrorsTester, AdditionalSemicolon)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/additional_semicolon.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, DoubleBraces)
@@ -605,8 +555,7 @@ TEST(SyntaxErrorsTester, DoubleBraces)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/double_braces.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, MissingLBrace)
@@ -614,8 +563,7 @@ TEST(SyntaxErrorsTester, MissingLBrace)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/missing_lbrace.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, MissingLocationLBrace)
@@ -623,8 +571,7 @@ TEST(SyntaxErrorsTester, MissingLocationLBrace)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/missing_location_lbrace.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, MissingLocationRBrace)
@@ -632,8 +579,7 @@ TEST(SyntaxErrorsTester, MissingLocationRBrace)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/missing_location_rbrace.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, MissingRBrace)
@@ -641,8 +587,7 @@ TEST(SyntaxErrorsTester, MissingRBrace)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/missing_rbrace.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, MissingSemicolon)
@@ -650,8 +595,7 @@ TEST(SyntaxErrorsTester, MissingSemicolon)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/missing_semicolon.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
 TEST(SyntaxErrorsTester, SemicolonBeforeDirective)
@@ -659,21 +603,21 @@ TEST(SyntaxErrorsTester, SemicolonBeforeDirective)
   const std::string configPath =
     std::string(ASSETS_PATH) + "syntax_errors/semicolon_before_directive.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_THROW(config = parser.parseConfig(), std::invalid_argument);
+  EXPECT_THROW(parser.parseConfig(), std::invalid_argument);
 }
 
-// ============================================================================
-// Valid Config Tests
-// ============================================================================
+// =================================================================
+// ======================= Valid Config Tests ======================
+// =================================================================
 
-TEST(ValidConfigTester, BodySizeMultipliers)
+TEST_F(ValidConfigTester, BodySizeMultipliers)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/bodysize_multipliers.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  ASSERT_NO_THROW(config = parser.parseConfig());
+  ASSERT_NO_THROW(parser.parseConfig());
+
+  const Config& config = Config::getConfig();
 
   const std::vector<ServerConfig>& servers = config.getServers();
   ASSERT_EQ(servers.size(), 8);
@@ -696,165 +640,149 @@ TEST(ValidConfigTester, BodySizeMultipliers)
   EXPECT_EQ(servers[7].getMaxBodySize(), 8UL * 1024 * 1024 * 1024);
 }
 
-TEST(ValidConfigTester, CommentsInValue)
+TEST_F(ValidConfigTester, CommentsInValue)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/comments_in_value.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, DuplicateMethods)
+TEST_F(ValidConfigTester, DuplicateMethods)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/duplicate_methods.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, EmptyLinesSemicolon)
+TEST_F(ValidConfigTester, EmptyLinesSemicolon)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/empty_lines_semicolon.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, EmptyLocation)
+TEST_F(ValidConfigTester, EmptyLocation)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/empty_location.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, ErrorPages)
+TEST_F(ValidConfigTester, ErrorPages)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/error_pages.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, GlobalRoot)
+TEST_F(ValidConfigTester, GlobalRoot)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/global_root.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, LargeValues)
+TEST_F(ValidConfigTester, LargeValues)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/large_values.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, Minimal)
+TEST_F(ValidConfigTester, Minimal)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/minimal.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, MultinameServer)
+TEST_F(ValidConfigTester, MultinameServer)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/multiname_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, MultipleLocations)
+TEST_F(ValidConfigTester, MultipleLocations)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/multiple_locations.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, MultipleServers)
+TEST_F(ValidConfigTester, MultipleServers)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/multiple_servers.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, MultiportServer)
+TEST_F(ValidConfigTester, MultiportServer)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/multiport_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, NewlinesInDirectives)
+TEST_F(ValidConfigTester, NewlinesInDirectives)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/newlines_in_directives.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, OverlappingHostnames)
+TEST_F(ValidConfigTester, OverlappingHostnames)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/overlapping_hostnames.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, OverlappingPorts)
+TEST_F(ValidConfigTester, OverlappingPorts)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/overlapping_ports.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, OverwriteErrorcodeLocation)
+TEST_F(ValidConfigTester, OverwriteErrorcodeLocation)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/overwrite_errorcode_location.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, OverwriteErrorcodeServer)
+TEST_F(ValidConfigTester, OverwriteErrorcodeServer)
 {
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/overwrite_errorcode_server.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
 }
 
-TEST(ValidConfigTester, Simple)
+TEST_F(ValidConfigTester, Simple)
 {
   const std::string configPath = std::string(ASSETS_PATH) + "valid/simple.conf";
   ConfigParser parser(configPath.c_str());
-  Config config;
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
+
+  const Config& config = Config::getConfig();
 
   EXPECT_EQ(config.getRoot(), "/var/www/");
   EXPECT_EQ(config.getMaxBodySize(), 1024);
@@ -864,14 +792,15 @@ TEST(ValidConfigTester, Simple)
   EXPECT_EQ(config.getServers()[0].getHostnames()[0], "serv1");
 }
 
-TEST(ValidConfigTester, TestAllValues)
+TEST_F(ValidConfigTester, TestAllValues)
 {
   const std::string path =
     std::string(ASSETS_PATH) + "valid/test_all_values.conf";
   ConfigParser parser(path.c_str());
-  Config config;
 
-  EXPECT_NO_THROW(config = parser.parseConfig());
+  EXPECT_NO_THROW(parser.parseConfig());
+
+  const Config& config = Config::getConfig();
 
   // Global
   EXPECT_EQ(config.getRoot(), "/var/www/global/");

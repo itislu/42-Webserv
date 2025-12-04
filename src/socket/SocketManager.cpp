@@ -22,6 +22,13 @@ SocketManager::SocketManager(const config::Config& config)
   createListeningSockets(config.getServers());
 }
 
+SocketManager& SocketManager::getInstance()
+{
+  static SocketManager socketManager(config::Config::getConfig());
+
+  return socketManager;
+}
+
 // only call in the constructor - because no exception guarantee
 void SocketManager::createListeningSockets(
   const std::vector<config::ServerConfig>& configs)

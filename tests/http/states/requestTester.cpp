@@ -16,6 +16,9 @@
 
 namespace {
 
+using config::Config;
+using config::ServerConfig;
+
 /**
  * Test with incomplete buffer
  * The buffer is extended by one char until parsing is done
@@ -41,8 +44,7 @@ ft::unique_ptr<Client> requestTestCharByChar(std::string& rawBuffer)
  */
 ft::unique_ptr<Client> requestTest(std::string& rawBuffer)
 {
-  const config::Config config;
-  config::ServerConfig serverConfig(config);
+  ServerConfig serverConfig(Config::getConfig());
   const Server server(serverConfig);
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
   client->setServer(&server);
