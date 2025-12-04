@@ -1,10 +1,10 @@
 #ifndef SERVERBUILDER_HPP
 #define SERVERBUILDER_HPP
 
-#include "config/ConfigTypes.hpp"
-#include "config/ParsedLocation.hpp"
-#include "config/ParsedServer.hpp"
-#include "config/ServerConfig.hpp"
+#include "ConfigTypes.hpp"
+#include "ParsedLocation.hpp"
+#include "ParsedServer.hpp"
+#include <config/ServerConfig.hpp>
 #include <vector>
 
 namespace config {

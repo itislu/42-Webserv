@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 ServerConfig::ServerConfig(const Config& global)
   : _root(global.getRoot())
   , _index("index.html")
@@ -168,5 +166,3 @@ const LocationConfig* ServerConfig::getBestMatchLocation(
   }
   return bestMatch;
 }
-
-} // namespace config

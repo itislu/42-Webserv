@@ -1,10 +1,10 @@
 #ifndef DIRECTIVEHANDLER_HPP
 #define DIRECTIVEHANDLER_HPP
 
-#include "config/Config.hpp"
-#include "config/ConfigTypes.hpp"
-#include "config/LocationConfig.hpp"
-#include "config/ServerConfig.hpp"
+#include "ConfigTypes.hpp"
+#include <config/Config.hpp>
+#include <config/LocationConfig.hpp>
+#include <config/ServerConfig.hpp>
 #include <string>
 #include <vector>
 

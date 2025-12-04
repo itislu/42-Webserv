@@ -1,7 +1,7 @@
-#include "config/Config.hpp"
-#include "config/ConfigParser.hpp"
-#include "config/ServerConfig.hpp"
-#include "server/ServerManager.hpp"
+#include <config/Config.hpp>
+#include <config/ServerConfig.hpp>
+#include <config/parser/ConfigParser.hpp>
+#include <server/ServerManager.hpp>
 #include <utils/logger/Logger.hpp>
 
 #include <exception>
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     config::ConfigParser(argv[1]).parseConfig();
-    std::cout << config::Config::getConfig();
+    std::cout << Config::getConfig();
 
     ServerManager::getInstance();
     ServerManager::run();

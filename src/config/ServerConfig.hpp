@@ -8,8 +8,6 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 class Config;
 
 class ServerConfig
@@ -64,7 +62,5 @@ private:
 
   std::vector<LocationConfig> _locations;
 };
-
-} // namespace config
 
 #endif

@@ -1,10 +1,10 @@
 #include "ServerBuilder.hpp"
-#include "config/ConfigTypes.hpp"
-#include "config/DirectiveHandler.hpp"
-#include "config/LocationBuilder.hpp"
-#include "config/ParsedLocation.hpp"
-#include "config/ParsedServer.hpp"
-#include "config/ServerConfig.hpp"
+#include "ConfigTypes.hpp"
+#include "DirectiveHandler.hpp"
+#include "LocationBuilder.hpp"
+#include "ParsedLocation.hpp"
+#include "ParsedServer.hpp"
+#include <config/ServerConfig.hpp>
 #include <set>
 #include <stdexcept>
 #include <string>

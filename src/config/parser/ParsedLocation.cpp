@@ -1,5 +1,5 @@
 #include "ParsedLocation.hpp"
-#include "config/ConfigTypes.hpp"
+#include "ConfigTypes.hpp"
 #include <string>
 
 namespace config {

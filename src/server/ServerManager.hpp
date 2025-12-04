@@ -34,16 +34,16 @@ private:
   typedef std::map<const Socket*, std::vector<const Server*> >::const_iterator
     const_SockToServIter;
 
-  void addServer(const config::ServerConfig& config,
+  void addServer(const ServerConfig& config,
                  const std::vector<const Socket*>& listeners);
-  void createServers(const std::vector<config::ServerConfig>& configs);
+  void createServers(const std::vector<ServerConfig>& configs);
   void mapServerToSocket(const Server& server,
                          const std::vector<const Socket*>& listeners);
 
   static std::vector<const Socket*> createListeners(
     const std::vector<int>& ports);
 
-  explicit ServerManager(const config::Config& config);
+  explicit ServerManager(const Config& config);
   ServerManager(const ServerManager& other);
   ServerManager& operator=(const ServerManager& other);
 

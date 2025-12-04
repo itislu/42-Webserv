@@ -108,7 +108,7 @@ long Client::getTimeout() const
   if (_server != FT_NULLPTR) {
     return _server->getTimeout();
   }
-  return config::Config::getDefaultTimeout();
+  return Config::getDefaultTimeout();
 }
 
 const Server* Client::getServer() const

@@ -5,10 +5,6 @@
 #include <gtest/gtest.h>
 #include <string>
 
-using config::Config;
-using config::LocationConfig;
-using config::ServerConfig;
-
 TEST(LocationMatchTest, SimplePrefixMatch)
 {
   ServerConfig server(Config::getConfig());

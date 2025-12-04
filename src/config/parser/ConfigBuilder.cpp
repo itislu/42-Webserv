@@ -1,9 +1,9 @@
 #include "ConfigBuilder.hpp"
-#include "config/Config.hpp"
-#include "config/DirectiveHandler.hpp"
-#include "config/ParsedConfig.hpp"
-#include "config/ParsedServer.hpp"
-#include "config/ServerBuilder.hpp"
+#include "DirectiveHandler.hpp"
+#include "ParsedConfig.hpp"
+#include "ParsedServer.hpp"
+#include "ServerBuilder.hpp"
+#include <config/Config.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>

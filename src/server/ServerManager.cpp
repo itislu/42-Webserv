@@ -29,12 +29,12 @@ extern "C" void sigIntHandler(int /*sigNum*/)
 
 ServerManager& ServerManager::getInstance()
 {
-  static ServerManager serverManager(config::Config::getConfig());
+  static ServerManager serverManager(Config::getConfig());
 
   return serverManager;
 }
 
-ServerManager::ServerManager(const config::Config& config)
+ServerManager::ServerManager(const Config& config)
 {
   if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
@@ -42,12 +42,10 @@ ServerManager::ServerManager(const config::Config& config)
   createServers(config.getServers());
 }
 
-void ServerManager::createServers(
-  const std::vector<config::ServerConfig>& configs)
+void ServerManager::createServers(const std::vector<ServerConfig>& configs)
 {
   _servers.reserve(configs.size());
-  for (config::Config::const_ServConfIter it = configs.begin();
-       it != configs.end();
+  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     const std::vector<const Socket*> listeners =
       createListeners(it->getPorts());
@@ -70,7 +68,7 @@ std::vector<const Socket*> ServerManager::createListeners(
   return listeners;
 }
 
-void ServerManager::addServer(const config::ServerConfig& config,
+void ServerManager::addServer(const ServerConfig& config,
                               const std::vector<const Socket*>& listeners)
 {
   const ft::shared_ptr<const Server> server =
