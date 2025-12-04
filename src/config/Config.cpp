@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 int Config::_defaultTimeout = 0;
 const char* const Config::defaultRoot = "/var/www";
 const std::size_t Config::defaultMaxBodySize = 1024L * 1024;
@@ -183,5 +181,3 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
   out << "Lowest Timeout(Default): " << Config::getDefaultTimeout() << "s\n";
   return out;
 }
-
-} // namespace config

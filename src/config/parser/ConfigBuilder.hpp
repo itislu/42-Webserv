@@ -1,9 +1,9 @@
 #ifndef CONFIGBUILDER_HPP
 #define CONFIGBUILDER_HPP
 
-#include "config/Config.hpp"
-#include "config/ParsedConfig.hpp"
-#include "config/ParsedServer.hpp"
+#include "ParsedConfig.hpp"
+#include "ParsedServer.hpp"
+#include <config/Config.hpp>
 #include <vector>
 
 namespace config {

@@ -1,8 +1,8 @@
-#include "config/DirectiveHandler.hpp"
-#include "config/Config.hpp"
-#include "config/Converters.hpp"
-#include "config/LocationConfig.hpp"
-#include "config/ServerConfig.hpp"
+#include "DirectiveHandler.hpp"
+#include "Converters.hpp"
+#include <config/Config.hpp>
+#include <config/LocationConfig.hpp>
+#include <config/ServerConfig.hpp>
 #include <cstddef>
 #include <exception>
 #include <libftpp/utility.hpp>

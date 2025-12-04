@@ -1,7 +1,7 @@
 #include "ParsedConfig.hpp"
-#include "config/ConfigTypes.hpp"
-#include "config/ParsedLocation.hpp"
-#include "config/ParsedServer.hpp"
+#include "ConfigTypes.hpp"
+#include "ParsedLocation.hpp"
+#include "ParsedServer.hpp"
 #include <map>
 #include <ostream>
 #include <string>

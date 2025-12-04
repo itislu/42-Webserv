@@ -37,7 +37,7 @@ private:
   typedef std::map<int, const Socket*>::iterator FdToSockIter;
   typedef std::map<int, const Socket*>::const_iterator const_FdToSockIter;
 
-  void createListeningSockets(const std::vector<config::ServerConfig>& configs);
+  void createListeningSockets(const std::vector<ServerConfig>& configs);
   void createListener(const std::vector<int>& ports);
   bool listenerExists(int port) const;
 
@@ -47,7 +47,7 @@ private:
   void removePfd(int fdes);
   void removeFdFromMap(int fdes);
 
-  explicit SocketManager(const config::Config& config);
+  explicit SocketManager(const Config& config);
   SocketManager(const SocketManager& other);
   SocketManager& operator=(const SocketManager& other);
 

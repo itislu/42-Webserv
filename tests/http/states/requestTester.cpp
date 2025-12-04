@@ -16,9 +16,6 @@
 
 namespace {
 
-using config::Config;
-using config::ServerConfig;
-
 /**
  * Test with incomplete buffer
  * The buffer is extended by one char until parsing is done

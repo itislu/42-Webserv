@@ -1,12 +1,12 @@
 #include "Lexer.hpp"
-#include "config/Token.hpp"
-#include "utils/fileUtils.hpp"
+#include "Token.hpp"
 #include <cstddef>
 #include <iterator>
 #include <libftpp/ctype.hpp>
 #include <libftpp/string.hpp>
 #include <stdexcept>
 #include <string>
+#include <utils/fileUtils.hpp>
 
 namespace config {
 

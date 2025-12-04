@@ -74,11 +74,11 @@ const std::string& ValidateRequest::getPath() const
 {
   return _path;
 }
-const config::ServerConfig* ValidateRequest::getServer() const
+const ServerConfig* ValidateRequest::getServer() const
 {
   return _server;
 }
-const config::LocationConfig* ValidateRequest::getLocation() const
+const LocationConfig* ValidateRequest::getLocation() const
 {
   return _location;
 }

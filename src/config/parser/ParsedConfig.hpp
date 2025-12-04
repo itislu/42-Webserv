@@ -1,8 +1,8 @@
 #ifndef PARSEDCONFIG_HPP
 #define PARSEDCONFIG_HPP
 
+#include "ConfigTypes.hpp"
 #include "ParsedServer.hpp"
-#include "config/ConfigTypes.hpp"
 #include <ostream>
 #include <vector>
 

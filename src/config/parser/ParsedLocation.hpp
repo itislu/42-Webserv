@@ -1,7 +1,7 @@
 #ifndef PARSEDLOCATION_HPP
 #define PARSEDLOCATION_HPP
 
-#include "config/ConfigTypes.hpp"
+#include "ConfigTypes.hpp"
 #include <string>
 
 namespace config {

@@ -163,7 +163,7 @@ int EventManager::calculateTimeout()
 {
   // No clients yet, get default
   if (!_clientManager().hasClients()) {
-    const long timeout = config::Config::getDefaultTimeout();
+    const long timeout = Config::getDefaultTimeout();
     const int timeoutMs = convertSecondsToMs(timeout);
     std::cout << "No clients - use default timeout: " << timeoutMs << "ms\n";
     return timeoutMs;
