@@ -67,6 +67,10 @@ endfunction()
 
 # utils
 
+add_my_test(bufferQueueTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/bufferQueueTester.cpp
+)
+
 add_my_test(fileBufferTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/fileBufferTester.cpp
 )
