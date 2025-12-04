@@ -23,7 +23,6 @@
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
-#include <cctype>
 #include <cstddef>
 #include <cstdlib>
 #include <exception>

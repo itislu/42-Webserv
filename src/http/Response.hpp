@@ -16,10 +16,11 @@ public:
   const std::string& getVersion() const;
   const StatusCode& getStatusCode() const;
   Headers& getHeaders();
-  ft::shared_ptr<IInBuffer>& getBody();
+  const ft::shared_ptr<IInBuffer>& getBody() const;
 
   void setVersion(const std::string& version);
   void setStatusCode(StatusCode::Code code);
+  void setBody(ft::shared_ptr<IInBuffer> body);
 
 private:
   std::string _version;

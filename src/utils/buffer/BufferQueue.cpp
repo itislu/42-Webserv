@@ -17,9 +17,9 @@ Logger& BufferQueue::_log = Logger::getInstance(LOG_SERVER);
 /* ************************************************************************** */
 // PUBLIC
 
-void BufferQueue::append(const ft::shared_ptr<IInBuffer>& buffer)
+void BufferQueue::append(ft::shared_ptr<IInBuffer> buffer)
 {
-  _queue.push_back(buffer);
+  _queue.push_back(ft::move(buffer));
 }
 
 ssize_t BufferQueue::send(int fdes, std::size_t bytes)
@@ -28,11 +28,11 @@ ssize_t BufferQueue::send(int fdes, std::size_t bytes)
     return 0;
   }
 
-  if (_queue.front()->size() == 0) {
+  if (_queue.front()->isEmpty()) {
     _queue.pop_front();
     _log.warning() << "BufferQueue: empty buffer found\n";
     // One skip should be enough, should only skip empty body files for example
-    if (_queue.empty() || _queue.front()->size() == 0) {
+    if (_queue.empty() || _queue.front()->isEmpty()) {
       _log.warning() << "BufferQueue: next buffer is still empty\n";
       return 0;
     }
@@ -49,23 +49,21 @@ bool BufferQueue::isEmpty() const
   return _queue.empty();
 }
 
-// NOLINTBEGIN(misc-const-correctness)
-SmartBuffer* BufferQueue::getSmartBuffer()
+SmartBuffer& BufferQueue::getSmartBuffer()
 {
   if (!_queue.empty()) {
     const ft::shared_ptr<IInBuffer>& base = _queue.back();
     IInBuffer* const raw = base.get();
     SmartBuffer* const derived = dynamic_cast<SmartBuffer*>(raw);
     if (derived != FT_NULLPTR) {
-      return derived;
+      return *derived;
     }
   }
 
   const ft::shared_ptr<SmartBuffer> sbuff = ft::make_shared<SmartBuffer>();
   _queue.push_back(sbuff);
-  return sbuff.shared_ptr<SmartBuffer>::get();
+  return *sbuff.get(); // call to shared_ptr<SmartBuffer>::get()
 }
-// NOLINTEND(misc-const-correctness)
 
 /* ************************************************************************** */
 // PRIVATE

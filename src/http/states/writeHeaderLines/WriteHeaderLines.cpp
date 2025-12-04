@@ -28,7 +28,7 @@ Logger& WriteHeaderLines::_log = Logger::getInstance(LOG_HTTP);
 WriteHeaderLines::WriteHeaderLines(Client* context)
   : IState<Client>(context)
   , _client(context)
-  , _buffer(_client->getOutBuffQueue().getSmartBuffer())
+  , _buffer(&_client->getOutBuffQueue().getSmartBuffer())
 {
   _log.info() << "WriteHeaderLines\n";
 }
