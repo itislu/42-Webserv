@@ -104,7 +104,7 @@ TEST(RequestTester, CompleteBufferTest)
   EXPECT_EQ(value, "7");
 }
 
-// // NOLINTEND
+// NOLINTEND
 
 // Main function to run all tests
 int main(int argc, char** argv)
