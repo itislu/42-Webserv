@@ -43,6 +43,7 @@ public:
   ssize_t send(int fdes, std::size_t bytes);
 
 protected:
+  // Just for testing.
   const IInBuffer* getRawBuffer() const;
 
 private:

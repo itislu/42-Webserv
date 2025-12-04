@@ -71,9 +71,6 @@ void MemoryBuffer::seek(std::size_t pos)
     }
     throw BufferException(errOutOfRange);
   }
-  if (_data.empty()) {
-    return;
-  }
   _pos = pos;
 }
 
@@ -186,7 +183,6 @@ ContigContainer MemoryBuffer::_consumeFront(std::size_t bytes)
 {
   // read bytes from the beginning
   const ContigContainer front = _getData<ContigContainer>(0, bytes);
-  assert(front.size() == bytes); // Unexpected EOF should not happen
 
   // remove read bytes
   removeFront(front.size());

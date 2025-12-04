@@ -22,7 +22,7 @@ TEST(MemoryBufferTester, AppendString)
 
 TEST(MemoryBufferTester, AppendVector)
 {
-  std::string inputStr = "0123456789Alaaaaaaaaaaaaaaaaaarm";
+  const std::string inputStr = "0123456789Alaaaaaaaaaaaaaaaaaarm";
   const MemoryBuffer::RawBytes input(inputStr.begin(), inputStr.end());
 
   MemoryBuffer memoryBuffer;
@@ -48,6 +48,13 @@ TEST(MemoryBufferTester, GetPeekSeek)
   EXPECT_EQ(memoryBuffer.get(), '5');
   EXPECT_EQ(memoryBuffer.peek(), '6');
   EXPECT_EQ(memoryBuffer.peek(), '6');
+  EXPECT_EQ(memoryBuffer.get(), '6');
+
+  memoryBuffer.seek(0);
+  EXPECT_EQ(memoryBuffer.get(), '0');
+  EXPECT_EQ(memoryBuffer.peek(), '1');
+  EXPECT_EQ(memoryBuffer.peek(), '1');
+  EXPECT_EQ(memoryBuffer.get(), '1');
 }
 
 TEST(MemoryBufferTester, MoveToFile)

@@ -68,6 +68,7 @@ void FileBuffer::seek(std::size_t pos)
     }
     throw BufferException(errOutOfRange);
   }
+  // pos is 0; size == 0 means no file open.
   if (_size == 0) {
     return;
   }
@@ -142,8 +143,8 @@ void FileBuffer::replace(RawBytes& rawData)
 
 void FileBuffer::moveBufferToFile(const std::string& filepath)
 {
-  if (_fileName.empty()) {
-    throw BufferException(errRename);
+  if (_size == 0) {
+    throw BufferException(errFileEmpty);
   }
   if (_fs.is_open()) {
     _fs.close();
@@ -170,7 +171,7 @@ std::size_t FileBuffer::size() const
 
 ssize_t FileBuffer::send(int fdes, std::size_t bytes)
 {
-  bytes = std::min(bytes, size());
+  bytes = std::min(bytes, _size);
   IBuffer::RawBytes buff = _getData<RawBytes>(0, bytes);
   const ssize_t bytesSent = ::send(fdes, buff.data(), buff.size(), 0);
   if (bytesSent > 0) {
@@ -328,19 +329,24 @@ void FileBuffer::_copyFrom(FileBuffer& src)
 
 /**
  * Close curr file and try to open tmp file.
- * If success, swap filename and destructor of tmpFb will remove old curr file.
  * If fail, reopen curr file and keep it; tmpFb will remove its tmp file.
+ * If success, swap filename and destructor of tmpFb will remove old curr file.
  */
 void FileBuffer::_replaceCurrFile(FileBuffer& tmpFb)
 {
-  _fs.close();
+  if (_fs.is_open()) {
+    _fs.close();
+  }
   _fs.open(tmpFb._fileName.c_str(),
            std::ios::in | std::ios::out | std::ios::binary);
   if (!_fs.is_open()) {
+    // Fail.
     _fs.open(_fileName.c_str(),
              std::ios::in | std::ios::out | std::ios::binary);
     throw BufferException(errOpen);
   }
+
+  // Success.
   using std::swap;
   swap(_fileName, tmpFb._fileName);
   swap(_size, tmpFb._size);

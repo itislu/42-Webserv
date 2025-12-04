@@ -66,9 +66,6 @@ endfunction()
 # Tester
 
 # utils
-add_my_test(utilsTester
-  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/utilsTester.cpp
-)
 
 add_my_test(fileBufferTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/fileBufferTester.cpp
@@ -85,6 +82,7 @@ add_my_test(smartBufferTester
 # http
 
 # http/parser
+
 add_my_test(http11RulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/http11RulesTester.cpp
 )

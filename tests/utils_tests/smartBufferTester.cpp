@@ -6,11 +6,15 @@
 #include <gtest/gtest.h>
 #include <string>
 
+namespace {
+
 class SmartBufferTest : public SmartBuffer
 {
 public:
   using SmartBuffer::getRawBuffer;
 };
+
+}
 
 // NOLINTBEGIN(readability-magic-numbers)
 TEST(SmartBufferTester, AppendString)

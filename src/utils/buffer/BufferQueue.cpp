@@ -62,7 +62,7 @@ SmartBuffer& BufferQueue::getSmartBuffer()
 
   const ft::shared_ptr<SmartBuffer> sbuff = ft::make_shared<SmartBuffer>();
   _queue.push_back(sbuff);
-  return *sbuff.get(); // call to shared_ptr<SmartBuffer>::get()
+  return *sbuff;
 }
 
 /* ************************************************************************** */

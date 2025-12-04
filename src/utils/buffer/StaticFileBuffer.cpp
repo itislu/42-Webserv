@@ -76,9 +76,6 @@ void StaticFileBuffer::seek(std::size_t pos)
     }
     throw BufferException(errOutOfRange);
   }
-  if (size() == 0) {
-    return;
-  }
 
   _fs.seekg(static_cast<std::streamoff>(pos + _consumedFront));
   if (_fs.fail()) {
