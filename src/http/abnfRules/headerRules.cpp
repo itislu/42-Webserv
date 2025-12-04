@@ -69,33 +69,21 @@ ft::shared_ptr<RepetitionRule> contentLengthRule()
 }
 
 /**
+ *
+ * Sender:
  * Transfer-Encoding = [ transfer-coding *( OWS "," OWS transfer-coding ) ]
+ *
+ * Receipient:
+ * #element => [ element ] *( OWS "," OWS [ element ] )
  */
-ft::shared_ptr<RepetitionRule> transferEncodingRule()
+ft::shared_ptr<SequenceRule> transferEncodingRule()
 {
-  // transfer-coding *( OWS "," OWS transfer-coding )
-  const ft::shared_ptr<SequenceRule> full = ft::make_shared<SequenceRule>();
+  const ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
 
-  // transfer-coding
-  full->addRule(transferCodingRule());
+  seq->addRule(listRule(transferCodingRule()));
 
-  // *( OWS "," OWS transfer-coding )
-  ft::shared_ptr<SequenceRule> repSeq = ft::make_shared<SequenceRule>();
-  repSeq->addRule(owsRule());
-  repSeq->addRule(ft::make_shared<LiteralRule>(",")); // comma
-  repSeq->addRule(owsRule());
-  repSeq->addRule(transferCodingRule());
-
-  full->addRule(ft::make_shared<RepetitionRule>(ft::move(repSeq)));
-
-  // Whole thing optional
-  const ft::shared_ptr<RepetitionRule> opt =
-    ft::make_shared<RepetitionRule>(full);
-  opt->setMin(0);
-  opt->setMax(1);
-
-  opt->setDebugTag("transferEncodingRule");
-  return opt;
+  seq->setDebugTag("transferEncodingRule");
+  return seq;
 }
 
 /**

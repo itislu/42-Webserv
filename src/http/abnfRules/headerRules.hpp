@@ -12,7 +12,7 @@ ft::shared_ptr<SequenceRule> fieldLineWrapper(
 
 ft::shared_ptr<SequenceRule> hostHeaderRule();
 ft::shared_ptr<RepetitionRule> contentLengthRule();
-ft::shared_ptr<RepetitionRule> transferEncodingRule();
+ft::shared_ptr<SequenceRule> transferEncodingRule();
 ft::shared_ptr<SequenceRule> transferCodingRule();
 ft::shared_ptr<SequenceRule> transferParameterRule();
 

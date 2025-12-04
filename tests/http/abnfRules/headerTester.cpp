@@ -1,7 +1,7 @@
-#include "http/abnfRules/headerRules.hpp"
-#include "http/abnfRules/ruleUtils.hpp"
-#include "libftpp/memory.hpp"
-#include "utils/abnfRules/SequenceRule.hpp"
+#include <http/abnfRules/headerRules.hpp>
+#include <http/abnfRules/ruleUtils.hpp>
+#include <libftpp/memory.hpp>
+#include <utils/abnfRules/SequenceRule.hpp>
 
 #include <gtest/gtest.h>
 
@@ -84,6 +84,16 @@ TEST(HeaderTester, TransferEncoding)
 
   // Optional empty (allowed by [ … ])
   EXPECT_TRUE(isValidString(*rule, "\r\n"));
+  EXPECT_TRUE(isValidString(*rule, " \r\n"));
+
+  // Empty list
+  EXPECT_TRUE(isValidString(*rule, ",,,,\r\n"));
+  EXPECT_TRUE(isValidString(*rule, ",\r\n"));
+  EXPECT_TRUE(isValidString(*rule, " , \r\n"));
+  EXPECT_TRUE(isValidString(*rule, " , , , ,  \r\n"));
+  EXPECT_TRUE(isValidString(*rule, " , chunked \r\n"));
+  EXPECT_TRUE(isValidString(*rule, " , chunked , \r\n"));
+  EXPECT_TRUE(isValidString(*rule, " , chunked,test \r\n"));
 }
 
 /**
