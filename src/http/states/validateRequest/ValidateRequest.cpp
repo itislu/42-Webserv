@@ -362,15 +362,15 @@ void ValidateRequest::_validateHostHeader()
 
 void ValidateRequest::_compareHostHeaders()
 {
+  _host = ft::to_lower(_host);
   const std::string& host =
     ft::to_lower(_client->getRequest().getUri().getAuthority().getHost());
-  _host = ft::to_lower(_host);
-
-  _log.info() << "Host Header: [" << _host << "]\n";
-  _log.info() << "Uri Host: [" << host << "]\n";
-
-  if (_host != host) {
-    endState(StatusCode::BadRequest);
+  if (!host.empty()) {
+    _log.info() << "Host Header: [" << _host << "]\n";
+    _log.info() << "Uri Host: [" << host << "]\n";
+    if (_host != host) {
+      endState(StatusCode::BadRequest);
+    }
   }
 }
 
