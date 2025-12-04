@@ -1,6 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "socket/Socket.hpp"
 #include <client/TimeStamp.hpp>
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
@@ -21,7 +22,7 @@ class Client
 public:
   Client();
   explicit Client(int fdes);
-  Client(int fdes, const Server* server);
+  Client(int fdes, const Server* server, const Socket* socket);
 
   int getFd() const;
   bool hasServer() const;
@@ -29,6 +30,7 @@ public:
   SmartBuffer& getInBuff();
   BufferQueue& getOutBuffQueue();
   const Server* getServer() const;
+  const Socket& getSocket() const;
   StateHandler<Client>& getStateHandler();
   Request& getRequest();
   Response& getResponse();
@@ -51,6 +53,7 @@ private:
 
   AutoFd _fd;
   const Server* _server;
+  const Socket* _socket;
   std::string _host;
   TimeStamp _lastActivity;
   SmartBuffer _inBuff;

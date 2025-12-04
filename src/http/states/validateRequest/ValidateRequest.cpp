@@ -1,8 +1,8 @@
 #include "ValidateRequest.hpp"
 
 #include "client/Client.hpp"
-#include "config/Converters.hpp"
 #include "config/LocationConfig.hpp"
+#include "config/parser/Converters.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
@@ -42,12 +42,6 @@ Logger& ValidateRequest::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC
-
-/*
-
-
-
-*/
 
 ValidateRequest::ValidateRequest(Client* context)
   : IState<Client>(context)
@@ -104,12 +98,13 @@ StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
 
 void ValidateRequest::_init()
 {
-  /* TODO: split this into server init and host header validation */
+  _validateHostHeader();
+  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+    return;
+  }
+
   if (!_client->hasServer()) {
-    _initServer();
-    if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
-      return;
-    }
+    _setServerByHost();
   }
 
   _path = _client->getRequest().getUri().getPath();
@@ -122,7 +117,6 @@ void ValidateRequest::_init()
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
   const Request::Method method = _client->getRequest().getMethod();
-  _log.info() << _client->getRequest().getMethod() << "\n";
 
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
@@ -336,48 +330,34 @@ void ValidateRequest::endState(StatusCode::Code status)
   }
 }
 
-/* TODO: check if there is only one host header and not multiple */
-void ValidateRequest::_initServer()
+void ValidateRequest::_validateHostHeader()
 {
   std::string hostHeader = _client->getRequest().getHeaders().at("host");
   _log.info() << "Host Header: [" << hostHeader << "]\n";
 
   if (hostHeader.empty()) {
     hostHeader = _client->getRequest().getUri().getAuthority().getHost();
-    _log.info() << "Uri Host: [" << hostHeader << "]\n"; // empty in 1.1
+    _log.info() << "Uri Host: [" << hostHeader << "]\n";
   }
-
-  /* TODO: RFC says there has to be one host header */
-  if (!hostHeader.empty()) {
-    _setServerByHost(hostHeader);
-  } else {
+  if (hostHeader.empty()) {
     endState(StatusCode::BadRequest);
+    return;
   }
-}
 
-void ValidateRequest::_setServerByHost(const std::string& hostHeader)
-{
-  std::string host;
   int port = 0;
-  _splitHostHeader(hostHeader, host, port);
+  _splitHostHeader(hostHeader, _host, port);
   if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
     _log.info() << "Split: \n";
-    _log.info() << "  Host: " << host << "\n";
+    _log.info() << "  Host: " << _host << "\n";
     _log.info() << "  Port: " << port << "\n";
   }
 
-  const Socket& socket =
-    SocketManager::getInstance().getSocketFromClientFd(_client->getFd());
-
+  const Socket& socket = _client->getSocket();
   // Note: check if this is possible
   if (socket.getPort() != port) {
-    // Something very wrong here
+    endState(StatusCode::BadRequest);
+    return;
   }
-
-  const Server* const server =
-    ServerManager::getInstance().getServerByHost(&socket, host);
-  _log.info() << "Found server for host: " << host << "\n";
-  _client->setServer(server);
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
@@ -401,4 +381,14 @@ void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
   } else {
     host = hostHeader;
   }
+}
+
+void ValidateRequest::_setServerByHost()
+{
+  const Socket& socket = _client->getSocket();
+
+  const Server* const server =
+    ServerManager::getInstance().getServerByHost(socket, _host);
+  _log.info() << "Found server for host: " << _host << "\n";
+  _client->setServer(server);
 }
