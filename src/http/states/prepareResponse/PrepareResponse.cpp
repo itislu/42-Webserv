@@ -8,7 +8,7 @@
 #include <http/states/prepareResponse/HandleGet.hpp>
 #include <http/states/prepareResponse/HandlePost.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
@@ -26,7 +26,7 @@ PrepareResponse::PrepareResponse(Client* context)
   , _client(context)
   , _stateHandler(this)
 {
-  _log.info() << "PrepareResponse\n";
+  _log.info() << *_client << " PrepareResponse\n";
   _init();
 
   // todo remove this log after testing
@@ -46,9 +46,9 @@ try {
     _client->getStateHandler().setState<WriteStatusLine>();
   }
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "PrepareResponse: " << e.what() << '\n';
+  _log.error() << *_client << " PrepareResponse: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
-  getContext()->getStateHandler().setState<WriteStatusLine>();
+  throw;
 }
 
 StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()

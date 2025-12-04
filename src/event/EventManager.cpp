@@ -4,6 +4,7 @@
 #include <client/ClientManager.hpp>
 #include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
+#include <http/http.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
@@ -13,9 +14,11 @@
 #include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
+#include <cstring>
 #include <exception>
 #include <iostream>
 #include <sys/poll.h>
+#include <sys/socket.h>
 #include <vector>
 
 /* **************************************************************************
@@ -77,28 +80,32 @@ void EventManager::clientStateMachine(Client& client)
 }
 
 bool EventManager::handleClient(Client* client, unsigned events)
-{
+try {
   if (client == FT_NULLPTR) {
     return false;
   }
   bool alive = true;
-  if ((events & POLLIN) != 0 && alive) { // Receive Data
+  if (pollInEnabled(events) && alive) { // Receive Data
     alive = receiveFromClient(*client);
   }
   if (alive) {
     clientStateMachine(*client);
   }
-  if (alive && client->hasDataToSend()) {
+  if (!pollOutEnabled(events) && alive && client->hasDataToSend()) {
     _socketManager().enablePollout(client->getFd());
     _log.info() << "Pollout enabled\n";
   }
-  if ((events & POLLOUT) != 0 && alive) { // Send Data
+  if (pollOutEnabled(events) && alive) { // Send Data
     alive = sendToClient(*client);
   }
   if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 && alive) {
     return false; // disconnect client
   }
   return alive;
+} catch (const std::exception& e) {
+  _log.error() << *client << " EventManager: " << e.what() << '\n';
+  handleException(client);
+  return false;
 }
 
 void EventManager::disconnectClient(Client* client)
@@ -169,17 +176,6 @@ int EventManager::calculateTimeout()
   return timeoutMs;
 }
 
-void EventManager::checkTimeouts()
-{
-  std::vector<ft::shared_ptr<Client> > timedOut;
-  _clientManager().getTimedOutClients(timedOut);
-  for (std::size_t i = 0; i < timedOut.size(); ++i) {
-    std::cout << "[SERVER] Client fd=" << timedOut[i]->getFd()
-              << " timed out.\n";
-    disconnectClient(timedOut[i].get());
-  }
-}
-
 int EventManager::check()
 {
   const int timeout = calculateTimeout();
@@ -194,4 +190,36 @@ int EventManager::check()
     std::cerr << "Error: " << e.what() << "\n";
   }
   return ready;
+}
+
+void EventManager::checkTimeouts()
+{
+  std::vector<ft::shared_ptr<Client> > timedOut;
+  _clientManager().getTimedOutClients(timedOut);
+  for (std::size_t i = 0; i < timedOut.size(); ++i) {
+    std::cout << "[SERVER] Client fd=" << timedOut[i]->getFd()
+              << " timed out.\n";
+    disconnectClient(timedOut[i].get());
+  }
+}
+
+bool EventManager::pollInEnabled(unsigned events)
+{
+  return (events & POLLIN) != 0;
+}
+
+bool EventManager::pollOutEnabled(unsigned events)
+{
+  return (events & POLLOUT) != 0;
+}
+
+void EventManager::handleException(Client* client)
+{
+  /**  //todo
+   * should send response message only if nothing has been sent yet.
+   * tricky for piped requests
+   */
+  const char* const msg = http::minResponse500;
+  const std::size_t msgLen = std::strlen(msg);
+  (void)send(client->getFd(), msg, msgLen, 0);
 }

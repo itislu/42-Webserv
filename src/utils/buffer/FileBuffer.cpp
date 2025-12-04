@@ -1,32 +1,35 @@
 #include "FileBuffer.hpp"
 
-#include <libftpp/expected.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/fileUtils.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <exception>
 #include <ios>
 #include <iosfwd>
 #include <iostream>
-#include <new>
 #include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 // INIT
 
-const char* const FileBuffer::errOpen = "FbException: open failed";
-const char* const FileBuffer::errSeek = "FbException: seek failed";
-const char* const FileBuffer::errFileEmpty = "FbException: file is empty";
+const char* const FileBuffer::errOpen = "FileBuffer exception: open failed";
+const char* const FileBuffer::errSeek = "FileBuffer exception: seek failed";
+const char* const FileBuffer::errFileEmpty =
+  "FileBuffer exception: file is empty";
 const char* const FileBuffer::errOutOfRange =
-  "FbException: tried to access out of range";
-const char* const FileBuffer::errRead = "FbException: read failed";
-const char* const FileBuffer::errWrite = "FbException: write failed";
-const char* const FileBuffer::errTell = "FbException: tell position failed";
-const char* const FileBuffer::errRename = "FbException: rename file failed";
+  "FileBuffer exception: tried to access out of range";
+const char* const FileBuffer::errRead = "FileBuffer exception: read failed";
+const char* const FileBuffer::errWrite = "FileBuffer exception: write failed";
+const char* const FileBuffer::errTell =
+  "FileBuffer exception: tell position failed";
+const char* const FileBuffer::errRename =
+  "FileBuffer exception: rename file failed";
 
 /* ************************************************************************** */
 // PUBLIC
@@ -155,152 +158,6 @@ void FileBuffer::moveBufferToFile(const std::string& filepath)
   _size = 0;
 }
 
-// Non-throwing versions
-
-IBuffer::ExpectChr FileBuffer::get(std::nothrow_t /*unused*/)
-{
-  try {
-    return get();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectChr FileBuffer::peek(std::nothrow_t /*unused*/)
-{
-  try {
-    return peek();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::seek(std::size_t pos, std::nothrow_t /*unused*/)
-{
-  try {
-    seek(pos);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectPos FileBuffer::pos(std::nothrow_t /*unused*/)
-{
-  try {
-    return pos();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::append(const std::string& data,
-                                       std::nothrow_t /*unused*/)
-{
-  try {
-    append(data);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::append(const FileBuffer::RawBytes& buffer,
-                                       std::size_t bytes,
-                                       std::nothrow_t /*unused*/)
-{
-  try {
-    append(buffer, bytes);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::removeFront(std::size_t bytes,
-                                            std::nothrow_t /*unused*/)
-{
-  try {
-    removeFront(bytes);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectStr FileBuffer::consumeFront(std::size_t bytes,
-                                            std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeFront(bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw FileBuffer::consumeRawFront(std::size_t bytes,
-                                               std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeRawFront(bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw FileBuffer::consumeAll(std::nothrow_t /*unused*/)
-{
-  try {
-    return consumeAll();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectStr FileBuffer::getStr(std::size_t start,
-                                      std::size_t bytes,
-                                      std::nothrow_t /*unused*/)
-{
-  try {
-    return getStr(start, bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectRaw FileBuffer::getRawBytes(std::size_t start,
-                                           std::size_t bytes,
-                                           std::nothrow_t /*unused*/)
-{
-  try {
-    return getRawBytes(start, bytes);
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::replace(RawBytes& rawData,
-                                        std::nothrow_t /*unused*/)
-{
-  try {
-    replace(rawData);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
-IBuffer::ExpectVoid FileBuffer::moveBufferToFile(const std::string& filepath,
-                                                 std::nothrow_t /*unused*/)
-{
-  try {
-    moveBufferToFile(filepath);
-    return ExpectVoid();
-  } catch (const std::exception& e) {
-    return ft::unexpected<BufferException>(e);
-  }
-}
-
 bool FileBuffer::isEmpty() const
 {
   return _size == 0;
@@ -309,6 +166,17 @@ bool FileBuffer::isEmpty() const
 std::size_t FileBuffer::size() const
 {
   return _size;
+}
+
+ssize_t FileBuffer::send(int fdes, std::size_t bytes)
+{
+  bytes = std::min(bytes, size());
+  IBuffer::RawBytes buff = _getData<RawBytes>(0, bytes);
+  const ssize_t bytesSent = ::send(fdes, buff.data(), buff.size(), 0);
+  if (bytesSent > 0) {
+    removeFront(bytesSent);
+  }
+  return bytesSent;
 }
 
 /* ************************************************************************** */

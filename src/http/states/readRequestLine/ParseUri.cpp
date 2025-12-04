@@ -34,7 +34,7 @@ ParseUri::ParseUri(ReadRequestLine* context)
   , _client(context->getContext())
   , _buffReader()
 {
-  _log.info() << "ParseUri\n";
+  _log.info() << *_client << " ParseUri\n";
   _buffReader.init(&_client->getInBuff());
 }
 

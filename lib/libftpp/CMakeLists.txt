@@ -5,6 +5,7 @@
 set(LIB_NAME ftpp)
 
 add_library(${LIB_NAME} STATIC
+  libftpp/ctype/ctype.cpp
   libftpp/exception/exception.cpp
   libftpp/expected/bad_expected_access_void.cpp
   libftpp/expected/unexpect_t.cpp

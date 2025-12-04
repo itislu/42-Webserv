@@ -31,8 +31,6 @@ void ConfigBuilder::buildServers(const std::vector<ParsedServer>& servers,
 
 void ConfigBuilder::build(const ParsedConfig& parsed)
 {
-  Config::getConfig();
-
   DirectiveHandler<Config>::buildDirectives(parsed.getDirectives(),
                                             Config::getConfig());
   buildServers(parsed.getServers(), Config::getConfig());

@@ -47,7 +47,7 @@ public:
                                            const std::string& path) const;
 
 private:
-  explicit Config();
+  Config();
 
   static const char* const defaultRoot;
   static const std::size_t defaultMaxBodySize;

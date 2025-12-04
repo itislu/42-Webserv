@@ -13,7 +13,6 @@
 class ServerManager
 {
 public:
-  static void init(const Config& config);
   static ServerManager& getInstance();
 
   ~ServerManager() {}

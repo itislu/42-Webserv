@@ -5,7 +5,7 @@
 #include <http/Headers.hpp>
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
-#include <utils/SmartBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 
 #include <cstddef>
 #include <string>
