@@ -130,6 +130,11 @@ void Client::setServer(const Server* server)
   _server = server;
 }
 
+void Client::setSocket(const Socket* socket)
+{
+  _socket = socket;
+}
+
 bool Client::receive()
 {
   static IInBuffer::RawBytes buffer(_maxChunk);

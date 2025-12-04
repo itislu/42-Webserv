@@ -1,6 +1,7 @@
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
 #include "server/Server.hpp"
+#include "socket/Socket.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
@@ -22,8 +23,10 @@ namespace {
  */
 ft::unique_ptr<Client> requestTestCharByChar(std::string& rawBuffer)
 {
+  Socket socket(8080);
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
   client->getStateHandler().setState<ReadRequestLine>();
+  client->setSocket(&socket);
 
   std::size_t index = 0;
   while (!client->getStateHandler().isDone() && index < rawBuffer.size()) {
@@ -43,8 +46,10 @@ ft::unique_ptr<Client> requestTest(std::string& rawBuffer)
 {
   ServerConfig serverConfig(Config::getConfig());
   const Server server(serverConfig);
+  Socket socket(8080);
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
   client->setServer(&server);
+  client->setSocket(&socket);
   client->getStateHandler().setState<ReadRequestLine>();
   client->getInBuff().append(rawBuffer);
 

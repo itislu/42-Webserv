@@ -37,6 +37,7 @@ public:
   Resource& getResource();
 
   void setServer(const Server* server);
+  void setSocket(const Socket* socket);
 
   const TimeStamp& getLastActivity() const;
   long getTimeout() const;
