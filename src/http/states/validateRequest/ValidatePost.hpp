@@ -2,6 +2,7 @@
 #define VALIDATEPOST_HPP
 
 #include "config/LocationConfig.hpp"
+#include "config/ServerConfig.hpp"
 #include "http/StatusCode.hpp"
 #include "http/states/validateRequest/ValidateRequest.hpp"
 #include "utils/logger/Logger.hpp"
