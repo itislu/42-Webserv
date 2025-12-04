@@ -331,7 +331,6 @@ void ValidateRequest::endState(StatusCode::Code status)
 }
 
 // localhost:8080
-
 void ValidateRequest::_validateHostHeader()
 {
   const Headers& headers = _client->getRequest().getHeaders();
@@ -343,10 +342,10 @@ void ValidateRequest::_validateHostHeader()
     endState(StatusCode::BadRequest);
     return;
   }
-  _log.info() << "Host Header: [" << hostHeader << "]\n";
 
   int port = -1;
   _splitHostHeader(hostHeader, port);
+  /* TODO: remove this */
   if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
     _log.info() << "Split: \n";
     _log.info() << "  Host: " << _host << "\n";
@@ -364,8 +363,12 @@ void ValidateRequest::_validateHostHeader()
 void ValidateRequest::_compareHostHeaders()
 {
   const std::string& host =
-    _client->getRequest().getUri().getAuthority().getHost();
+    ft::to_lower(_client->getRequest().getUri().getAuthority().getHost());
+  _host = ft::to_lower(_host);
+
+  _log.info() << "Host Header: [" << _host << "]\n";
   _log.info() << "Uri Host: [" << host << "]\n";
+
   if (_host != host) {
     endState(StatusCode::BadRequest);
   }
