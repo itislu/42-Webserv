@@ -1,8 +1,11 @@
 #include "HandleGet.hpp"
 #include "libftpp/memory.hpp"
+#include "libftpp/utility.hpp"
 #include "utils/buffer/StaticFileBuffer.hpp"
 
 #include <client/Client.hpp>
+#include <cstring>
+#include <dirent.h>
 #include <http/Headers.hpp>
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
@@ -104,4 +107,50 @@ void HandleGet::_openFile()
 bool HandleGet::_fail()
 {
   return _client->getResponse().getStatusCode() != StatusCode::Ok;
+}
+
+/* Generates a HTML for the autoindex setting in a location if no index.html is
+  present. If the entry in the folder is directory it generates a clickable
+  link. If the entry is a regular file it just lists the name.
+
+  TODO: change string conncatination to .append() - for faster performance
+*/
+std::string HandleGet::_generateAutoindex(const std::string& path)
+{
+  DIR* const dir = opendir(path.c_str());
+  if (dir == FT_NULLPTR) {
+    return "<html><body><h1>403 Forbidden</h1></body></html>\n";
+  }
+
+  std::string html;
+  html.append("<html><head><title>Index of ");
+  html.append(path);
+  html.append("</title></head><body>\n");
+  html.append("<h1>Index of ");
+  html.append(path);
+  html.append("</h1>\n<ul>\n");
+
+  struct dirent* entry = 0;
+  while ((entry = readdir(dir)) != 0) {
+    const char* const name = static_cast<char*>(entry->d_name);
+    if (std::strcmp(name, ".") == 0 || std::strcmp(name, "..") == 0) {
+      continue;
+    }
+
+    const std::string fullPath = path + "/" + name;
+    if (isDirectory(fullPath)) {
+      html.append("<li><a href=\"");
+      html.append(name);
+      html.append("/\">");
+      html.append(name);
+      html.append("/</a></li>\n");
+    } else {
+      html.append("<li>");
+      html.append(name);
+      html.append("</li>\n");
+    }
+  }
+  html.append("</ul></body></html>\n");
+  closedir(dir);
+  return html;
 }

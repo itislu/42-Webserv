@@ -3,6 +3,7 @@
 #define HANDLE_GET_HPP
 
 #include "utils/state/IState.hpp"
+#include <string>
 
 class Logger;
 class Client;
@@ -21,6 +22,7 @@ private:
   void _addContentLengthHeader();
   void _addContentType();
   void _openFile();
+  static std::string _generateAutoindex(const std::string& path);
   bool _fail();
 
   PrepareResponse* _prepareResponse;
