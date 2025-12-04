@@ -1,4 +1,5 @@
 #include "ValidateRequest.hpp"
+
 #include "client/Client.hpp"
 #include "config/LocationConfig.hpp"
 #include "http/Request.hpp"
@@ -44,7 +45,7 @@ ValidateRequest::ValidateRequest(Client* context)
   , _server()
   , _location()
 {
-  _log.info() << "ValidateRequest\n";
+  _log.info() << *_client << " ValidateRequest\n";
 }
 
 void ValidateRequest::run()

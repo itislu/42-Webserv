@@ -29,6 +29,7 @@ bool isQuotedPairChar(char chr);
 typedef std::map<std::string, std::string> ExtToTypeMap;
 const ExtToTypeMap& getExtToType();
 
+extern const char* const minResponse500;
 }
 
 #endif

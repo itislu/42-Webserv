@@ -3,9 +3,13 @@
 #include <client/Client.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <exception>
 #include <sstream>
 #include <string>
 
@@ -26,12 +30,18 @@ HandleError::HandleError(PrepareResponse* context)
 }
 
 void HandleError::run()
-{
+try {
   // todo get custom error page from config
 
   const StatusCode& statuscode = _client->getResponse().getStatusCode();
-  _client->getOutBuff().append(_makeErrorBody(statuscode));
+  ft::shared_ptr<SmartBuffer> buff = ft::make_shared<SmartBuffer>();
+  buff->append(_makeErrorBody(statuscode));
+  _client->getOutBuffQueue().append(ft::move(buff));
   getContext()->getStateHandler().setDone();
+} catch (const std::exception& e) {
+  _log.error() << *_client << " HandleError: " << e.what() << '\n';
+  _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+  throw;
 }
 
 /* ************************************************************************** */

@@ -2,7 +2,8 @@
 #ifndef BUFFER_READER_HPP
 #define BUFFER_READER_HPP
 
-#include "utils/IBuffer.hpp"
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstddef>
 #include <new>
@@ -14,7 +15,7 @@ public:
   typedef IBuffer::ExpectChr ExpectChr;
   typedef IBuffer::ExpectVoid ExpectVoid;
 
-  void init(IBuffer* buffer);
+  void init(IInBuffer* buffer);
 
   // Throwing versions
   char getNextChar();
@@ -32,7 +33,7 @@ public:
   bool reachedEnd() const;
 
 private:
-  IBuffer* _buffer;
+  IInBuffer* _buffer;
   std::size_t _posInBuff;
 };
 
