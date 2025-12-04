@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 
-Server::Server(const config::ServerConfig& servConfig)
+Server::Server(const ServerConfig& servConfig)
   : _config(&servConfig)
   , _timeOut(servConfig.getTimeout())
 {
 }
 
-Server::Server(const config::ServerConfig& config,
+Server::Server(const ServerConfig& config,
                const std::vector<const Socket*>& listeners)
   : _config(&config)
   , _listeners(listeners)
@@ -19,7 +19,7 @@ Server::Server(const config::ServerConfig& config,
 {
 }
 
-const config::ServerConfig& Server::getConfig() const
+const ServerConfig& Server::getConfig() const
 {
   return *_config;
 }

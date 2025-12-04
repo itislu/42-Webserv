@@ -19,12 +19,12 @@ Resource::Type Resource::getType() const
   return _type;
 }
 
-const config::LocationConfig* Resource::getLocation()
+const LocationConfig* Resource::getLocation()
 {
   return _location;
 }
 
-const config::ServerConfig* Resource::getServer()
+const ServerConfig* Resource::getServer()
 {
   return _server;
 }
@@ -34,12 +34,12 @@ void Resource::setType(Type type)
   _type = type;
 }
 
-void Resource::setLocation(const config::LocationConfig* location)
+void Resource::setLocation(const LocationConfig* location)
 {
   _location = location;
 }
 
-void Resource::setServer(const config::ServerConfig* server)
+void Resource::setServer(const ServerConfig* server)
 {
   _server = server;
 }

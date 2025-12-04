@@ -1,11 +1,13 @@
 #include "ValidateDelete.hpp"
-#include "client/Client.hpp"
-#include "config/FileUtils.hpp"
-#include "http/Resource.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/validateRequest/ValidateRequest.hpp"
-#include "utils/logger/Logger.hpp"
-#include "utils/state/IState.hpp"
+
+#include <client/Client.hpp>
+#include <http/Resource.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
+#include <utils/fileUtils.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+
 #include <string>
 
 /* ************************************************************************** */
@@ -32,13 +34,13 @@ void ValidateDelete::run()
 
 void ValidateDelete::validate()
 {
-  if (config::fileutils::isDirectory(_path)) {
+  if (isDirectory(_path)) {
     // 403 most servers dont allow deleting directories
     // some allow deleting empty directories...
     endState(StatusCode::Forbidden);
     return;
   }
-  if (!config::fileutils::isFile(_path)) {
+  if (!isFile(_path)) {
     endState(StatusCode::NotFound);
     return;
   }
@@ -51,11 +53,15 @@ void ValidateDelete::validateParentDirPermissions()
   if (dirPath.empty()) {
     dirPath = "/";
   }
-  if (!config::fileutils::isExecuteable(dirPath)) {
+  if (!isDirectory(dirPath)) {
     endState(StatusCode::NotFound);
     return;
   }
-  if (!config::fileutils::isWriteable(dirPath)) {
+  if (!isExecuteable(dirPath)) {
+    endState(StatusCode::NotFound);
+    return;
+  }
+  if (!isWriteable(dirPath)) {
     endState(StatusCode::Forbidden);
     return;
   }

@@ -19,8 +19,11 @@ public:
   StateHandler<ReadRequestLine>& getStateHandler();
 
 private:
-  StateHandler<ReadRequestLine> _stateHandler;
+  void _setNextState();
+
   static Logger& _log;
+
+  StateHandler<ReadRequestLine> _stateHandler;
 };
 
 #endif

@@ -24,8 +24,8 @@ public:
   void run();
 
   const std::string& getPath() const;
-  const config::ServerConfig* getServer() const;
-  const config::LocationConfig* getLocation() const;
+  const ServerConfig* getServer() const;
+  const LocationConfig* getLocation() const;
 
   static std::string appendToRoot(const std::string& uri,
                                   const std::string& root);
@@ -52,7 +52,7 @@ private:
                              Request::Method method);
 
   static std::string decodePath(const std::string& path,
-                                int (*wantDecode)(int));
+                                bool (*wantDecode)(char));
   static bool validateChars(const std::string& path);
   static ft::optional<std::string> normalizePath(const std::string& path,
                                                  NormalizationMode mode);
@@ -63,8 +63,8 @@ private:
   static Logger& _log;
   StateHandler<ValidateRequest> _stateHandler;
   std::string _path;
-  const config::ServerConfig* _server;
-  const config::LocationConfig* _location;
+  const ServerConfig* _server;
+  const LocationConfig* _location;
 };
 
 #endif

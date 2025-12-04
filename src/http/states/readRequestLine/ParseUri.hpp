@@ -11,6 +11,8 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
+#include <cstddef>
+
 class Client;
 class ReadRequestLine;
 
@@ -22,6 +24,9 @@ public:
 
   void run();
 
+  static void setMaxUriLength(std::size_t value);
+  static void resetMaxUriLength();
+
 private:
   static SequenceRule& _sequence();
   static bool _isAbsoluteForm(const Rule::ResultMap& results);
@@ -29,8 +34,11 @@ private:
   static Extractor<Uri>& _uriExtractorAbsoluteForm();
   static Extractor<Authority>& _authExtractor();
   void _extractParts(const Rule::ResultMap& results);
+  bool _uriTooLong();
 
   static Logger& _log;
+  static const std::size_t _defaultMaxUriLength = 8042;
+  static std::size_t _maxUriLength;
   Client* _client;
   BufferReader _buffReader;
   Uri _tmpUri;

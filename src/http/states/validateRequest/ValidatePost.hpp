@@ -25,8 +25,8 @@ private:
   static Logger& _log;
   Client* _client;
   std::string _path;
-  const config::ServerConfig* _server;
-  const config::LocationConfig* _location;
+  const ServerConfig* _server;
+  const LocationConfig* _location;
 };
 
 #endif
