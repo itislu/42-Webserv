@@ -7,6 +7,12 @@
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc5234#appendix-B.1
+ *
+ * CRLF           =  CR LF
+ *                ; Internet standard newline
+ */
 ft::shared_ptr<LiteralRule> endOfLineRule()
 {
   const ft::shared_ptr<LiteralRule> seq =
@@ -23,8 +29,8 @@ ft::shared_ptr<LiteralRule> endOfLineRule()
  */
 ft::shared_ptr<RepetitionRule> owsRule()
 {
-  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isWhitespace));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(" \t"));
 
   rep->setDebugTag("owsRule");
   return rep;
@@ -36,8 +42,8 @@ ft::shared_ptr<RepetitionRule> owsRule()
  */
 ft::shared_ptr<RepetitionRule> rwsRule()
 {
-  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isWhitespace));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(" \t"));
   rep->setMin(1);
 
   rep->setDebugTag("rwsRule");

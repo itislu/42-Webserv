@@ -14,7 +14,6 @@
 class ServerManager
 {
 public:
-  static void init(const config::Config& config);
   static ServerManager& getInstance();
 
   ~ServerManager() {}

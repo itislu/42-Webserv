@@ -5,6 +5,7 @@
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
+#include <libftpp/ctype.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
@@ -114,8 +115,8 @@ ft::shared_ptr<SequenceRule> chunkInfoRule()
  */
 ft::shared_ptr<RepetitionRule> chunkSizeRule()
 {
-  const ft::shared_ptr<RepetitionRule> size = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isHexDigit));
+  const ft::shared_ptr<RepetitionRule> size =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isxdigit));
   size->setMin(1);
 
   size->setRuleId(ChunkSize);

@@ -1,11 +1,10 @@
-#include "utils/SmartBuffer.hpp"
+#include "utils/buffer/SmartBuffer.hpp"
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
-#include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -145,6 +144,13 @@ TEST(UriAbnfTest, Scheme)
 
   // Invalid
   EXPECT_FALSE(runParser("1a1234", *sequence));
+
+  // Invalid: non-ASCII
+  EXPECT_FALSE(runParser("\x80", *sequence));
+  EXPECT_FALSE(runParser("\xFF", *sequence));
+  EXPECT_FALSE(runParser("\xC0", *sequence));
+  EXPECT_FALSE(runParser("A\x80", *sequence));
+  EXPECT_FALSE(runParser("A\xF0", *sequence));
 }
 
 /**
@@ -201,6 +207,12 @@ TEST(UriAbnfTest, UserInfo)
   ft::shared_ptr<RepetitionRule> rep = userinfoRule();
   EXPECT_TRUE(runParser("a1234", *rep));
   EXPECT_TRUE(runParser("a:", *rep));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(runParser("\x80", *rep));
+  EXPECT_FALSE(runParser("\xFF", *rep));
+  EXPECT_FALSE(runParser("user\x80", *rep));
+  EXPECT_FALSE(runParser("\xC0name", *rep));
 }
 
 /**
@@ -220,6 +232,12 @@ TEST(UriAbnfTest, Port)
   ft::shared_ptr<RepetitionRule> rep = portRule();
   EXPECT_FALSE(runParser("abc", *rep));
   EXPECT_TRUE(runParser("8080", *rep));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(runParser("\x80", *rep));
+  EXPECT_FALSE(runParser("\xFF", *rep));
+  EXPECT_FALSE(runParser("8\x80", *rep));
+  EXPECT_FALSE(runParser("\xC0", *rep));
 }
 
 /**
@@ -290,6 +308,13 @@ TEST(UriAbnfTest, IPvFuture)
   EXPECT_FALSE(runParser("v1.fe 80", *sequence));
   EXPECT_FALSE(runParser("v1.fe80/", *sequence));
   EXPECT_FALSE(runParser("v1.#:", *sequence));
+
+  // Non-ASCII.
+  EXPECT_FALSE(runParser("v\x80.fe80", *sequence));
+  EXPECT_FALSE(runParser("v\xFF.fe80", *sequence));
+  EXPECT_FALSE(runParser("vF\x80.fe80", *sequence));
+  EXPECT_FALSE(runParser("v1.fe\x80", *sequence));
+  EXPECT_FALSE(runParser("v1.fe\xFF", *sequence));
 
   ft::shared_ptr<SequenceRule> seqWithEnd = ipvFutureRule();
   seqWithEnd->addRule(ft::make_shared<RangeRule>("\n"));
@@ -461,6 +486,13 @@ TEST(UriAbnfTest, h16)
   EXPECT_FALSE(runParser("0x1", *rep));
   EXPECT_FALSE(runParser("1.2", *rep));
   EXPECT_FALSE(runParser("1g", *rep));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(runParser("\x80", *rep));
+  EXPECT_FALSE(runParser("\xFF", *rep));
+  EXPECT_FALSE(runParser("1\x80", *rep));
+  EXPECT_FALSE(runParser("a\xFF", *rep));
+  EXPECT_FALSE(runParser("\xC0", *rep));
 }
 
 /**
@@ -528,7 +560,7 @@ TEST(UriAbnfTest, DecOctet)
   sequence.addRule(decOctetRule());
 
   // 0-9
-  EXPECT_TRUE(runParser("1", sequence));
+  EXPECT_TRUE(runParser("0", sequence));
   EXPECT_TRUE(runParser("9", sequence));
 
   // 10-99
@@ -546,6 +578,22 @@ TEST(UriAbnfTest, DecOctet)
   // 250-255
   EXPECT_TRUE(runParser("250", sequence));
   EXPECT_TRUE(runParser("255", sequence));
+
+  // Invalid
+  EXPECT_FALSE(runParser("256", sequence));
+  EXPECT_FALSE(runParser("260", sequence));
+  EXPECT_FALSE(runParser("300", sequence));
+  EXPECT_FALSE(runParser("00", sequence));
+  EXPECT_FALSE(runParser("01", sequence));
+  EXPECT_FALSE(runParser("0100", sequence));
+  EXPECT_FALSE(runParser("9999999999999999999999999999999", sequence));
+  EXPECT_FALSE(runParser("a1", sequence));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(runParser("\x80", sequence));
+  EXPECT_FALSE(runParser("\xFF", sequence));
+  EXPECT_FALSE(runParser("0\x80", sequence));
+  EXPECT_FALSE(runParser("\xC0", sequence));
 }
 
 /**
@@ -559,6 +607,13 @@ TEST(UriAbnfTest, RegName)
   EXPECT_TRUE(runParser("a%20", sequence));
   EXPECT_TRUE(runParser("a%20b", sequence));
   EXPECT_TRUE(runParser("a%20b!!!=", sequence));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(runParser("\x80", sequence));
+  EXPECT_FALSE(runParser("\xFF", sequence));
+  EXPECT_FALSE(runParser("host\x80", sequence));
+  EXPECT_FALSE(runParser("\xC0host", sequence));
+  EXPECT_FALSE(runParser("ho\xFFst", sequence));
 }
 
 /**
@@ -764,7 +819,7 @@ TEST(UriAbnfTest, SegmentNzNc)
   EXPECT_EQ(rep->getReps(), 7);
 
   // Invalid
-  // valid until : so cout is 3
+  // valid until ':' so count is 3
   EXPECT_FALSE(runParser("foo:bar", sequence));
   EXPECT_EQ(rep->getReps(), 3);
   EXPECT_FALSE(runParser("a:b", sequence));
@@ -772,6 +827,16 @@ TEST(UriAbnfTest, SegmentNzNc)
   EXPECT_FALSE(runParser(":", sequence));
   EXPECT_EQ(rep->getReps(), 0);
   EXPECT_FALSE(runParser("?", sequence));
+  EXPECT_EQ(rep->getReps(), 0);
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(runParser("\x80", sequence));
+  EXPECT_EQ(rep->getReps(), 0);
+  EXPECT_FALSE(runParser("\xFF", sequence));
+  EXPECT_EQ(rep->getReps(), 0);
+  EXPECT_FALSE(runParser("seg\x80", sequence));
+  EXPECT_EQ(rep->getReps(), 3);
+  EXPECT_FALSE(runParser("\xC0seg", sequence));
   EXPECT_EQ(rep->getReps(), 0);
 }
 
@@ -830,9 +895,7 @@ TEST(UriAbnfTest, Fragment)
 TEST(UriAbnfTest, PercentEncoded)
 {
   SequenceRule sequence;
-  sequence.addRule(ft::make_shared<LiteralRule>("%"));
-  sequence.addRule(ft::make_shared<RangeRule>(http::isHexDigit));
-  sequence.addRule(ft::make_shared<RangeRule>(http::isHexDigit));
+  sequence.addRule(pctRule());
 
   // Valid
   EXPECT_TRUE(runParser("%aB", sequence));
@@ -847,21 +910,51 @@ TEST(UriAbnfTest, PercentEncoded)
 /**
  * unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
  */
-TEST(UriAbnfTest, ValidUnreserved)
+TEST(UriAbnfTest, Unreserved)
 {
+  // Valid unreserved characters
   EXPECT_TRUE(http::isUnreserved('A'));
   EXPECT_TRUE(http::isUnreserved('1'));
   EXPECT_TRUE(http::isUnreserved('-'));
   EXPECT_TRUE(http::isUnreserved('.'));
   EXPECT_TRUE(http::isUnreserved('_'));
   EXPECT_TRUE(http::isUnreserved('~'));
+
+  // Invalid - reserved characters
+  EXPECT_FALSE(http::isUnreserved(':'));
+  EXPECT_FALSE(http::isUnreserved('/'));
+  EXPECT_FALSE(http::isUnreserved('?'));
+  EXPECT_FALSE(http::isUnreserved('#'));
+  EXPECT_FALSE(http::isUnreserved('['));
+  EXPECT_FALSE(http::isUnreserved(']'));
+  EXPECT_FALSE(http::isUnreserved('@'));
+  EXPECT_FALSE(http::isUnreserved('!'));
+
+  // Invalid - control characters and whitespace
+  // EXPECT_FALSE(http::isUnreserved('\0')); // TODO
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(1)));
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(31)));
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(127)));
+  EXPECT_FALSE(http::isUnreserved('\t'));
+  EXPECT_FALSE(http::isUnreserved('\n'));
+  EXPECT_FALSE(http::isUnreserved('\r'));
+  EXPECT_FALSE(http::isUnreserved(' '));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(-1)));
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(-42)));
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(-128)));
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(128)));
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(200)));
+  EXPECT_FALSE(http::isUnreserved(static_cast<char>(255)));
 }
 
 /**
  * reserved = gen-delims / sub-delims
  */
-TEST(UriAbnfTest, ValidReserved)
+TEST(UriAbnfTest, Reserved)
 {
+  // Valid gen-delims
   EXPECT_TRUE(http::isReserved(':'));
   EXPECT_TRUE(http::isReserved('/'));
   EXPECT_TRUE(http::isReserved('?'));
@@ -869,6 +962,8 @@ TEST(UriAbnfTest, ValidReserved)
   EXPECT_TRUE(http::isReserved('['));
   EXPECT_TRUE(http::isReserved(']'));
   EXPECT_TRUE(http::isReserved('@'));
+
+  // Valid sub-delims
   EXPECT_TRUE(http::isReserved('!'));
   EXPECT_TRUE(http::isReserved('$'));
   EXPECT_TRUE(http::isReserved('&'));
@@ -880,13 +975,41 @@ TEST(UriAbnfTest, ValidReserved)
   EXPECT_TRUE(http::isReserved(','));
   EXPECT_TRUE(http::isReserved(';'));
   EXPECT_TRUE(http::isReserved('='));
+
+  // Invalid
+  EXPECT_FALSE(http::isReserved('A'));
+  EXPECT_FALSE(http::isReserved('z'));
+  EXPECT_FALSE(http::isReserved('0'));
+  EXPECT_FALSE(http::isReserved('-'));
+  EXPECT_FALSE(http::isReserved('.'));
+  EXPECT_FALSE(http::isReserved('_'));
+  EXPECT_FALSE(http::isReserved('~'));
+
+  // Invalid - control characters and whitespace
+  // EXPECT_FALSE(http::isReserved('\0')); // TODO
+  EXPECT_FALSE(http::isReserved(static_cast<char>(1)));
+  EXPECT_FALSE(http::isReserved(static_cast<char>(31)));
+  EXPECT_FALSE(http::isReserved(static_cast<char>(127)));
+  EXPECT_FALSE(http::isReserved('\t'));
+  EXPECT_FALSE(http::isReserved('\n'));
+  EXPECT_FALSE(http::isReserved('\r'));
+  EXPECT_FALSE(http::isReserved(' '));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(http::isReserved(static_cast<char>(-1)));
+  EXPECT_FALSE(http::isReserved(static_cast<char>(-42)));
+  EXPECT_FALSE(http::isReserved(static_cast<char>(-128)));
+  EXPECT_FALSE(http::isReserved(static_cast<char>(128)));
+  EXPECT_FALSE(http::isReserved(static_cast<char>(200)));
+  EXPECT_FALSE(http::isReserved(static_cast<char>(255)));
 }
 
 /**
  * gen-delims = ":" / "/" / "?" / "#" / "[" / "]" / "@"
  */
-TEST(UriAbnfTest, ValidGenDelims)
+TEST(UriAbnfTest, GenDelims)
 {
+  // Valid
   EXPECT_TRUE(http::isGenDelim(':'));
   EXPECT_TRUE(http::isGenDelim('/'));
   EXPECT_TRUE(http::isGenDelim('?'));
@@ -894,14 +1017,24 @@ TEST(UriAbnfTest, ValidGenDelims)
   EXPECT_TRUE(http::isGenDelim('['));
   EXPECT_TRUE(http::isGenDelim(']'));
   EXPECT_TRUE(http::isGenDelim('@'));
+
+  // Invalid
+  EXPECT_FALSE(http::isGenDelim('!'));
+  EXPECT_FALSE(http::isGenDelim('$'));
+  EXPECT_FALSE(http::isGenDelim('&'));
+  EXPECT_FALSE(http::isGenDelim('='));
+  EXPECT_FALSE(http::isGenDelim('A'));
+  EXPECT_FALSE(http::isGenDelim('0'));
+  EXPECT_FALSE(http::isGenDelim('-'));
 }
 
 /**
  * sub-delims = "!" / "$" / "&" / "'" / "(" / ")" /
  *              "*" / "+" / "," / ";" / "="
  */
-TEST(UriAbnfTest, ValidSubDelims)
+TEST(UriAbnfTest, SubDelims)
 {
+  // Valid
   EXPECT_TRUE(http::isSubDelim('!'));
   EXPECT_TRUE(http::isSubDelim('$'));
   EXPECT_TRUE(http::isSubDelim('&'));
@@ -913,6 +1046,73 @@ TEST(UriAbnfTest, ValidSubDelims)
   EXPECT_TRUE(http::isSubDelim(','));
   EXPECT_TRUE(http::isSubDelim(';'));
   EXPECT_TRUE(http::isSubDelim('='));
+
+  // Invalid
+  EXPECT_FALSE(http::isSubDelim(':'));
+  EXPECT_FALSE(http::isSubDelim('/'));
+  EXPECT_FALSE(http::isSubDelim('?'));
+  EXPECT_FALSE(http::isSubDelim('#'));
+  EXPECT_FALSE(http::isSubDelim('['));
+  EXPECT_FALSE(http::isSubDelim(']'));
+  EXPECT_FALSE(http::isSubDelim('@'));
+  EXPECT_FALSE(http::isSubDelim('A'));
+  EXPECT_FALSE(http::isSubDelim('z'));
+  EXPECT_FALSE(http::isSubDelim('0'));
+  EXPECT_FALSE(http::isSubDelim('-'));
+  EXPECT_FALSE(http::isSubDelim('.'));
+  EXPECT_FALSE(http::isSubDelim('_'));
+  EXPECT_FALSE(http::isSubDelim('~'));
+}
+
+/**
+ * tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*"
+ *         / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+ *         / DIGIT / ALPHA
+ *         ; any VCHAR, except delimiters
+ */
+TEST(UriAbnfTest, Tchar)
+{
+  // Valid
+  EXPECT_TRUE(http::isTchar('A'));
+  EXPECT_TRUE(http::isTchar('1'));
+  EXPECT_TRUE(http::isTchar('!'));
+  EXPECT_TRUE(http::isTchar('#'));
+  EXPECT_TRUE(http::isTchar('$'));
+  EXPECT_TRUE(http::isTchar('%'));
+  EXPECT_TRUE(http::isTchar('&'));
+  EXPECT_TRUE(http::isTchar('\''));
+  EXPECT_TRUE(http::isTchar('*'));
+  EXPECT_TRUE(http::isTchar('+'));
+  EXPECT_TRUE(http::isTchar('-'));
+  EXPECT_TRUE(http::isTchar('.'));
+  EXPECT_TRUE(http::isTchar('^'));
+  EXPECT_TRUE(http::isTchar('_'));
+  EXPECT_TRUE(http::isTchar('`'));
+  EXPECT_TRUE(http::isTchar('|'));
+  EXPECT_TRUE(http::isTchar('~'));
+
+  // Invalid
+  EXPECT_FALSE(http::isTchar(':'));
+  EXPECT_FALSE(http::isTchar('/'));
+  EXPECT_FALSE(http::isTchar('?'));
+
+  // Invalid - control characters and whitespace
+  // EXPECT_FALSE(http::isTchar('\0')); // TODO
+  EXPECT_FALSE(http::isTchar(static_cast<char>(1)));
+  EXPECT_FALSE(http::isTchar(static_cast<char>(31)));
+  EXPECT_FALSE(http::isTchar(static_cast<char>(127)));
+  EXPECT_FALSE(http::isTchar('\t'));
+  EXPECT_FALSE(http::isTchar('\n'));
+  EXPECT_FALSE(http::isTchar('\r'));
+  EXPECT_FALSE(http::isTchar(' '));
+
+  // Invalid - non-ASCII
+  EXPECT_FALSE(http::isTchar(static_cast<char>(-1)));
+  EXPECT_FALSE(http::isTchar(static_cast<char>(-42)));
+  EXPECT_FALSE(http::isTchar(static_cast<char>(-128)));
+  EXPECT_FALSE(http::isTchar(static_cast<char>(128)));
+  EXPECT_FALSE(http::isTchar(static_cast<char>(200)));
+  EXPECT_FALSE(http::isTchar(static_cast<char>(255)));
 }
 
 // NOLINTEND

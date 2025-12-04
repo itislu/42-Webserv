@@ -8,7 +8,6 @@
 
 class ServerManager;
 
-/* TODO: change this to namespace? */
 class EventManager
 {
 public:
@@ -29,6 +28,9 @@ private:
   static void clientStateMachine(Client& client);
   static void disconnectClient(Client* client);
   static void acceptClient(int fdes, unsigned events);
+  static bool pollInEnabled(unsigned events);
+  static bool pollOutEnabled(unsigned events);
+  static void handleException(Client* client);
 
   /* TIMEOUT */
   static int calculateTimeout();

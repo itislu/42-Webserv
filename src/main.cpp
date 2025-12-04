@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
   try {
     Logger::getInstance(LOG_GENERAL).info() << "webserv started\n";
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)d
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     config::ConfigParser(argv[1]).parseConfig();
     std::cout << config::Config::getConfig();
 

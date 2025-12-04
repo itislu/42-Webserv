@@ -4,12 +4,12 @@
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
-#include <utils/IBuffer.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <fstream>
-#include <ios>
+#include <exception>
 
 /* ************************************************************************** */
 // INIT
@@ -31,53 +31,29 @@ void WriteBody::run()
 try {
   _writeIntoOutBuffer();
 
-  if (_done || _fail()) {
+  if (_done) {
+    _log.info() << *_client << " WriteBody: " << "done\n";
     getContext()->getStateHandler().setDone();
   }
-} catch (const IBuffer::BufferException& e) {
-  _log.error() << "WriteBody: " << e.what() << '\n';
+} catch (const std::exception& e) {
+  _log.error() << *_client << " WriteBody: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
-  getContext()->getStateHandler().setDone();
+  throw;
 }
 
 /* ************************************************************************** */
 // PRIVATE
 
-bool WriteBody::_fail()
-{
-  return _client->getResponse().getStatusCode() != StatusCode::Ok;
-}
-
 void WriteBody::_writeIntoOutBuffer()
 {
-  std::ifstream& ifs = _client->getResponse().getBody();
-  _log.info() << "WriteBody: run\n";
+  /** // todo
+   * for chunked encoding:
+   * - _client->getOutBuffQueue().getSmartBuffer()
+   * - add response body to smartbuffer
+   */
 
-  if (!ifs.is_open()) {
-    _log.info() << "no body\n";
-    _done = true;
-    return;
+  if (_client->getResponse().getBody() != FT_NULLPTR) {
+    _client->getOutBuffQueue().append(_client->getResponse().getBody());
   }
-
-  IBuffer& outBuffer = _client->getOutBuff();
-  if (outBuffer.size() >= _outBufferLimit) {
-    return;
-  }
-
-  IBuffer::RawBytes buff(_chunkSize);
-  ifs.read(buff.data(), _chunkSize);
-  if (ifs.fail() && !ifs.eof()) {
-    _log.error() << "WriteBody: stream read error\n";
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    return;
-  }
-
-  const std::streamsize readCount = ifs.gcount();
-  if (readCount > 0) {
-    outBuffer.append(buff, readCount);
-  }
-
-  if (ifs.eof()) {
-    _done = true;
-  }
+  _done = true;
 }

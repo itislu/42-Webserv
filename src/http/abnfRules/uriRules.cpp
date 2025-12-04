@@ -2,6 +2,7 @@
 
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/http.hpp>
+#include <libftpp/ctype.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
@@ -10,8 +11,6 @@
 #include <utils/abnfRules/RepetitionRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
-
-#include <ctype.h>
 
 /**
  * Reference:
@@ -123,7 +122,7 @@ ft::shared_ptr<SequenceRule> schemeRule()
     ft::make_shared<RepetitionRule>(ft::move(range));
 
   const ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
-  seq->addRule(ft::make_shared<RangeRule>(::isalpha));
+  seq->addRule(ft::make_shared<RangeRule>(ft::isalpha));
   seq->addRule(ft::move(rep));
 
   seq->setDebugTag("schemeRule");
@@ -213,7 +212,7 @@ ft::shared_ptr<AlternativeRule> hostRule()
 ft::shared_ptr<RepetitionRule> portRule()
 {
   const ft::shared_ptr<RepetitionRule> rep =
-    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(::isdigit));
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isdigit));
   rep->setDebugTag("portRule");
   return rep;
 }
@@ -252,8 +251,8 @@ ft::shared_ptr<SequenceRule> ipvFutureRule()
   seq->addRule(ft::make_shared<LiteralRule>("v"));
 
   // 1*HEXDIG
-  ft::shared_ptr<RepetitionRule> hexRep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isHexDigit));
+  ft::shared_ptr<RepetitionRule> hexRep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isxdigit));
   hexRep->setMin(1);
   seq->addRule(ft::move(hexRep));
 
@@ -458,8 +457,8 @@ ft::shared_ptr<AlternativeRule> ipv6AddressRule()
  */
 ft::shared_ptr<RepetitionRule> h16Rule()
 {
-  const ft::shared_ptr<RepetitionRule> rep = ft::make_shared<RepetitionRule>(
-    ft::make_shared<RangeRule>(http::isHexDigit));
+  const ft::shared_ptr<RepetitionRule> rep =
+    ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isxdigit));
   rep->setMin(1);
   rep->setMax(4);
   rep->setDebugTag("h16Rule");
@@ -521,26 +520,26 @@ ft::shared_ptr<AlternativeRule> decOctetRule()
     ft::make_shared<AlternativeRule>();
 
   // DIGIT → 0-9
-  alter->addRule(ft::make_shared<RangeRule>(::isdigit));
+  alter->addRule(ft::make_shared<RangeRule>(ft::isdigit));
 
   // %x31-39 DIGIT → [1-9][0-9]
   ft::shared_ptr<SequenceRule> rule10_99 = ft::make_shared<SequenceRule>();
   rule10_99->addRule(ft::make_shared<RangeRule>(http::isDigit19));
-  rule10_99->addRule(ft::make_shared<RangeRule>(::isdigit));
+  rule10_99->addRule(ft::make_shared<RangeRule>(ft::isdigit));
   alter->addRule(ft::move(rule10_99));
 
   // "1" 2DIGIT → 100–199
   ft::shared_ptr<SequenceRule> rule100_199 = ft::make_shared<SequenceRule>();
   rule100_199->addRule(ft::make_shared<LiteralRule>("1"));
-  rule100_199->addRule(ft::make_shared<RangeRule>(::isdigit));
-  rule100_199->addRule(ft::make_shared<RangeRule>(::isdigit));
+  rule100_199->addRule(ft::make_shared<RangeRule>(ft::isdigit));
+  rule100_199->addRule(ft::make_shared<RangeRule>(ft::isdigit));
   alter->addRule(ft::move(rule100_199));
 
   // "2" %x30-34 DIGIT → 200–249
   ft::shared_ptr<SequenceRule> rule200_249 = ft::make_shared<SequenceRule>();
   rule200_249->addRule(ft::make_shared<LiteralRule>("2"));
   rule200_249->addRule(ft::make_shared<RangeRule>(http::isDigit04));
-  rule200_249->addRule(ft::make_shared<RangeRule>(::isdigit));
+  rule200_249->addRule(ft::make_shared<RangeRule>(ft::isdigit));
   alter->addRule(ft::move(rule200_249));
 
   // "25" %x30-35 → 250–255
@@ -780,8 +779,8 @@ ft::shared_ptr<SequenceRule> pctRule()
 {
   const ft::shared_ptr<SequenceRule> pctSeq = ft::make_shared<SequenceRule>();
   pctSeq->addRule(ft::make_shared<LiteralRule>("%"));
-  pctSeq->addRule(ft::make_shared<RangeRule>(http::isHexDigit));
-  pctSeq->addRule(ft::make_shared<RangeRule>(http::isHexDigit));
+  pctSeq->addRule(ft::make_shared<RangeRule>(ft::isxdigit));
+  pctSeq->addRule(ft::make_shared<RangeRule>(ft::isxdigit));
 
   pctSeq->setDebugTag("pctRule");
   return pctSeq;

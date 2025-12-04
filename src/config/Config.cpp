@@ -34,13 +34,7 @@ Config& Config::getConfig()
  * values from previous test */
 void Config::reset()
 {
-  Config& config = getConfig();
-
-  config._errorPages.clear();
-  config._servers.clear();
-  config.setRoot(defaultRoot);
-  config.setMaxBodySize(defaultMaxBodySize);
-  config.setTimeout(defaultTimeout);
+  getConfig() = Config();
 }
 
 const std::vector<ServerConfig>& Config::getServers() const
