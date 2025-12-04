@@ -3,6 +3,7 @@
 #include "client/Client.hpp"
 #include "config/LocationConfig.hpp"
 #include "config/parser/Converters.hpp"
+#include "http/Headers.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
@@ -19,7 +20,6 @@
 #include "server/Server.hpp"
 #include "server/ServerManager.hpp"
 #include "socket/Socket.hpp"
-#include "socket/SocketManager.hpp"
 #include "utils/state/StateHandler.hpp"
 
 #include <cstddef>
@@ -330,56 +330,63 @@ void ValidateRequest::endState(StatusCode::Code status)
   }
 }
 
+// localhost:8080
+
 void ValidateRequest::_validateHostHeader()
 {
-  std::string hostHeader = _client->getRequest().getHeaders().at("host");
-  _log.info() << "Host Header: [" << hostHeader << "]\n";
-
-  if (hostHeader.empty()) {
-    hostHeader = _client->getRequest().getUri().getAuthority().getHost();
-    _log.info() << "Uri Host: [" << hostHeader << "]\n";
+  const Headers& headers = _client->getRequest().getHeaders();
+  std::string hostHeader;
+  if (headers.contains("host")) {
+    hostHeader = headers.at("host");
   }
   if (hostHeader.empty()) {
     endState(StatusCode::BadRequest);
     return;
   }
+  _log.info() << "Host Header: [" << hostHeader << "]\n";
 
-  int port = 0;
-  _splitHostHeader(hostHeader, _host, port);
+  int port = -1;
+  _splitHostHeader(hostHeader, port);
   if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
     _log.info() << "Split: \n";
     _log.info() << "  Host: " << _host << "\n";
     _log.info() << "  Port: " << port << "\n";
   }
+  if (port > 0) {
+    const Socket& socket = _client->getSocket();
+    if (socket.getPort() != port) {
+      endState(StatusCode::BadRequest);
+    }
+  }
+  _compareHostHeaders();
+}
 
-  const Socket& socket = _client->getSocket();
-  // Note: check if this is possible
-  if (socket.getPort() != port) {
+void ValidateRequest::_compareHostHeaders()
+{
+  const std::string& host =
+    _client->getRequest().getUri().getAuthority().getHost();
+  _log.info() << "Uri Host: [" << host << "]\n";
+  if (_host != host) {
     endState(StatusCode::BadRequest);
-    return;
   }
 }
 
-void ValidateRequest::_splitHostHeader(const std::string& hostHeader,
-                                       std::string& host,
-                                       int& port)
+void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
 {
   const std::size_t pos = hostHeader.find(':');
   if (pos != std::string::npos) {
-
-    host = hostHeader.substr(0, pos);
+    _host = hostHeader.substr(0, pos);
     const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
     if (!portStr.empty()) {
       try {
         port = config::convert::toPort(portStr);
       } catch (const std::exception& e) {
         // NOTE: not sure if this is even possible
-        // Bad Request? - confirm with testing
         endState(StatusCode::BadRequest);
       }
     }
   } else {
-    host = hostHeader;
+    _host = hostHeader;
   }
 }
 
