@@ -81,15 +81,13 @@ void WriteBody::_defineBodyFraming()
 
 void WriteBody::_handleFixedLengthBody()
 {
-  if (_client->getResponse().getBody() != FT_NULLPTR) {
-    _client->getOutBuffQueue().append(_client->getResponse().getBody());
-  }
+  _client->getOutBuffQueue().append(_client->getResponse().getBody());
   _done = true;
 }
 
 /**
  * Write more into the outBuffer than the EventManager will send to keep poll
- * enabled. Also put not enough into outbuffer so SmartBuffer stays a
+ * enabled. Also limit the amount written into SmartBuffer so it stays a
  * MemoryBuffer.
  *
  * chunk          = chunk-size [ chunk-ext ] CRLF
@@ -97,16 +95,19 @@ void WriteBody::_handleFixedLengthBody()
  */
 void WriteBody::_handleChunkedBody()
 {
+  const ft::shared_ptr<IInBuffer>& body = _client->getResponse().getBody();
   while (!_done && _smartBuffer->size() < _outBufferLimit) {
-    const ft::shared_ptr<IInBuffer>& body = _client->getResponse().getBody();
+    if (body->isEmpty()) {
+      _smartBuffer->append("0\r\n\r\n");
+      _done = true;
+      break;
+    }
+
     const std::size_t currChunkSize = std::min(body->size(), _chunkSize);
     const IBuffer::RawBytes rawBytes = body->consumeRawFront(currChunkSize);
 
     std::ostringstream oss;
-    oss << std::hex << rawBytes.size() << http::CRLF;
-
-    _log.info() << oss.str() << '\n'; // todo
-
+    oss << std::hex << std::nouppercase << rawBytes.size() << http::CRLF;
     _smartBuffer->append(oss.str());
     _smartBuffer->append(rawBytes, rawBytes.size());
     _smartBuffer->append(http::CRLF);

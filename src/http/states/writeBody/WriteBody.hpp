@@ -31,7 +31,7 @@ private:
   bool _done;
   bool _chunked;
   bool _fixedLength;
-  SmartBuffer* _smartBuffer;
+  SmartBuffer* _smartBuffer; // Owner in Client::_outBuffQueue
 };
 
 #endif
