@@ -34,14 +34,12 @@ MemoryBuffer::MemoryBuffer()
 MemoryBuffer::MemoryBuffer(const std::string& data)
   : _pos(0)
 {
-  _data.reserve(_startSize);
   MemoryBuffer::append(data);
 }
 
 MemoryBuffer::MemoryBuffer(const RawBytes& buffer, std::size_t bytes)
   : _pos(0)
 {
-  _data.reserve(_startSize);
   MemoryBuffer::append(buffer, bytes);
 }
 
@@ -117,6 +115,7 @@ void MemoryBuffer::append(const std::string& data)
 
 void MemoryBuffer::append(const RawBytes& buffer, std::size_t bytes)
 {
+  assert(bytes <= buffer.size());
   _data.insert(_data.end(),
                buffer.begin(),
                buffer.begin() + static_cast<RawBytes::difference_type>(bytes));
@@ -139,6 +138,9 @@ void MemoryBuffer::replace(RawBytes& raw)
 
 void MemoryBuffer::moveBufferToFile(const std::string& filepath)
 {
+  if (_data.empty()) {
+    throw BufferException(errBufferEmpty);
+  }
   std::ofstream ofs(filepath.c_str(),
                     std::ios::out | std::ios::binary | std::ios::trunc);
 
@@ -146,7 +148,7 @@ void MemoryBuffer::moveBufferToFile(const std::string& filepath)
     throw BufferException(errOpen);
   }
 
-  ofs.write(&_data[0], static_cast<std::streamsize>(_data.size()));
+  ofs.write(_data.data(), static_cast<std::streamsize>(_data.size()));
   if (!ofs.good()) {
     throw BufferException(errWrite);
   }
