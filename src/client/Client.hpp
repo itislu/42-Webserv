@@ -30,7 +30,7 @@ public:
   SmartBuffer& getInBuff();
   BufferQueue& getOutBuffQueue();
   const Server* getServer() const;
-  const Socket& getSocket() const;
+  const Socket* getSocket() const;
   StateHandler<Client>& getStateHandler();
   Request& getRequest();
   Response& getResponse();

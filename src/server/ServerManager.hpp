@@ -20,7 +20,7 @@ public:
 
   const std::vector<ft::shared_ptr<const Server> >& getServers() const;
   const Server* getInitServer(const Socket& socket) const;
-  const Server* getServerByHost(const Socket& socket,
+  const Server* getServerByHost(const Socket* socket,
                                 const std::string& host) const;
 
   static void run();

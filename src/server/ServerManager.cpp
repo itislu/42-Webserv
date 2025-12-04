@@ -92,17 +92,18 @@ void ServerManager::mapServerToSocket(
   Tries to find the best server for the given hostname. If no hostname matches
   it defaults to the first server that is associated with this socket.
 */
-const Server* ServerManager::getServerByHost(const Socket& socket,
+const Server* ServerManager::getServerByHost(const Socket* socket,
                                              const std::string& host) const
 {
-  const const_SockToServIter iter = _socketToServers.find(&socket);
+  const const_SockToServIter iter = _socketToServers.find(socket);
+  if (iter == _socketToServers.end()) {
+    return FT_NULLPTR; // this should never happen
+  }
   const std::vector<const Server*>& servers = iter->second;
   for (std::size_t i = 0; i < servers.size(); ++i) {
     const std::vector<std::string>& serverNames = servers[i]->getHostnames();
     for (std::size_t name = 0; name < serverNames.size(); ++name) {
-      /* TODO: check if this has to be exact match or case insensitive */
       if (host == serverNames[name]) {
-        std::cout << "Found Host server: " << serverNames[name] << "\n";
         return servers[i];
       }
     }

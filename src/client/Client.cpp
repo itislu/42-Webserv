@@ -120,9 +120,9 @@ const Server* Client::getServer() const
   return _server;
 }
 
-const Socket& Client::getSocket() const
+const Socket* Client::getSocket() const
 {
-  return *_socket;
+  return _socket;
 }
 
 void Client::setServer(const Server* server)

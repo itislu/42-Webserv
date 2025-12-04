@@ -330,7 +330,6 @@ void ValidateRequest::endState(StatusCode::Code status)
   }
 }
 
-// localhost:8080
 void ValidateRequest::_validateHostHeader()
 {
   const Headers& headers = _client->getRequest().getHeaders();
@@ -345,15 +344,15 @@ void ValidateRequest::_validateHostHeader()
 
   int port = -1;
   _splitHostHeader(hostHeader, port);
-  /* TODO: remove this */
+  /* TODO: remove this after testing*/
   if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
     _log.info() << "Split: \n";
     _log.info() << "  Host: " << _host << "\n";
     _log.info() << "  Port: " << port << "\n";
   }
-  if (port > 0) {
-    const Socket& socket = _client->getSocket();
-    if (socket.getPort() != port) {
+  if (port != -1) {
+    const Socket* const socket = _client->getSocket();
+    if (socket->getPort() != port) {
       endState(StatusCode::BadRequest);
     }
   }
@@ -395,8 +394,7 @@ void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
 
 void ValidateRequest::_setServerByHost()
 {
-  const Socket& socket = _client->getSocket();
-
+  const Socket* const socket = _client->getSocket();
   const Server* const server =
     ServerManager::getInstance().getServerByHost(socket, _host);
   _log.info() << "Found server for host: " << _host << "\n";
