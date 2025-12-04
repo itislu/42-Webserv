@@ -123,8 +123,12 @@ std::string HandleGet::_generateAutoindex(const std::string& path)
   }
 
   std::string html;
-  html += "<html><head><title>Index of " + path + "</title></head><body>\n";
-  html += "<h1>Index of " + path + "</h1>\n<ul>\n";
+  html.append("<html><head><title>Index of ");
+  html.append(path);
+  html.append("</title></head><body>\n");
+  html.append("<h1>Index of ");
+  html.append(path);
+  html.append("</h1>\n<ul>\n");
 
   struct dirent* entry = 0;
   while ((entry = readdir(dir)) != 0) {
@@ -135,19 +139,18 @@ std::string HandleGet::_generateAutoindex(const std::string& path)
 
     const std::string fullPath = path + "/" + name;
     if (isDirectory(fullPath)) {
-      html += "<li><a href=\"";
-      html += name;
-      html += "/\">";
-      html += name;
-      html += "/</a></li>\n";
+      html.append("<li><a href=\"");
+      html.append(name);
+      html.append("/\">");
+      html.append(name);
+      html.append("/</a></li>\n");
     } else {
-      html += "<li>";
-      html += name;
-      html += "</li>\n";
+      html.append("<li>");
+      html.append(name);
+      html.append("</li>\n");
     }
   }
-
-  html += "</ul></body></html>\n";
+  html.append("</ul></body></html>\n");
   closedir(dir);
   return html;
 }
