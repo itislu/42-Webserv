@@ -32,6 +32,7 @@ void Lexer::init()
 
   _input.assign(std::istreambuf_iterator<char>(_file),
                 std::istreambuf_iterator<char>());
+  _file.close();
 }
 
 void Lexer::validateInputFile()

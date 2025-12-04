@@ -38,7 +38,7 @@ bool ConfigParser::isExpectedNext(Token::Type type)
 void ConfigParser::skipComments()
 {
   _token = _lexer.next();
-  while (_token.getType() == Token::Comment && _token.getType() != Token::End) {
+  while (_token.getType() == Token::Comment) {
     _lexer.skipComment();
     _token = _lexer.next();
   }
@@ -76,7 +76,7 @@ void ConfigParser::validateErrorPages(const std::vector<std::string>& value)
   bool isCode = true;
   try {
     convert::toCode(value.back());
-  } catch (const std::exception& e) {
+  } catch (const std::exception&) {
     isCode = false;
   }
   if (isCode) {

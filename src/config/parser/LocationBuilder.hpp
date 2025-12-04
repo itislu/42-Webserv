@@ -3,7 +3,8 @@
 
 #include "ParsedLocation.hpp"
 #include <config/LocationConfig.hpp>
-#include <config/ServerConfig.hpp>
+
+class ServerConfig;
 
 namespace config {
 

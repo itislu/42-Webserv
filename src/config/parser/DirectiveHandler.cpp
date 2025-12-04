@@ -251,7 +251,7 @@ void Entries<LocationConfig>::setRedirection(
   LocationConfig& config)
 {
   if (values.size() != 1) {
-    throw std::invalid_argument("redirection: invalid number of arguments");
+    throw std::invalid_argument("redirect_url: invalid number of arguments");
   }
   config.setRedirection(values[0]);
 }

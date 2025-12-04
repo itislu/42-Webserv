@@ -1,7 +1,7 @@
 #ifndef SERVERCONFIG_HPP
 #define SERVERCONFIG_HPP
 
-#include "config/LocationConfig.hpp"
+#include "LocationConfig.hpp"
 #include <cstddef>
 #include <map>
 #include <set>
