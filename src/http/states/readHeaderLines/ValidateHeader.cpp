@@ -55,6 +55,9 @@ void ValidateHeader::run(const std::string& name, const std::string& value)
 /* ************************************************************************** */
 // PRIVATE
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-3.2-6
+ */
 void ValidateHeader::_validateHost(const std::string& value)
 {
   if (_headers->contains("Host")) {
@@ -71,6 +74,9 @@ void ValidateHeader::_validateHost(const std::string& value)
   }
 }
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-6.1-15
+ */
 void ValidateHeader::_validateContentLength(const std::string& value)
 {
   const bool hasTransferEncoding = _headers->contains("Transfer-Encoding");
@@ -90,6 +96,10 @@ void ValidateHeader::_validateContentLength(const std::string& value)
   }
 }
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-6.1-15
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-6.1-16
+ */
 void ValidateHeader::_validateTransferEncoding(const std::string& value)
 {
   const bool hasContentLength = _headers->contains("Content-Length");

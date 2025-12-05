@@ -99,7 +99,7 @@ void Request::setVersion(const std::string& version)
   _version = version;
 }
 
-std::string Request::toString()
+std::string Request::toString() const
 {
   std::stringstream oss;
   oss << "{\n";
@@ -113,7 +113,7 @@ std::string Request::toString()
   return oss.str();
 }
 
-/* ***************************************************************************/
+/* ************************************************************************** */
 // PRIVATE
 
 std::size_t Request::_getMaxMethodLen() throw()

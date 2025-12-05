@@ -18,18 +18,18 @@ public:
 
   Type getType() const;
   const std::string& getPath() const;
-  const LocationConfig* getLocation();
-  const ServerConfig* getServer();
+  const LocationConfig* getLocation() const;
+  const ServerConfig* getServer() const;
 
   void setPath(const std::string& path);
   void setType(Type type);
   void setLocation(const LocationConfig* location);
   void setServer(const ServerConfig* server);
 
-  std::string toString();
+  std::string toString() const;
 
 private:
-  std::string _typeToString();
+  std::string _typeToString() const;
 
   Type _type;
   std::string _path;

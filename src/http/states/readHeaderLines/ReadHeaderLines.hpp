@@ -2,7 +2,7 @@
 #ifndef READ_HEADER_LINES_HPP
 #define READ_HEADER_LINES_HPP
 
-#include "http/states/readHeaderLines/ValidateHeader.hpp"
+#include "ValidateHeader.hpp"
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
