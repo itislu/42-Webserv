@@ -30,6 +30,11 @@ typedef std::map<std::string, std::string> ExtToTypeMap;
 const ExtToTypeMap& getExtToType();
 
 extern const char* const minResponse500;
+
+#define HOST "Host"
+#define CONTENT_LENGTH "Content-Length"
+#define TRANSFER_ENCODING "Transfer-Encoding"
+
 }
 
 #endif
