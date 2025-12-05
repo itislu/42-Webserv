@@ -67,11 +67,11 @@ ft::shared_ptr<RepetitionRule> contentLengthRule()
 }
 
 /**
- *
  * Sender:
  * Transfer-Encoding = [ transfer-coding *( OWS "," OWS transfer-coding ) ]
  *
- * Receipient:
+ * Recipient:
+ * Transfer-Encoding = #transfer-coding
  * #element => [ element ] *( OWS "," OWS [ element ] )
  */
 ft::shared_ptr<SequenceRule> transferEncodingRule()

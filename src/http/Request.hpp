@@ -41,7 +41,7 @@ public:
   void setUri(const Uri& uri);
   void setVersion(const std::string& version);
 
-  std::string toString();
+  std::string toString() const;
 
 private:
   struct MethodMap;

@@ -27,12 +27,12 @@ Resource::Type Resource::getType() const
   return _type;
 }
 
-const LocationConfig* Resource::getLocation()
+const LocationConfig* Resource::getLocation() const
 {
   return _location;
 }
 
-const ServerConfig* Resource::getServer()
+const ServerConfig* Resource::getServer() const
 {
   return _server;
 }
@@ -69,7 +69,17 @@ ft::optional<std::string> Resource::getErrorPage(int code) const
   return ft::nullopt;
 }
 
-std::string Resource::_typeToString()
+std::string Resource::toString() const
+{
+  std::ostringstream oss;
+  oss << " Resource:\n";
+  oss << "  path: " << _path << "\n";
+  oss << "  type: " << _typeToString() << "\n";
+
+  return oss.str();
+}
+
+std::string Resource::_typeToString() const
 {
   switch (_type) {
     case Undefined:
@@ -84,14 +94,4 @@ std::string Resource::_typeToString()
       return "Error";
   }
   FT_UNREACHABLE();
-}
-
-std::string Resource::toString()
-{
-  std::stringstream oss;
-  oss << " Resource:\n";
-  oss << "  path: " << _path << "\n";
-  oss << "  type: " << _typeToString() << "\n";
-
-  return oss.str();
 }

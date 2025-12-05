@@ -22,8 +22,8 @@ public:
   Resource();
   Type getType() const;
   const std::string& getPath() const;
-  const LocationConfig* getLocation();
-  const ServerConfig* getServer();
+  const LocationConfig* getLocation() const;
+  const ServerConfig* getServer() const;
 
   void setPath(const std::string& path);
   void setType(Type type);
@@ -32,10 +32,10 @@ public:
 
   ft::optional<std::string> getErrorPage(int code) const;
 
-  std::string toString();
+  std::string toString() const;
 
 private:
-  std::string _typeToString();
+  std::string _typeToString() const;
 
   Type _type;
   std::string _path;
