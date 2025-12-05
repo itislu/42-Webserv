@@ -2,20 +2,14 @@
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
-#include <http/Request.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
-#include <http/states/readBody/ReadBody.hpp>
 #include <http/states/validateRequest/ValidateRequest.hpp>
-#include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
-#include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -23,7 +17,7 @@
 #include <cstddef>
 #include <string>
 
-/* ***************************************************************************/
+/* ************************************************************************** */
 // INIT
 
 Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);

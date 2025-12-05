@@ -19,12 +19,12 @@ Resource::Type Resource::getType() const
   return _type;
 }
 
-const LocationConfig* Resource::getLocation()
+const LocationConfig* Resource::getLocation() const
 {
   return _location;
 }
 
-const ServerConfig* Resource::getServer()
+const ServerConfig* Resource::getServer() const
 {
   return _server;
 }
@@ -44,7 +44,7 @@ void Resource::setServer(const ServerConfig* server)
   _server = server;
 }
 
-std::string Resource::_typeToString()
+std::string Resource::_typeToString() const
 {
   switch (_type) {
     case File:
@@ -59,9 +59,9 @@ std::string Resource::_typeToString()
   FT_UNREACHABLE();
 }
 
-std::string Resource::toString()
+std::string Resource::toString() const
 {
-  std::stringstream oss;
+  std::ostringstream oss;
   oss << " Resource:\n";
   oss << "  path: " << _path << "\n";
   oss << "  type: " << _typeToString() << "\n";
