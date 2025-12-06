@@ -2,46 +2,20 @@
 #include <http/Headers.hpp>
 #include <http/Response.hpp>
 #include <http/http.hpp>
-#include <http/states/readHeaderLines/ReadHeaderLines.hpp>
-#include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <http/states/writeBody/WriteBody.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/string.hpp>
 #include <utils/buffer/MemoryBuffer.hpp>
 #include <utils/buffer/SmartBuffer.hpp>
-#include <utils/state/IState.hpp>
 
+#include <algorithm>
+#include <cstddef>
 #include <gtest/gtest.h>
+#include <ios>
 #include <string>
 
-const std::string chunk = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01"
-                          "23456789ABCDEF0123456789AB"
-                          "CDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCD"
-                          "EF0123456789ABCDEF01234567"
-                          "89ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789"
-                          "ABCDEF0123456789ABCDEF0123"
-                          "456789ABCDEF0123456789ABCDEF0123456789ABCDEF012345"
-                          "6789ABCDEF0123456789ABCDEF"
-                          "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01"
-                          "23456789ABCDEF0123456789AB"
-                          "CDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCD"
-                          "EF0123456789ABCDEF01234567"
-                          "89ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789"
-                          "ABCDEF0123456789ABCDEF0123"
-                          "456789ABCDEF0123456789ABCDEF0123456789ABCDEF012345"
-                          "6789ABCDEF0123456789ABCDEF"
-                          "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01"
-                          "23456789ABCDEF0123456789AB"
-                          "CDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCD"
-                          "EF0123456789ABCDEF01234567"
-                          "89ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789"
-                          "ABCDEF0123456789ABCDEF0123"
-                          "456789ABCDEF0123456789ABCDEF0123456789ABCDEF012345"
-                          "6789ABCDEF0123456789ABCDEF"
-                          "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01"
-                          "23456789ABCDEF0123456789AB"
-                          "CDEF0123456789ABCDEF0123456789ABCDEF";
-
 namespace {
+
 void StateTest(Client& client, const std::string& bodyLines)
 {
   Response& response = client.getResponse();
@@ -49,46 +23,99 @@ void StateTest(Client& client, const std::string& bodyLines)
   headers.addHeader("Transfer-Encoding", "chunked");
   response.setBody(ft::make_shared<MemoryBuffer>(bodyLines));
   client.getStateHandler().setState<WriteBody>();
-  client.getStateHandler().getState()->run();
-}
 }
 
-TEST(WriteBodyTester, BasicTest)
+/* ************************************************************************** */
+// GENERATE
+
+std::string generateChunk(std::size_t size)
+{
+  std::string result;
+  result.reserve(size);
+  const std::string pattern = "0123456789ABCDEF";
+  for (std::size_t i = 0; i < size; ++i) {
+    result.push_back(pattern[i % pattern.size()]);
+  }
+  return result;
+}
+
+/* ************************************************************************** */
+// CONSUME
+
+std::string consume(Client& client, std::size_t bytes)
+{
+  client.getStateHandler().getState()->run();
+  SmartBuffer& outBuff = client.getOutBuffQueue().getSmartBuffer();
+  const std::size_t toConsume = std::min(bytes, outBuff.size());
+  const std::string data = outBuff.consumeFront(toConsume);
+  return data;
+}
+
+std::string consumeAll(Client& client, std::size_t consumeSize)
+{
+  std::string data;
+  while (!client.getStateHandler().isDone() ||
+         client.getOutBuffQueue().getSmartBuffer().size() > 0) {
+    const std::string consumed = consume(client, consumeSize);
+    data.append(consumed);
+  }
+  return data;
+}
+
+/* ************************************************************************** */
+// EXPECT
+
+std::string parseChunkLine(const std::string& data, std::string::size_type& pos)
+{
+  const std::string::size_type crlfPos = data.find(http::CRLF, pos);
+  EXPECT_NE(crlfPos, std::string::npos);
+  const std::string line = data.substr(pos, crlfPos - pos);
+  pos = crlfPos + std::string(http::CRLF).size();
+  return line;
+}
+
+void expectChunk(const std::string& data,
+                 std::string::size_type& pos,
+                 const std::string& expectedSize,
+                 const std::string& expectedData)
+{
+  const std::string chunkSize = parseChunkLine(data, pos);
+  EXPECT_EQ(chunkSize, expectedSize);
+  const std::string chunkData = parseChunkLine(data, pos);
+  EXPECT_EQ(chunkData, expectedData);
+}
+
+void expectLastChunk(const std::string& data, std::string::size_type& pos)
+{
+  expectChunk(data, pos, "0", "");
+}
+
+}
+
+TEST(WriteBodyTester, BasicTestChunked)
 {
   const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  const std::string chunk = generateChunk(Client::maxChunk);
   StateTest(*client, chunk + chunk);
+  const std::string output = consumeAll(*client, Client::maxChunk);
 
-  SmartBuffer& buffer = client->getOutBuffQueue().getSmartBuffer();
+  const std::string chunkSize = ft::to_string(Client::maxChunk, std::ios::hex);
+  std::string::size_type pos = 0;
 
-  // chunk 1
-  EXPECT_EQ(buffer.consumeFront(5), "400\r\n");
-  EXPECT_EQ(buffer.consumeFront(chunk.size()), chunk);
-  EXPECT_EQ(buffer.consumeFront(2), http::CRLF);
-
-  // chunk 2
-  EXPECT_EQ(buffer.consumeFront(5), "400\r\n");
-  EXPECT_EQ(buffer.consumeFront(chunk.size()), chunk);
-  EXPECT_EQ(buffer.consumeFront(2), http::CRLF);
-
-  // end chunk
-  EXPECT_EQ(buffer.consumeFront(3), "0\r\n");
-
-  // end of line
-  EXPECT_EQ(buffer.consumeFront(2), http::CRLF);
+  expectChunk(output, pos, chunkSize, chunk);
+  expectChunk(output, pos, chunkSize, chunk);
+  expectLastChunk(output, pos);
 }
 
-TEST(WriteBodyTester, EmptyBody)
+TEST(WriteBodyTester, EmptyBodyChunked)
 {
   const ft::unique_ptr<Client> client = ft::make_unique<Client>();
   StateTest(*client, "");
 
-  SmartBuffer& buffer = client->getOutBuffQueue().getSmartBuffer();
+  const std::string output = consumeAll(*client, Client::maxChunk);
+  std::string::size_type pos = 0;
 
-  // end chunk
-  EXPECT_EQ(buffer.consumeFront(3), "0\r\n");
-
-  // end of line
-  EXPECT_EQ(buffer.consumeFront(2), http::CRLF);
+  expectLastChunk(output, pos);
 }
 
 // Main function to run all tests
