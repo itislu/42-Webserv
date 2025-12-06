@@ -29,6 +29,7 @@ public:
 
   const Socket& getSocket(int fdes) const;
   const Socket& getListener(int port) const;
+  const Socket& getSocketFromClientFd(int fdes) const;
 
   void removeFd(int fdes);
 

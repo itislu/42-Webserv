@@ -4,6 +4,7 @@
 #include "Client.hpp"
 #include "libftpp/memory.hpp"
 #include "server/Server.hpp"
+#include "socket/Socket.hpp"
 #include <cstddef>
 #include <map>
 #include <vector>
@@ -23,7 +24,7 @@ public:
   const std::map<int, ft::shared_ptr<Client> >& getClients() const;
   bool hasClients() const;
 
-  void addClient(int fdes, const Server* server);
+  void addClient(int fdes, const Server* server, const Socket& socket);
   void removeClient(int fdes);
 
   long getMinTimeout() const;

@@ -7,9 +7,9 @@
 class Authority
 {
 public:
-  std::string getUserinfo() const;
-  std::string getHost() const;
-  std::string getPort() const;
+  const std::string& getUserinfo() const;
+  const std::string& getHost() const;
+  const std::string& getPort() const;
 
   void setUserinfo(const std::string& userinfo);
   void setHost(const std::string& host);

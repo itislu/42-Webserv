@@ -6,17 +6,17 @@
 /* ************************************************************************** */
 // PUBLIC
 
-std::string Authority::getUserinfo() const
+const std::string& Authority::getUserinfo() const
 {
   return _userinfo;
 }
 
-std::string Authority::getHost() const
+const std::string& Authority::getHost() const
 {
   return _host;
 }
 
-std::string Authority::getPort() const
+const std::string& Authority::getPort() const
 {
   return _port;
 }

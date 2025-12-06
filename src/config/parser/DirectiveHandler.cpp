@@ -1,5 +1,6 @@
 #include "DirectiveHandler.hpp"
 #include "Converters.hpp"
+#include "libftpp/string.hpp"
 #include <config/Config.hpp>
 #include <config/LocationConfig.hpp>
 #include <config/ServerConfig.hpp>
@@ -155,7 +156,7 @@ void Entries<ServerConfig>::setHostnames(const std::vector<std::string>& values,
                                          ServerConfig& config)
 {
   for (std::size_t i = 0; i < values.size(); ++i) {
-    config.addHostName(values[i]);
+    config.addHostName(ft::to_lower(values[i]));
   }
 }
 

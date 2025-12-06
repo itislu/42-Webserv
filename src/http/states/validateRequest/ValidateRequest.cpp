@@ -2,6 +2,8 @@
 
 #include "client/Client.hpp"
 #include "config/LocationConfig.hpp"
+#include "config/parser/Converters.hpp"
+#include "http/Headers.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
@@ -16,10 +18,13 @@
 #include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
+#include "server/ServerManager.hpp"
+#include "socket/Socket.hpp"
 #include "utils/state/StateHandler.hpp"
 
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <iostream>
 #include <set>
@@ -93,19 +98,25 @@ StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
 
 void ValidateRequest::_init()
 {
+  _validateHostHeader();
+  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+    return;
+  }
+
   if (!_client->hasServer()) {
-    _initServer();
+    _setServerByHost();
   }
 
   _path = _client->getRequest().getUri().getPath();
   _initConfigs();
   _initResource();
 
+  _log.info() << "Root: " << _server->getRoot() << "\n";
+
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
   const Request::Method method = _client->getRequest().getMethod();
-  _log.info() << _client->getRequest().getMethod() << "\n";
 
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
@@ -131,18 +142,6 @@ bool ValidateRequest::validateMethod(
     }
   }
   return false;
-}
-
-void ValidateRequest::_initServer()
-{
-  /*
-    TODO:
-    - get host from Request
-    - host should be in Uri -> authority -> getHost()
-    - look up servers from client socket and find matching servername -> host
-    - if no exact match, use default server for that socket
-    - set server in client
-  */
 }
 
 void ValidateRequest::_initConfigs()
@@ -329,4 +328,75 @@ void ValidateRequest::endState(StatusCode::Code status)
     _client->getResource().setType(Resource::Error);
     _stateHandler.setDone();
   }
+}
+
+void ValidateRequest::_validateHostHeader()
+{
+  const Headers& headers = _client->getRequest().getHeaders();
+  std::string hostHeader;
+  if (headers.contains("host")) {
+    hostHeader = headers.at("host");
+  }
+  if (hostHeader.empty()) {
+    endState(StatusCode::BadRequest);
+    return;
+  }
+
+  int port = -1;
+  _splitHostHeader(hostHeader, port);
+  /* TODO: remove this after testing*/
+  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+    _log.info() << "Split: \n";
+    _log.info() << "  Host: " << _host << "\n";
+    _log.info() << "  Port: " << port << "\n";
+  }
+  if (port != -1) {
+    const Socket* const socket = _client->getSocket();
+    if (socket->getPort() != port) {
+      endState(StatusCode::BadRequest);
+    }
+  }
+  _compareHostHeaders();
+}
+
+void ValidateRequest::_compareHostHeaders()
+{
+  _host = ft::to_lower(_host);
+  const std::string& host =
+    ft::to_lower(_client->getRequest().getUri().getAuthority().getHost());
+  if (!host.empty()) {
+    _log.info() << "Host Header: [" << _host << "]\n";
+    _log.info() << "Uri Host: [" << host << "]\n";
+    if (_host != host) {
+      endState(StatusCode::BadRequest);
+    }
+  }
+}
+
+void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
+{
+  const std::size_t pos = hostHeader.find(':');
+  if (pos != std::string::npos) {
+    _host = hostHeader.substr(0, pos);
+    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
+    if (!portStr.empty()) {
+      try {
+        port = config::convert::toPort(portStr);
+      } catch (const std::exception& e) {
+        // NOTE: not sure if this is even possible
+        endState(StatusCode::BadRequest);
+      }
+    }
+  } else {
+    _host = hostHeader;
+  }
+}
+
+void ValidateRequest::_setServerByHost()
+{
+  const Socket* const socket = _client->getSocket();
+  const Server* const server =
+    ServerManager::getInstance().getServerByHost(socket, _host);
+  _log.info() << "Found server for host: " << _host << "\n";
+  _client->setServer(server);
 }
