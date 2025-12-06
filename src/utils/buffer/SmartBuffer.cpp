@@ -138,6 +138,14 @@ void SmartBuffer::moveBufferToFile(const std::string& filepath)
   _buffer->moveBufferToFile(filepath);
 }
 
+void SmartBuffer::reset()
+{
+  _buffer->reset();
+  if (_usesFile) {
+    _switchToMemoryBuffer();
+  }
+}
+
 bool SmartBuffer::isEmpty() const
 {
   return _buffer->isEmpty();

@@ -21,6 +21,7 @@ public:
   virtual void removeFront(std::size_t bytes) = 0;
   virtual void replace(RawBytes& rawData) = 0;
   virtual void moveBufferToFile(const std::string& filepath) = 0;
+  virtual void reset() = 0;
 
   // Non-throwing versions
   ExpectVoid append(const std::string& data, std::nothrow_t /*unused*/);

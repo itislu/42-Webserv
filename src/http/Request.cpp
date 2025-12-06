@@ -31,24 +31,6 @@ Request::Request()
 {
 }
 
-Request::Request(const Request& other)
-  : _method(UNDEFINED)
-  , _uri(other._uri)
-  , _version(other._version)
-  , _headers(other._headers)
-{
-}
-
-Request& Request::operator=(const Request& other)
-{
-  _method = other._method;
-  _uri = other._uri;
-  _version = other._version;
-  _headers = other._headers;
-  // body can not be copied
-  return *this;
-}
-
 Request::Method Request::strToMethod(const std::string& strMethod)
 {
   for (std::size_t i = 0; i < _methodMap.size(); i++) {
@@ -57,6 +39,15 @@ Request::Method Request::strToMethod(const std::string& strMethod)
     }
   }
   return Request::UNDEFINED;
+}
+
+void Request::reset()
+{
+  _method = UNDEFINED;
+  _uri = Uri();
+  _version.clear();
+  _headers = Headers();
+  _body.reset();
 }
 
 Request::Method Request::getMethod() const

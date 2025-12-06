@@ -37,6 +37,7 @@ public:
   void removeFront(std::size_t bytes);
   void replace(RawBytes& rawData);
   void moveBufferToFile(const std::string& filepath);
+  void reset();
 
   bool isEmpty() const;
   std::size_t size() const;
