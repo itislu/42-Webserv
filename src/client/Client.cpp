@@ -2,21 +2,16 @@
 
 #include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
-#include <http/Headers.hpp>
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
-#include <http/StatusCode.hpp>
-#include <http/Uri.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
-#include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
 #include <utils/buffer/BufferQueue.hpp>
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/buffer/IInBuffer.hpp>
-#include <utils/buffer/MemoryBuffer.hpp>
 #include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/StateHandler.hpp>
@@ -191,20 +186,7 @@ void Client::prepareForNewRequest()
 {
   getStateHandler().setState<ReadRequestLine>();
 
-  Response& response = getResponse();
-  response.setStatusCode(StatusCode::Ok);
-  response.setVersion("");
-  response.setBody(ft::shared_ptr<MemoryBuffer>());
-  response.getHeaders() = Headers();
-
-  Request& request = getRequest();
-  request.setMethod(Request::UNDEFINED);
-  request.setUri(Uri());
-  request.setVersion("");
-  request.getHeaders() = Headers();
-
-  Resource& resource = getResource();
-  resource.setLocation(FT_NULLPTR);
-  resource.setPath("");
-  resource.setServer(FT_NULLPTR);
+  _response = Response();
+  _request = Request();
+  _resource = Resource();
 }

@@ -26,7 +26,6 @@ private:
   std::string _version;
   StatusCode _statuscode;
   Headers _headers;
-
   ft::shared_ptr<IInBuffer> _body;
 };
 

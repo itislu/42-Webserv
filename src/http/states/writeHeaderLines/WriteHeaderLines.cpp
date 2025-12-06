@@ -2,6 +2,7 @@
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
+#include <http/Request.hpp>
 #include <http/StatusCode.hpp>
 #include <http/http.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
@@ -78,21 +79,37 @@ std::string WriteHeaderLines::_makeHttpDate()
 
 void WriteHeaderLines::_setConnectionHeader()
 {
-  const Headers& reqHeaders = _client->getRequest().getHeaders();
+  Request& request = _client->getRequest();
+  const Headers& reqHeaders = request.getHeaders();
   Headers& headers = _client->getResponse().getHeaders();
 
   // previously set
   if (headers.contains("Connection")) {
     return;
   }
+
+  std::string conn;
   if (reqHeaders.contains("Connection")) {
-    const std::string& conn = reqHeaders.at("Connection");
-    if (ft::to_lower(conn) == "keep-alive") {
-      headers.addHeader("Connection", "keep-alive");
-    } else {
-      headers.addHeader("Connection", "close");
-    }
-  } else {
-    headers.addHeader("Connection", "close");
+    conn = ft::to_lower(reqHeaders.at("Connection"));
   }
+
+  // close connection present
+  if (conn == "close") {
+    headers.addHeader("Connection", "close");
+    return;
+  }
+
+  // HTTP/1.1 -> connection persist
+  if (request.getVersion() == "HTTP/1.1") {
+    headers.addHeader("Connection", "keep-alive");
+    return;
+  }
+
+  // HTTP/1.0 + keep-alive -> connection persist
+  if (request.getVersion() == "HTTP/1.0" && conn == "keep-alive") {
+    headers.addHeader("Connection", "keep-alive");
+    return;
+  }
+
+  headers.addHeader("Connection", "close");
 }
