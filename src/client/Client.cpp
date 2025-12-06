@@ -181,3 +181,12 @@ std::ostream& operator<<(std::ostream& out, const Client& client)
   out << "Client(" << client.getFd() << ")";
   return out;
 }
+
+void Client::prepareForNewRequest()
+{
+  getStateHandler().setState<ReadRequestLine>();
+
+  _response = Response();
+  _request = Request();
+  _resource = Resource();
+}

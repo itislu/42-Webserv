@@ -1,9 +1,9 @@
-#include "http/Response.hpp"
-#include "http/StatusCode.hpp"
-#include "http/http.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
+#include <http/http.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
@@ -65,34 +65,91 @@ TEST(ReadHeaderLinesTester, HeaderList)
   EXPECT_EQ(value, headerValue);
 }
 
-TEST(ReadHeaderLinesTester, DISABLED_HeaderValueTooLarge)
+TEST(ReadHeaderLinesTester, HeaderValueTooLarge)
 {
-  // todo set max HeaderFieldLineLength
+  // check is ONE_HEADER > MAX_FIELDLINE_SIZE
+
+  ReadHeaderLines::setMaxFieldLineSize(37);
 
   std::string line("Host: webserv\r\n"
-                   "Header_test: loooooooooooooooooooong\r\n"
+                   "Header_test: loooooooooooooooooooong\r\n" // size 38
                    "\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
   Response& response = client->getResponse();
   const StatusCode& statusCode = response.getStatusCode();
 
   EXPECT_EQ(statusCode, StatusCode::RequestHeaderFieldsTooLarge);
+
+  ReadHeaderLines::resetMaxFieldLineSize();
 }
 
-TEST(ReadHeaderLinesTester, DISABLED_HeadersTooLarge)
+TEST(ReadHeaderLinesTester, HeadersTooLarge)
 {
-  // todo set max HeaderLength
+  // check is ALL_HEADERS > MAX_HEADER_SIZE
 
-  std::string line("Host: webserv\r\n"
-                   "Header1: loooooooooooooooooooong\r\n"
-                   "Header2: loooooooooooooooooooong\r\n"
-                   "Header3: loooooooooooooooooooong\r\n"
-                   "\r\n");
+  ReadHeaderLines::setMaxHeaderSize(91);
+
+  std::string line("Header1: loooooooooooooooong\r\n" // size 30
+                   "Header2: loooooooooooooooong\r\n" // size 30
+                   "Header3: loooooooooooooooong\r\n" // size 30
+                   "\r\n");                           // size 2
   ft::unique_ptr<Client> client = StateTest(line);
   Response& response = client->getResponse();
   const StatusCode& statusCode = response.getStatusCode();
 
   EXPECT_EQ(statusCode, StatusCode::RequestHeaderFieldsTooLarge);
+
+  ReadHeaderLines::resetMaxHeaderSize();
+}
+
+TEST(ReadHeaderLinesTester, MultipleHostHeaders)
+{
+  std::string line("TestHeader1: hi\r\n"
+                   "Host: webserv\r\n"
+                   "Host: somethingElse\r\n"
+                   "TestHeader: 7\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, TransferEncAndContentLen)
+{
+  std::string line("TestHeader1: hi\r\n"
+                   "Transfer-Encoding: chunked\r\n"
+                   "Content-Length: 3\r\n"
+                   "TestHeader: 7\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, InvalidContentLength)
+{
+  std::string line("TestHeader1: hi\r\n"
+                   "Content-Length: 7a\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, InvalidTransferEncoding)
+{
+  std::string line("TestHeader1: hi\r\n"
+                   "Transfer-Encoding: chunked;\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
 }
 
 // NOLINTEND

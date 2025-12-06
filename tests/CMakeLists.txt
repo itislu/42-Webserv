@@ -93,6 +93,10 @@ add_my_test(headerLineRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerLineRulesTester.cpp
 )
 
+add_my_test(headerTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerTester.cpp
+)
+
 add_my_test(requestLineRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/requestLineRulesTester.cpp
 )

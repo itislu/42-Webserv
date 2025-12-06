@@ -43,6 +43,8 @@ public:
   bool sendTo();
   bool receive();
 
+  void prepareForNewRequest();
+
 private:
   void updateLastActivity();
 

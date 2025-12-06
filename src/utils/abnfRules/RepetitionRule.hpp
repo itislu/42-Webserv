@@ -21,6 +21,8 @@ public:
 
   void setMin(int value);
   void setMax(int value);
+  int getMin() const;
+  int getMax() const;
   bool reachedMin() const;
   int getReps() const;
 
