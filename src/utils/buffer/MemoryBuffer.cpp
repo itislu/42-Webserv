@@ -157,6 +157,12 @@ void MemoryBuffer::moveBufferToFile(const std::string& filepath)
   _pos = 0;
 }
 
+void MemoryBuffer::reset()
+{
+  _data.clear();
+  _pos = 0;
+}
+
 bool MemoryBuffer::isEmpty() const
 {
   return _data.empty();

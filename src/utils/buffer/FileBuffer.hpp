@@ -41,6 +41,7 @@ public:
   void removeFront(std::size_t bytes);
   void replace(RawBytes& rawData);
   void moveBufferToFile(const std::string& filepath);
+  void reset();
 
   bool isEmpty() const;
   std::size_t size() const;
@@ -60,7 +61,6 @@ private:
   void _saveRemainder();
   void _copyFrom(FileBuffer& src);
   void _replaceCurrFile(FileBuffer& tmpFb);
-  void _removeCurrFile();
 
   static const std::size_t _copyBufferSize = 4096;
 

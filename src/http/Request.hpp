@@ -23,12 +23,11 @@ public:
   };
 
   Request();
-  ~Request() {}
-  Request(const Request& other);
-  Request& operator=(const Request& other);
 
   static const std::size_t MaxMethodLen;
   static Method strToMethod(const std::string& strMethod);
+
+  void reset();
 
   Method getMethod() const;
   const Uri& getUri() const;

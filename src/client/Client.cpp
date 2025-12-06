@@ -187,6 +187,6 @@ void Client::prepareForNewRequest()
   getStateHandler().setState<ReadRequestLine>();
 
   _response = Response();
-  _request = Request();
+  _request.reset();
   _resource = Resource();
 }
