@@ -42,7 +42,7 @@ void HandlePost::_setNextState()
 {
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
 
-  if (statusCode == StatusCode::Ok) {
+  if (statusCode == StatusCode::Ok || statusCode == StatusCode::Created) {
     getContext()->getStateHandler().setDone();
   } else {
     getContext()->getStateHandler().setState<HandleError>();

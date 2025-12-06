@@ -34,6 +34,7 @@ add_library(${LIB_NAME} STATIC
   states/writeStatusLine/WriteStatusLine.cpp
   Authority.cpp
   Headers.cpp
+  headerUtils.cpp
   http.cpp
   Request.cpp
   Response.cpp

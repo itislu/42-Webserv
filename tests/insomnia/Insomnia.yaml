@@ -1,0 +1,197 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1761142447914
+  modified: 1761142447914
+  description: ""
+collection:
+  - name: Webserv
+    meta:
+      id: fld_b2e91a522ea8456a88eaf99faaf2b613
+      created: 1764947791370
+      modified: 1764951763548
+      sortKey: -1764947791370
+      description: ""
+    children:
+      - url: http://localhost:8080/get.html
+        name: BasicRequest
+        meta:
+          id: req_876e9556d71d408a9ab13d09f7952378
+          created: 1761142474184
+          modified: 1764947800257
+          isPrivate: false
+          description: ""
+          sortKey: -1764947796216
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.1
+          - name: Connection
+            value: close
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 200', () => {
+                insomnia.expect(insomnia.response.code).to.eql(200);
+            });
+
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/get.html
+        name: MethodNotAllowed
+        meta:
+          id: req_94f0e469d94945a7b19d829d6cd22fe6
+          created: 1764946608857
+          modified: 1764947797312
+          isPrivate: false
+          description: ""
+          sortKey: -1764947796116
+        method: GOT
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/notfoundshit.html
+        name: CustomErrPage
+        meta:
+          id: req_6d7166a9074f41cfb3dc8965cf357cfe
+          created: 1764947050228
+          modified: 1764947804220
+          isPrivate: false
+          description: ""
+          sortKey: -1764947796166
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 404', () => {
+                insomnia.expect(insomnia.response.code).to.eql(404);
+            });
+
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/upload
+        name: Upload
+        meta:
+          id: req_33ded881151a4334ae994ea056be2a18
+          created: 1764947828326
+          modified: 1764951762486
+          isPrivate: false
+          description: ""
+          sortKey: -1764947828326
+        method: POST
+        body:
+          mimeType: text/plain
+          text: |
+            HelloWorld
+        headers:
+          - name: Content-Type
+            value: text/plain
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+          - name: Content-Length
+            value: "10"
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |+
+            
+
+            insomnia.test('Check if status is 201', () => {
+                insomnia.expect(insomnia.response.code).to.eql(201);
+            });
+
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: upload/
+        name: UploadRelative
+        meta:
+          id: req_f63797e774af4ce88c3adc94379cb8eb
+          created: 1764952067561
+          modified: 1764952973512
+          isPrivate: false
+          description: ""
+          sortKey: -1764947812271
+        method: POST
+        body:
+          mimeType: text/plain
+          text: |
+            HelloWorld
+        headers:
+          - name: Content-Type
+            value: text/plain
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+          - name: Content-Length
+            value: "10"
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |+
+            
+
+            insomnia.test('Check if status is 201', () => {
+                insomnia.expect(insomnia.response.code).to.eql(201);
+            });
+
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1761142460751
+    modified: 1764951763547
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1761142460750
+    modified: 1764951763548
+    isPrivate: false

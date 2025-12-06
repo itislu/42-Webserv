@@ -1,33 +1,34 @@
 #include "ValidateRequest.hpp"
 
-#include "client/Client.hpp"
-#include "config/LocationConfig.hpp"
-#include "http/Request.hpp"
-#include "http/Resource.hpp"
-#include "http/StatusCode.hpp"
-#include "http/http.hpp"
-#include "http/states/prepareResponse/PrepareResponse.hpp"
-#include "http/states/readBody/ReadBody.hpp"
-#include "http/states/validateRequest/ValidateDelete.hpp"
-#include "http/states/validateRequest/ValidateGet.hpp"
-#include "http/states/validateRequest/ValidatePost.hpp"
-#include "libftpp/algorithm.hpp"
-#include "libftpp/optional.hpp"
-#include "libftpp/string.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "utils/state/StateHandler.hpp"
+#include <client/Client.hpp>
+#include <config/LocationConfig.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/StatusCode.hpp>
+#include <http/http.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/states/readBody/ReadBody.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/validateRequest/ValidateDelete.hpp>
+#include <http/states/validateRequest/ValidateGet.hpp>
+#include <http/states/validateRequest/ValidatePost.hpp>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/optional.hpp>
+#include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <utils/convert.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+#include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
 #include <cstdlib>
-#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <exception>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
-#include <utils/convert.hpp>
-#include <utils/logger/Logger.hpp>
-#include <utils/state/IState.hpp>
 #include <vector>
 
 /* ************************************************************************** */
@@ -49,7 +50,7 @@ ValidateRequest::ValidateRequest(Client* context)
 }
 
 void ValidateRequest::run()
-{
+try {
   _init();
 
   _stateHandler.setStateHasChanged(true);
@@ -68,6 +69,10 @@ void ValidateRequest::run()
       getContext()->getStateHandler().setState<PrepareResponse>();
     }
   }
+} catch (const std::exception& e) {
+  _log.error() << *getContext() << " ValidateRequest: " << e.what() << '\n';
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 const std::string& ValidateRequest::getPath() const

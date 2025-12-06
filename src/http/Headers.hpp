@@ -10,6 +10,7 @@
 class Headers
 {
 public:
+  void setHeader(const std::string& key, const std::string& value);
   void addHeader(const std::string& key, const std::string& value);
 
   std::string toString() const;
@@ -26,6 +27,7 @@ private:
 
   static void _formatInput(std::string& key, HeaderPair& headerPair);
   void _addNew(const std::string& key, const HeaderPair& headerPair);
+  void _setExisting(const std::string& key, const HeaderPair& headerPair);
   void _addExisting(const std::string& key, const HeaderPair& headerPair);
 
   HeaderMap _headers;
