@@ -77,6 +77,9 @@ std::string WriteHeaderLines::_makeHttpDate()
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#name-persistence
+ */
 void WriteHeaderLines::_setConnectionHeader()
 {
   Request& request = _client->getRequest();
@@ -99,8 +102,8 @@ void WriteHeaderLines::_setConnectionHeader()
     return;
   }
 
-  // HTTP/1.1 -> connection persist
-  if (request.getVersion() == http::HTTP_1_1) {
+  // HTTP/1.1 (or later) -> connection persist
+  if (request.getVersion() >= http::HTTP_1_1) {
     headers.addHeader("Connection", "keep-alive");
     return;
   }
