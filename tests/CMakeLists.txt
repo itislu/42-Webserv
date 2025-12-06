@@ -123,6 +123,10 @@ add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
 )
 
+add_my_test(writeBodyTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/writeBodyTester.cpp
+)
+
 # config
 
 add_my_test(configParserTester
