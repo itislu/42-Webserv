@@ -8,6 +8,24 @@
 /* ************************************************************************** */
 // PUBLIC
 
+void Headers::setHeader(const std::string& key, const std::string& value)
+{
+  std::string keyFormated = key;
+  HeaderPair headerPair(key, value);
+  _formatInput(keyFormated, headerPair);
+
+  if (keyFormated.empty()) {
+    return;
+  }
+
+  const HeaderMap::const_iterator iter = _headers.find(keyFormated);
+  if (iter == _headers.end()) {
+    _addNew(keyFormated, headerPair);
+  } else {
+    _setExisting(keyFormated, headerPair);
+  }
+}
+
 void Headers::addHeader(const std::string& key, const std::string& value)
 {
   std::string keyFormated = key;
@@ -80,6 +98,12 @@ void Headers::_formatInput(std::string& key, HeaderPair& headerPair)
 void Headers::_addNew(const std::string& key, const HeaderPair& headerPair)
 {
   _headers[key] = headerPair;
+}
+
+void Headers::_setExisting(const std::string& key, const HeaderPair& headerPair)
+{
+  HeaderPair& header = _headers[key];
+  header.second = headerPair.second;
 }
 
 void Headers::_addExisting(const std::string& key, const HeaderPair& headerPair)
