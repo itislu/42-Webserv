@@ -13,14 +13,22 @@ add_library(${LIB_NAME} STATIC
   abnfRules/Rule.cpp
   abnfRules/RuleResult.cpp
   abnfRules/SequenceRule.cpp
+
+  buffer/BufferQueue.cpp
+  buffer/FileBuffer.cpp
+  buffer/IBuffer.cpp
+  buffer/IInBuffer.cpp
+  buffer/IOutBuffer.cpp
+  buffer/MemoryBuffer.cpp
+  buffer/SmartBuffer.cpp
+  buffer/StaticFileBuffer.cpp
+
   logger/Logger.cpp
-  Buffer.cpp
+
   BufferReader.cpp
-  FileBuffer.cpp
+  convert.cpp
   fileUtils.cpp
-  IBuffer.cpp
   printUtils.cpp
-  SmartBuffer.cpp
 )
 
 target_link_libraries(${LIB_NAME} 

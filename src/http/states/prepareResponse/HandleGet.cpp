@@ -8,14 +8,15 @@
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
+#include <libftpp/memory.hpp>
 #include <libftpp/optional.hpp>
 #include <libftpp/string.hpp>
+#include <utils/buffer/StaticFileBuffer.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <cstddef>
-#include <fstream>
 #include <string>
 
 /* ************************************************************************** */
@@ -97,12 +98,7 @@ void HandleGet::_addContentType()
 void HandleGet::_openFile()
 {
   const std::string& filepath = _client->getResource().getPath();
-  std::ifstream& body = _client->getResponse().getBody();
-  body.open(filepath.c_str());
-  if (!body.is_open()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    _log.error() << "HandleGet: failed to open file\n";
-  }
+  _client->getResponse().setBody(ft::make_shared<StaticFileBuffer>(filepath));
 }
 
 bool HandleGet::_fail()

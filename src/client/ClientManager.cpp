@@ -11,6 +11,13 @@
 #include <utility>
 #include <vector>
 
+ClientManager& ClientManager::getInstance()
+{
+  static ClientManager clientManager;
+
+  return clientManager;
+}
+
 Client* ClientManager::getClient(int fdes) const
 {
   const const_FdToClientIter iter = _clients.find(fdes);

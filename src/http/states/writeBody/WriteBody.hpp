@@ -2,6 +2,7 @@
 #ifndef WRITE_BODY_HPP
 #define WRITE_BODY_HPP
 
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -16,15 +17,18 @@ public:
   void run();
 
 private:
-  bool _fail();
-  void _writeIntoOutBuffer();
+  void _defineBodyFraming();
+  void _handleFixedLengthBody();
+  void _handleChunkedBody();
+  void _handleLastChunk();
 
   static Logger& _log;
-  static const int _outBufferLimit = 4096;
-  static const int _chunkSize = 1024;
-  Client* _client;
 
+  Client* _client;
+  SmartBuffer* _outBuffer; // Owner in Client::_outBuffQueue
   bool _done;
+  bool _chunked;
+  bool _fixedLength;
 };
 
 #endif

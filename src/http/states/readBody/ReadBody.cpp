@@ -12,18 +12,20 @@
 #include <libftpp/algorithm.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
-#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInOutBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -48,7 +50,7 @@ ReadBody::ReadBody(Client* context)
   , _chunkedBody(false)
   , _done(false)
 {
-  _log.info() << "ReadBody\n";
+  _log.info() << *_client << " ReadBody\n";
 
   _determineBodyFraming();
   _buffReader.init(&_client->getInBuff());
@@ -62,7 +64,7 @@ ReadBody::ReadBody(Client* context)
 }
 
 void ReadBody::run()
-{
+try {
   if (_fixedLengthBody) {
     _readFixedLengthBody();
   } else if (_chunkedBody) {
@@ -72,6 +74,10 @@ void ReadBody::run()
   if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
     getContext()->getStateHandler().setState<PrepareResponse>();
   }
+} catch (const std::exception& e) {
+  _log.error() << *_client << " ReadBody: " << e.what() << "\n";
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 /* ************************************************************************** */
@@ -121,12 +127,6 @@ void ReadBody::_determineBodyFraming()
   const Headers& headers = _client->getRequest().getHeaders();
   const bool hasTransferEncoding = headers.contains("Transfer-Encoding");
   const bool hasContentLength = headers.contains("Content-Length");
-  // todo add grammar rules for these headers
-  if (hasContentLength && hasTransferEncoding) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
-    return;
-  }
   if (hasContentLength) {
     _validateContentLength();
     return;
@@ -320,7 +320,7 @@ void ReadBody::_setChunkExt(const std::string& value)
  */
 void ReadBody::_readBody()
 {
-  IBuffer& inBuffer = _client->getInBuff();
+  IInOutBuffer& inBuffer = _client->getInBuff();
   Request& request = _client->getRequest();
 
   std::size_t toConsume = std::min(_readChunkSize, _bodyLength - _consumed);

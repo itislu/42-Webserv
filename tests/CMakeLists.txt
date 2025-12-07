@@ -78,6 +78,10 @@ add_my_test(fileBufferTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/fileBufferTester.cpp
 )
 
+add_my_test(memoryBufferTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/memoryBufferTester.cpp
+)
+
 add_my_test(smartBufferTester
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_tests/smartBufferTester.cpp
 )
@@ -91,6 +95,10 @@ add_my_test(http11RulesTester
 
 add_my_test(headerLineRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerLineRulesTester.cpp
+)
+
+add_my_test(headerTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerTester.cpp
 )
 
 add_my_test(requestLineRulesTester
@@ -117,6 +125,10 @@ add_my_test(readRequestLineTester
 
 add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
+)
+
+add_my_test(writeBodyTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/writeBodyTester.cpp
 )
 
 # config

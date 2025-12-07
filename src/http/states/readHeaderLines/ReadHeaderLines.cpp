@@ -13,21 +13,25 @@
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
-#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <cstddef>
 #include <string>
 
-/* **************************************************************************
- */
+/* ***************************************************************************/
 // INIT
 
 Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);
+
+const std::size_t ReadHeaderLines::_defaultMaxFieldLineSize;
+const std::size_t ReadHeaderLines::_defaultMaxHeaderSize;
+std::size_t ReadHeaderLines::_maxFieldLineSize = _defaultMaxFieldLineSize;
+std::size_t ReadHeaderLines::_maxHeaderSize = _defaultMaxHeaderSize;
 
 /* ************************************************************************** */
 // PUBLIC
@@ -38,8 +42,9 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
   , _buffReader()
   , _sizeHeaders(0)
   , _done(false)
+  , _validator(_client)
 {
-  _log.info() << "ReadHeaderLines\n";
+  _log.info() << *_client << " ReadHeaderLines\n";
   _init();
 }
 
@@ -62,9 +67,29 @@ try {
     return;
   }
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "ReadHeaderLines: " << e.what() << "\n";
+  _log.error() << *_client << " ReadHeaderLines: " << e.what() << "\n";
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setState<PrepareResponse>();
+}
+
+void ReadHeaderLines::setMaxFieldLineSize(std::size_t value)
+{
+  _maxFieldLineSize = value;
+}
+
+void ReadHeaderLines::setMaxHeaderSize(std::size_t value)
+{
+  _maxHeaderSize = value;
+}
+
+void ReadHeaderLines::resetMaxFieldLineSize()
+{
+  _maxFieldLineSize = _defaultMaxFieldLineSize;
+}
+
+void ReadHeaderLines::resetMaxHeaderSize()
+{
+  _maxHeaderSize = _defaultMaxHeaderSize;
 }
 
 void ReadHeaderLines::_init()
@@ -141,12 +166,12 @@ bool ReadHeaderLines::_hasEndOfLine()
 std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
 {
   const RuleResult& result = _results[ruleId];
-  const std::size_t index = result.getEnd();
+  const std::size_t pos = result.getEnd();
 
-  if (_headerTooLarge(index)) {
+  if (_headerTooLarge(pos)) {
     return "";
   }
-  const std::string part = _client->getInBuff().consumeFront(index);
+  const std::string part = _client->getInBuff().consumeFront(pos);
   _buffReader.resetPosInBuff();
   return part;
 }
@@ -156,24 +181,24 @@ void ReadHeaderLines::_addLineToHeaders(const std::string& line)
   const std::size_t index = line.find(':');
   const std::string name = line.substr(0, index);
   const std::string value = line.substr(index + 1, line.size());
+
+  // validate header
+  _validator.run(name, value);
+
   Headers& headers = _client->getRequest().getHeaders();
   headers.addHeader(name, value);
 }
 
 bool ReadHeaderLines::_headerTooLarge(std::size_t newBytes)
 {
-  // todo values from config ??
-
-  const std::size_t maxFieldLineSize = 4242;
-  if (newBytes > maxFieldLineSize) {
+  if (newBytes > _maxFieldLineSize) {
     _client->getResponse().setStatusCode(
       StatusCode::RequestHeaderFieldsTooLarge);
     _log.error() << "ReadHeaderLines: field line too large\n";
     return true;
   }
 
-  const std::size_t maxHeaderSize = 8042;
-  if (_sizeHeaders + newBytes > maxHeaderSize) {
+  if (_sizeHeaders + newBytes > _maxHeaderSize) {
     _client->getResponse().setStatusCode(
       StatusCode::RequestHeaderFieldsTooLarge);
     _log.error() << "ReadHeaderLines: header too large\n";

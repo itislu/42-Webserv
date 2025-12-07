@@ -1,4 +1,4 @@
-#include "utils/SmartBuffer.hpp"
+#include "utils/buffer/SmartBuffer.hpp"
 #include <http/abnfRules/requestLineRules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
