@@ -31,10 +31,10 @@ Logger& WriteBody::_log = Logger::getInstance(LOG_HTTP);
 WriteBody::WriteBody(Client* context)
   : IState<Client>(context)
   , _client(context)
+  , _outBuffer(FT_NULLPTR)
   , _done(false)
   , _chunked(false)
   , _fixedLength(false)
-  , _smartBuffer(FT_NULLPTR)
 {
   _log.info() << "WriteBody\n";
   _defineBodyFraming();
@@ -73,7 +73,7 @@ void WriteBody::_defineBodyFraming()
     _fixedLength = true;
   } else {
     _chunked = true;
-    _smartBuffer = &_client->getOutBuffQueue().getSmartBuffer();
+    _outBuffer = &_client->getOutBuffQueue().getSmartBuffer();
   }
 }
 
@@ -93,7 +93,7 @@ void WriteBody::_handleChunkedBody()
 {
   // Ensure amount written into the SmartBuffer keeps it a MemoryBuffer.
   assert(SmartBuffer::getMemoryToFileThreshold() > Client::maxChunk * 2);
-  if (_smartBuffer->size() > Client::maxChunk) {
+  if (_outBuffer->size() > Client::maxChunk) {
     return;
   }
 
@@ -109,9 +109,9 @@ void WriteBody::_handleChunkedBody()
 
   std::ostringstream oss;
   oss << std::hex << std::nouppercase << rawBytes.size() << http::CRLF;
-  _smartBuffer->append(oss.str());
-  _smartBuffer->append(rawBytes, rawBytes.size());
-  _smartBuffer->append(http::CRLF);
+  _outBuffer->append(oss.str());
+  _outBuffer->append(rawBytes, rawBytes.size());
+  _outBuffer->append(http::CRLF);
 
   if (body->isEmpty()) {
     _handleLastChunk();
@@ -127,6 +127,6 @@ void WriteBody::_handleLastChunk()
   static const std::string lastChunk =
     std::string("0").append(http::CRLF).append(http::CRLF);
 
-  _smartBuffer->append(lastChunk);
+  _outBuffer->append(lastChunk);
   _done = true;
 }

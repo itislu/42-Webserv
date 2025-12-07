@@ -23,12 +23,12 @@ private:
   void _handleLastChunk();
 
   static Logger& _log;
-  Client* _client;
 
+  Client* _client;
+  SmartBuffer* _outBuffer; // Owner in Client::_outBuffQueue
   bool _done;
   bool _chunked;
   bool _fixedLength;
-  SmartBuffer* _smartBuffer; // Owner in Client::_outBuffQueue
 };
 
 #endif
