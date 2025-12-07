@@ -18,11 +18,11 @@ void Headers::setHeader(const std::string& key, const std::string& value)
     return;
   }
 
-  const HeaderMap::const_iterator iter = _headers.find(keyFormated);
-  if (iter == _headers.end()) {
-    _addNew(keyFormated, headerPair);
+  HeaderPair& header = _headers[keyFormated];
+  if (header.first.empty()) {
+    header = headerPair;
   } else {
-    _setExisting(keyFormated, headerPair);
+    header.second = headerPair.second;
   }
 }
 
@@ -36,11 +36,11 @@ void Headers::addHeader(const std::string& key, const std::string& value)
     return;
   }
 
-  const HeaderMap::const_iterator iter = _headers.find(keyFormated);
-  if (iter == _headers.end()) {
-    _addNew(keyFormated, headerPair);
+  HeaderPair& header = _headers[keyFormated];
+  if (header.first.empty()) {
+    header = headerPair;
   } else {
-    _addExisting(keyFormated, headerPair);
+    header.second.append(", ").append(headerPair.second);
   }
 }
 
@@ -93,21 +93,4 @@ void Headers::_formatInput(std::string& key, HeaderPair& headerPair)
   ft::trim(headerPair.second);
 
   ft::to_lower(key);
-}
-
-void Headers::_addNew(const std::string& key, const HeaderPair& headerPair)
-{
-  _headers[key] = headerPair;
-}
-
-void Headers::_setExisting(const std::string& key, const HeaderPair& headerPair)
-{
-  HeaderPair& header = _headers[key];
-  header.second = headerPair.second;
-}
-
-void Headers::_addExisting(const std::string& key, const HeaderPair& headerPair)
-{
-  HeaderPair& header = _headers[key];
-  header.second.append(", ").append(headerPair.second);
 }

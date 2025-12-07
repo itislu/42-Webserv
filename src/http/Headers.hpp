@@ -26,9 +26,6 @@ private:
   typedef std::map<std::string, HeaderPair> HeaderMap;
 
   static void _formatInput(std::string& key, HeaderPair& headerPair);
-  void _addNew(const std::string& key, const HeaderPair& headerPair);
-  void _setExisting(const std::string& key, const HeaderPair& headerPair);
-  void _addExisting(const std::string& key, const HeaderPair& headerPair);
 
   HeaderMap _headers;
 };
