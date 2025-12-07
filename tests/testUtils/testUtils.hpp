@@ -15,7 +15,7 @@ namespace testUtils {
  *
  * Example:
  * @code
- * test::makeString("foo\x00bar"); // Returns std::string of length 7.
+ * testUtils::makeString("foo\x00bar"); // Returns std::string of length 7.
  * @endcode
  */
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays)
