@@ -93,6 +93,24 @@ void expectLastChunk(const std::string& data, std::string::size_type& pos)
 
 }
 
+TEST(WriteBodyTester, KeepPollEnabled)
+{
+  const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  const std::string chunk = generateChunk(Client::maxChunk * 2);
+  setupStateTest(*client, chunk);
+  // One consume runs the state once.
+  const std::string output = consume(*client, chunk.size());
+
+  // Ensure more than maxChunk was written into outBuffer to keep poll enabled.
+  EXPECT_GT(output.size(), Client::maxChunk);
+}
+
+TEST(WriteBodyTester, MemoryToFileThreshold)
+{
+  // Ensure amount written into the SmartBuffer keeps it a MemoryBuffer.
+  EXPECT_GT(SmartBuffer::getMemoryToFileThreshold(), Client::maxChunk * 2);
+}
+
 TEST(WriteBodyTester, BasicTestChunked)
 {
   const ft::unique_ptr<Client> client = ft::make_unique<Client>();

@@ -1,5 +1,4 @@
 #include "WriteBody.hpp"
-#include "utils/buffer/SmartBuffer.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -13,7 +12,6 @@
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <cstddef>
 #include <exception>
 #include <ios>
@@ -91,12 +89,9 @@ void WriteBody::_handleFixedLengthBody()
  */
 void WriteBody::_handleChunkedBody()
 {
-  // Ensure amount written into the SmartBuffer keeps it a MemoryBuffer.
-  assert(SmartBuffer::getMemoryToFileThreshold() > Client::maxChunk * 2);
   if (_outBuffer->size() > Client::maxChunk) {
     return;
   }
-
   const ft::shared_ptr<IInBuffer>& body = _client->getResponse().getBody();
 
   if (body->isEmpty()) {
