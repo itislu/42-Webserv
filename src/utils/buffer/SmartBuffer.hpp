@@ -19,6 +19,8 @@ public:
   SmartBuffer();
   ~SmartBuffer() {}
 
+  static std::size_t getMemoryToFileThreshold();
+  static std::size_t getFileToMemoryThreshold();
   static void setMemoryToFileThreshold(std::size_t value);
   static void setFileToMemoryThreshold(std::size_t value);
 

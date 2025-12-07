@@ -1,12 +1,10 @@
 #include "WriteBody.hpp"
+#include "utils/buffer/SmartBuffer.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
-#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/http.hpp>
-#include <http/states/prepareResponse/HandleError.hpp>
-#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/buffer/IBuffer.hpp>
@@ -15,17 +13,17 @@
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <exception>
 #include <ios>
 #include <sstream>
+#include <string>
 
 /* ************************************************************************** */
 // INIT
 
 Logger& WriteBody::_log = Logger::getInstance(LOG_HTTP);
-const std::size_t WriteBody::_outBufferLimit;
-const std::size_t WriteBody::_chunkSize;
 
 /* ************************************************************************** */
 // PUBLIC
@@ -86,36 +84,49 @@ void WriteBody::_handleFixedLengthBody()
 }
 
 /**
- * Write more into the outBuffer than the EventManager will send to keep poll
- * enabled. Also limit the amount written into SmartBuffer so it stays a
- * MemoryBuffer.
+ * Write more into the outBuffer than the Client will send to keep poll enabled.
  *
  * chunk          = chunk-size [ chunk-ext ] CRLF
  *                  chunk-data CRLF
  */
 void WriteBody::_handleChunkedBody()
 {
-  const ft::shared_ptr<IInBuffer>& body = _client->getResponse().getBody();
-  while (!_done && _smartBuffer->size() < _outBufferLimit) {
-    if (body->isEmpty()) {
-      _smartBuffer->append("0\r\n\r\n");
-      _done = true;
-      break;
-    }
-
-    const std::size_t currChunkSize = std::min(body->size(), _chunkSize);
-    const IBuffer::RawBytes rawBytes = body->consumeRawFront(currChunkSize);
-
-    std::ostringstream oss;
-    oss << std::hex << std::nouppercase << rawBytes.size() << http::CRLF;
-    _smartBuffer->append(oss.str());
-    _smartBuffer->append(rawBytes, rawBytes.size());
-    _smartBuffer->append(http::CRLF);
-
-    if (body->isEmpty()) {
-      _done = true;
-      // if we ever send trailers the second CRLF should be removed
-      _smartBuffer->append("0\r\n\r\n");
-    }
+  // Ensure amount written into the SmartBuffer keeps it a MemoryBuffer.
+  assert(SmartBuffer::getMemoryToFileThreshold() > Client::maxChunk * 2);
+  if (_smartBuffer->size() > Client::maxChunk) {
+    return;
   }
+
+  const ft::shared_ptr<IInBuffer>& body = _client->getResponse().getBody();
+
+  if (body->isEmpty()) {
+    _handleLastChunk();
+    return;
+  }
+
+  const std::size_t currChunkSize = std::min(body->size(), Client::maxChunk);
+  const IBuffer::RawBytes rawBytes = body->consumeRawFront(currChunkSize);
+
+  std::ostringstream oss;
+  oss << std::hex << std::nouppercase << rawBytes.size() << http::CRLF;
+  _smartBuffer->append(oss.str());
+  _smartBuffer->append(rawBytes, rawBytes.size());
+  _smartBuffer->append(http::CRLF);
+
+  if (body->isEmpty()) {
+    _handleLastChunk();
+  }
+}
+
+/**
+ * last-chunk     = 1*("0") [ chunk-ext ] CRLF
+ */
+void WriteBody::_handleLastChunk()
+{
+  // if we ever send trailers the second CRLF should be removed
+  static const std::string lastChunk =
+    std::string("0").append(http::CRLF).append(http::CRLF);
+
+  _smartBuffer->append(lastChunk);
+  _done = true;
 }

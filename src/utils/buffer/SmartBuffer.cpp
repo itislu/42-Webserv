@@ -34,6 +34,16 @@ SmartBuffer::SmartBuffer()
   _buffer = ft::move(newBuffer);
 }
 
+std::size_t SmartBuffer::getMemoryToFileThreshold()
+{
+  return _memoryToFileThreshold;
+}
+
+std::size_t SmartBuffer::getFileToMemoryThreshold()
+{
+  return _fileToMemoryThreshold;
+}
+
 void SmartBuffer::setMemoryToFileThreshold(std::size_t value)
 {
   _memoryToFileThreshold = value;
