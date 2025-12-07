@@ -1,14 +1,14 @@
-#include "http/Response.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/readBody/ReadBody.hpp"
-#include "utils/buffer/IBuffer.hpp"
-#include "utils/buffer/SmartBuffer.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/readBody/ReadBody.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/state/IState.hpp>
 
 #include <gtest/gtest.h>
@@ -109,6 +109,60 @@ TEST(ReadBodyTester, ChunkedWithTrailer)
   EXPECT_EQ(value, "value1");
   EXPECT_NO_THROW(value = headers.at("Trailer2"));
   EXPECT_EQ(value, "value2");
+}
+
+TEST(ReadBodyTester, TransferEncodingEmpty)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding", "");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+}
+
+TEST(ReadBodyTester, ChunkedIsNotFinalEncoding)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding", "chunke");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding",
+                                                "chunked, zip");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+}
+
+TEST(ReadBodyTester, TransferEncodingMultipleChunked)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding",
+                                                "chunked, CHUNKED");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+}
+
+TEST(ReadBodyTester, TransferEncodingNotImplemented)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding",
+                                                ", zip, chunked");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::NotImplemented);
+  }
 }
 
 TEST(ReadBodyTester, FixedLength)

@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 
 namespace header {
 const char* const host = "Host";
@@ -32,4 +33,35 @@ void setContentTypeHeader(Headers& headers, const std::string& filePath)
   } else {
     headers.setHeader(header::contentType, "text/html");
   }
+}
+
+/**
+ * @brief Convert raw header list to vector of strings.
+ *
+ * #element => [ element ] *( OWS "," OWS [ element ] )
+ *
+ * - removes whitespace
+ */
+std::vector<std::string> convertHeaderList(const std::string& rawList)
+{
+  std::vector<std::string> result;
+
+  std::string token;
+  for (std::size_t i = 0; i < rawList.size(); ++i) {
+    if (rawList[i] == ',') {
+      ft::trim(token);
+      if (!token.empty()) {
+        result.push_back(token);
+        token.clear();
+      }
+    } else {
+      token += rawList[i];
+    }
+  }
+
+  ft::trim(token);
+  if (!token.empty()) {
+    result.push_back(token);
+  }
+  return result;
 }
