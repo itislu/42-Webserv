@@ -16,7 +16,7 @@
 
 namespace {
 
-void StateTest(Client& client, const std::string& bodyLines)
+void setupStateTest(Client& client, const std::string& bodyLines)
 {
   Response& response = client.getResponse();
   Headers& headers = response.getHeaders();
@@ -46,6 +46,7 @@ std::string consume(Client& client, std::size_t bytes)
 {
   client.getStateHandler().getState()->run();
   SmartBuffer& outBuff = client.getOutBuffQueue().getSmartBuffer();
+  EXPECT_FALSE(outBuff.usesFile());
   const std::size_t toConsume = std::min(bytes, outBuff.size());
   const std::string data = outBuff.consumeFront(toConsume);
   return data;
@@ -96,10 +97,10 @@ TEST(WriteBodyTester, BasicTestChunked)
 {
   const ft::unique_ptr<Client> client = ft::make_unique<Client>();
   const std::string chunk = generateChunk(Client::maxChunk);
-  StateTest(*client, chunk + chunk);
+  setupStateTest(*client, chunk + chunk);
   const std::string output = consumeAll(*client, Client::maxChunk);
 
-  const std::string chunkSize = ft::to_string(Client::maxChunk, std::ios::hex);
+  const std::string chunkSize = ft::to_string(chunk.size(), std::ios::hex);
   std::string::size_type pos = 0;
 
   expectChunk(output, pos, chunkSize, chunk);
@@ -110,11 +111,72 @@ TEST(WriteBodyTester, BasicTestChunked)
 TEST(WriteBodyTester, EmptyBodyChunked)
 {
   const ft::unique_ptr<Client> client = ft::make_unique<Client>();
-  StateTest(*client, "");
+  setupStateTest(*client, "");
 
   const std::string output = consumeAll(*client, Client::maxChunk);
   std::string::size_type pos = 0;
 
+  expectLastChunk(output, pos);
+}
+
+TEST(WriteBodyTester, SingleByteChunked)
+{
+  const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  setupStateTest(*client, "X");
+
+  const std::string output = consumeAll(*client, Client::maxChunk);
+  std::string::size_type pos = 0;
+
+  expectChunk(output, pos, "1", "X");
+  expectLastChunk(output, pos);
+}
+
+TEST(WriteBodyTester, LargeAndSmallChunk)
+{
+  const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  const std::string chunk1 = generateChunk(Client::maxChunk);
+  const std::string chunk2 = generateChunk(50);
+  setupStateTest(*client, chunk1 + chunk2);
+
+  const std::string output = consumeAll(*client, Client::maxChunk);
+  const std::string chunkSize1 = ft::to_string(chunk1.size(), std::ios::hex);
+  const std::string chunkSize2 = ft::to_string(chunk2.size(), std::ios::hex);
+  std::string::size_type pos = 0;
+
+  expectChunk(output, pos, chunkSize1, chunk1);
+  expectChunk(output, pos, chunkSize2, chunk2);
+  expectLastChunk(output, pos);
+}
+
+TEST(WriteBodyTester, ThreeChunks)
+{
+  const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  const std::string chunk = generateChunk(Client::maxChunk);
+  setupStateTest(*client, chunk + chunk + chunk);
+
+  const std::string output = consumeAll(*client, Client::maxChunk);
+  const std::string chunkSize = ft::to_string(chunk.size(), std::ios::hex);
+  std::string::size_type pos = 0;
+
+  expectChunk(output, pos, chunkSize, chunk);
+  expectChunk(output, pos, chunkSize, chunk);
+  expectChunk(output, pos, chunkSize, chunk);
+  expectLastChunk(output, pos);
+}
+
+TEST(WriteBodyTester, SlowConsumerChunked)
+{
+  const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  const std::string chunk = generateChunk(Client::maxChunk);
+  setupStateTest(*client, chunk + chunk);
+
+  // Consume in small increments
+  const std::string output = consumeAll(*client, 100);
+  const std::string chunkSize = ft::to_string(chunk.size(), std::ios::hex);
+  std::string::size_type pos = 0;
+
+  expectChunk(output, pos, chunkSize, chunk);
+  expectChunk(output, pos, chunkSize, chunk);
   expectLastChunk(output, pos);
 }
 

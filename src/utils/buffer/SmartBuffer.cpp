@@ -163,6 +163,11 @@ ssize_t SmartBuffer::send(int fdes, std::size_t bytes)
   return _buffer->send(fdes, bytes);
 }
 
+bool SmartBuffer::usesFile() const
+{
+  return _usesFile;
+}
+
 const IInBuffer* SmartBuffer::getRawBuffer() const
 {
   return _buffer.get();

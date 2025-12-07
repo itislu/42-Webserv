@@ -44,6 +44,9 @@ public:
   std::size_t size() const;
   ssize_t send(int fdes, std::size_t bytes);
 
+  // Non-interface
+  bool usesFile() const;
+
 protected:
   const IInBuffer* getRawBuffer() const;
 
