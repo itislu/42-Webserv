@@ -24,7 +24,7 @@ add_library(${LIB_NAME} STATIC
   states/readRequestLine/ParseVersion.cpp
   states/readRequestLine/ReadRequestLine.cpp
   states/readHeaderLines/ReadHeaderLines.cpp
-  states/readHeaderLines/ValidateHeader.cpp
+  states/readHeaderLines/RequestHeaderValidator.cpp
   states/validateRequest/ValidateDelete.cpp
   states/validateRequest/ValidateGet.cpp
   states/validateRequest/ValidatePost.cpp
@@ -32,6 +32,8 @@ add_library(${LIB_NAME} STATIC
   states/writeBody/WriteBody.cpp
   states/writeHeaderLines/WriteHeaderLines.cpp
   states/writeStatusLine/WriteStatusLine.cpp
+  utils/BaseHeaderValidator.cpp
+  utils/HeaderParser.cpp
   Authority.cpp
   Headers.cpp
   http.cpp

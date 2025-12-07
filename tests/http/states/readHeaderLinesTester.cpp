@@ -7,7 +7,6 @@
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
-#include <libftpp/utility.hpp>
 #include <utils/state/IState.hpp>
 
 #include <gtest/gtest.h>
@@ -22,7 +21,7 @@ ft::unique_ptr<Client> StateTest(const std::string& requestLine)
   client->getInBuff().append(requestLine);
   client->getStateHandler().setState<ReadHeaderLines>();
   client->getStateHandler().getState()->run();
-  return ft::move(client);
+  return client;
 }
 }
 
