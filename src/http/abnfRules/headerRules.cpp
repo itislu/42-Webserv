@@ -78,10 +78,7 @@ ft::shared_ptr<RepetitionRule> contentLengthRule()
  */
 ft::shared_ptr<SequenceRule> transferEncodingRule()
 {
-  const ft::shared_ptr<SequenceRule> seq = ft::make_shared<SequenceRule>();
-
-  seq->addRule(listRule(transferCodingRule()));
-
+  const ft::shared_ptr<SequenceRule> seq = listRule(transferCodingRule());
   seq->setDebugTag("transferEncodingRule");
   return seq;
 }
