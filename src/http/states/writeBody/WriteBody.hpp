@@ -6,8 +6,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cstddef>
-
 class Client;
 
 /* ************************************************************************** */
@@ -22,16 +20,15 @@ private:
   void _defineBodyFraming();
   void _handleFixedLengthBody();
   void _handleChunkedBody();
+  void _handleLastChunk();
 
   static Logger& _log;
-  static const std::size_t _outBufferLimit = 3072;
-  static const std::size_t _chunkSize = 1024;
-  Client* _client;
 
+  Client* _client;
+  SmartBuffer* _outBuffer; // Owner in Client::_outBuffQueue
   bool _done;
   bool _chunked;
   bool _fixedLength;
-  SmartBuffer* _smartBuffer; // Owner in Client::_outBuffQueue
 };
 
 #endif
