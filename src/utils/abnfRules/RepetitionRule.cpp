@@ -90,6 +90,16 @@ void RepetitionRule::setMax(int value)
   _maxReps = value;
 }
 
+int RepetitionRule::getMin() const
+{
+  return _minReps;
+}
+
+int RepetitionRule::getMax() const
+{
+  return _maxReps;
+}
+
 bool RepetitionRule::reachedMin() const
 {
   return _reachedMin;
