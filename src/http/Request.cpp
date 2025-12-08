@@ -64,6 +64,11 @@ Request::Method Request::getMethod() const
   return _method;
 }
 
+std::string Request::getStrMethod() const
+{
+  return _methodToString();
+}
+
 const Uri& Request::getUri() const
 {
   return _uri;

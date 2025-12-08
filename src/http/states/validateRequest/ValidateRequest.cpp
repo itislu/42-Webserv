@@ -9,6 +9,7 @@
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readBody/ReadBody.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/startCgi/StartCgi.hpp>
 #include <http/states/validateRequest/ValidateDelete.hpp>
 #include <http/states/validateRequest/ValidateGet.hpp>
 #include <http/states/validateRequest/ValidatePost.hpp>
@@ -64,7 +65,11 @@ try {
                 << _client->getResource().toString() << "\n";
     _log.info() << _client->getResponse().getStatusCode() << "\n";
     if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
-      getContext()->getStateHandler().setState<ReadBody>();
+      if (_client->getResource().getType() == Resource::Cgi) {
+        getContext()->getStateHandler().setState<StartCgi>();
+      } else {
+        getContext()->getStateHandler().setState<ReadBody>();
+      }
     } else {
       getContext()->getStateHandler().setState<PrepareResponse>();
     }

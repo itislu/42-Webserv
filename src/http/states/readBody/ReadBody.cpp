@@ -1,18 +1,22 @@
 #include "ReadBody.hpp"
 
 #include <client/Client.hpp>
+#include <http/CgiContext.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Resource.hpp>
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/http11Rules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/states/waitForCgi/WaitForCgi.hpp>
 #include <http/utils/HeaderParser.hpp>
 #include <libftpp/algorithm.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -69,8 +73,14 @@ try {
     _readChunkedBody();
   }
 
+  _updateCgi();
+
   if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
-    getContext()->getStateHandler().setState<PrepareResponse>();
+    if (_client->getResource().getType() == Resource::Cgi) {
+      getContext()->getStateHandler().setState<WaitForCgi>();
+    } else {
+      getContext()->getStateHandler().setState<PrepareResponse>();
+    }
   }
 } catch (const std::exception& e) {
   _log.error() << *_client << " ReadBody: " << e.what() << "\n";
@@ -348,4 +358,18 @@ bool ReadBody::_setBodyLength(const std::string& numStr, std::ios::fmtflags fmt)
   }
   _log.info() << "body length: " << _bodyLength << '\n';
   return true;
+}
+
+void ReadBody::_updateCgi()
+{
+  CgiContext* cgiContext = _client->getCgiContext().get();
+  if (cgiContext == FT_NULLPTR) {
+    return;
+  }
+
+  if (_done || _fixedLengthBody) {
+    cgiContext->setContentLengthAvailable();
+    cgiContext->setContentLength(_bodyLength);
+  }
+  // todo enable pollout for ClientToCgi FD
 }

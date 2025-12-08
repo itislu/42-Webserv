@@ -2,10 +2,11 @@
 #define CLIENT_HPP
 
 #include <client/TimeStamp.hpp>
+#include <http/CgiContext.hpp>
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
-#include <ostream>
+#include <libftpp/memory.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
 #include <utils/buffer/BufferQueue.hpp>
@@ -14,6 +15,7 @@
 #include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
+#include <ostream>
 #include <string>
 
 class Client
@@ -35,6 +37,7 @@ public:
   Request& getRequest();
   Response& getResponse();
   Resource& getResource();
+  ft::shared_ptr<CgiContext>& getCgiContext();
 
   void setServer(const Server* server);
 
@@ -62,6 +65,7 @@ private:
   Request _request;
   Response _response;
   Resource _resource;
+  ft::shared_ptr<CgiContext> _cgiContext;
 };
 
 std::ostream& operator<<(std::ostream& out, const Client& client);

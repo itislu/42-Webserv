@@ -4,6 +4,7 @@
 #include <client/ClientManager.hpp>
 #include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
+#include <http/CgiContext.hpp>
 #include <http/http.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
@@ -78,6 +79,12 @@ void EventManager::clientStateMachine(Client& client)
     handler.setStateHasChanged(false);
     handler.getState()->run();
   }
+
+  CgiContext* cgiContext = client.getCgiContext().get();
+  if (cgiContext != FT_NULLPTR) {
+    cgiContext->getShExecCgi().getState()->run();
+    cgiContext->getShProcessCgiResponse().getState()->run();
+  }
 }
 
 /** // todo error when loong chunked sending
@@ -102,8 +109,15 @@ try {
     _socketManager().enablePollout(client->getFd());
     _log.info() << "Pollout enabled\n";
   }
-  if (pollOutEnabled(events) && alive) { // Send Data
+  if (pollOutEnabled(events) && alive && client->hasDataToSend()) { // Send Data
     alive = sendToClient(*client);
+  }
+  if (client->getCgiContext() != FT_NULLPTR) {
+    if (!client->getStateHandler().isDone() ||
+        !client->getCgiContext()->getShExecCgi().isDone() ||
+        !client->getCgiContext()->getShProcessCgiResponse().isDone()) {
+      _socketManager().enablePollout(client->getFd()); // todo remove
+    }
   }
   if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 && alive) {
     return false; // disconnect client

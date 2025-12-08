@@ -2,10 +2,12 @@
 
 #include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
+#include <http/CgiContext.hpp>
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
@@ -101,6 +103,11 @@ Response& Client::getResponse()
 Resource& Client::getResource()
 {
   return _resource;
+}
+
+ft::shared_ptr<CgiContext>& Client::getCgiContext()
+{
+  return _cgiContext;
 }
 
 long Client::getTimeout() const

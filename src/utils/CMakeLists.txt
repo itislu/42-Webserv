@@ -28,6 +28,7 @@ add_library(${LIB_NAME} STATIC
   BufferReader.cpp
   convert.cpp
   fileUtils.cpp
+  Pipe.cpp
   printUtils.cpp
 )
 

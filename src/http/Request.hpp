@@ -31,6 +31,7 @@ public:
   static Method strToMethod(const std::string& strMethod);
 
   Method getMethod() const;
+  std::string getStrMethod() const;
   const Uri& getUri() const;
   const std::string& getVersion() const;
   Headers& getHeaders();

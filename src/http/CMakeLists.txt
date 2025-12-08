@@ -13,28 +13,36 @@ add_library(${LIB_NAME} STATIC
   abnfRules/ruleIds.cpp
   abnfRules/ruleUtils.cpp
   abnfRules/uriRules.cpp
+  
   states/prepareResponse/HandleDelete.cpp
   states/prepareResponse/HandleError.cpp
   states/prepareResponse/HandleGet.cpp
   states/prepareResponse/HandlePost.cpp
   states/prepareResponse/PrepareResponse.cpp
   states/readBody/ReadBody.cpp
+  states/readHeaderLines/ReadHeaderLines.cpp
+  states/readHeaderLines/RequestHeaderValidator.cpp
   states/readRequestLine/ParseMethod.cpp
   states/readRequestLine/ParseUri.cpp
   states/readRequestLine/ParseVersion.cpp
   states/readRequestLine/ReadRequestLine.cpp
-  states/readHeaderLines/ReadHeaderLines.cpp
-  states/readHeaderLines/RequestHeaderValidator.cpp
+  states/startCgi/StartCgi.cpp
   states/validateRequest/ValidateDelete.cpp
   states/validateRequest/ValidateGet.cpp
   states/validateRequest/ValidatePost.cpp
   states/validateRequest/ValidateRequest.cpp
+  states/waitForCgi/WaitForCgi.cpp
   states/writeBody/WriteBody.cpp
   states/writeHeaderLines/WriteHeaderLines.cpp
   states/writeStatusLine/WriteStatusLine.cpp
+  statesCgi/executeCgi/ExecuteCgi.cpp
+  statesCgi/processCgiResponse/ProcessCgiResponse.cpp
+  
   utils/BaseHeaderValidator.cpp
   utils/HeaderParser.cpp
+
   Authority.cpp
+  CgiContext.cpp
   Headers.cpp
   headerUtils.cpp
   http.cpp

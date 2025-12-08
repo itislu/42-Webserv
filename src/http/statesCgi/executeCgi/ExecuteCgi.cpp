@@ -1,0 +1,198 @@
+#include "ExecuteCgi.hpp"
+
+#include <client/Client.hpp>
+#include <http/Headers.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <libftpp/array.hpp>
+#include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+#include <utils/Pipe.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+
+#include <algorithm>
+#include <cerrno>
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
+#include <exception>
+#include <iostream>
+#include <string>
+#include <sys/types.h>
+#include <unistd.h>
+#include <vector>
+
+/* ************************************************************************** */
+// INIT
+
+Logger& ExecuteCgi::_log = Logger::getInstance(LOG_HTTP);
+const std::size_t ExecuteCgi::_chunkSize;
+
+/* ************************************************************************** */
+// PUBLIC
+
+ExecuteCgi::ExecuteCgi(CgiContext* context)
+  : IState<CgiContext>(context)
+  , _client(context->getClient())
+  , _state(PrepareEnv)
+  , _contentLength(0)
+  , _bytesWriten(0)
+{
+  _log.info() << *_client << " ExecuteCgi\n";
+}
+
+void ExecuteCgi::run()
+try {
+  if (_state == PrepareEnv) {
+    _prepareEnv();
+  }
+  if (_state == ExecuteScript) {
+    _executeScript();
+  }
+  if (_state == ProvideBody) {
+    _provideBody();
+  }
+  if (_state == Done) {
+    _log.info() << *_client << " ExecuteCgi done\n";
+    getContext()->getShExecCgi().setDone();
+  }
+} catch (const std::exception& e) {
+  _log.error() << *_client << " ExecuteCgi: " << e.what() << "\n";
+  _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getShExecCgi().setDone();
+}
+
+/* ************************************************************************** */
+// PRIVATE
+
+void ExecuteCgi::_prepareEnv()
+{
+  if (!getContext()->contentLengthAvailable()) {
+    return;
+  }
+
+  Request& request = _client->getRequest();
+  const Resource& resource = _client->getResource();
+  const Headers& reqHeaders = request.getHeaders();
+
+  _contentLength = getContext()->getContentLength();
+
+  _addEnvVar("GATEWAY_INTERFACE", "CGI/1.1");
+  _addEnvVar("SERVER_PROTOCOL", "HTTP/1.1");
+  _addEnvVar("REQUEST_METHOD", request.getStrMethod());
+  _addEnvVar("CONTENT_LENGTH", ft::to_string(_contentLength));
+  if (reqHeaders.contains("Content-Type")) {
+    _addEnvVar("CONTENT_TYPE", reqHeaders.at("Content-Type"));
+  } else {
+    _addEnvVar("CONTENT_TYPE", "text/plain");
+  }
+  _addEnvVar("SCRIPT_NAME", resource.getPath());
+  _addEnvVar("QUERY_STRING", request.getUri().getQuery());
+  _state = ExecuteScript;
+}
+
+void ExecuteCgi::_addEnvVar(const std::string& key, const std::string& value)
+{
+  std::string entry(key);
+  entry.append("=");
+  entry.append(value);
+  _env.push_back(entry);
+}
+
+std::vector<char*> ExecuteCgi::_buildEnvp()
+{
+  std::vector<char*> envpOut;
+  envpOut.clear();
+  envpOut.reserve(_env.size() + 1);
+
+  for (size_t i = 0; i < _env.size(); ++i) {
+    envpOut.push_back(const_cast<char*>(_env[i].c_str()));
+  }
+
+  envpOut.push_back(NULL);
+  return envpOut;
+}
+
+void ExecuteCgi::_executeScript()
+{
+  Pipe& pipeToCgi = getContext()->getPipeClientToCgi();
+  Pipe& pipeFromCgi = getContext()->getPipeCgiToClient();
+
+  pipeToCgi.init();
+  pipeFromCgi.init();
+
+  const pid_t pid = fork();
+  if (pid < 0) {
+    _log.error() << "Fork Cgi failed\n";
+    std::cerr << "fork() failed: " << strerror(errno) << "\n";
+    return;
+  }
+
+  if (pid == 0) {
+    _handleChild();
+  }
+
+  _log.info() << "Run cgi script\n";
+
+  // Close child's ends
+  pipeToCgi.closeRead();
+  pipeFromCgi.closeWrite();
+
+  _state = ProvideBody;
+}
+
+void ExecuteCgi::_handleChild()
+{
+  const Resource& resource = _client->getResource();
+  Pipe& pipeToCgi = getContext()->getPipeClientToCgi();
+  Pipe& pipeFromCgi = getContext()->getPipeCgiToClient();
+
+  // Redirect stdin
+  dup2(pipeToCgi.getReadFd(), STDIN_FILENO);
+  pipeToCgi.close();
+
+  // Redirect stdout
+  dup2(pipeFromCgi.getWriteFd(), STDOUT_FILENO);
+  pipeFromCgi.close();
+
+  const std::string& interpreter = "/bin/bash";
+  const std::string& script = resource.getPath();
+  ft::array<char* const, 3> args = {
+    const_cast<char*>(interpreter.c_str()),
+    const_cast<char*>(script.c_str()),
+    FT_NULLPTR,
+  };
+  execve(interpreter.c_str(), args.data(), _buildEnvp().data());
+
+  std::cerr << "execve failed: " << strerror(errno) << "\n";
+  std::exit(1);
+}
+
+void ExecuteCgi::_provideBody()
+{
+  Request& request = _client->getRequest();
+  Pipe& pipeToCgi = getContext()->getPipeClientToCgi();
+
+  if (request.getBody().isEmpty()) {
+    return;
+  }
+
+  // Write TO CHILD (stdin)
+  const std::size_t toWrite = std::min(request.getBody().size(), _chunkSize);
+  IBuffer::RawBytes msg = request.getBody().getRawBytes(0, toWrite);
+  const ssize_t res = write(pipeToCgi.getWriteFd(), msg.data(), msg.size());
+  if (res < 0) {
+    // todo handle error
+  } else {
+    _bytesWriten += res;
+  }
+
+  if (_bytesWriten >= _contentLength) {
+    pipeToCgi.closeWrite();
+    _state = Done;
+  }
+}
