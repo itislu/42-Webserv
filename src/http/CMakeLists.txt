@@ -36,6 +36,7 @@ add_library(${LIB_NAME} STATIC
   utils/HeaderParser.cpp
   Authority.cpp
   Headers.cpp
+  headerUtils.cpp
   http.cpp
   Request.cpp
   Response.cpp

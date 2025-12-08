@@ -24,7 +24,8 @@ bool runParser(const std::string& str, Rule& rule)
   }
   return matches;
 }
-}
+
+} // namespace
 
 /**
  * The path is terminated
