@@ -1,4 +1,6 @@
 #include "ParseVersion.hpp"
+#include "http/Response.hpp"
+#include "http/http.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
@@ -58,6 +60,7 @@ void ParseVersion::run()
 
   if (_sequence.reachedEnd()) {
     _extractVersion();
+    _validateVersion();
     getContext()->getStateHandler().setDone();
     return;
   }
@@ -84,4 +87,13 @@ void ParseVersion::_init()
   _sequence.addRule(ft::make_shared<RangeRule>(ft::isdigit));
   _sequence.addRule(endOfLineRule());
   _sequence.setBufferReader(&_buffReader);
+}
+
+void ParseVersion::_validateVersion()
+{
+  Response& response = _client->getResponse();
+  const std::string& version = _client->getRequest().getVersion();
+  if (version != http::HTTP_1_0 && version != http::HTTP_1_1) {
+    response.setStatusCode(StatusCode::HttpVersionNotSupported);
+  }
 }
