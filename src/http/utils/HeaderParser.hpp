@@ -30,6 +30,8 @@ public:
     InvalidHeader
   };
 
+  HeaderParser();
+
   void setValidator(ft::shared_ptr<BaseHeaderValidator> validator);
 
   Result parseIntoStruct(IInOutBuffer& buffer, Headers& headers);

@@ -18,6 +18,15 @@
 /* ************************************************************************** */
 // PUBLIC
 
+HeaderParser::HeaderParser()
+  : _reader()
+  , _startPos(0)
+  , _bytesRead(0)
+  , _customValidatorAvailable(false)
+  , _headerPartsSet(false)
+{
+}
+
 void HeaderParser::setValidator(ft::shared_ptr<BaseHeaderValidator> validator)
 {
   _customValidatorAvailable = validator != FT_NULLPTR;
@@ -142,6 +151,7 @@ bool HeaderParser::_isValidHeaderLine(std::size_t startPos)
 ft::optional<HeaderParser::Result> HeaderParser::_runValidator(
   IInBuffer& buffer)
 {
+  _headerPartsSet = false;
   if (_validator->fieldLineTooLarge(_bytesRead)) {
     return FieldLineTooLarge;
   }
@@ -154,8 +164,6 @@ ft::optional<HeaderParser::Result> HeaderParser::_runValidator(
     if (!_validator->isValid(_name, _value)) {
       return InvalidHeader;
     }
-  } else {
-    _headerPartsSet = false;
   }
   return ft::nullopt;
 }
