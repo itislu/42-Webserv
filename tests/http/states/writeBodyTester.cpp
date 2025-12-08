@@ -91,7 +91,7 @@ void expectLastChunk(const std::string& data, std::string::size_type& pos)
   expectChunk(data, pos, "0", "");
 }
 
-}
+} // namespace
 
 /* ************************************************************************** */
 // TESTS
