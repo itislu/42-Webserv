@@ -35,6 +35,7 @@ public:
   const std::string& getVersion() const;
   Headers& getHeaders();
   SmartBuffer& getBody();
+  Headers& getTrailers();
 
   void setMethod(Method method);
   void setUri(const Uri& uri);
@@ -54,6 +55,7 @@ private:
   std::string _version;
   Headers _headers;
   SmartBuffer _body;
+  Headers _trailers;
 };
 
 struct Request::MethodMap

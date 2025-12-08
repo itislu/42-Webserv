@@ -18,18 +18,15 @@
 /* ************************************************************************** */
 // PUBLIC
 
-void HeaderParser::init(ft::shared_ptr<BaseHeaderValidator> validator)
+void HeaderParser::setValidator(ft::shared_ptr<BaseHeaderValidator> validator)
 {
-  if (validator != FT_NULLPTR) {
-    _validator = ft::move(validator);
-  } else {
-    _validator = ft::make_shared<BaseHeaderValidator>();
-  }
+  _validator = ft::move(validator);
 }
 
 HeaderParser::Result HeaderParser::parseIntoStruct(IInOutBuffer& buffer,
                                                    Headers& headers)
 {
+  _initValidator();
   _reader.init(&buffer);
   _endOfLineRule().setBufferReader(&_reader);
   _fieldLineRule().setBufferReader(&_reader);
@@ -73,6 +70,14 @@ SequenceRule& HeaderParser::_fieldLineRule()
 {
   static const ft::shared_ptr<SequenceRule> sequence = fieldLinePartRule();
   return *sequence;
+}
+
+void HeaderParser::_initValidator()
+{
+  if (_validator != FT_NULLPTR) {
+    return;
+  }
+  _validator = ft::make_shared<BaseHeaderValidator>();
 }
 
 /**

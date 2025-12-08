@@ -95,7 +95,7 @@ void ReadHeaderLines::_init()
     ft::make_shared<RequestHeaderValidator>(_client);
   validator->setMaxFieldLineSize(_maxFieldLineSize);
   validator->setMaxHeaderSize(_maxHeaderSize);
-  _headerParser.init(ft::move(validator));
+  _headerParser.setValidator(ft::move(validator));
 }
 
 void ReadHeaderLines::_readLines()

@@ -30,7 +30,7 @@ public:
     InvalidHeader
   };
 
-  void init(ft::shared_ptr<BaseHeaderValidator> validator);
+  void setValidator(ft::shared_ptr<BaseHeaderValidator> validator);
 
   Result parseIntoStruct(IInOutBuffer& buffer, Headers& headers);
   // void validateHeaders(IInBuffer& buffer);
@@ -38,6 +38,7 @@ public:
 private:
   static LiteralRule& _endOfLineRule();
   static SequenceRule& _fieldLineRule();
+  void _initValidator();
   bool _isValidEndOfLine(std::size_t startPos);
   bool _isValidHeaderLine(std::size_t startPos);
   ft::optional<Result> _addHeader(IInOutBuffer& buffer, Headers& headers);

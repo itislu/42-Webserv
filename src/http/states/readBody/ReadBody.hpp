@@ -2,6 +2,7 @@
 #ifndef READ_BODY_HPP
 #define READ_BODY_HPP
 
+#include <http/utils/HeaderParser.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
@@ -51,8 +52,6 @@ private:
   void _readTrailerSection();
   bool _readingOk();
   bool _hasEndOfLine();
-  std::string _extractPart(const Rule::RuleId& ruleId);
-  void _addLineToHeaders(const std::string& line);
   void _setChunkSize(const std::string& hexNum);
   void _setChunkExt(const std::string& value);
 
@@ -66,12 +65,11 @@ private:
   Client* _client;
   BufferReader _buffReader;
   Rule::ResultMap _results;
-
+  HeaderParser _headerParser;
   std::size_t _bodyLength;
   std::size_t _consumed;
   ChunkedState _chunkedState;
   std::string _chunkExtension;
-
   bool _fixedLengthBody;
   bool _chunkedBody;
   bool _done;

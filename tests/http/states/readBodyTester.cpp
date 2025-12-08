@@ -1,14 +1,14 @@
-#include "http/Response.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/readBody/ReadBody.hpp"
-#include "utils/buffer/IBuffer.hpp"
-#include "utils/buffer/SmartBuffer.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/readBody/ReadBody.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/state/IState.hpp>
 
 #include <gtest/gtest.h>
@@ -103,11 +103,11 @@ TEST(ReadBodyTester, ChunkedWithTrailer)
     EXPECT_EQ(*body, data);
   }
 
-  const Headers& headers = request.getHeaders();
+  const Headers& trailers = request.getTrailers();
   std::string value;
-  EXPECT_NO_THROW(value = headers.at("Trailer1"));
+  EXPECT_NO_THROW(value = trailers.at("Trailer1"));
   EXPECT_EQ(value, "value1");
-  EXPECT_NO_THROW(value = headers.at("Trailer2"));
+  EXPECT_NO_THROW(value = trailers.at("Trailer2"));
   EXPECT_EQ(value, "value2");
 }
 

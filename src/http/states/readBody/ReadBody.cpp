@@ -3,19 +3,20 @@
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/http11Rules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/utils/HeaderParser.hpp>
 #include <libftpp/algorithm.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
-#include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/buffer/IInOutBuffer.hpp>
@@ -244,29 +245,34 @@ void ReadBody::_readChunkDataEnd()
 
 void ReadBody::_readTrailerSection()
 {
-  _buffReader.resetPosInBuff();
-  while (_readingOk()) {
-    _results.clear();
-    _fieldLineRule().reset();
-    _endOfLineRule().reset();
+  Response& response = _client->getResponse();
+  IInOutBuffer& buffer = _client->getInBuff();
+  Headers& trailers = _client->getRequest().getTrailers();
+  const HeaderParser::Result result =
+    _headerParser.parseIntoStruct(buffer, trailers);
 
-    if (_fieldLineRule().matches()) {
-      if (_fieldLineRule().reachedEnd()) {
-        const std::string fieldLine = _extractPart(FieldLinePart);
-        _addLineToHeaders(fieldLine);
-      }
-    } else if (_hasEndOfLine()) {
-      if (_endOfLineRule().reachedEnd()) {
-        _extractPart(EndOfLine);
-        _done = true;
-        return;
-      }
-    } else {
-      _client->getResponse().setStatusCode(StatusCode::BadRequest);
-      _log.error() << "ReadBody: failed to read trailer section\n";
+  switch (result) {
+    case HeaderParser::EndOfBuffer:
+      // header is not complete
+      break;
+    case HeaderParser::EndOfHeaders:
       _done = true;
-      return;
-    }
+      break;
+    case HeaderParser::SyntaxError:
+      _log.error() << "ReadBody: trailer syntax error\n";
+      response.setStatusCode(StatusCode::BadRequest);
+      break;
+    case HeaderParser::FieldLineTooLarge:
+      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      _log.error() << "ReadBody: trailer line too large\n";
+      break;
+    case HeaderParser::HeaderTooLarge:
+      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      _log.error() << "ReadBody: trailer too large\n";
+      break;
+    case HeaderParser::InvalidHeader:
+      // Error code will be set by RequestHeaderValidator
+      break;
   }
 }
 
@@ -283,24 +289,6 @@ bool ReadBody::_hasEndOfLine()
 {
   _buffReader.resetPosInBuff();
   return _endOfLineRule().matches();
-}
-
-std::string ReadBody::_extractPart(const Rule::RuleId& ruleId)
-{
-  const RuleResult& result = _results[ruleId];
-  const std::size_t index = result.getEnd();
-  const std::string res = _client->getInBuff().consumeFront(index);
-  _buffReader.resetPosInBuff();
-  return res;
-}
-
-void ReadBody::_addLineToHeaders(const std::string& line)
-{
-  const std::size_t index = line.find(':');
-  const std::string name = line.substr(0, index);
-  const std::string value = line.substr(index + 1, line.size());
-  Headers& headers = _client->getRequest().getHeaders();
-  headers.addHeader(name, value);
 }
 
 void ReadBody::_setChunkSize(const std::string& hexNum)
