@@ -29,7 +29,5 @@ void setContentTypeHeader(Headers& headers, const std::string& filePath)
 
   if (type != extToType.end()) {
     headers.setHeader(header::contentType, type->second);
-  } else {
-    headers.setHeader(header::contentType, "text/html");
   }
 }
