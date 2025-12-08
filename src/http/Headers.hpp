@@ -4,7 +4,6 @@
 
 #include <map>
 #include <string>
-#include <utility>
 
 /* ************************************************************************** */
 class Headers
@@ -22,13 +21,17 @@ public:
 private:
   // the HeaderMap contains the header name in lowercase as key
   // and the HeaderPair contains the original header name + value
-  typedef std::pair<std::string, std::string> HeaderPair;
+  struct HeaderPair
+  {
+    std::string name;
+    std::string value;
+  };
   typedef std::map<std::string, HeaderPair> HeaderMap;
 
   static void _formatInput(std::string& key, HeaderPair& headerPair);
-  void _addNew(const std::string& key, const HeaderPair& headerPair);
-  void _setExisting(const std::string& key, const HeaderPair& headerPair);
-  void _addExisting(const std::string& key, const HeaderPair& headerPair);
+  static void _addNew(HeaderPair& entry, const HeaderPair& headerPair);
+  static void _setExisting(HeaderPair& entry, const HeaderPair& headerPair);
+  static void _addExisting(HeaderPair& entry, const HeaderPair& headerPair);
 
   HeaderMap _headers;
 };
