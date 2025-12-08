@@ -29,7 +29,7 @@ void Pipe::init()
   // _setFdNonBlocking(_pipefd[0]);
   // _setFdNonBlocking(_pipefd[1]);
 }
-// NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+// NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 
 void Pipe::close()
 {
