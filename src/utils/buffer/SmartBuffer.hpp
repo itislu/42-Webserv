@@ -19,6 +19,8 @@ public:
   SmartBuffer();
   ~SmartBuffer() {}
 
+  static std::size_t getMemoryToFileThreshold();
+  static std::size_t getFileToMemoryThreshold();
   static void setMemoryToFileThreshold(std::size_t value);
   static void setFileToMemoryThreshold(std::size_t value);
 
@@ -41,6 +43,9 @@ public:
   bool isEmpty() const;
   std::size_t size() const;
   ssize_t send(int fdes, std::size_t bytes);
+
+  // Non-interface
+  bool usesFile() const;
 
 protected:
   const IInBuffer* getRawBuffer() const;

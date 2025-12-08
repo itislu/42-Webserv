@@ -1,28 +1,27 @@
 #include "HandleGet.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
-#include "utils/buffer/StaticFileBuffer.hpp"
 
 #include <client/Client.hpp>
-#include <cstring>
-#include <dirent.h>
-#include <http/Headers.hpp>
 #include <http/Resource.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
-#include <http/http.hpp>
+#include <http/headerUtils.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <libftpp/optional.hpp>
-#include <libftpp/string.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
+#include <utils/buffer/StaticFileBuffer.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cstddef>
+#include <cstring>
+#include <dirent.h>
 #include <string>
 
-/* ************************************************************************** */
+/* **************************************************************************
+ */
 // INIT
 
 Logger& HandleGet::_log = Logger::getInstance(LOG_HTTP);
@@ -42,15 +41,9 @@ HandleGet::HandleGet(PrepareResponse* context)
 void HandleGet::run()
 {
   if (_client->getResource().getType() == Resource::Autoindex) {
-
+    _handleAutoIndex();
   } else {
-    _addContentLengthHeader();
-    if (!_fail()) {
-      _addContentType();
-    }
-    if (!_fail()) {
-      _openFile();
-    }
+    _handleStaticFile();
   }
   _setNextState();
 }
@@ -68,61 +61,40 @@ void HandleGet::_setNextState()
   }
 }
 
-void HandleGet::_addContentLengthHeader()
+void HandleGet::_handleAutoIndex()
 {
+  const ft::shared_ptr<SmartBuffer> buffer = ft::make_shared<SmartBuffer>();
+  const Resource& resource = _client->getResource();
+  _generateAutoindex(resource.getPath(), *buffer);
+}
+
+void HandleGet::_handleStaticFile()
+{
+  Response& response = _client->getResponse();
+
+  // set body
   const std::string& filePath = _client->getResource().getPath();
-  const ft::optional<std::size_t> optSize = getFileSize(filePath);
-  if (!optSize.has_value()) {
-    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
-    _log.error() << "HandleGet: failed to determine content length\n";
-    return;
-  }
+  response.setBody(ft::make_shared<StaticFileBuffer>(filePath));
 
-  const std::string sizeStr = ft::to_string(*optSize);
-  Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Content-Length", sizeStr);
+  // set headers
+  setContentLengthHeader(response.getHeaders(), response.getBody()->size());
+  setContentTypeHeader(response.getHeaders(), filePath);
 }
 
-void HandleGet::_addContentType()
-{
-  const std::string& filePath = _client->getResource().getPath();
-  const std::string fileExt = getFileExtension(filePath);
-  const http::ExtToTypeMap& extToType = http::getExtToType();
-  const http::ExtToTypeMap::const_iterator type = extToType.find(fileExt);
-
-  Headers& headers = _client->getResponse().getHeaders();
-  if (type != extToType.end()) {
-    headers.addHeader("Content-Type", type->second);
-  } else {
-    headers.addHeader("Content-Type", "text/html");
-  }
-}
-
-void HandleGet::_openFile()
-{
-  const std::string& filepath = _client->getResource().getPath();
-  _client->getResponse().setBody(ft::make_shared<StaticFileBuffer>(filepath));
-}
-
-bool HandleGet::_fail()
-{
-  return _client->getResponse().getStatusCode() != StatusCode::Ok;
-}
-
-/* Generates a HTML for the autoindex setting in a location if no index.html is
+/*
+  Generates a HTML for the autoindex setting in a location if no index.html is
   present. If the entry in the folder is directory it generates a clickable
   link. If the entry is a regular file it just lists the name.
-
-  TODO: change string conncatination to .append() - for faster performance
 */
-std::string HandleGet::_generateAutoindex(const std::string& path)
+void HandleGet::_generateAutoindex(const std::string& path, SmartBuffer& buffer)
 {
   DIR* const dir = opendir(path.c_str());
   if (dir == FT_NULLPTR) {
-    return "<html><body><h1>403 Forbidden</h1></body></html>\n";
+    buffer.append("<html><body><h1>403 Forbidden</h1></body></html>\n");
+    return;
   }
 
-  std::string html;
+  SmartBuffer& html = buffer;
   html.append("<html><head><title>Index of ");
   html.append(path);
   html.append("</title></head><body>\n");
@@ -152,5 +124,4 @@ std::string HandleGet::_generateAutoindex(const std::string& path)
   }
   html.append("</ul></body></html>\n");
   closedir(dir);
-  return html;
 }

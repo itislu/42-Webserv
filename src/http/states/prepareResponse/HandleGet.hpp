@@ -1,8 +1,10 @@
 #pragma once
+#include "utils/buffer/SmartBuffer.hpp"
 #ifndef HANDLE_GET_HPP
 #define HANDLE_GET_HPP
 
-#include "utils/state/IState.hpp"
+#include <utils/state/IState.hpp>
+
 #include <string>
 
 class Logger;
@@ -19,15 +21,13 @@ public:
 
 private:
   void _setNextState();
-  void _addContentLengthHeader();
-  void _addContentType();
-  void _openFile();
-  static std::string _generateAutoindex(const std::string& path);
-  bool _fail();
+  void _handleAutoIndex();
+  void _handleStaticFile();
+  static void _generateAutoindex(const std::string& path, SmartBuffer& buffer);
 
+  static Logger& _log;
   PrepareResponse* _prepareResponse;
   Client* _client;
-  static Logger& _log;
 };
 
 #endif

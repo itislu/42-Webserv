@@ -43,6 +43,10 @@ function(add_my_test test_name)
     PRIVATE ASSETS_PATH="${PROJECT_SOURCE_DIR}/tests/assets/"
   )
 
+  target_include_directories(${test_name}
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/testUtils
+  )
+
   target_link_libraries(${test_name}
     PRIVATE
     GTest::gtest
@@ -93,6 +97,10 @@ add_my_test(headerLineRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerLineRulesTester.cpp
 )
 
+add_my_test(headerTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/headerTester.cpp
+)
+
 add_my_test(requestLineRulesTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/abnfRules/requestLineRulesTester.cpp
 )
@@ -117,6 +125,10 @@ add_my_test(readRequestLineTester
 
 add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
+)
+
+add_my_test(writeBodyTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/writeBodyTester.cpp
 )
 
 # config
