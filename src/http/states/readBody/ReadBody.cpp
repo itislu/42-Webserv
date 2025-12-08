@@ -271,7 +271,11 @@ void ReadBody::_readTrailerSection()
       _log.error() << "ReadBody: trailer too large\n";
       break;
     case HeaderParser::InvalidHeader:
-      // not used
+      // will only be set if custom validator used
+      if (response.getStatusCode() == StatusCode::Ok) {
+        _log.error() << "ReadBody: validator failed to set error status\n";
+        response.setStatusCode(StatusCode::BadRequest);
+      }
       break;
   }
 }

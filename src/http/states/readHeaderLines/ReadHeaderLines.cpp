@@ -127,6 +127,11 @@ void ReadHeaderLines::_readLines()
       break;
     case HeaderParser::InvalidHeader:
       // Error code will be set by RequestHeaderValidator
+      if (response.getStatusCode() == StatusCode::Ok) {
+        _log.error()
+          << "ReadHeaderLines: validator failed to set error status\n";
+        response.setStatusCode(StatusCode::BadRequest);
+      }
       break;
   }
 }

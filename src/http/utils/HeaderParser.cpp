@@ -183,10 +183,10 @@ void HeaderParser::_getHeaderParts(IInBuffer& buffer)
   const std::string line = buffer.getStr(_startPos, _bytesRead);
   const std::size_t index = line.find(':');
   _name = line.substr(0, index);
-  _value = line.substr(index + 1, line.size());
+  _value = line.substr(index + 1);
 }
 
-ft::optional<HeaderParser::Result> HeaderParser ::_validateEndOfLine()
+ft::optional<HeaderParser::Result> HeaderParser::_validateEndOfLine()
 {
   if (_validator->headerTooLarge(_bytesRead)) {
     return HeaderTooLarge;

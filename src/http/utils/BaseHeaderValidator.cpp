@@ -34,7 +34,8 @@ bool BaseHeaderValidator::fieldLineTooLarge(std::size_t newBytes) const
 
 bool BaseHeaderValidator::headerTooLarge(std::size_t newBytes)
 {
-  if (_totalSizeHeaders + newBytes > _maxHeaderSize) {
+  if (newBytes > _maxHeaderSize ||
+      _totalSizeHeaders > _maxHeaderSize - newBytes) {
     return true;
   }
   _totalSizeHeaders += newBytes;
