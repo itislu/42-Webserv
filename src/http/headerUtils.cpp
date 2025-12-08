@@ -9,11 +9,13 @@
 #include <string>
 
 namespace header {
+
 const char* const host = "Host";
 const char* const contentLength = "Content-Length";
 const char* const transferEncoding = "Transfer-Encoding";
 const char* const contentType = "Content-Type";
-}
+
+} // namespace header
 
 void setContentLengthHeader(Headers& headers, std::size_t length)
 {

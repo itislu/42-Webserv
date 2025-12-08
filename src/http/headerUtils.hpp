@@ -8,11 +8,13 @@
 #include <string>
 
 namespace header {
+
 extern const char* const host;
 extern const char* const contentLength;
 extern const char* const transferEncoding;
 extern const char* const contentType;
-}
+
+} // namespace header
 
 void setContentLengthHeader(Headers& headers, std::size_t length);
 void setContentTypeHeader(Headers& headers, const std::string& filePath);
