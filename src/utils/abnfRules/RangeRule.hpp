@@ -10,6 +10,7 @@
 class RangeRule : public Rule
 {
 public:
+  // NUL bytes in the range string are not supported.
   explicit RangeRule(const char* range);
   explicit RangeRule(bool (*func)(char));
   ~RangeRule();
