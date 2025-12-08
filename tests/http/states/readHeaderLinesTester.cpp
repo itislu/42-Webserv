@@ -6,8 +6,11 @@
 #include <http/http.hpp>
 #include <http/states/readHeaderLines/ReadHeaderLines.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/utils/HeaderParser.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
 #include <testUtils.hpp>
+#include <utils/buffer/MemoryBuffer.hpp>
 #include <utils/state/IState.hpp>
 
 #include <gtest/gtest.h>
@@ -25,7 +28,14 @@ ft::unique_ptr<Client> StateTest(const std::string& requestLine)
   client->getInBuff().append(requestLine);
   client->getStateHandler().setState<ReadHeaderLines>();
   client->getStateHandler().getState()->run();
-  return client;
+  return ft::move(client);
+}
+
+HeaderParser::Result validateOnly(const std::string& line)
+{
+  MemoryBuffer buffer(line);
+  HeaderParser _headerParser;
+  return _headerParser.validateHeaderPart(buffer);
 }
 
 } // namespace
@@ -224,6 +234,44 @@ TEST(ReadHeaderLinesTester, NulByteInContentLengthHeader)
   const StatusCode& statusCode = response.getStatusCode();
 
   EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, ValidateHeaderPartValid)
+{
+  std::string line = "Host: webserv\r\n"
+                     "Content-Length: value\r\n"
+                     "\r\n";
+  EXPECT_EQ(validateOnly(line), HeaderParser::EndOfHeaders);
+
+  line = "\r\n";
+  EXPECT_EQ(validateOnly(line), HeaderParser::EndOfHeaders);
+}
+
+TEST(ReadHeaderLinesTester, ValidateHeaderPartEndOfBuffer)
+{
+  std::string line;
+  line = "Host";
+  EXPECT_EQ(validateOnly(line), HeaderParser::EndOfBuffer);
+
+  line = "Host: webserv\r\n";
+  EXPECT_EQ(validateOnly(line), HeaderParser::EndOfBuffer);
+
+  line = "Host: webserv\r\n"
+         "Content-Length: value\r\n";
+  EXPECT_EQ(validateOnly(line), HeaderParser::EndOfBuffer);
+
+  line = "Host: webserv\r\n"
+         "Content-Length: value\r\n"
+         "\r";
+  EXPECT_EQ(validateOnly(line), HeaderParser::EndOfBuffer);
+}
+
+TEST(ReadHeaderLinesTester, ValidateHeaderPartSyntaxError)
+{
+  std::string line = "Host: webserv\r\n"
+                     "Content-Length : value\r\n"
+                     "\r\n";
+  EXPECT_EQ(validateOnly(line), HeaderParser::SyntaxError);
 }
 
 // NOLINTEND

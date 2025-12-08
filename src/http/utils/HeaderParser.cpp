@@ -20,6 +20,7 @@
 
 void HeaderParser::setValidator(ft::shared_ptr<BaseHeaderValidator> validator)
 {
+  _customValidatorAvailable = validator != FT_NULLPTR;
   _validator = ft::move(validator);
 }
 
@@ -30,18 +31,54 @@ HeaderParser::Result HeaderParser::parseIntoStruct(IInOutBuffer& buffer,
   _reader.init(&buffer);
   _endOfLineRule().setBufferReader(&_reader);
   _fieldLineRule().setBufferReader(&_reader);
-  const std::size_t startPos = 0;
+  _startPos = 0;
   while (!_reader.reachedEnd()) {
-    if (_isValidHeaderLine(startPos)) {
+    if (_isValidHeaderLine(_startPos)) {
       if (_fieldLineRule().reachedEnd()) {
-        const ft::optional<Result> optRes = _addHeader(buffer, headers);
+        const ft::optional<Result> optRes = _runValidator(buffer);
+        if (optRes.has_value()) {
+          return *optRes;
+        }
+        _addHeader(buffer, headers);
+      }
+    } else if (_isValidEndOfLine(_startPos)) {
+      if (_endOfLineRule().reachedEnd()) {
+        const ft::optional<Result> optRes = _validateEndOfLine();
+        if (optRes.has_value()) {
+          return *optRes;
+        }
+        buffer.removeFront(_bytesRead);
+        return EndOfHeaders;
+      }
+    } else {
+      return SyntaxError;
+    }
+  }
+  return EndOfBuffer;
+}
+
+HeaderParser::Result HeaderParser::validateHeaderPart(IInBuffer& buffer)
+{
+  _initValidator();
+  _reader.init(&buffer);
+  _endOfLineRule().setBufferReader(&_reader);
+  _fieldLineRule().setBufferReader(&_reader);
+  while (!_reader.reachedEnd()) {
+    _startPos = _reader.getPosInBuff();
+    if (_isValidHeaderLine(_startPos)) {
+      if (_fieldLineRule().reachedEnd()) {
+        const ft::optional<Result> optRes = _runValidator(buffer);
         if (optRes.has_value()) {
           return *optRes;
         }
       }
-    } else if (_isValidEndOfLine(startPos)) {
+    } else if (_isValidEndOfLine(_startPos)) {
       if (_endOfLineRule().reachedEnd()) {
-        return _removeEndOfLine(buffer);
+        const ft::optional<Result> optRes = _validateEndOfLine();
+        if (optRes.has_value()) {
+          return *optRes;
+        }
+        return EndOfHeaders;
       }
     } else {
       return SyntaxError;
@@ -85,7 +122,6 @@ void HeaderParser::_initValidator()
  */
 bool HeaderParser::_isValidEndOfLine(std::size_t startPos)
 {
-  _reader.setPosInBuff(0);
   _endOfLineRule().reset();
   const bool matches = _endOfLineRule().matches();
   _bytesRead = _reader.getPosInBuff() - startPos;
@@ -97,16 +133,14 @@ bool HeaderParser::_isValidEndOfLine(std::size_t startPos)
  */
 bool HeaderParser::_isValidHeaderLine(std::size_t startPos)
 {
-  _reader.setPosInBuff(0);
   _fieldLineRule().reset();
   const bool matches = _fieldLineRule().matches();
   _bytesRead = _reader.getPosInBuff() - startPos;
   return matches;
 }
 
-ft::optional<HeaderParser::Result> HeaderParser::_addHeader(
-  IInOutBuffer& buffer,
-  Headers& headers)
+ft::optional<HeaderParser::Result> HeaderParser::_runValidator(
+  IInBuffer& buffer)
 {
   if (_validator->fieldLineTooLarge(_bytesRead)) {
     return FieldLineTooLarge;
@@ -114,32 +148,40 @@ ft::optional<HeaderParser::Result> HeaderParser::_addHeader(
   if (_validator->headerTooLarge(_bytesRead)) {
     return HeaderTooLarge;
   }
-  std::string name;
-  std::string value;
-  _extractHeaderParts(buffer, name, value);
-  if (!_validator->isValid(name, value)) {
-    return InvalidHeader;
+  if (_customValidatorAvailable) {
+    _getHeaderParts(buffer);
+    _headerPartsSet = true;
+    if (!_validator->isValid(_name, _value)) {
+      return InvalidHeader;
+    }
+  } else {
+    _headerPartsSet = false;
   }
-  headers.addHeader(name, value);
   return ft::nullopt;
 }
 
-void HeaderParser::_extractHeaderParts(IInOutBuffer& buffer,
-                                       std::string& name,
-                                       std::string& value)
+void HeaderParser::_addHeader(IInOutBuffer& buffer, Headers& headers)
 {
-  const std::string line = buffer.consumeFront(_bytesRead);
-  const std::size_t index = line.find(':');
-  name = line.substr(0, index);
-  value = line.substr(index + 1, line.size());
+  if (!_headerPartsSet) {
+    _getHeaderParts(buffer);
+  }
+  buffer.removeFront(_bytesRead);
   _reader.resetPosInBuff();
+  headers.addHeader(_name, _value);
 }
 
-HeaderParser::Result HeaderParser ::_removeEndOfLine(IInOutBuffer& buffer)
+void HeaderParser::_getHeaderParts(IInBuffer& buffer)
+{
+  const std::string line = buffer.getStr(_startPos, _bytesRead);
+  const std::size_t index = line.find(':');
+  _name = line.substr(0, index);
+  _value = line.substr(index + 1, line.size());
+}
+
+ft::optional<HeaderParser::Result> HeaderParser ::_validateEndOfLine()
 {
   if (_validator->headerTooLarge(_bytesRead)) {
     return HeaderTooLarge;
   }
-  buffer.removeFront(_bytesRead);
-  return EndOfHeaders;
+  return ft::nullopt;
 }

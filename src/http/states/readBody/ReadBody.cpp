@@ -271,7 +271,7 @@ void ReadBody::_readTrailerSection()
       _log.error() << "ReadBody: trailer too large\n";
       break;
     case HeaderParser::InvalidHeader:
-      // Error code will be set by RequestHeaderValidator
+      // not used
       break;
   }
 }

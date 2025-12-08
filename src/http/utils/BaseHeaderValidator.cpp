@@ -1,7 +1,6 @@
 #include "BaseHeaderValidator.hpp"
 
 #include <cstddef>
-#include <iostream>
 #include <string>
 
 /* ************************************************************************** */
