@@ -18,10 +18,10 @@
 
 #include <cstring>
 #include <dirent.h>
+#include <exception>
 #include <string>
 
-/* **************************************************************************
- */
+/* ***************************************************************************/
 // INIT
 
 Logger& HandleGet::_log = Logger::getInstance(LOG_HTTP);
@@ -63,9 +63,15 @@ void HandleGet::_setNextState()
 
 void HandleGet::_handleAutoIndex()
 {
-  const ft::shared_ptr<SmartBuffer> buffer = ft::make_shared<SmartBuffer>();
+  Response& response = _client->getResponse();
+  ft::shared_ptr<SmartBuffer> buffer = ft::make_shared<SmartBuffer>();
   const Resource& resource = _client->getResource();
   _generateAutoindex(resource.getPath(), *buffer);
+  response.setBody(ft::move(buffer));
+
+  // set headers
+  setContentLengthHeader(response.getHeaders(), response.getBody()->size());
+  response.getHeaders().setHeader(header::contentType, "text/html");
 }
 
 void HandleGet::_handleStaticFile()
@@ -86,42 +92,45 @@ void HandleGet::_handleStaticFile()
   present. If the entry in the folder is directory it generates a clickable
   link. If the entry is a regular file it just lists the name.
 */
-void HandleGet::_generateAutoindex(const std::string& path, SmartBuffer& buffer)
+void HandleGet::_generateAutoindex(const std::string& path, SmartBuffer& html)
 {
   DIR* const dir = opendir(path.c_str());
   if (dir == FT_NULLPTR) {
-    buffer.append("<html><body><h1>403 Forbidden</h1></body></html>\n");
+    _client->getResponse().setStatusCode(StatusCode::Forbidden);
     return;
   }
+  try {
+    html.append("<html><head><title>Index of ");
+    html.append(path);
+    html.append("</title></head><body>\n");
+    html.append("<h1>Index of ");
+    html.append(path);
+    html.append("</h1>\n<ul>\n");
 
-  SmartBuffer& html = buffer;
-  html.append("<html><head><title>Index of ");
-  html.append(path);
-  html.append("</title></head><body>\n");
-  html.append("<h1>Index of ");
-  html.append(path);
-  html.append("</h1>\n<ul>\n");
+    struct dirent* entry = 0;
+    while ((entry = readdir(dir)) != 0) {
+      const char* const name = static_cast<char*>(entry->d_name);
+      if (std::strcmp(name, ".") == 0 || std::strcmp(name, "..") == 0) {
+        continue;
+      }
 
-  struct dirent* entry = 0;
-  while ((entry = readdir(dir)) != 0) {
-    const char* const name = static_cast<char*>(entry->d_name);
-    if (std::strcmp(name, ".") == 0 || std::strcmp(name, "..") == 0) {
-      continue;
+      const std::string fullPath = path + "/" + name;
+      if (isDirectory(fullPath)) {
+        html.append("<li><a href=\"");
+        html.append(name);
+        html.append("/\">");
+        html.append(name);
+        html.append("/</a></li>\n");
+      } else {
+        html.append("<li>");
+        html.append(name);
+        html.append("</li>\n");
+      }
     }
-
-    const std::string fullPath = path + "/" + name;
-    if (isDirectory(fullPath)) {
-      html.append("<li><a href=\"");
-      html.append(name);
-      html.append("/\">");
-      html.append(name);
-      html.append("/</a></li>\n");
-    } else {
-      html.append("<li>");
-      html.append(name);
-      html.append("</li>\n");
-    }
+    html.append("</ul></body></html>\n");
+    closedir(dir);
+  } catch (const std::exception& e) {
+    closedir(dir);
+    throw;
   }
-  html.append("</ul></body></html>\n");
-  closedir(dir);
 }
