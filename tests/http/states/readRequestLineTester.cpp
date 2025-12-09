@@ -334,7 +334,7 @@ TEST(ReadRequestLineTester, MultipleNulBytes)
 TEST(ReadRequestLineTester, InvalidVersion)
 {
   std::string line("GET "
-                   "http:/ "
+                   "/ "
                    "HTTP/2.0\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
   Response& response = client->getResponse();
