@@ -3,6 +3,7 @@
 
 // NOLINTBEGIN
 
+#include <ostream>
 #include <string>
 
 // 1. Define a struct to hold your test data
@@ -11,6 +12,14 @@ struct PathTestParams
   std::string testName;
   std::string input;
   std::string expected;
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const PathTestParams& params)
+  {
+    os << "{ Name: " << params.testName << ", Input: '" << params.input
+       << "', Expected: '" << params.expected << "' }";
+    return os;
+  }
 };
 
 // 2. Create a Test Fixture class
