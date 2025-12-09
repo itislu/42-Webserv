@@ -6,7 +6,6 @@
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
-#include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/http11Rules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
@@ -57,11 +56,9 @@ ReadBody::ReadBody(Client* context)
   _buffReader.init(&_client->getInBuff());
   _chunkInfoRule().setBufferReader(&_buffReader);
   _endOfLineRule().setBufferReader(&_buffReader);
-  _fieldLineRule().setBufferReader(&_buffReader);
 
   _chunkInfoRule().setResultMap(&_results);
   _endOfLineRule().setResultMap(&_results);
-  _fieldLineRule().setResultMap(&_results);
 }
 
 void ReadBody::run()
@@ -99,15 +96,6 @@ SequenceRule& ReadBody::_chunkInfoRule()
 LiteralRule& ReadBody::_endOfLineRule()
 {
   static const ft::shared_ptr<LiteralRule> rule = endOfLineRule();
-  return *rule;
-}
-
-/**
- * field-line CRLF
- */
-SequenceRule& ReadBody::_fieldLineRule()
-{
-  static const ft::shared_ptr<SequenceRule> rule = fieldLinePartRule();
   return *rule;
 }
 
@@ -287,12 +275,6 @@ bool ReadBody::_readingOk()
     return false;
   }
   return !_done && !_buffReader.reachedEnd();
-}
-
-bool ReadBody::_hasEndOfLine()
-{
-  _buffReader.resetPosInBuff();
-  return _endOfLineRule().matches();
 }
 
 void ReadBody::_setChunkSize(const std::string& hexNum)

@@ -36,7 +36,6 @@ private:
 
   static SequenceRule& _chunkInfoRule();
   static LiteralRule& _endOfLineRule();
-  static SequenceRule& _fieldLineRule();
   static Extractor<ReadBody>& _chunkExtractor();
 
   void _determineBodyFraming();
@@ -51,7 +50,6 @@ private:
   void _readChunkDataEnd();
   void _readTrailerSection();
   bool _readingOk();
-  bool _hasEndOfLine();
   void _setChunkSize(const std::string& hexNum);
   void _setChunkExt(const std::string& value);
 
