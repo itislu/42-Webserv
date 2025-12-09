@@ -13,7 +13,6 @@
 #include <http/states/validateRequest/ValidateGet.hpp>
 #include <http/states/validateRequest/ValidatePost.hpp>
 #include <libftpp/algorithm.hpp>
-#include <libftpp/optional.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
@@ -27,9 +26,7 @@
 #include <exception>
 #include <iostream>
 #include <set>
-#include <sstream>
 #include <string>
-#include <vector>
 
 /* ************************************************************************** */
 // INIT
