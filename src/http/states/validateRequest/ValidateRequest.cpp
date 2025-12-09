@@ -204,7 +204,7 @@ void ValidateRequest::_initRequestPath()
   _log.info() << "decode unreserved - path: " << decoded << "\n";
 
   // 2. Normalize path (collapse . | .. | //).
-  decoded = normalizePath(decoded, CapAtRoot).value();
+  decoded = removeDotSegments(decoded);
   _log.info() << "normalizePath - path: " << decoded << "\n";
 
   // 3. Decode all other characters.
@@ -216,12 +216,8 @@ void ValidateRequest::_initRequestPath()
     endState(StatusCode::BadRequest);
     return;
   }
-
   // 5. Check that path is not going out of root.
-  if (!normalizePath(decoded, FailAboveRoot).has_value()) {
-    endState(StatusCode::BadRequest);
-    return;
-  }
+  decoded = removeDotSegments(decoded);
 
   // 6. Combine with root.
   if (_location != FT_NULLPTR) {
@@ -265,37 +261,71 @@ bool ValidateRequest::validateChars(const std::string& path)
   return !ft::contains(path, '\0');
 }
 
-ft::optional<std::string> ValidateRequest::normalizePath(
-  const std::string& path,
-  NormalizationMode mode)
+void ValidateRequest::removeLastSegment(std::string& output)
 {
-  std::vector<std::string> segments;
-  std::string token;
-  std::stringstream stream(path);
+  const std::size_t lastSlash = output.rfind('/');
+  if (lastSlash == std::string::npos) {
+    output.clear();
+  } else {
+    output.erase(lastSlash);
+  }
+}
 
-  while (!std::getline(stream, token, '/').fail()) {
-    if (token.empty() || token == ".") {
-      continue;
+std::string ValidateRequest::removeDotSegments(const std::string& path)
+{
+  std::string input = path;
+  std::string output;
+
+  while (!input.empty()) {
+    // A. If the input buffer begins with a prefix of "../" or "./",
+    //    then remove that prefix from the input buffer.
+    if (ft::starts_with(input, "../")) {
+      input.erase(0, 3);
+    } else if (ft::starts_with(input, "./")) {
+      input.erase(0, 2);
     }
-    if (token == "..") {
-      if (!segments.empty()) {
-        segments.pop_back();
-      } else if (mode == FailAboveRoot) {
-        return ft::nullopt;
+
+    // B. If the input buffer begins with a prefix of "/./" or "/.",
+    //    where "." is a complete path segment, then replace that prefix with
+    //    "/"
+    else if (ft::starts_with(input, "/./")) {
+      input.replace(0, 3, "/");
+    } else if (input == "/.") {
+      input.replace(0, 2, "/");
+    }
+
+    // C. If the input buffer begins with a prefix of "/../" or "/..",
+    //    where ".." is a complete path segment, then replace that prefix with
+    //    "/" and remove the last segment from the output buffer.
+    else if (ft::starts_with(input, "/../")) {
+      input.replace(0, 4, "/");
+      removeLastSegment(output);
+    } else if (input == "/..") {
+      input.replace(0, 3, "/");
+      removeLastSegment(output);
+    }
+
+    // D. If the input buffer consists only of "." or "..", then remove
+    //    that from the input buffer.
+    else if (input == "." || input == "..") {
+      input.clear();
+    }
+
+    // E. Move the first path segment in the input buffer to the end of
+    //    the output buffer, including the initial "/" character (if any)
+    //    and any subsequent characters up to, but not including, the next "/"
+    else {
+      const std::size_t nextSlash = input.find('/', 1);
+      if (nextSlash == std::string::npos) {
+        output += input;
+        input.clear();
+      } else {
+        output += input.substr(0, nextSlash);
+        input.erase(0, nextSlash);
       }
-    } else {
-      segments.push_back(token);
     }
   }
-
-  std::string final = "/";
-  for (std::size_t i = 0; i < segments.size(); ++i) {
-    final += segments[i];
-    if (i + 1 < segments.size()) {
-      final += "/";
-    }
-  }
-  return final;
+  return output;
 }
 
 std::string ValidateRequest::removePrefix(const std::string& uriPath,

@@ -131,6 +131,10 @@ add_my_test(writeBodyTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/writeBodyTester.cpp
 )
 
+add_my_test(removeDotsTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/removeDotsTester.cpp
+)
+
 # config
 
 add_my_test(configParserTester
