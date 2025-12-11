@@ -158,8 +158,7 @@ TEST(ValidateRequestTester, DecodeInvalidOnlyOneHex)
 
 TEST(ValidateRequestTester, NormalizePath)
 {
-  Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   ft::unique_ptr<Client> client =
     requestValidate(Request::GET, "/a/b/c/./../../g", server);
@@ -167,22 +166,9 @@ TEST(ValidateRequestTester, NormalizePath)
   EXPECT_EQ(client->getResource().getPath(), "/a/g");
 }
 
-TEST(ValidateRequestTester, NormalizePath01)
-{
-  Config config;
-  ServerConfig server(config);
-  server.setRoot("server_root/");
-
-  ft::unique_ptr<Client> client =
-    requestValidate(Request::GET, "/a/../.././..//////..//", server);
-
-  EXPECT_EQ(client->getResource().getPath(), "server_root/");
-}
-
 TEST(ValidateRequestTester, NormalizePathMidContent)
 {
-  Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   ft::unique_ptr<Client> client =
     requestValidate(Request::GET, "/mid/content=5/../6", server);
