@@ -13,7 +13,7 @@ add_library(${LIB_NAME} STATIC
   abnfRules/ruleIds.cpp
   abnfRules/ruleUtils.cpp
   abnfRules/uriRules.cpp
-  
+
   states/prepareResponse/HandleDelete.cpp
   states/prepareResponse/HandleError.cpp
   states/prepareResponse/HandleGet.cpp
@@ -36,6 +36,7 @@ add_library(${LIB_NAME} STATIC
   states/writeHeaderLines/WriteHeaderLines.cpp
   states/writeStatusLine/WriteStatusLine.cpp
   statesCgi/executeCgi/ExecuteCgi.cpp
+  statesCgi/processCgiResponse/CgiHeaderValidator.cpp
   statesCgi/processCgiResponse/ProcessCgiResponse.cpp
   
   utils/BaseHeaderValidator.cpp

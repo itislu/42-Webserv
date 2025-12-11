@@ -38,8 +38,8 @@ WriteHeaderLines::WriteHeaderLines(Client* context)
 void WriteHeaderLines::run()
 try {
   Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Date", _makeHttpDate());
-  headers.addHeader("Server", "webserv"); // TODO from config probably ?
+  headers.setHeader("Date", _makeHttpDate());
+  headers.setHeader("Server", "webserv"); // TODO from config probably ?
 
   _setConnectionHeader();
 
@@ -95,21 +95,21 @@ void WriteHeaderLines::_setConnectionHeader()
 
   // close connection present
   if (conn == "close") {
-    headers.addHeader("Connection", "close");
+    headers.setHeader("Connection", "close");
     return;
   }
 
   // HTTP/1.1 -> connection persist
   if (request.getVersion() == "HTTP/1.1") {
-    headers.addHeader("Connection", "keep-alive");
+    headers.setHeader("Connection", "keep-alive");
     return;
   }
 
   // HTTP/1.0 + keep-alive -> connection persist
   if (request.getVersion() == "HTTP/1.0" && conn == "keep-alive") {
-    headers.addHeader("Connection", "keep-alive");
+    headers.setHeader("Connection", "keep-alive");
     return;
   }
 
-  headers.addHeader("Connection", "close");
+  headers.setHeader("Connection", "close");
 }

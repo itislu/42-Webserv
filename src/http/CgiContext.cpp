@@ -1,10 +1,11 @@
 #include "CgiContext.hpp"
-#include "utils/Pipe.hpp"
 
-#include <cstddef>
 #include <http/statesCgi/executeCgi/ExecuteCgi.hpp>
 #include <http/statesCgi/processCgiResponse/ProcessCgiResponse.hpp>
+#include <utils/Pipe.hpp>
 #include <utils/state/StateHandler.hpp>
+
+#include <cstddef>
 
 /* ************************************************************************** */
 // PUBLIC
@@ -14,6 +15,7 @@ CgiContext::CgiContext(Client* client)
   , _shExecCgi(this)
   , _shProcessCgiResponse(this)
   , _contentLengthAvailable(false)
+  , _contentLength(0)
 {
   _shExecCgi.setState<ExecuteCgi>();
   _shProcessCgiResponse.setState<ProcessCgiResponse>();

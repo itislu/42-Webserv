@@ -2,6 +2,7 @@
 #ifndef PROCESS_CGI_RESPONSE_HPP
 #define PROCESS_CGI_RESPONSE_HPP
 
+#include <http/utils/HeaderParser.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
@@ -18,13 +19,18 @@ public:
   void run();
 
 private:
+  bool _ok();
   void _readCgiResponse();
+  void _parseCgiHeader();
+  void _checkBody();
 
   static Logger& _log;
 
   Client* _client;
   ft::shared_ptr<SmartBuffer> _smartBuffer;
+  HeaderParser _headerParser;
   bool _done;
+  bool _headersParsed;
 };
 
 #endif

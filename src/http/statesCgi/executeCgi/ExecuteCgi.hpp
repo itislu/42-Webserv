@@ -36,7 +36,6 @@ private:
   void _provideBody();
 
   static Logger& _log;
-  static const std::size_t _chunkSize = 1024;
 
   Client* _client;
   State _state;

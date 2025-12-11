@@ -38,17 +38,18 @@ public:
   Response& getResponse();
   Resource& getResource();
   ft::shared_ptr<CgiContext>& getCgiContext();
+  long getTimeout() const;
 
   void setServer(const Server* server);
-
-  const TimeStamp& getLastActivity() const;
-  long getTimeout() const;
 
   bool hasDataToSend() const;
   bool sendTo();
   bool receive();
 
   void prepareForNewRequest();
+
+  void setCloseConnection(bool value);
+  bool closeConnection() const;
 
 private:
   void updateLastActivity();
@@ -58,7 +59,6 @@ private:
   AutoFd _fd;
   const Server* _server;
   std::string _host;
-  TimeStamp _lastActivity;
   SmartBuffer _inBuff;
   BufferQueue _outBuffQueue;
   StateHandler<Client> _stateHandler;
@@ -66,6 +66,8 @@ private:
   Response _response;
   Resource _resource;
   ft::shared_ptr<CgiContext> _cgiContext;
+
+  bool _closeConnection;
 };
 
 std::ostream& operator<<(std::ostream& out, const Client& client);

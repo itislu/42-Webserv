@@ -1,6 +1,5 @@
 #include "Client.hpp"
 
-#include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
 #include <http/CgiContext.hpp>
 #include <http/Request.hpp>
@@ -40,6 +39,7 @@ Client::Client()
   : _fd(-1)
   , _server()
   , _stateHandler(this)
+  , _closeConnection(false)
 {
   _stateHandler.setState<ReadRequestLine>();
 }
@@ -48,6 +48,7 @@ Client::Client(int fdes)
   : _fd(fdes)
   , _server()
   , _stateHandler(this)
+  , _closeConnection(false)
 {
   _stateHandler.setState<ReadRequestLine>();
 }
@@ -56,6 +57,7 @@ Client::Client(int fdes, const Server* server)
   : _fd(fdes)
   , _server(server)
   , _stateHandler(this)
+  , _closeConnection(false)
 {
   _stateHandler.setState<ReadRequestLine>();
 }
@@ -148,7 +150,6 @@ bool Client::receive()
     std::cerr << ("[SERVER] recv failed, removing client\n");
     return false;
   }
-  updateLastActivity();
   return true;
 }
 
@@ -164,18 +165,7 @@ bool Client::sendTo()
                  << std::strerror(errno) << "\n";
     return false;
   }
-  updateLastActivity();
   return true;
-}
-
-const TimeStamp& Client::getLastActivity() const
-{
-  return _lastActivity;
-}
-
-void Client::updateLastActivity()
-{
-  _lastActivity.setTime(TimeStamp::now());
 }
 
 bool Client::hasDataToSend() const
@@ -196,4 +186,14 @@ void Client::prepareForNewRequest()
   _response = Response();
   _request = Request();
   _resource = Resource();
+}
+
+void Client::setCloseConnection(bool value)
+{
+  _closeConnection = value;
+}
+
+bool Client::closeConnection() const
+{
+  return _closeConnection;
 }

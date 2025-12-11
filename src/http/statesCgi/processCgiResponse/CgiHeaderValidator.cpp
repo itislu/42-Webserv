@@ -1,4 +1,4 @@
-#include "RequestHeaderValidator.hpp"
+#include "CgiHeaderValidator.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -17,27 +17,28 @@
 /* ***************************************************************************/
 // INIT
 
-Logger& RequestHeaderValidator::_log = Logger::getInstance(LOG_HTTP);
+Logger& CgiHeaderValidator::_log = Logger::getInstance(LOG_HTTP);
 
-const ft::array<RequestHeaderValidator::ValidatorEntry,
-                RequestHeaderValidator::_validators>
-  RequestHeaderValidator::_validatorMap = { {
-    { "host", &RequestHeaderValidator::_validateHost },
-    { "content-length", &RequestHeaderValidator::_validateContentLength },
-    { "transfer-encoding", &RequestHeaderValidator::_validateTransferEncoding },
+const ft::array<CgiHeaderValidator::ValidatorEntry,
+                CgiHeaderValidator::_validators>
+  CgiHeaderValidator::_validatorMap = { {
+    { "content-length", &CgiHeaderValidator::_validateContentLength },
+    { "transfer-encoding", &CgiHeaderValidator::_validateTransferEncoding },
   } };
 
 /* ************************************************************************** */
 // PUBLIC
 
-RequestHeaderValidator::RequestHeaderValidator(Client* client)
+CgiHeaderValidator::CgiHeaderValidator(Client* client)
   : _client(client)
-  , _headers(&_client->getRequest().getHeaders())
+  , _headers(&_client->getResponse().getHeaders())
 {
 }
 
-bool RequestHeaderValidator::isValid(const std::string& name,
-                                     const std::string& value)
+// todo check returned statuscodes
+
+bool CgiHeaderValidator::isValid(const std::string& name,
+                                 const std::string& value)
 {
   const std::string key = ft::to_lower(ft::trim(name));
   for (std::size_t i = 0; i < _validatorMap.size(); ++i) {
@@ -54,30 +55,13 @@ bool RequestHeaderValidator::isValid(const std::string& name,
 /* ************************************************************************** */
 // PRIVATE
 
-void RequestHeaderValidator::_validateHost(const std::string& value)
-{
-  if (_headers->contains("Host")) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "RequestHeaderValidator: found duplicate Host header\n";
-    return;
-  }
-
-  static const ft::shared_ptr<SequenceRule> rule =
-    fieldLineWrapper(hostHeaderRule());
-  if (!isValidString(*rule, value)) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "RequestHeaderValidator: invalid Host header\n";
-  }
-}
-
-void RequestHeaderValidator::_validateContentLength(const std::string& value)
+void CgiHeaderValidator::_validateContentLength(const std::string& value)
 {
   const bool hasTransferEncoding = _headers->contains("Transfer-Encoding");
   if (hasTransferEncoding) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _client->setCloseConnection(true);
     _log.error()
-      << "RequestHeaderValidator: has Transfer-Encoding AND Content-Length\n";
+      << "CgiHeaderValidator: has Transfer-Encoding AND Content-Length\n";
     return;
   }
 
@@ -85,25 +69,23 @@ void RequestHeaderValidator::_validateContentLength(const std::string& value)
     fieldLineWrapper(contentLengthRule());
   if (!isValidString(*rule, value)) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "RequestHeaderValidator: invalid Content-Length header\n";
+    _log.error() << "CgiHeaderValidator: invalid Content-Length header\n";
   }
 }
 
-void RequestHeaderValidator::_validateTransferEncoding(const std::string& value)
+void CgiHeaderValidator::_validateTransferEncoding(const std::string& value)
 {
   const bool hasContentLength = _headers->contains("Content-Length");
   if (hasContentLength) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _client->setCloseConnection(true);
     _log.error()
-      << "RequestHeaderValidator: has Transfer-Encoding AND Content-Length\n";
+      << "CgiHeaderValidator: has Transfer-Encoding AND Content-Length\n";
     return;
   }
 
   if (_client->getRequest().getVersion() == "HTTP/1.0") {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _client->setCloseConnection(true);
-    _log.error() << "RequestHeaderValidator: has Transfer-Encoding with "
+    _log.error() << "CgiHeaderValidator: has Transfer-Encoding with "
                     "version HTTP/1.0\n";
     return;
   }
@@ -112,7 +94,6 @@ void RequestHeaderValidator::_validateTransferEncoding(const std::string& value)
     fieldLineWrapper(transferEncodingRule());
   if (!isValidString(*rule, value)) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error()
-      << "RequestHeaderValidator: invalid Transfer-Encoding header\n";
+    _log.error() << "CgiHeaderValidator: invalid Transfer-Encoding header\n";
   }
 }

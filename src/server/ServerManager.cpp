@@ -134,9 +134,10 @@ const std::vector<ft::shared_ptr<const Server> >& ServerManager::getServers()
 
 void ServerManager::run()
 {
+  EventManager& eventManager = EventManager::getInstance();
   g_running = 1;
   while (g_running == 1) {
-    const int res = EventManager::check();
+    const int res = eventManager.check();
     if (res == 0) {
       std::cout << "poll: timeout\n";
     }
@@ -146,7 +147,7 @@ void ServerManager::run()
       }
       break;
     }
-    EventManager::checkTimeouts();
+    eventManager.checkTimeouts();
   }
   std::cout << "Shutting down servers...\n";
 }

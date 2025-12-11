@@ -13,19 +13,18 @@ class Client;
 class PrepareResponse;
 
 /* ************************************************************************** */
-class RequestHeaderValidator : public BaseHeaderValidator
+class CgiHeaderValidator : public BaseHeaderValidator
 {
 public:
-  explicit RequestHeaderValidator(Client* client);
+  explicit CgiHeaderValidator(Client* client);
   bool isValid(const std::string& name, const std::string& value);
 
 private:
   struct ValidatorEntry;
-  typedef void (RequestHeaderValidator::*fnPtrValid)(const std::string&);
+  typedef void (CgiHeaderValidator::*fnPtrValid)(const std::string&);
   static const int _validators = 3;
   static const ft::array<ValidatorEntry, _validators> _validatorMap;
 
-  void _validateHost(const std::string& value);
   void _validateContentLength(const std::string& value);
   void _validateTransferEncoding(const std::string& value);
 
@@ -34,10 +33,10 @@ private:
   Headers* _headers;
 };
 
-struct RequestHeaderValidator::ValidatorEntry
+struct CgiHeaderValidator::ValidatorEntry
 {
   const char* name;
-  RequestHeaderValidator::fnPtrValid fnPtrValid;
+  CgiHeaderValidator::fnPtrValid fnPtrValid;
 };
 
 #endif
