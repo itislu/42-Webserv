@@ -72,5 +72,15 @@ IBuffer::ExpectVoid IOutBuffer::moveBufferToFile(const std::string& filepath,
   }
 }
 
+IBuffer::ExpectVoid IOutBuffer::reset(std::nothrow_t /*unused*/)
+{
+  try {
+    reset();
+    return ExpectVoid();
+  } catch (const std::exception& e) {
+    return ft::unexpected<BufferException>(e);
+  }
+}
+
 /* ************************************************************************** */
 // PRIVATE

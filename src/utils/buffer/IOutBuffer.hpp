@@ -32,6 +32,7 @@ public:
   ExpectVoid replace(RawBytes& rawData, std::nothrow_t /*unused*/);
   ExpectVoid moveBufferToFile(const std::string& filepath,
                               std::nothrow_t /*unused*/);
+  ExpectVoid reset(std::nothrow_t /*unused*/);
 
 private:
   IOutBuffer(const IOutBuffer& other);
