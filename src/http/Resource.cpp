@@ -1,5 +1,6 @@
 #include "Resource.hpp"
 #include "config/LocationConfig.hpp"
+#include "libftpp/optional.hpp"
 #include "libftpp/utility.hpp"
 #include <sstream>
 #include <string>
@@ -42,6 +43,23 @@ void Resource::setLocation(const LocationConfig* location)
 void Resource::setServer(const ServerConfig* server)
 {
   _server = server;
+}
+
+ft::optional<std::string> Resource::getErrorPage(int code) const
+{
+  if (_location != FT_NULLPTR) {
+    const std::string errPage = _location->getErrorPage(code);
+    if (!errPage.empty()) {
+      return errPage;
+    }
+  }
+  if (_server != FT_NULLPTR) {
+    const std::string errPage = _server->getErrorPage(code);
+    if (!errPage.empty()) {
+      return errPage;
+    }
+  }
+  return ft::nullopt;
 }
 
 std::string Resource::_typeToString() const

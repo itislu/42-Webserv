@@ -1,8 +1,10 @@
 #ifndef RESOURCE_HPP
 #define RESOURCE_HPP
 
-#include "config/LocationConfig.hpp"
-#include "config/ServerConfig.hpp"
+#include <config/LocationConfig.hpp>
+#include <config/ServerConfig.hpp>
+#include <libftpp/optional.hpp>
+
 #include <string>
 
 class Resource
@@ -25,6 +27,8 @@ public:
   void setType(Type type);
   void setLocation(const LocationConfig* location);
   void setServer(const ServerConfig* server);
+
+  ft::optional<std::string> getErrorPage(int code) const;
 
   std::string toString() const;
 

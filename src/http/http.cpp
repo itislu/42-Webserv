@@ -20,6 +20,9 @@ namespace http {
  */
 const char* const CRLF = "\r\n";
 
+const char* const HTTP_1_0 = "HTTP/1.0";
+const char* const HTTP_1_1 = "HTTP/1.1";
+
 /**
  * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
  */
@@ -29,7 +32,7 @@ bool isSchemeChar(char chr)
     return true;
   }
 
-  static const char specialSchemeChars[] = "+-.";
+  static const char specialSchemeChars[] = { '+', '-', '.' };
   return ft::contains(specialSchemeChars, chr);
 }
 
@@ -39,9 +42,10 @@ bool isAuthChar(char chr)
     return true;
   }
 
-  static const char specialAuthorityChars[] = "-._~"
-                                              "!$&'()*+,;=:@"
-                                              "[]";
+  static const char specialAuthorityChars[] = { '-', '.', '_',  '~', '!',
+                                                '$', '&', '\'', '(', ')',
+                                                '*', '+', ',',  ';', '=',
+                                                ':', '@', '[',  ']' };
   return ft::contains(specialAuthorityChars, chr);
 }
 
@@ -62,7 +66,7 @@ bool isUnreserved(char chr)
     return true;
   }
 
-  static const char specialUnreservedChars[] = "-._~";
+  static const char specialUnreservedChars[] = { '-', '.', '_', '~' };
   return ft::contains(specialUnreservedChars, chr);
 }
 
@@ -71,7 +75,7 @@ bool isUnreserved(char chr)
  */
 bool isGenDelim(char chr)
 {
-  static const char genDelims[] = ":/?#[]@";
+  static const char genDelims[] = { ':', '/', '?', '#', '[', ']', '@' };
   return ft::contains(genDelims, chr);
 }
 
@@ -81,7 +85,8 @@ bool isGenDelim(char chr)
  */
 bool isSubDelim(char chr)
 {
-  static const char subDelims[] = "!$&'()*+,;=";
+  static const char subDelims[] = { '!', '$', '&', '\'', '(', ')',
+                                    '*', '+', ',', ';',  '=' };
   return ft::contains(subDelims, chr);
 }
 
@@ -105,7 +110,9 @@ bool isTchar(char chr)
     return true;
   }
 
-  static const char specialTokenChars[] = "!#$%&'*+-.^_`|~";
+  static const char specialTokenChars[] = { '!',  '#', '$', '%', '&',
+                                            '\'', '*', '+', '-', '.',
+                                            '^',  '_', '`', '|', '~' };
   return ft::contains(specialTokenChars, chr);
 }
 
@@ -224,4 +231,5 @@ const ExtToTypeMap& getExtToType()
 const char* const minResponse500 = "HTTP/1.1 500 Internal Server Error\r\n"
                                    "Content-Length: 0\r\n"
                                    "Connection: close\r\n\r\n";
-}
+
+} // namespace http
