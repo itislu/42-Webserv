@@ -81,7 +81,7 @@ INSTANTIATE_TEST_SUITE_P(
     PathTestParams{ "RootBlast", "../../a", "a" },
 
     // Trailing Slash
-    PathTestParams{ "TrailingSlash", "/file/", "/file/" },
+    PathTestParams{ "TrailingSlash02", "/file/", "/file/" },
 
     // Middle Slashes
     PathTestParams{ "MiddleSlashes", "/dir////file", "/dir////file" }),
@@ -90,9 +90,6 @@ INSTANTIATE_TEST_SUITE_P(
   [](const testing::TestParamInfo<PathTestParams>& info) {
     return info.param.testName;
   });
-
-// // Middle Slashes
-// PathTestParams{ "MiddleSlashes", "/dir////file", "/dir////file" }),
 
 // NOLINTEND
 
