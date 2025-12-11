@@ -205,16 +205,11 @@ TEST(ValidateRequestTester, DecodeInvalidOnlyOneHex)
 // ss -tulpn | grep 8080
 int main(int argc, char** argv)
 {
-  try {
-    const std::string configPath =
-      std::string(ASSETS_PATH) + "valid/validateRequest.conf";
-    ConfigParser parser(configPath.c_str());
-    parser.parseConfig();
-    ServerManager::getInstance();
-  } catch (const std::exception& e) {
-    std::cerr << "Error: " << e.what();
-    return 1;
-  }
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "valid/validateRequest.conf";
+  ConfigParser parser(configPath.c_str());
+  parser.parseConfig();
+  ServerManager::getInstance();
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
