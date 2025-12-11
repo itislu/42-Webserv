@@ -27,7 +27,8 @@ public:
     UriTooLong = 414,
     RequestHeaderFieldsTooLarge = 431,
     InternalServerError = 500,
-    NotImplemented = 501
+    NotImplemented = 501,
+    HttpVersionNotSupported = 505
   };
 
   StatusCode();
@@ -44,7 +45,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 15;
+  static const int _codes = 16;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;
