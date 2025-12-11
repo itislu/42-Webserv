@@ -1,5 +1,6 @@
 #include "Resource.hpp"
 #include "config/LocationConfig.hpp"
+#include "libftpp/optional.hpp"
 #include "libftpp/utility.hpp"
 #include <sstream>
 #include <string>
@@ -19,12 +20,12 @@ Resource::Type Resource::getType() const
   return _type;
 }
 
-const config::LocationConfig* Resource::getLocation()
+const LocationConfig* Resource::getLocation()
 {
   return _location;
 }
 
-const config::ServerConfig* Resource::getServer()
+const ServerConfig* Resource::getServer()
 {
   return _server;
 }
@@ -34,14 +35,31 @@ void Resource::setType(Type type)
   _type = type;
 }
 
-void Resource::setLocation(const config::LocationConfig* location)
+void Resource::setLocation(const LocationConfig* location)
 {
   _location = location;
 }
 
-void Resource::setServer(const config::ServerConfig* server)
+void Resource::setServer(const ServerConfig* server)
 {
   _server = server;
+}
+
+ft::optional<std::string> Resource::getErrorPage(int code) const
+{
+  if (_location != FT_NULLPTR) {
+    const std::string errPage = _location->getErrorPage(code);
+    if (!errPage.empty()) {
+      return errPage;
+    }
+  }
+  if (_server != FT_NULLPTR) {
+    const std::string errPage = _server->getErrorPage(code);
+    if (!errPage.empty()) {
+      return errPage;
+    }
+  }
+  return ft::nullopt;
 }
 
 std::string Resource::_typeToString()

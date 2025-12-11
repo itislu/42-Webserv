@@ -17,13 +17,13 @@ public:
   void run();
 
 private:
-  void _addContentLengthHeader();
-  void _addContentType();
-  void _openFile();
+  void _setNextState();
+  void _handleAutoIndex();
+  void _handleStaticFile();
 
+  static Logger& _log;
   PrepareResponse* _prepareResponse;
   Client* _client;
-  static Logger& _log;
 };
 
 #endif

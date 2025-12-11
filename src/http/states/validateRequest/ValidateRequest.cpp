@@ -1,29 +1,34 @@
 #include "ValidateRequest.hpp"
-#include "client/Client.hpp"
-#include "config/Converters.hpp"
-#include "config/LocationConfig.hpp"
-#include "http/Request.hpp"
-#include "http/Resource.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/prepareResponse/PrepareResponse.hpp"
-#include "http/states/readBody/ReadBody.hpp"
-#include "http/states/validateRequest/ValidateDelete.hpp"
-#include "http/states/validateRequest/ValidateGet.hpp"
-#include "http/states/validateRequest/ValidatePost.hpp"
-#include "libftpp/string.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "utils/state/StateHandler.hpp"
+
+#include <client/Client.hpp>
+#include <config/LocationConfig.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/StatusCode.hpp>
+#include <http/http.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/states/readBody/ReadBody.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/validateRequest/ValidateDelete.hpp>
+#include <http/states/validateRequest/ValidateGet.hpp>
+#include <http/states/validateRequest/ValidatePost.hpp>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/optional.hpp>
+#include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <utils/convert.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+#include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
 #include <cstdlib>
-#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <exception>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
-#include <utils/logger/Logger.hpp>
-#include <utils/state/IState.hpp>
 #include <vector>
 
 /* ************************************************************************** */
@@ -41,11 +46,11 @@ ValidateRequest::ValidateRequest(Client* context)
   , _server()
   , _location()
 {
-  _log.info() << "ValidateRequest\n";
+  _log.info() << *_client << " ValidateRequest\n";
 }
 
 void ValidateRequest::run()
-{
+try {
   _init();
 
   _stateHandler.setStateHasChanged(true);
@@ -57,23 +62,28 @@ void ValidateRequest::run()
   if (_stateHandler.isDone()) {
     _log.info() << "ValidateRequest result\n"
                 << _client->getResource().toString() << "\n";
+    _log.info() << _client->getResponse().getStatusCode() << "\n";
     if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
       getContext()->getStateHandler().setState<ReadBody>();
     } else {
       getContext()->getStateHandler().setState<PrepareResponse>();
     }
   }
+} catch (const std::exception& e) {
+  _log.error() << *getContext() << " ValidateRequest: " << e.what() << '\n';
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 const std::string& ValidateRequest::getPath() const
 {
   return _path;
 }
-const config::ServerConfig* ValidateRequest::getServer() const
+const ServerConfig* ValidateRequest::getServer() const
 {
   return _server;
 }
-const config::LocationConfig* ValidateRequest::getLocation() const
+const LocationConfig* ValidateRequest::getLocation() const
 {
   return _location;
 }
@@ -101,15 +111,16 @@ void ValidateRequest::_init()
                             : _server->getAllowedMethods();
   const Request::Method method = _client->getRequest().getMethod();
   _log.info() << _client->getRequest().getMethod() << "\n";
-  if (validateMethod(allowedMethods, method)) {
-    _log.info() << "method is VALID\n";
-    _initRequestPath();
-    if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
-      _initState(method);
-    }
-  } else {
+
+  if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
+  }
+  _log.info() << "method is VALID\n";
+
+  _initRequestPath();
+  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
+    _initState(method);
   }
 }
 
@@ -171,29 +182,48 @@ void ValidateRequest::_initState(const Request::Method& method)
   }
 }
 
+static bool alwaysDecode(char /*unused*/)
+{
+  return true;
+}
+
+/**
+ * 1. Decode unreserved characters.
+ * 2. Normalize path (collapse . | .. | //).
+ * 3. Decode all other characters (first decoding cannot produce more '%').
+ * 4. Check for illegal characters (NUL).
+ * 5. Check that path is not going out of root.
+ * 6. Combine with root.
+ */
 void ValidateRequest::_initRequestPath()
 {
   _log.info() << "init request path - path: " << _path << "\n";
-  // 1. Decode URI
-  std::string decoded = decodePath(_path);
-  if (decoded.empty() && !_path.empty()) {
-    _log.info() << "Error after decoding: [" << decoded << "]\n";
-    endState(StatusCode::BadRequest);
-    return;
-  }
-  _log.info() << "decode uri - path: " << decoded << "\n";
-  // 2. check for illegal characters (NULL, control chars)
+
+  // 1. Decode unreserved characters.
+  std::string decoded = decodePath(_path, http::isUnreserved);
+  _log.info() << "decode unreserved - path: " << decoded << "\n";
+
+  // 2. Normalize path (collapse . | .. | //).
+  decoded = normalizePath(decoded, CapAtRoot).value();
+  _log.info() << "normalizePath - path: " << decoded << "\n";
+
+  // 3. Decode all other characters.
+  decoded = decodePath(decoded, alwaysDecode);
+  _log.info() << "decode all - path: " << decoded << "\n";
+
+  // 4. Check for illegal characters (NUL).
   if (!validateChars(decoded)) {
     endState(StatusCode::BadRequest);
     return;
   }
-  _log.info() << "validate chars - path: " << decoded << "\n";
 
-  // 3. Normalize Path (collapse . / .. / //)
-  decoded = normalizePath(decoded);
-  _log.info() << "normalizePath - path: " << decoded << "\n";
+  // 5. Check that path is not going out of root.
+  if (!normalizePath(decoded, FailAboveRoot).has_value()) {
+    endState(StatusCode::BadRequest);
+    return;
+  }
 
-  // 4. Combine with root
+  // 6. Combine with root.
   if (_location != FT_NULLPTR) {
     _path = removePrefix(decoded, _location->getPath());
     _log.info() << "remove Prefix - path: " << _path << "\n";
@@ -206,7 +236,8 @@ void ValidateRequest::_initRequestPath()
   _log.info() << "_path: " << _path << "\n";
 }
 
-std::string ValidateRequest::decodePath(const std::string& path)
+std::string ValidateRequest::decodePath(const std::string& path,
+                                        bool (*wantDecode)(char))
 {
   std::string decoded;
   decoded.reserve(path.size());
@@ -215,48 +246,42 @@ std::string ValidateRequest::decodePath(const std::string& path)
   for (std::size_t i = 0; i < path.size(); ++i) {
     if (path[i] == '%') {
       // decode hex
-      if (path.size() <= i + 2) {
-        return ""; // error
-      }
-      const int hex1 = config::convert::hexToInt(path[i + 1]);
-      const int hex2 = config::convert::hexToInt(path[i + 2]);
-      if (hex1 < 0 || hex2 < 0) {
-        return ""; // error
-      }
+      const int hex1 = utils::hexToInt(path[i + 1]);
+      const int hex2 = utils::hexToInt(path[i + 2]);
       const char decode = static_cast<char>((hex1 * hexMult) + hex2);
-      decoded += decode;
-      i += 2;
-    } else {
-      decoded += path[i];
+      if (wantDecode(decode)) {
+        decoded += decode;
+        i += 2;
+        continue;
+      }
     }
+    decoded += path[i];
   }
   return decoded;
 }
 
 bool ValidateRequest::validateChars(const std::string& path)
 {
-  for (std::size_t i = 0; i < path.size(); ++i) {
-    const unsigned char chr = path[i];
-    if (chr < ' ') {
-      return false;
-    }
-  }
-  return true;
+  return !ft::contains(path, '\0');
 }
 
-std::string ValidateRequest::normalizePath(const std::string& path)
+ft::optional<std::string> ValidateRequest::normalizePath(
+  const std::string& path,
+  NormalizationMode mode)
 {
   std::vector<std::string> segments;
   std::string token;
   std::stringstream stream(path);
 
-  while (std::getline(stream, token, '/') != 0) {
+  while (!std::getline(stream, token, '/').fail()) {
     if (token.empty() || token == ".") {
       continue;
     }
     if (token == "..") {
       if (!segments.empty()) {
         segments.pop_back();
+      } else if (mode == FailAboveRoot) {
+        return ft::nullopt;
       }
     } else {
       segments.push_back(token);

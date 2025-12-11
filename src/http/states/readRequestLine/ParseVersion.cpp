@@ -1,10 +1,13 @@
 #include "ParseVersion.hpp"
+#include "http/Response.hpp"
+#include "http/http.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <libftpp/ctype.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/BufferReader.hpp>
@@ -13,7 +16,7 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <ctype.h>
+#include <cstddef>
 #include <string>
 
 /* ************************************************************************** */
@@ -29,7 +32,7 @@ ParseVersion::ParseVersion(ReadRequestLine* context)
   , _client(context->getContext())
   , _buffReader()
 {
-  _log.info() << "ParseVersion\n";
+  _log.info() << *_client << " ParseVersion\n";
   _init();
 }
 
@@ -57,6 +60,7 @@ void ParseVersion::run()
 
   if (_sequence.reachedEnd()) {
     _extractVersion();
+    _validateVersion();
     getContext()->getStateHandler().setDone();
     return;
   }
@@ -64,10 +68,9 @@ void ParseVersion::run()
 
 void ParseVersion::_extractVersion()
 {
-  const long index = _buffReader.getPosInBuff();
-  std::string input = _client->getInBuff().consumeFront(index);
-  ft::trim(input);
-  _client->getRequest().setVersion(input);
+  const std::size_t index = _buffReader.getPosInBuff();
+  std::string version = _client->getInBuff().consumeFront(index);
+  _client->getRequest().setVersion(ft::trim(version));
 }
 
 /* ************************************************************************** */
@@ -79,9 +82,18 @@ void ParseVersion::_init()
 
   // _sequence.addRule(owsRule());
   _sequence.addRule(ft::make_shared<LiteralRule>("HTTP/"));
-  _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
+  _sequence.addRule(ft::make_shared<RangeRule>(ft::isdigit));
   _sequence.addRule(ft::make_shared<LiteralRule>("."));
-  _sequence.addRule(ft::make_shared<RangeRule>(::isdigit));
+  _sequence.addRule(ft::make_shared<RangeRule>(ft::isdigit));
   _sequence.addRule(endOfLineRule());
   _sequence.setBufferReader(&_buffReader);
+}
+
+void ParseVersion::_validateVersion()
+{
+  Response& response = _client->getResponse();
+  const std::string& version = _client->getRequest().getVersion();
+  if (version != http::HTTP_1_0 && version != http::HTTP_1_1) {
+    response.setStatusCode(StatusCode::HttpVersionNotSupported);
+  }
 }

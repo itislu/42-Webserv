@@ -5,14 +5,9 @@
 #include <gtest/gtest.h>
 #include <string>
 
-using config::Config;
-using config::ServerConfig;
-using config::LocationConfig;
-
 TEST(LocationMatchTest, SimplePrefixMatch)
 {
-  const Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig img(server);
   img.setPath("/image");
@@ -27,8 +22,7 @@ TEST(LocationMatchTest, SimplePrefixMatch)
 
 TEST(LocationMatchTest, LongestPrefixMatch)
 {
-  const Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig img(server);
   img.setPath("/image");
@@ -46,8 +40,7 @@ TEST(LocationMatchTest, LongestPrefixMatch)
 
 TEST(LocationMatchTest, NoMatch)
 {
-  const Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig test(server);
   test.setPath("/test");
@@ -60,8 +53,7 @@ TEST(LocationMatchTest, NoMatch)
 
 TEST(LocationMatchTest, ExactMatch)
 {
-  const Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig api(server);
   api.setPath("/api");
@@ -78,8 +70,7 @@ TEST(LocationMatchTest, ExactMatch)
 
 TEST(LocationMatchTest, DirectoryBoundary)
 {
-  const Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig app(server);
   app.setPath("/app");
@@ -101,8 +92,7 @@ TEST(LocationMatchTest, DirectoryBoundary)
 
 TEST(LocationMatchTest, TrailingSlashEquality)
 {
-  const Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig img(server);
   img.setPath("/image");
@@ -115,8 +105,7 @@ TEST(LocationMatchTest, TrailingSlashEquality)
 
 TEST(LocationMatchTest, RootLocationFallback)
 {
-  const Config config;
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig root(server);
   root.setPath("/");
@@ -137,9 +126,7 @@ TEST(LocationMatchTest, RootLocationFallback)
 
 TEST(LocationMatchTest, DeepNestedMatch)
 {
-  const Config config;
-
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig locA(server);
   locA.setPath("/a");
@@ -158,9 +145,7 @@ TEST(LocationMatchTest, DeepNestedMatch)
 
 TEST(LocationMatchTest, SameLengthPrefixChoosing)
 {
-  const Config config;
-
-  ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
 
   LocationConfig loc1(server);
   loc1.setPath("/abc");

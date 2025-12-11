@@ -1,11 +1,10 @@
-#include "utils/SmartBuffer.hpp"
+#include "utils/buffer/SmartBuffer.hpp"
 #include <http/abnfRules/requestLineRules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
 
-#include <cctype>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -25,7 +24,8 @@ bool runParser(const std::string& str, Rule& rule)
   }
   return matches;
 }
-}
+
+} // namespace
 
 /**
  * The path is terminated

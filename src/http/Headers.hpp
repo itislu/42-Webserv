@@ -9,6 +9,7 @@
 class Headers
 {
 public:
+  void setHeader(const std::string& key, const std::string& value);
   void addHeader(const std::string& key, const std::string& value);
 
   std::string toString() const;
@@ -18,11 +19,19 @@ public:
   bool contains(const std::string& key) const;
 
 private:
-  typedef std::map<std::string, std::string> HeaderMap;
+  // the HeaderMap contains the header name in lowercase as key
+  // and the HeaderPair contains the original header name + value
+  struct HeaderPair
+  {
+    std::string name;
+    std::string value;
+  };
+  typedef std::map<std::string, HeaderPair> HeaderMap;
 
-  static void _formatInput(std::string& key, std::string& value);
-  void _addNew(const std::string& key, const std::string& value);
-  void _addExisting(const std::string& key, const std::string& value);
+  static void _formatInput(std::string& key, HeaderPair& headerPair);
+  static void _addNew(HeaderPair& entry, const HeaderPair& headerPair);
+  static void _setExisting(HeaderPair& entry, const HeaderPair& headerPair);
+  static void _addExisting(HeaderPair& entry, const HeaderPair& headerPair);
 
   HeaderMap _headers;
 };

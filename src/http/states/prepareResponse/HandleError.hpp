@@ -2,7 +2,10 @@
 #ifndef HANDLE_ERROR_HPP
 #define HANDLE_ERROR_HPP
 
-#include "utils/state/IState.hpp"
+#include <http/StatusCode.hpp>
+#include <utils/state/IState.hpp>
+
+#include <string>
 
 class Logger;
 class Client;
@@ -17,6 +20,11 @@ public:
   void run();
 
 private:
+  static std::string _makeErrorBody(const StatusCode& statuscode);
+
+  void _customErrorPage(const std::string& errPage);
+  void _defaultErrorPage();
+
   PrepareResponse* _prepareResponse;
   Client* _client;
   static Logger& _log;

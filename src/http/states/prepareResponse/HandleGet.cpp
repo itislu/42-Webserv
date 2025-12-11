@@ -1,17 +1,19 @@
 #include "HandleGet.hpp"
 
 #include <client/Client.hpp>
-#include <http/Headers.hpp>
-#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
+#include <http/headerUtils.hpp>
+#include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
+#include <libftpp/memory.hpp>
+#include <utils/buffer/StaticFileBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <fstream>
-#include <sstream>
 #include <string>
-#include <sys/stat.h>
 
 /* ************************************************************************** */
 // INIT
@@ -27,65 +29,46 @@ HandleGet::HandleGet(PrepareResponse* context)
   , _client(_prepareResponse->getContext())
 {
   _log.info() << "HandleGet\n";
+  _log.info() << "HandleGet: " << _client->getResource().getPath() << "\n";
 }
 
 void HandleGet::run()
 {
-  _addContentLengthHeader();
-  _addContentType();
-  _openFile();
-  getContext()->getStateHandler().setDone();
+  if (_client->getResource().getType() == Resource::Autoindex) {
+    _handleAutoIndex();
+  } else {
+    _handleStaticFile();
+  }
+  _setNextState();
 }
 
 /* ************************************************************************** */
 // PRIVATE
 
-void HandleGet::_addContentLengthHeader()
+void HandleGet::_setNextState()
 {
-  struct stat info = {};
-  const Request::Method method = _client->getRequest().getMethod();
-
-  if (method == Request::GET) {
-    stat("./assets/testWebsite/get.html", &info);
-  } else if (method == Request::POST) {
-    stat("./assets/testWebsite/post.html", &info);
-  } else if (method == Request::DELETE) {
-    stat("./assets/testWebsite/delete.html", &info);
+  const StatusCode& statusCode = _client->getResponse().getStatusCode();
+  if (statusCode == StatusCode::Ok) {
+    getContext()->getStateHandler().setDone();
   } else {
-    stat("./assets/testWebsite/index.html", &info);
+    getContext()->getStateHandler().setState<HandleError>();
   }
-
-  std::ostringstream oss;
-  oss << info.st_size;
-  const std::string contentLength = oss.str();
-  Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Content-Length", contentLength);
 }
 
-void HandleGet::_addContentType()
+void HandleGet::_handleAutoIndex()
 {
-  Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Content-Type", "text/html");
+  // todo
 }
 
-void HandleGet::_openFile()
+void HandleGet::_handleStaticFile()
 {
-  // const std::string& path = _client->getResource().getPath();
-  const Request::Method method = _client->getRequest().getMethod();
+  Response& response = _client->getResponse();
 
-  std::string file;
-  if (method == Request::GET) {
-    file = "./assets/testWebsite/get.html";
-  } else if (method == Request::POST) {
-    file = "./assets/testWebsite/post.html";
-  } else if (method == Request::DELETE) {
-    file = "./assets/testWebsite/delete.html";
-  } else {
-    file = "./assets/testWebsite/index.html";
-  }
+  // set body
+  const std::string& filePath = _client->getResource().getPath();
+  response.setBody(ft::make_shared<StaticFileBuffer>(filePath));
 
-  _log.info() << "GET file: " << file << "\n";
-
-  std::ifstream& body = _client->getResponse().getBody();
-  body.open(file.c_str());
+  // set headers
+  setContentLengthHeader(response.getHeaders(), response.getBody()->size());
+  setContentTypeHeader(response.getHeaders(), filePath);
 }

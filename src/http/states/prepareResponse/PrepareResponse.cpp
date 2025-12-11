@@ -8,7 +8,7 @@
 #include <http/states/prepareResponse/HandleGet.hpp>
 #include <http/states/prepareResponse/HandlePost.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <utils/IBuffer.hpp>
+#include <utils/buffer/IBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
@@ -25,17 +25,17 @@ PrepareResponse::PrepareResponse(Client* context)
   : IState<Client>(context)
   , _client(context)
   , _stateHandler(this)
-  , _initialized(false)
 {
-  _log.info() << "Prepare response\n";
+  _log.info() << *_client << " PrepareResponse\n";
+  _init();
+
+  // todo remove this log after testing
+  _log.info() << "PrepareResponse Request:\n\n"
+              << getContext()->getRequest().toString() << "\n\n";
 }
 
 void PrepareResponse::run()
 try {
-  if (!_initialized) {
-    _init();
-  }
-
   _stateHandler.setStateHasChanged(true);
   while (!_stateHandler.isDone() && _stateHandler.stateHasChanged()) {
     _stateHandler.setStateHasChanged(false);
@@ -46,9 +46,9 @@ try {
     _client->getStateHandler().setState<WriteStatusLine>();
   }
 } catch (const IBuffer::BufferException& e) {
-  _log.error() << "PrepareResponse: " << e.what() << '\n';
+  _log.error() << *_client << " PrepareResponse: " << e.what() << '\n';
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
-  getContext()->getStateHandler().setState<WriteStatusLine>();
+  throw;
 }
 
 StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
@@ -61,8 +61,6 @@ StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
 
 void PrepareResponse::_init()
 {
-  _initialized = true;
-
   if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
     _stateHandler.setState<HandleError>();
   } else {

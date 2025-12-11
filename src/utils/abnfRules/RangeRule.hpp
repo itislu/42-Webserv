@@ -10,8 +10,9 @@
 class RangeRule : public Rule
 {
 public:
+  // NUL bytes in the range string are not supported.
   explicit RangeRule(const char* range);
-  explicit RangeRule(int (*func)(int));
+  explicit RangeRule(bool (*func)(char));
   ~RangeRule();
 
   bool matches();
@@ -30,7 +31,7 @@ private:
   {
     union
     {
-      int (*func)(int);
+      bool (*func)(char);
       const char* set;
     };
     RangeType type;

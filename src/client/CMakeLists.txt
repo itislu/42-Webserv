@@ -12,6 +12,7 @@ add_library(${LIB_NAME} STATIC
 
 target_link_libraries(${LIB_NAME} 
   PRIVATE
+  config
   ftpp
   http
   socket

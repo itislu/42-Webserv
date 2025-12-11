@@ -8,21 +8,39 @@
 /* ************************************************************************** */
 // PUBLIC
 
-void Headers::addHeader(const std::string& key, const std::string& value)
+void Headers::setHeader(const std::string& key, const std::string& value)
 {
   std::string keyFormated = key;
-  std::string valueFormated = value;
-  _formatInput(keyFormated, valueFormated);
+  HeaderPair headerPair = { key, value };
+  _formatInput(keyFormated, headerPair);
 
   if (keyFormated.empty()) {
     return;
   }
 
-  const HeaderMap::const_iterator iter = _headers.find(keyFormated);
-  if (iter == _headers.end()) {
-    _addNew(keyFormated, valueFormated);
+  HeaderPair& entry = _headers[keyFormated];
+  if (entry.name.empty()) {
+    _addNew(entry, headerPair);
   } else {
-    _addExisting(keyFormated, valueFormated);
+    _setExisting(entry, headerPair);
+  }
+}
+
+void Headers::addHeader(const std::string& key, const std::string& value)
+{
+  std::string keyFormated = key;
+  HeaderPair headerPair = { key, value };
+  _formatInput(keyFormated, headerPair);
+
+  if (keyFormated.empty()) {
+    return;
+  }
+
+  HeaderPair& entry = _headers[keyFormated];
+  if (entry.name.empty()) {
+    _addNew(entry, headerPair);
+  } else {
+    _addExisting(entry, headerPair);
   }
 }
 
@@ -32,8 +50,9 @@ std::string Headers::toString() const
   for (HeaderMap::const_iterator iter = _headers.begin();
        iter != _headers.end();
        ++iter) {
-    oss.append(iter->first).append(": ");
-    oss.append(iter->second).append(http::CRLF);
+    const HeaderPair& header = iter->second;
+    oss.append(header.name).append(": ");
+    oss.append(header.value).append(http::CRLF);
   }
   return oss;
 }
@@ -44,9 +63,10 @@ std::string Headers::toLogString() const
   for (HeaderMap::const_iterator iter = _headers.begin();
        iter != _headers.end();
        ++iter) {
+    const HeaderPair& header = iter->second;
     oss.append("  \"");
-    oss.append(iter->first).append(": ");
-    oss.append(iter->second);
+    oss.append(header.name).append(": ");
+    oss.append(header.value);
     oss.append("\"\n");
   }
   return oss;
@@ -54,7 +74,8 @@ std::string Headers::toLogString() const
 
 const std::string& Headers::at(const std::string& key) const
 {
-  return _headers.at(ft::to_lower(key));
+  const HeaderPair& header = _headers.at(ft::to_lower(key));
+  return header.value;
 }
 
 bool Headers::contains(const std::string& key) const
@@ -65,20 +86,26 @@ bool Headers::contains(const std::string& key) const
 /* ************************************************************************** */
 // PRIVATE
 
-void Headers::_formatInput(std::string& key, std::string& value)
+void Headers::_formatInput(std::string& key, HeaderPair& headerPair)
 {
   ft::trim(key);
-  ft::trim(value);
+  ft::trim(headerPair.name);
+  ft::trim(headerPair.value);
 
   ft::to_lower(key);
 }
 
-void Headers::_addNew(const std::string& key, const std::string& value)
+void Headers::_addNew(HeaderPair& entry, const HeaderPair& headerPair)
 {
-  _headers[key] = value;
+  entry = headerPair;
 }
 
-void Headers::_addExisting(const std::string& key, const std::string& value)
+void Headers::_setExisting(HeaderPair& entry, const HeaderPair& headerPair)
 {
-  _headers[key].append(", ").append(value);
+  entry.value = headerPair.value;
+}
+
+void Headers::_addExisting(HeaderPair& entry, const HeaderPair& headerPair)
+{
+  entry.value.append(", ").append(headerPair.value);
 }

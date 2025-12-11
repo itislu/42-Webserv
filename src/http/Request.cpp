@@ -4,7 +4,7 @@
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/utility.hpp>
-#include <utils/SmartBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -31,34 +31,22 @@ Request::Request()
 {
 }
 
-Request::Method Request::getMethod() const
+Request::Request(const Request& other)
+  : _method(UNDEFINED)
+  , _uri(other._uri)
+  , _version(other._version)
+  , _headers(other._headers)
 {
-  return _method;
 }
 
-void Request::setMethod(Request::Method method)
+Request& Request::operator=(const Request& other)
 {
-  _method = method;
-}
-
-const Uri& Request::getUri() const
-{
-  return _uri;
-}
-
-void Request::setUri(const Uri& uri)
-{
-  _uri = uri;
-}
-
-const std::string& Request::getVersion() const
-{
-  return _version;
-}
-
-void Request::setVersion(const std::string& version)
-{
-  _version = version;
+  _method = other._method;
+  _uri = other._uri;
+  _version = other._version;
+  _headers = other._headers;
+  // body can not be copied
+  return *this;
 }
 
 Request::Method Request::strToMethod(const std::string& strMethod)
@@ -71,6 +59,21 @@ Request::Method Request::strToMethod(const std::string& strMethod)
   return Request::UNDEFINED;
 }
 
+Request::Method Request::getMethod() const
+{
+  return _method;
+}
+
+const Uri& Request::getUri() const
+{
+  return _uri;
+}
+
+const std::string& Request::getVersion() const
+{
+  return _version;
+}
+
 Headers& Request::getHeaders()
 {
   return _headers;
@@ -79,6 +82,21 @@ Headers& Request::getHeaders()
 SmartBuffer& Request::getBody()
 {
   return _body;
+}
+
+void Request::setMethod(Request::Method method)
+{
+  _method = method;
+}
+
+void Request::setUri(const Uri& uri)
+{
+  _uri = uri;
+}
+
+void Request::setVersion(const std::string& version)
+{
+  _version = version;
 }
 
 std::string Request::toString()
@@ -95,7 +113,7 @@ std::string Request::toString()
   return oss.str();
 }
 
-/* ************************************************************************** */
+/* ***************************************************************************/
 // PRIVATE
 
 std::size_t Request::_getMaxMethodLen() throw()

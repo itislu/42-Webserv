@@ -1,5 +1,9 @@
-#include <utils/FileBuffer.hpp>
+#include <utils/buffer/FileBuffer.hpp>
+#include <utils/buffer/StaticFileBuffer.hpp>
 
+#include <cstdio>
+#include <exception>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -46,6 +50,53 @@ TEST(FileBufferTester, GetPeekSeek)
   EXPECT_EQ(filebuffer.get(), '5');
   EXPECT_EQ(filebuffer.peek(), '6');
   EXPECT_EQ(filebuffer.peek(), '6');
+}
+
+TEST(FileBufferTester, MoveToFile)
+{
+  std::string testFilePath;
+  testFilePath.append(ASSETS_PATH);
+  testFilePath.append("TestFile_FileBufferTester.txt");
+
+  FileBuffer fileBuffer;
+  fileBuffer.append("HelloWorld");
+
+  fileBuffer.moveBufferToFile(testFilePath);
+
+  const std::fstream fstream(testFilePath);
+  EXPECT_TRUE(fstream.is_open());
+  EXPECT_EQ(fileBuffer.size(), 0);
+
+  (void)std::remove(testFilePath.c_str());
+}
+
+TEST(FileBufferTester, StaticFileBuffer)
+{
+  std::string testFilePath;
+  try {
+    testFilePath.append(ASSETS_PATH);
+    testFilePath.append("TestFile_FileBufferTester.txt");
+    FileBuffer fileBuffer;
+    fileBuffer.append("HelloWorld");
+    fileBuffer.moveBufferToFile(testFilePath);
+
+    StaticFileBuffer sfb(testFilePath);
+    sfb.consumeRawFront(sfb.size() / 2);
+
+    sfb.seek(3);
+    EXPECT_EQ(sfb.pos(), 3);
+    sfb.seek(0);
+
+    sfb.consumeRawFront(sfb.size());
+    EXPECT_TRUE(sfb.isEmpty());
+    EXPECT_EQ(sfb.size(), 0);
+    (void)std::remove(testFilePath.c_str());
+  } catch (const std::exception& e) {
+    if (!testFilePath.empty()) {
+      (void)std::remove(testFilePath.c_str());
+    }
+    FAIL() << e.what() << '\n';
+  }
 }
 
 // Main function to run all tests

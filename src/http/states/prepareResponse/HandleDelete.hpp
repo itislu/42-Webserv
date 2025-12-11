@@ -17,9 +17,12 @@ public:
   void run();
 
 private:
+  void _setNextState();
+  void _deleteFile();
+
+  static Logger& _log;
   PrepareResponse* _prepareResponse;
   Client* _client;
-  static Logger& _log;
 };
 
 #endif

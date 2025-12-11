@@ -55,6 +55,12 @@ std::string ruleIdtoString(HttpRuleId rid)
       return "HierPartPathEmpty";
     case FieldLinePart:
       return "FieldLinePart";
+    case ChunkInfo:
+      return "ChunkInfo";
+    case ChunkSize:
+      return "ChunkSize";
+    case ChunkExt:
+      return "ChunkExt";
   }
   FT_UNREACHABLE();
 }
