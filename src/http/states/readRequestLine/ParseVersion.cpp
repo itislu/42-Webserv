@@ -1,9 +1,8 @@
 #include "ParseVersion.hpp"
-#include "http/Response.hpp"
-#include "http/http.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
@@ -93,7 +92,7 @@ void ParseVersion::_validateVersion()
 {
   Response& response = _client->getResponse();
   const std::string& version = _client->getRequest().getVersion();
-  if (version != http::HTTP_1_0 && version != http::HTTP_1_1) {
+  if (!ft::starts_with(version, "HTTP/1.")) {
     response.setStatusCode(StatusCode::HttpVersionNotSupported);
   }
 }
