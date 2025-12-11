@@ -78,12 +78,21 @@ INSTANTIATE_TEST_SUITE_P(
 
     // Complex
     PathTestParams{ "ComplexRFC", "/a/b/c/./../../g", "/a/g" },
-    PathTestParams{ "RootBlast", "../../a", "a" }),
+    PathTestParams{ "RootBlast", "../../a", "a" },
+
+    // Trailing Slash
+    PathTestParams{ "TrailingSlash", "/file/", "/file/" },
+
+    // Middle Slashes
+    PathTestParams{ "MiddleSlashes", "/dir////file", "/dir////file" }),
 
   // Optional: Print the test name in the output for clearer debugging
   [](const testing::TestParamInfo<PathTestParams>& info) {
     return info.param.testName;
   });
+
+// // Middle Slashes
+// PathTestParams{ "MiddleSlashes", "/dir////file", "/dir////file" }),
 
 // NOLINTEND
 
