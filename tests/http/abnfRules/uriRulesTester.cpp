@@ -3,6 +3,7 @@
 #include <http/abnfRules/uriRules.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
+#include <testUtils.hpp>
 #include <utils/BufferReader.hpp>
 #include <utils/abnfRules/AlternativeRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
@@ -12,6 +13,8 @@
 
 #include <gtest/gtest.h>
 #include <string>
+
+using testUtils::makeString;
 
 /**
  * Reference:
@@ -37,7 +40,7 @@ bool runParser(const std::string& str, Rule& rule)
   return matches;
 }
 
-}
+} // namespace
 
 // NOLINTBEGIN
 
@@ -82,6 +85,20 @@ TEST(UriAbnfTest, URI)
 
   // frag only
   EXPECT_TRUE(runParser("http:#frag ", *s));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0http://web.com "), *s));
+  EXPECT_FALSE(runParser(makeString("ht\0tp://web.com "), *s));
+  EXPECT_FALSE(runParser(makeString("http\0://web.com "), *s));
+  EXPECT_FALSE(runParser(makeString("http:\0//web.com "), *s));
+  EXPECT_FALSE(runParser(makeString("http:/\0/web.com "), *s));
+  EXPECT_FALSE(runParser(makeString("http://\0web.com "), *s));
+  EXPECT_FALSE(runParser(makeString("http://w\0eb.com "), *s));
+  EXPECT_FALSE(runParser(makeString("http://web.com\0 "), *s));
+  EXPECT_FALSE(runParser(makeString("http://web.com/\0path "), *s));
+  EXPECT_FALSE(runParser(makeString("http://web.com/pa\0th "), *s));
+  EXPECT_FALSE(runParser(makeString("http://web.com?q=\0 "), *s));
+  EXPECT_FALSE(runParser(makeString("http://web.com#\0frag "), *s));
 }
 
 /**
@@ -151,6 +168,12 @@ TEST(UriAbnfTest, Scheme)
   EXPECT_FALSE(runParser("\xC0", *sequence));
   EXPECT_FALSE(runParser("A\x80", *sequence));
   EXPECT_FALSE(runParser("A\xF0", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), *sequence));
+  EXPECT_FALSE(runParser(makeString("\0http"), *sequence));
+  EXPECT_FALSE(runParser(makeString("ht\0tp"), *sequence));
+  EXPECT_FALSE(runParser(makeString("http\0"), *sequence));
 }
 
 /**
@@ -197,6 +220,14 @@ TEST(UriAbnfTest, Authority)
   EXPECT_FALSE(runParser("example.com: ", *sequence));
   EXPECT_FALSE(runParser("user@host:a", *sequence));
   EXPECT_FALSE(runParser("user@host:12:34", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0example.com"), *sequence));
+  EXPECT_FALSE(runParser(makeString("example\0.com"), *sequence));
+  EXPECT_FALSE(runParser(makeString("user\0@host"), *sequence));
+  EXPECT_FALSE(runParser(makeString("user@\0host"), *sequence));
+  EXPECT_FALSE(runParser(makeString("user@host:\080"), *sequence));
+  EXPECT_FALSE(runParser(makeString("user@host:80\0"), *sequence));
 }
 
 /**
@@ -213,6 +244,13 @@ TEST(UriAbnfTest, UserInfo)
   EXPECT_FALSE(runParser("\xFF", *rep));
   EXPECT_FALSE(runParser("user\x80", *rep));
   EXPECT_FALSE(runParser("\xC0name", *rep));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), *rep));
+  EXPECT_FALSE(runParser(makeString("\0user"), *rep));
+  EXPECT_FALSE(runParser(makeString("us\0er"), *rep));
+  EXPECT_FALSE(runParser(makeString("user\0"), *rep));
+  EXPECT_FALSE(runParser(makeString("user:pass\0word"), *rep));
 }
 
 /**
@@ -238,6 +276,12 @@ TEST(UriAbnfTest, Port)
   EXPECT_FALSE(runParser("\xFF", *rep));
   EXPECT_FALSE(runParser("8\x80", *rep));
   EXPECT_FALSE(runParser("\xC0", *rep));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), *rep));
+  EXPECT_FALSE(runParser(makeString("\080"), *rep));
+  EXPECT_FALSE(runParser(makeString("8\0000"), *rep));
+  EXPECT_FALSE(runParser(makeString("80\0"), *rep));
 }
 
 /**
@@ -281,6 +325,13 @@ TEST(UriAbnfTest, IP_literal)
   // Missing brackets.
   EXPECT_FALSE(runParser("2001:db8::1", *sequence));
   EXPECT_FALSE(runParser("v1.fe80", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("[\0::1]"), *sequence));
+  EXPECT_FALSE(runParser(makeString("[::1\0]"), *sequence));
+  EXPECT_FALSE(runParser(makeString("[2001:db8::\0001]"), *sequence));
+  EXPECT_FALSE(runParser(makeString("[v1\0.fe80]"), *sequence));
+  EXPECT_FALSE(runParser(makeString("[v1.fe\080]"), *sequence));
 }
 
 /**
@@ -315,6 +366,13 @@ TEST(UriAbnfTest, IPvFuture)
   EXPECT_FALSE(runParser("vF\x80.fe80", *sequence));
   EXPECT_FALSE(runParser("v1.fe\x80", *sequence));
   EXPECT_FALSE(runParser("v1.fe\xFF", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("v\0001.fe80"), *sequence));
+  EXPECT_FALSE(runParser(makeString("v1\0.fe80"), *sequence));
+  EXPECT_FALSE(runParser(makeString("v1.\000fe80"), *sequence));
+  EXPECT_FALSE(runParser(makeString("v1.fe\00080"), *sequence));
+  EXPECT_FALSE(runParser(makeString("v1.fe80\0"), *sequence));
 
   ft::shared_ptr<SequenceRule> seqWithEnd = ipvFutureRule();
   seqWithEnd->addRule(ft::make_shared<RangeRule>("\n"));
@@ -461,6 +519,13 @@ TEST(UriAbnfTest, IPv6address)
 
   // h16 group too long.
   EXPECT_FALSE(runParser("01234::", *alter));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("2001:db8::\0001"), *alter));
+  EXPECT_FALSE(runParser(makeString("\0002001:db8::1"), *alter));
+  EXPECT_FALSE(runParser(makeString("2001\0:db8::1"), *alter));
+  EXPECT_FALSE(runParser(makeString("::\0"), *alter));
+  EXPECT_FALSE(runParser(makeString("::ffff:192.0.2.\000128"), *alter));
 }
 
 /**
@@ -493,6 +558,13 @@ TEST(UriAbnfTest, h16)
   EXPECT_FALSE(runParser("1\x80", *rep));
   EXPECT_FALSE(runParser("a\xFF", *rep));
   EXPECT_FALSE(runParser("\xC0", *rep));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), *rep));
+  EXPECT_FALSE(runParser(makeString("\0001"), *rep));
+  EXPECT_FALSE(runParser(makeString("1\0"), *rep));
+  EXPECT_FALSE(runParser(makeString("ab\0"), *rep));
+  EXPECT_FALSE(runParser(makeString("ab\0cd"), *rep));
 }
 
 /**
@@ -522,6 +594,12 @@ TEST(UriAbnfTest, ls32)
   EXPECT_FALSE(runParser("256.256.256.256", *alter));
   EXPECT_FALSE(runParser("192.168.1 ", *alter));
   EXPECT_FALSE(runParser("abcd:192.168.1.1", *alter));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0abcd:1234"), *alter));
+  EXPECT_FALSE(runParser(makeString("192\0.168.1.1"), *alter));
+  EXPECT_FALSE(runParser(makeString("192.168.1.\0001"), *alter));
+  EXPECT_FALSE(runParser(makeString("abcd:\0001234"), *alter));
 }
 
 /**
@@ -545,6 +623,12 @@ TEST(UriAbnfTest, IPv4address_Valid)
   EXPECT_FALSE(runParser("01.2.3.4", *sequence));
   EXPECT_FALSE(runParser("192.168.1. ", *sequence));
   EXPECT_FALSE(runParser("abc.def.ghi.jkl", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\000192.168.1.1"), *sequence));
+  EXPECT_FALSE(runParser(makeString("192\0.168.1.1"), *sequence));
+  EXPECT_FALSE(runParser(makeString("192.168\0.1.1"), *sequence));
+  EXPECT_FALSE(runParser(makeString("192.168.1.1\0"), *sequence));
 }
 
 /**
@@ -594,6 +678,12 @@ TEST(UriAbnfTest, DecOctet)
   EXPECT_FALSE(runParser("\xFF", sequence));
   EXPECT_FALSE(runParser("0\x80", sequence));
   EXPECT_FALSE(runParser("\xC0", sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), sequence));
+  EXPECT_FALSE(runParser(makeString("\0000"), sequence));
+  EXPECT_FALSE(runParser(makeString("1\0"), sequence));
+  EXPECT_FALSE(runParser(makeString("25\0"), sequence));
 }
 
 /**
@@ -614,6 +704,13 @@ TEST(UriAbnfTest, RegName)
   EXPECT_FALSE(runParser("host\x80", sequence));
   EXPECT_FALSE(runParser("\xC0host", sequence));
   EXPECT_FALSE(runParser("ho\xFFst", sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), sequence));
+  EXPECT_FALSE(runParser(makeString("host\0"), sequence));
+  EXPECT_FALSE(runParser(makeString("\0host"), sequence));
+  EXPECT_FALSE(runParser(makeString("ho\0st"), sequence));
+  EXPECT_FALSE(runParser(makeString("example.com\0"), sequence));
 }
 
 /**
@@ -660,6 +757,14 @@ TEST(UriAbnfTest, Path)
 
   // Invalid
   EXPECT_FALSE(runParser("?pub", *alter));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), *alter));
+  EXPECT_FALSE(runParser(makeString("\0abc"), *alter));
+  EXPECT_FALSE(runParser(makeString("abc\0"), *alter));
+  EXPECT_FALSE(runParser(makeString("/abc\0/def"), *alter));
+  EXPECT_FALSE(runParser(makeString("abc/\0def"), *alter));
+  EXPECT_FALSE(runParser(makeString("foo:bar\0"), *alter));
 }
 
 /**
@@ -688,6 +793,12 @@ TEST(UriAbnfTest, PathAbsolute)
   // Invalid
   EXPECT_FALSE(runParser("///", *sequence));
   EXPECT_FALSE(runParser("//abc/", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0/abc"), *sequence));
+  EXPECT_FALSE(runParser(makeString("/\0abc"), *sequence));
+  EXPECT_FALSE(runParser(makeString("/abc\0/def"), *sequence));
+  EXPECT_FALSE(runParser(makeString("/abc/def\0"), *sequence));
 }
 
 /**
@@ -718,6 +829,13 @@ TEST(UriAbnfTest, PathNoScheme)
   EXPECT_FALSE(runParser("?pub", *sequence));
   EXPECT_FALSE(runParser("/a/?pub", *sequence));
   EXPECT_FALSE(runParser("/a/pub?", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0abc"), *sequence));
+  EXPECT_FALSE(runParser(makeString("abc\0"), *sequence));
+  EXPECT_FALSE(runParser(makeString("abc\0/def"), *sequence));
+  EXPECT_FALSE(runParser(makeString("abc/def\0"), *sequence));
+  EXPECT_FALSE(runParser(makeString("@user/\0data"), *sequence));
 }
 
 /**
@@ -740,6 +858,13 @@ TEST(UriAbnfTest, PathRootless)
   // Invalid
   EXPECT_FALSE(runParser("/abc", *sequence));
   EXPECT_FALSE(runParser("//abc", *sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0abc"), *sequence));
+  EXPECT_FALSE(runParser(makeString("abc\0"), *sequence));
+  EXPECT_FALSE(runParser(makeString("abc/def\0"), *sequence));
+  EXPECT_FALSE(runParser(makeString("foo:bar\0"), *sequence));
+  EXPECT_FALSE(runParser(makeString("a:b/\0c"), *sequence));
 }
 
 /**
@@ -838,6 +963,18 @@ TEST(UriAbnfTest, SegmentNzNc)
   EXPECT_EQ(rep->getReps(), 3);
   EXPECT_FALSE(runParser("\xC0seg", sequence));
   EXPECT_EQ(rep->getReps(), 0);
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), sequence));
+  EXPECT_EQ(rep->getReps(), 0);
+  EXPECT_FALSE(runParser(makeString("\0abc"), sequence));
+  EXPECT_EQ(rep->getReps(), 0);
+  EXPECT_FALSE(runParser(makeString("ab\0c"), sequence));
+  EXPECT_EQ(rep->getReps(), 2);
+  EXPECT_FALSE(runParser(makeString("abc\0"), sequence));
+  EXPECT_EQ(rep->getReps(), 3);
+  EXPECT_FALSE(runParser(makeString("@user\0"), sequence));
+  EXPECT_EQ(rep->getReps(), 5);
 }
 
 /**
@@ -865,6 +1002,18 @@ TEST(UriAbnfTest, Pchar)
     sequence.addRule(rep);
     EXPECT_FALSE(runParser("abc%1Z!ac", sequence));
   }
+
+  {
+    // Invalid - NUL byte
+    SequenceRule sequence;
+    ft::shared_ptr<RepetitionRule> rep =
+      ft::make_shared<RepetitionRule>(pcharRule());
+    rep->setMin(3);
+    sequence.addRule(rep);
+    EXPECT_FALSE(runParser(makeString("\0user@test"), sequence));
+    EXPECT_FALSE(runParser(makeString("user\0@test"), sequence));
+    EXPECT_FALSE(runParser(makeString("user@test\0"), sequence));
+  }
 }
 
 /**
@@ -877,6 +1026,12 @@ TEST(UriAbnfTest, Query)
   EXPECT_TRUE(runParser("abc%0F!ac/abc/?", sequence));
   EXPECT_TRUE(runParser("?abc%0F!ac/abc/?", sequence));
   EXPECT_TRUE(runParser("???", sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), sequence));
+  EXPECT_FALSE(runParser(makeString("\0q=test"), sequence));
+  EXPECT_FALSE(runParser(makeString("key=val\0ue"), sequence));
+  EXPECT_FALSE(runParser(makeString("q=test\0"), sequence));
 }
 
 /**
@@ -887,6 +1042,12 @@ TEST(UriAbnfTest, Fragment)
   SequenceRule sequence;
   sequence.addRule(fragmentRule());
   EXPECT_TRUE(runParser("abc%0F!ac/abc/?", sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0"), sequence));
+  EXPECT_FALSE(runParser(makeString("\0section"), sequence));
+  EXPECT_FALSE(runParser(makeString("sec\0tion"), sequence));
+  EXPECT_FALSE(runParser(makeString("section\0"), sequence));
 }
 
 /**
@@ -905,6 +1066,12 @@ TEST(UriAbnfTest, PercentEncoded)
   EXPECT_FALSE(runParser("%A ", sequence));
   EXPECT_FALSE(runParser("%G1", sequence));
   EXPECT_FALSE(runParser("%1Z", sequence));
+
+  // Invalid - NUL byte
+  EXPECT_FALSE(runParser(makeString("\0%aB"), sequence));
+  EXPECT_FALSE(runParser(makeString("%\0"), sequence));
+  EXPECT_FALSE(runParser(makeString("%\0a"), sequence));
+  EXPECT_FALSE(runParser(makeString("%a\0"), sequence));
 }
 
 /**
@@ -931,7 +1098,7 @@ TEST(UriAbnfTest, Unreserved)
   EXPECT_FALSE(http::isUnreserved('!'));
 
   // Invalid - control characters and whitespace
-  // EXPECT_FALSE(http::isUnreserved('\0')); // TODO
+  EXPECT_FALSE(http::isUnreserved('\0'));
   EXPECT_FALSE(http::isUnreserved(static_cast<char>(1)));
   EXPECT_FALSE(http::isUnreserved(static_cast<char>(31)));
   EXPECT_FALSE(http::isUnreserved(static_cast<char>(127)));
@@ -986,7 +1153,7 @@ TEST(UriAbnfTest, Reserved)
   EXPECT_FALSE(http::isReserved('~'));
 
   // Invalid - control characters and whitespace
-  // EXPECT_FALSE(http::isReserved('\0')); // TODO
+  EXPECT_FALSE(http::isReserved('\0'));
   EXPECT_FALSE(http::isReserved(static_cast<char>(1)));
   EXPECT_FALSE(http::isReserved(static_cast<char>(31)));
   EXPECT_FALSE(http::isReserved(static_cast<char>(127)));
@@ -1097,7 +1264,7 @@ TEST(UriAbnfTest, Tchar)
   EXPECT_FALSE(http::isTchar('?'));
 
   // Invalid - control characters and whitespace
-  // EXPECT_FALSE(http::isTchar('\0')); // TODO
+  EXPECT_FALSE(http::isTchar('\0'));
   EXPECT_FALSE(http::isTchar(static_cast<char>(1)));
   EXPECT_FALSE(http::isTchar(static_cast<char>(31)));
   EXPECT_FALSE(http::isTchar(static_cast<char>(127)));

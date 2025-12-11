@@ -24,6 +24,8 @@ public:
   explicit Client(int fdes);
   Client(int fdes, const Server* server, const Socket* socket);
 
+  static const std::size_t maxChunk = 1024;
+
   int getFd() const;
   bool hasServer() const;
   const std::string& getHost() const;
@@ -46,11 +48,12 @@ public:
   bool sendTo();
   bool receive();
 
+  void prepareForNewRequest();
+
 private:
   void updateLastActivity();
 
   static Logger& _log;
-  static const std::size_t _maxChunk = 1024;
 
   AutoFd _fd;
   const Server* _server;

@@ -2,8 +2,6 @@
 
 #include "client/Client.hpp"
 #include "config/LocationConfig.hpp"
-#include "config/parser/Converters.hpp"
-#include "http/Headers.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
@@ -18,21 +16,15 @@
 #include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/Socket.hpp"
 #include "utils/state/StateHandler.hpp"
 
 #include <cstddef>
 #include <cstdlib>
-#include <exception>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
-#include <utils/convert.hpp>
-#include <utils/logger/Logger.hpp>
-#include <utils/state/IState.hpp>
 #include <vector>
 
 /* ************************************************************************** */
@@ -54,7 +46,7 @@ ValidateRequest::ValidateRequest(Client* context)
 }
 
 void ValidateRequest::run()
-{
+try {
   _init();
 
   _stateHandler.setStateHasChanged(true);
@@ -73,6 +65,10 @@ void ValidateRequest::run()
       getContext()->getStateHandler().setState<PrepareResponse>();
     }
   }
+} catch (const std::exception& e) {
+  _log.error() << *getContext() << " ValidateRequest: " << e.what() << '\n';
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 const std::string& ValidateRequest::getPath() const

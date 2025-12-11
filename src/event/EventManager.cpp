@@ -6,6 +6,7 @@
 #include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
 #include <http/http.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
@@ -63,8 +64,8 @@ bool EventManager::sendToClient(Client& client)
 bool EventManager::receiveFromClient(Client& client)
 {
   const bool alive = client.receive();
-  if (alive && client.hasDataToSend()) {
-    _socketManager().enablePollout(client.getFd());
+  if (client.getStateHandler().isDone() && !client.getInBuff().isEmpty()) {
+    client.prepareForNewRequest();
   }
   return alive;
 }
@@ -80,6 +81,12 @@ void EventManager::clientStateMachine(Client& client)
   }
 }
 
+/** // todo error when loong chunked sending
+ * in WriteBody
+ * got more requests wich can not be processed yet
+ * writing done inBuffer not empty
+ * how to trigger stateMachine again?
+ */
 bool EventManager::handleClient(Client* client, unsigned events)
 try {
   if (client == FT_NULLPTR) {
@@ -122,6 +129,7 @@ void EventManager::disconnectClient(Client* client)
   _clientManager().removeClient(clientFd);
 
   std::cout << "[SERVER] Client fd=" << clientFd << " disconnected\n";
+  _log.info() << "Client fd=" << clientFd << " disconnected\n";
 }
 
 void EventManager::acceptClient(int fdes, const unsigned events)

@@ -6,14 +6,18 @@
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
+#include <testUtils.hpp>
 #include <utils/state/IState.hpp>
 
 #include <gtest/gtest.h>
 #include <string>
 
+using testUtils::makeString;
+
 // NOLINTBEGIN
 
 namespace {
+
 ft::unique_ptr<Client> StateTest(const std::string& requestLine)
 {
   ft::unique_ptr<Client> client = ft::make_unique<Client>();
@@ -22,7 +26,8 @@ ft::unique_ptr<Client> StateTest(const std::string& requestLine)
   client->getStateHandler().getState()->run();
   return ft::move(client);
 }
-}
+
+} // namespace
 
 TEST(ReadRequestLineTester, BasicRequests)
 {
@@ -278,6 +283,63 @@ TEST(ReadRequestLineTester, UriTooLong)
   }
 
   ParseUri::resetMaxUriLength();
+}
+
+TEST(ReadRequestLineTester, NulByteInMethod)
+{
+  std::string line = makeString("GE\0T /path HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadRequestLineTester, NulByteInUri)
+{
+  std::string line = makeString("GET /pa\0th HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadRequestLineTester, NulByteInVersion)
+{
+  std::string line = makeString("GET /path HTTP/1.\0001\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadRequestLineTester, NulByteAtStartOfRequestLine)
+{
+  std::string line = makeString("\0GET /path HTTP/1.1\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadRequestLineTester, MultipleNulBytes)
+{
+  // Multiple NUL bytes in request line should be rejected
+  std::string line = makeString("GET\0 /pa\0th HTTP/1.1\0\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadRequestLineTester, InvalidVersion)
+{
+  std::string line("GET "
+                   "/ "
+                   "HTTP/2.0\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  EXPECT_EQ(response.getStatusCode().getCode(),
+            StatusCode::HttpVersionNotSupported);
 }
 
 // NOLINTEND

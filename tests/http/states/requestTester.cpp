@@ -58,7 +58,8 @@ ft::unique_ptr<Client> requestTest(std::string& rawBuffer)
   }
   return ft::move(client);
 }
-}
+
+} // namespace
 
 TEST(RequestTester, PartialBufferTest)
 {

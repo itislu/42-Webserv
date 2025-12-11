@@ -6,7 +6,10 @@
 #include <string>
 
 namespace http {
+
 extern const char* const CRLF;
+extern const char* const HTTP_1_0;
+extern const char* const HTTP_1_1;
 
 bool isSchemeChar(char chr);
 bool isAuthChar(char chr);
@@ -30,6 +33,7 @@ typedef std::map<std::string, std::string> ExtToTypeMap;
 const ExtToTypeMap& getExtToType();
 
 extern const char* const minResponse500;
-}
+
+} // namespace http
 
 #endif

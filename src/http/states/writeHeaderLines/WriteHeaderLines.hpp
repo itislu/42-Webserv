@@ -22,6 +22,8 @@ private:
   static Logger& _log;
   static std::string _makeHttpDate();
 
+  void _setConnectionHeader();
+
   Client* _client;
   SmartBuffer* _buffer;
 };
