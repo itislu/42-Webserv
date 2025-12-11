@@ -100,13 +100,13 @@ void WriteHeaderLines::_setConnectionHeader()
   }
 
   // HTTP/1.1 -> connection persist
-  if (request.getVersion() == "HTTP/1.1") {
+  if (request.getVersion() == http::HTTP_1_1) {
     headers.addHeader("Connection", "keep-alive");
     return;
   }
 
   // HTTP/1.0 + keep-alive -> connection persist
-  if (request.getVersion() == "HTTP/1.0" && conn == "keep-alive") {
+  if (request.getVersion() == http::HTTP_1_0 && conn == "keep-alive") {
     headers.addHeader("Connection", "keep-alive");
     return;
   }
