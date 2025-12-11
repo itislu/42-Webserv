@@ -41,7 +41,7 @@ FileBuffer::FileBuffer()
 
 FileBuffer::~FileBuffer()
 {
-  reset();
+  FileBuffer::reset();
 }
 
 // Throwing versions
