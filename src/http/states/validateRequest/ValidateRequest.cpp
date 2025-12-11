@@ -2,6 +2,8 @@
 
 #include "client/Client.hpp"
 #include "config/LocationConfig.hpp"
+#include "config/parser/Converters.hpp"
+#include "http/Headers.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
 #include "http/StatusCode.hpp"
@@ -16,10 +18,16 @@
 #include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
+#include "server/ServerManager.hpp"
+#include "socket/Socket.hpp"
+#include "utils/convert.hpp"
+#include "utils/logger/Logger.hpp"
+#include "utils/state/IState.hpp"
 #include "utils/state/StateHandler.hpp"
 
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <iostream>
 #include <set>
@@ -94,7 +102,7 @@ StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
 
 void ValidateRequest::_init()
 {
-  _validateHostHeader();
+  _validateHost();
   if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
     return;
   }
@@ -326,46 +334,34 @@ void ValidateRequest::endState(StatusCode::Code status)
   }
 }
 
-void ValidateRequest::_validateHostHeader()
+void ValidateRequest::_validateHost()
 {
-  const Headers& headers = _client->getRequest().getHeaders();
   std::string hostHeader;
+
+  const Headers& headers = _client->getRequest().getHeaders();
   if (headers.contains("host")) {
     hostHeader = headers.at("host");
   }
-  if (hostHeader.empty()) {
+  // HTTP 1.1 MUST have a host header
+  if (_client->getRequest().getVersion() == http::HTTP_1_1 &&
+      hostHeader.empty()) {
     endState(StatusCode::BadRequest);
     return;
   }
 
-  int port = -1;
-  _splitHostHeader(hostHeader, port);
-  /* TODO: remove this after testing*/
-  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
-    _log.info() << "Split: \n";
-    _log.info() << "  Host: " << _host << "\n";
-    _log.info() << "  Port: " << port << "\n";
-  }
-  if (port != -1) {
-    const Socket* const socket = _client->getSocket();
-    if (socket->getPort() != port) {
-      endState(StatusCode::BadRequest);
+  _host = _client->getRequest().getUri().getAuthority().getHost();
+  if (_host.empty()) {
+    int port = -1;
+    _splitHostHeader(hostHeader, port);
+    // TODO: check if this is necessary
+    if (port != -1) {
+      const Socket* const socket = _client->getSocket();
+      if (socket->getPort() != port) {
+        endState(StatusCode::BadRequest);
+        return;
+      }
     }
-  }
-  _compareHostHeaders();
-}
-
-void ValidateRequest::_compareHostHeaders()
-{
-  _host = ft::to_lower(_host);
-  const std::string& host =
-    ft::to_lower(_client->getRequest().getUri().getAuthority().getHost());
-  if (!host.empty()) {
-    _log.info() << "Host Header: [" << _host << "]\n";
-    _log.info() << "Uri Host: [" << host << "]\n";
-    if (_host != host) {
-      endState(StatusCode::BadRequest);
-    }
+    _host = ft::to_lower(_host);
   }
 }
 

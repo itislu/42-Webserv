@@ -45,7 +45,7 @@ private:
   void _initState(const Request::Method& method);
   void _initRequestPath();
 
-  void _validateHostHeader();
+  void _validateHost();
   void _splitHostHeader(const std::string& hostHeader, int& port);
   void _compareHostHeaders();
   void _setServerByHost();
