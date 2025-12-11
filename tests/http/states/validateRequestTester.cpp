@@ -15,10 +15,6 @@
 
 // NOLINTBEGIN
 
-using config::Config;
-using config::LocationConfig;
-using config::ServerConfig;
-
 ft::unique_ptr<Client> requestValidate(Request::Method method,
                                        const std::string& uriPath,
                                        ServerConfig& serverConfig)
@@ -45,8 +41,7 @@ ft::unique_ptr<Client> requestValidate(Request::Method method,
 
 ServerConfig createServConf()
 {
-  config::Config config;
-  config::ServerConfig server(config);
+  ServerConfig server(Config::getConfig());
   server.setRoot(ASSETS_PATH);
 
   return server;
