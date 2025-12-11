@@ -20,6 +20,9 @@ namespace http {
  */
 const char* const CRLF = "\r\n";
 
+const char* const HTTP_1_0 = "HTTP/1.0";
+const char* const HTTP_1_1 = "HTTP/1.1";
+
 /**
  * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
  */
