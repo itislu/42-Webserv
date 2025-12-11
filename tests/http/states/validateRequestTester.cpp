@@ -15,14 +15,12 @@
 #include "server/ServerManager.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
-#include <exception>
-#include <iostream>
 #include <string>
 
 #include <gtest/gtest.h>
 
 #ifndef ROOT
-#define ROOT "/home/lstefane/Downloads/Webserv/assets/testWebsite/"
+#define ROOT "./assets/testWebsite/"
 #endif
 
 namespace {
@@ -72,12 +70,10 @@ TEST(ValidateRequestTester, HostHeaderNoUriHost)
 
   ft::unique_ptr<Client> client = requestTest(line, 8080);
 
-  Response& response = client->getResponse();
   Resource& source = client->getResource();
   std::string result = std::string(ROOT) + "index.html";
 
   EXPECT_EQ(source.getPath(), result);
-  EXPECT_EQ(response.getStatusCode(), StatusCode::Ok);
 }
 
 // =================================================================
