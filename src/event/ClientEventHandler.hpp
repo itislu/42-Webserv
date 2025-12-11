@@ -12,21 +12,23 @@ class Client;
 class ClientEventHandler : public EventHandler
 {
 public:
-  explicit ClientEventHandler(int fdes, ft::shared_ptr<Client>);
+  explicit ClientEventHandler(int fdes, ft::shared_ptr<Client> client);
 
   Result handleEvent(unsigned revents);
   long getTimeout() const;
 
 private:
-  Result _checkPollInEvent();
-  Result _checkPollOutEvent();
-  Result _receiveFromClient();
-  Result _sendToClient();
+  Result _handlePollInEvent();
+  Result _handlePollOutEvent();
   void _clientStateMachine();
   void _handleException();
+  void _addCgiEventHandler();
+  void _prepareForNewRequest();
 
   static Logger& _log;
   ft::shared_ptr<Client> _client;
+
+  bool _cgiEventHandlerAdded;
 };
 
 #endif

@@ -25,7 +25,8 @@ public:
   int check();
   void checkTimeouts();
 
-  EventHandler* getEventHandler(RawFd fdes) const;
+  void addHandler(ft::shared_ptr<EventHandler> handler);
+  EventHandler* getHandler(RawFd fdes) const;
 
 private:
   EventManager() {};
@@ -47,7 +48,6 @@ private:
     std::vector<ft::shared_ptr<EventHandler> >& timedOut) const;
 
   /* MANAGE HANDLER */
-  void _addHandler(RawFd fdes, ft::shared_ptr<EventHandler> handler);
   void _removeHandler(RawFd fdes);
 
   static Logger& _log;

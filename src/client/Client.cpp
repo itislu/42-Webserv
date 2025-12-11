@@ -40,6 +40,7 @@ Client::Client()
   , _server()
   , _stateHandler(this)
   , _closeConnection(false)
+  , _alive(true)
 {
   _stateHandler.setState<ReadRequestLine>();
 }
@@ -49,6 +50,7 @@ Client::Client(int fdes)
   , _server()
   , _stateHandler(this)
   , _closeConnection(false)
+  , _alive(true)
 {
   _stateHandler.setState<ReadRequestLine>();
 }
@@ -58,6 +60,7 @@ Client::Client(int fdes, const Server* server)
   , _server(server)
   , _stateHandler(this)
   , _closeConnection(false)
+  , _alive(true)
 {
   _stateHandler.setState<ReadRequestLine>();
 }
@@ -186,6 +189,8 @@ void Client::prepareForNewRequest()
   _response = Response();
   _request = Request();
   _resource = Resource();
+
+  _cgiContext.reset();
 }
 
 void Client::setCloseConnection(bool value)
@@ -196,4 +201,14 @@ void Client::setCloseConnection(bool value)
 bool Client::closeConnection() const
 {
   return _closeConnection;
+}
+
+void Client::setAlive(bool value)
+{
+  _alive = value;
+}
+
+bool Client::alive() const
+{
+  return _alive;
 }

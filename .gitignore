@@ -23,6 +23,9 @@
 !Doxyfile
 !Makefile
 !tests/assets/**
+!assets/**/*.html
+!assets/**/*.conf
+!assets/**/*.sh
 .VSCodeCounter/
 build/
 latex/

@@ -3,6 +3,7 @@
 #define CGI_WRITE_EVENT_HANDLER_HPP
 
 #include <event/EventHandler.hpp>
+#include <libftpp/memory.hpp>
 #include <utils/logger/Logger.hpp>
 
 class Client;
@@ -11,14 +12,14 @@ class Client;
 class CgiWriteEventHandler : public EventHandler
 {
 public:
-  explicit CgiWriteEventHandler(int fdes, Client* client);
+  explicit CgiWriteEventHandler(int fdes, ft::shared_ptr<Client> client);
 
   Result handleEvent(unsigned revents);
   long getTimeout() const;
 
 private:
   static Logger& _log;
-  Client* _client;
+  ft::shared_ptr<Client> _client;
 };
 
 #endif

@@ -1,6 +1,9 @@
 #include "StartCgi.hpp"
 
 #include <client/Client.hpp>
+#include <event/CgiReadEventHandler.hpp>
+#include <event/CgiWriteEventHandler.hpp>
+#include <event/EventManager.hpp>
 #include <http/CgiContext.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
@@ -37,3 +40,6 @@ try {
   getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getStateHandler().setState<PrepareResponse>();
 }
+
+/* ************************************************************************** */
+// PRIVATE

@@ -2,7 +2,6 @@
 
 #include <client/Client.hpp>
 #include <client/TimeStamp.hpp>
-#include <climits>
 #include <config/Config.hpp>
 #include <event/ClientEventHandler.hpp>
 #include <event/EventHandler.hpp>
@@ -16,6 +15,8 @@
 #include <utils/logger/Logger.hpp>
 
 #include <algorithm>
+#include <cassert>
+#include <climits>
 #include <cstddef>
 #include <cstring>
 #include <exception>
@@ -70,7 +71,15 @@ void EventManager::checkTimeouts()
   }
 }
 
-EventHandler* EventManager::getEventHandler(RawFd fdes) const
+// NOLINTBEGIN(performance-unnecessary-value-param)
+void EventManager::addHandler(ft::shared_ptr<EventHandler> handler)
+{
+  assert(handler->getFd() > 0);
+  _handlers[handler->getFd()] = handler;
+}
+// NOLINTEND(performance-unnecessary-value-param)
+
+EventHandler* EventManager::getHandler(RawFd fdes) const
 {
   const const_iterHandler iter = _handlers.find(fdes);
   if (iter == _handlers.end()) {
@@ -102,7 +111,7 @@ void EventManager::_checkActivity()
       _acceptClient(pfds[i].fd, events);
       i++;
     } else {
-      EventHandler* const handler = getEventHandler(pfds[i].fd);
+      EventHandler* const handler = getHandler(pfds[i].fd);
       const EventHandler::Result result = handler->handleEvent(events);
       if (result == EventHandler::Disconnect) {
         _disconnectEventHandler(handler);
@@ -124,8 +133,8 @@ void EventManager::_acceptClient(int fdes, const unsigned events)
     const Server* const server = _serverManager().getInitServer(fdes);
     ft::shared_ptr<Client> client = ft::make_shared<Client>(clientFd, server);
     ft::shared_ptr<ClientEventHandler> handler =
-      ft::make_shared<ClientEventHandler>(fdes, ft::move(client));
-    _addHandler(clientFd, ft::move(handler));
+      ft::make_shared<ClientEventHandler>(clientFd, ft::move(client));
+    addHandler(ft::move(handler));
     _log.info() << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
     _log.error() << "[SERVER] accepting new client failed\n";
@@ -151,7 +160,7 @@ void EventManager::_disconnectEventHandler(EventHandler* handler)
 int EventManager::_calculateTimeout()
 {
   // No clients yet, get default
-  if (!_handlers.empty()) {
+  if (_handlers.empty()) {
     const long timeout = Config::getDefaultTimeout();
     const int timeoutMs = convertSecondsToMs(timeout);
     _log.info() << "No clients - use default timeout: " << timeoutMs << "ms\n";
@@ -188,11 +197,6 @@ void EventManager::_getTimedOutHandlers(
       timedOut.push_back(it->second);
     }
   }
-}
-
-void EventManager::_addHandler(RawFd fdes, ft::shared_ptr<EventHandler> handler)
-{
-  _handlers[fdes] = ft::move(handler);
 }
 
 void EventManager::_removeHandler(RawFd fdes)

@@ -10,6 +10,7 @@
 EventHandler::EventHandler(int fdes)
   : _fdes(fdes)
 {
+  updateLastActivity();
 }
 
 const TimeStamp& EventHandler::getLastActivity() const

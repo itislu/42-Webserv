@@ -1,5 +1,6 @@
 #include "ExecuteCgi.hpp"
 
+#include <cassert>
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
@@ -120,9 +121,6 @@ void ExecuteCgi::_executeScript()
 {
   Pipe& pipeToCgi = getContext()->getPipeClientToCgi();
   Pipe& pipeFromCgi = getContext()->getPipeCgiToClient();
-
-  pipeToCgi.init();
-  pipeFromCgi.init();
 
   const pid_t pid = fork();
   if (pid < 0) {

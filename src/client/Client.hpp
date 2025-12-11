@@ -1,7 +1,6 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <client/TimeStamp.hpp>
 #include <http/CgiContext.hpp>
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
@@ -39,17 +38,18 @@ public:
   Resource& getResource();
   ft::shared_ptr<CgiContext>& getCgiContext();
   long getTimeout() const;
+  bool closeConnection() const;
+  bool alive() const;
 
+  void setCloseConnection(bool value);
   void setServer(const Server* server);
+  void setAlive(bool value);
 
   bool hasDataToSend() const;
   bool sendTo();
   bool receive();
 
   void prepareForNewRequest();
-
-  void setCloseConnection(bool value);
-  bool closeConnection() const;
 
 private:
   void updateLastActivity();
@@ -68,6 +68,7 @@ private:
   ft::shared_ptr<CgiContext> _cgiContext;
 
   bool _closeConnection;
+  bool _alive;
 };
 
 std::ostream& operator<<(std::ostream& out, const Client& client);
