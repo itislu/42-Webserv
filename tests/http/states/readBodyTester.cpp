@@ -99,11 +99,11 @@ TEST(ReadBodyTester, ChunkedWithTrailer)
   const std::string body = buff.consumeFront(buff.size());
   EXPECT_EQ(body, data);
 
-  const Headers& headers = request.getHeaders();
+  const Headers& trailers = request.getTrailers();
   std::string value;
-  EXPECT_NO_THROW(value = headers.at("Trailer1"));
+  EXPECT_NO_THROW(value = trailers.at("Trailer1"));
   EXPECT_EQ(value, "value1");
-  EXPECT_NO_THROW(value = headers.at("Trailer2"));
+  EXPECT_NO_THROW(value = trailers.at("Trailer2"));
   EXPECT_EQ(value, "value2");
 }
 
