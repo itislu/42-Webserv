@@ -84,6 +84,11 @@ SmartBuffer& Request::getBody()
   return _body;
 }
 
+Headers& Request::getTrailers()
+{
+  return _trailers;
+}
+
 void Request::setMethod(Request::Method method)
 {
   _method = method;

@@ -1,8 +1,9 @@
 #pragma once
-#ifndef VALIDATE_HEADER_HPP
-#define VALIDATE_HEADER_HPP
+#ifndef REQUEST_HEADER_VALIDATOR_HPP
+#define REQUEST_HEADER_VALIDATOR_HPP
 
 #include <http/Headers.hpp>
+#include <http/utils/BaseHeaderValidator.hpp>
 #include <libftpp/array.hpp>
 
 #include <string>
@@ -12,15 +13,15 @@ class Client;
 class PrepareResponse;
 
 /* ************************************************************************** */
-class ValidateHeader
+class RequestHeaderValidator : public BaseHeaderValidator
 {
 public:
-  explicit ValidateHeader(Client* client);
-  void run(const std::string& name, const std::string& value);
+  explicit RequestHeaderValidator(Client* client);
+  bool isValid(const std::string& name, const std::string& value);
 
 private:
   struct ValidatorEntry;
-  typedef void (ValidateHeader::*fnPtrValid)(const std::string&);
+  typedef void (RequestHeaderValidator::*fnPtrValid)(const std::string&);
   static const int _validators = 3;
   static const ft::array<ValidatorEntry, _validators> _validatorMap;
 
@@ -37,10 +38,10 @@ private:
   bool _closeConnection;
 };
 
-struct ValidateHeader::ValidatorEntry
+struct RequestHeaderValidator::ValidatorEntry
 {
   const char* name;
-  ValidateHeader::fnPtrValid fnPtrValid;
+  RequestHeaderValidator::fnPtrValid fnPtrValid;
 };
 
 #endif
