@@ -3,6 +3,7 @@
 #define HTTP_HPP
 
 #include <map>
+#include <netinet/in.h>
 #include <string>
 
 namespace http {
@@ -11,6 +12,7 @@ extern const char* const CRLF;
 extern const char* const HTTP_1_0;
 extern const char* const HTTP_1_1;
 extern const char* const HTTP_2_0;
+const in_port_t httpPort = 80;
 
 bool isSchemeChar(char chr);
 bool isAuthChar(char chr);

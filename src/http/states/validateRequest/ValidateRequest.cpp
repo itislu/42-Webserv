@@ -368,11 +368,11 @@ void ValidateRequest::_validateHost()
     }
   }
 
-  const int httpPort = 80;
   const Socket* const socket = _client->getSocket();
-  const int port = (hostPort == -1) ? httpPort : hostPort;
+  const int port = (hostPort == -1) ? http::httpPort : hostPort;
   if (socket->getPort() != port) {
-    endState(StatusCode::BadRequest);
+    // https://datatracker.ietf.org/doc/html/rfc9110#name-rejecting-misdirected-reque
+    endState(StatusCode::MisdirectedRequest);
     return;
   }
 
