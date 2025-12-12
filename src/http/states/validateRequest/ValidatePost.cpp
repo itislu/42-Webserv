@@ -1,5 +1,6 @@
 
 #include "ValidatePost.hpp"
+#include "libftpp/string.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
@@ -71,6 +72,9 @@ void ValidatePost::validateStaticPost()
     if (!isWriteable(_path) || !isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
       return;
+    }
+    if (!ft::ends_with(_path, '/')) {
+      _path.append("/");
     }
     endState(StatusCode::Ok);
     return;
