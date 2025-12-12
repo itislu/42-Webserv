@@ -32,6 +32,7 @@
 #include <iostream>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -352,20 +353,20 @@ void ValidateRequest::_validateHost()
 
   int hostPort = -1;
   _host = _client->getRequest().getUri().getAuthority().getHost();
-  if (_host.empty()) {
-    if (!hostHeader.empty()) {
+  try {
+    if (!_host.empty()) {
+      _setPortFromUri(hostPort);
+    } else if (!hostHeader.empty()) {
       _splitHostHeader(hostHeader, hostPort);
     } else {
       // HTTP/1.0 with no Host-Header or URI-host
-      // endState(StatusCode::BadRequest); depends on how we want to implent it
+      // endState(StatusCode::BadRequest); depends how we want to implement it
       return;
     }
-  } else {
-    const std::string& uriPort =
-      _client->getRequest().getUri().getAuthority().getPort();
-    if (!uriPort.empty()) {
-      hostPort = config::convert::toPort(uriPort);
-    }
+  } catch (const std::invalid_argument&) {
+    // Invalid port reported by config::convert::toPort().
+    endState(StatusCode::BadRequest);
+    return;
   }
 
   const Socket* const socket = _client->getSocket();
@@ -381,21 +382,24 @@ void ValidateRequest::_validateHost()
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
 {
-  const std::size_t pos = hostHeader.find(':');
+  const std::string::size_type pos = hostHeader.find(':');
   if (pos != std::string::npos) {
     _host = hostHeader.substr(0, pos);
-    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
+    const std::string portStr = hostHeader.substr(pos + 1);
     if (!portStr.empty()) {
-      try {
-        port = config::convert::toPort(portStr);
-      } catch (const std::exception& e) {
-        // NOTE: not sure if this is even possible
-        endState(StatusCode::BadRequest);
-        return;
-      }
+      port = config::convert::toPort(portStr);
     }
   } else {
     _host = hostHeader;
+  }
+}
+
+void ValidateRequest::_setPortFromUri(int& port)
+{
+  const std::string& uriPort =
+    _client->getRequest().getUri().getAuthority().getPort();
+  if (!uriPort.empty()) {
+    port = config::convert::toPort(uriPort);
   }
 }
 
