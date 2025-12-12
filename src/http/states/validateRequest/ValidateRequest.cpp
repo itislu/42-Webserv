@@ -344,7 +344,8 @@ void ValidateRequest::_validateHost()
   }
 
   // HTTP 1.1 MUST have a host header
-  if (_client->getRequest().getVersion() == http::HTTP_1_1 && hostHeader.empty()) {
+  if (_client->getRequest().getVersion() == http::HTTP_1_1 &&
+      hostHeader.empty()) {
     endState(StatusCode::BadRequest);
     return;
   }
@@ -360,11 +361,10 @@ void ValidateRequest::_validateHost()
       return;
     }
   } else {
-    std::string uriPort = _client->getRequest().getUri().getAuthority().getPort();
-    if (!uriPort.empty())
-    {
-      if (ft::starts_with(uriPort, ':'))
-      {
+    std::string uriPort =
+      _client->getRequest().getUri().getAuthority().getPort();
+    if (!uriPort.empty()) {
+      if (ft::starts_with(uriPort, ':')) {
         uriPort = uriPort.substr(1);
       }
       hostPort = config::convert::toPort(uriPort);

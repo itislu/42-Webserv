@@ -93,7 +93,8 @@ TEST(ValidateRequestTester, HostHeaderNoUriHost)
 
 TEST(ValidateRequestTester, UriHostHasPrio)
 {
-  std::string line("GET http://serv01:8080/ HTTP/1.1\r\nHost: serv02:8080\r\n\r\n");
+  std::string line(
+    "GET http://serv01:8080/ HTTP/1.1\r\nHost: serv02:8080\r\n\r\n");
 
   ft::unique_ptr<Client> client = requestTest(line, 8080);
 
@@ -105,7 +106,8 @@ TEST(ValidateRequestTester, UriHostHasPrio)
 
 TEST(ValidateRequestTester, UriHostHasPrio02)
 {
-  std::string line("GET http://serv02:8080/ HTTP/1.1\r\nHost: serv01:8080\r\n\r\n");
+  std::string line(
+    "GET http://serv02:8080/ HTTP/1.1\r\nHost: serv01:8080\r\n\r\n");
 
   ft::unique_ptr<Client> client = requestTest(line, 8080);
 
@@ -272,8 +274,8 @@ TEST(ValidateRequestTester, DecodeOnlyOneHex)
 
 // Main function to run all tests
 // ss -tulpn | grep 8080
-#include <unistd.h>
 #include <limits.h> // For PATH_MAX
+#include <unistd.h>
 
 int main(int argc, char** argv)
 {
@@ -282,8 +284,9 @@ int main(int argc, char** argv)
     return 1;
   }
 
-    const std::string configPath = std::string(ASSETS_PATH) + "valid/validateRequest.conf";
-    ConfigParser parser(configPath.c_str());
+  const std::string configPath =
+    std::string(ASSETS_PATH) + "valid/validateRequest.conf";
+  ConfigParser parser(configPath.c_str());
   parser.parseConfig();
 
   ::testing::InitGoogleTest(&argc, argv);
