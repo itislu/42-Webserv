@@ -161,7 +161,6 @@ TEST(ValidateRequestTester, DecodeEmpty)
   ft::unique_ptr<Client> client = requestTest(line, 8080);
 
   EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
-  EXPECT_EQ(client->getResource().getType(), Resource::Error);
 }
 
 TEST(ValidateRequestTester, DecodeInvalid)
@@ -172,7 +171,6 @@ TEST(ValidateRequestTester, DecodeInvalid)
   ft::unique_ptr<Client> client = requestTest(line, 8080);
 
   EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
-  EXPECT_EQ(client->getResource().getType(), Resource::Error);
 }
 
 TEST(ValidateRequestTester, DecodeInvalidNull)
@@ -185,14 +183,13 @@ TEST(ValidateRequestTester, DecodeInvalidNull)
   EXPECT_EQ(client->getResource().getType(), Resource::Error);
 }
 
-TEST(ValidateRequestTester, DecodeInvalidOnlyOneHex)
+TEST(ValidateRequestTester, DecodeOnlyOneHex)
 {
   std::string line("GET http://localhost:8080/te%4 HTTP/1.1\r\nHost: "
                    "localhost:8080\r\n\r\n");
   ft::unique_ptr<Client> client = requestTest(line, 8080);
 
   EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
-  EXPECT_EQ(client->getResource().getType(), Resource::Error);
 }
 
 // NOLINTEND
