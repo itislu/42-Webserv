@@ -108,6 +108,9 @@ const Server* ServerManager::getServerByHost(const Socket* socket,
       }
     }
   }
+  if (servers.empty()) {
+    return FT_NULLPTR; // this should also never happen
+  }
   return servers[0];
 }
 

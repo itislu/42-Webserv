@@ -54,7 +54,7 @@ ft::unique_ptr<Client> requestTest(std::string& rawBuffer, int connection)
 // Hostheader Tests
 // =================================================================
 
-TEST(ValidateRequestTester, HostheaderMissingIn)
+TEST(ValidateRequestTester, HostheaderMissingInHttp1_1)
 {
   std::string line("GET http://localhost:8080/ HTTP/1.1\r\n\r\n");
 

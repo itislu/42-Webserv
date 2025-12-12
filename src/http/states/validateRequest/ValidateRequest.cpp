@@ -353,7 +353,7 @@ void ValidateRequest::_validateHost()
   if (_host.empty()) {
     int port = -1;
     _splitHostHeader(hostHeader, port);
-    // TODO: check if this is necessary
+    // TODO: validate this is a necessary check
     if (port != -1) {
       const Socket* const socket = _client->getSocket();
       if (socket->getPort() != port) {
@@ -361,8 +361,8 @@ void ValidateRequest::_validateHost()
         return;
       }
     }
-    _host = ft::to_lower(_host);
   }
+  _host = ft::to_lower(_host);
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
@@ -377,6 +377,7 @@ void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
       } catch (const std::exception& e) {
         // NOTE: not sure if this is even possible
         endState(StatusCode::BadRequest);
+        return;
       }
     }
   } else {
