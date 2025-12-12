@@ -33,7 +33,8 @@ WriteStatusLine::WriteStatusLine(Client* context)
 void WriteStatusLine::run()
 try {
   std::string statusLine;
-  statusLine.append("HTTP/1.1 ");
+  statusLine.append(http::HTTP_1_1);
+  statusLine.append(" ");
   statusLine.append(_client->getResponse().getStatusCode().toString());
   statusLine.append(http::CRLF);
 
