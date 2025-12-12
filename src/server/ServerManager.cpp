@@ -7,6 +7,7 @@
 #include "server/Server.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
+#include <cassert>
 #include <cerrno>
 #include <csignal>
 #include <cstring>
@@ -108,9 +109,7 @@ const Server* ServerManager::getServerByHost(const Socket* socket,
       }
     }
   }
-  if (servers.empty()) {
-    return FT_NULLPTR; // this should also never happen
-  }
+  assert(!servers.empty());
   return servers[0];
 }
 
