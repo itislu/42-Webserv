@@ -21,6 +21,7 @@ public:
 private:
   void _init();
   void _extractVersion();
+  void _validateVersion();
 
   Client* _client;
   BufferReader _buffReader;

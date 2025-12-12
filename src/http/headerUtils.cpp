@@ -10,11 +10,13 @@
 #include <vector>
 
 namespace header {
+
 const char* const host = "Host";
 const char* const contentLength = "Content-Length";
 const char* const transferEncoding = "Transfer-Encoding";
 const char* const contentType = "Content-Type";
-}
+
+} // namespace header
 
 void setContentLengthHeader(Headers& headers, std::size_t length)
 {
@@ -30,8 +32,6 @@ void setContentTypeHeader(Headers& headers, const std::string& filePath)
 
   if (type != extToType.end()) {
     headers.setHeader(header::contentType, type->second);
-  } else {
-    headers.setHeader(header::contentType, "text/html");
   }
 }
 

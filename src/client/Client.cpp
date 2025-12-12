@@ -30,7 +30,7 @@
 
 Logger& Client::_log = Logger::getInstance(LOG_SERVER);
 
-const std::size_t Client::_maxChunk;
+const std::size_t Client::maxChunk;
 
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void Client::setServer(const Server* server)
 
 bool Client::receive()
 {
-  static IInBuffer::RawBytes buffer(_maxChunk);
+  static IInBuffer::RawBytes buffer(maxChunk);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
     /* TODO: remove this! */
@@ -147,7 +147,7 @@ bool Client::receive()
 
 bool Client::sendTo()
 {
-  const ssize_t bytes = _outBuffQueue.send(getFd(), _maxChunk);
+  const ssize_t bytes = _outBuffQueue.send(getFd(), maxChunk);
   if (bytes > 0) {
     _log.info() << "sent " << bytes << " bytes\n";
   } else if (bytes == 0) {
