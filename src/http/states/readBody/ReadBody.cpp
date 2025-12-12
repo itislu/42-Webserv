@@ -17,6 +17,7 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
+#include <socket/SocketManager.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -371,5 +372,8 @@ void ReadBody::_updateCgi()
     cgiContext->setContentLengthAvailable();
     cgiContext->setContentLength(_bodyLength);
   }
-  // todo enable pollout for ClientToCgi FD
+
+  // new data -> enable cgi pollout
+  SocketManager::getInstance().enablePollout(
+    cgiContext->getPipeClientToCgi().getWriteFd());
 }

@@ -23,6 +23,7 @@ public:
   pollfd* getPfdStart();
 
   int acceptClient(int fdes);
+  void addCgiFd(int fdes);
 
   void enablePollout(int fdes);
   void disablePollout(int fdes);

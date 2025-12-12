@@ -41,7 +41,13 @@ ProcessCgiResponse::ProcessCgiResponse(CgiContext* context)
 
 void ProcessCgiResponse::run()
 try {
-  _readCgiResponse();
+  if (getContext()->cgiReadEventHandlerReceivedPollHupErr()) {
+    _done = true;
+  }
+
+  if (!_done) {
+    _readCgiResponse();
+  }
 
   if (!_done && _ok()) {
     // when headers are parsed, _smartbuffer is connected to response body
@@ -70,7 +76,7 @@ try {
 
 bool ProcessCgiResponse::_ok()
 {
-  return _client->getResponse().getStatusCode() != StatusCode::Ok;
+  return _client->getResponse().getStatusCode() == StatusCode::Ok;
 }
 
 void ProcessCgiResponse::_readCgiResponse()

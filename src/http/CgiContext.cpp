@@ -14,8 +14,10 @@ CgiContext::CgiContext(Client* client)
   : _client(client)
   , _shExecCgi(this)
   , _shProcessCgiResponse(this)
-  , _contentLengthAvailable(false)
   , _contentLength(0)
+  , _contentLengthAvailable(false)
+  , _cgiReadEventHandlerReceivedPollHupErr(false)
+  , _cgiWriteEventHandlerReceivedPollHupErr(false)
 {
   _shExecCgi.setState<ExecuteCgi>();
   _shProcessCgiResponse.setState<ProcessCgiResponse>();
@@ -64,6 +66,26 @@ void CgiContext::setContentLengthAvailable()
 void CgiContext::setContentLength(std::size_t value)
 {
   _contentLength = value;
+}
+
+void CgiContext::setCgiReadEventHandlerReceivedPollHupErr(bool value)
+{
+  _cgiReadEventHandlerReceivedPollHupErr = value;
+}
+
+void CgiContext::setCgiWriteEventHandlerReceivedPollHupErr(bool value)
+{
+  _cgiWriteEventHandlerReceivedPollHupErr = value;
+}
+
+bool CgiContext::cgiReadEventHandlerReceivedPollHupErr() const
+{
+  return _cgiReadEventHandlerReceivedPollHupErr;
+}
+
+bool CgiContext::cgiWriteEventHandlerReceivedPollHupErr() const
+{
+  return _cgiWriteEventHandlerReceivedPollHupErr;
 }
 
 /* ************************************************************************** */

@@ -1,5 +1,5 @@
 #include "CgiReadEventHandler.hpp"
-#include "utils/state/StateHandler.hpp"
+#include "socket/SocketManager.hpp"
 
 #include <client/Client.hpp>
 #include <event/EventHandler.hpp>
@@ -8,13 +8,14 @@
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <utils/logger/Logger.hpp>
+#include <utils/state/StateHandler.hpp>
 
 #include <exception>
 
 /* ***************************************************************************/
 // INIT
 
-Logger& CgiReadEventHandler::_log = Logger::getInstance(LOG_HTTP);
+Logger& CgiReadEventHandler::_log = Logger::getInstance(LOG_SERVER);
 
 /* ************************************************************************** */
 // PUBLIC
@@ -33,24 +34,18 @@ try {
     return Disconnect;
   }
 
-  if (!isPollInEvent(revents)) {
-    // should only be used for read
-    _log.error() << "CgiReadEventHandler: invalid event\n";
-    return Disconnect;
+  Result result = Alive;
+  if (isPollInEvent(revents)) {
+    result = _handlePollInEvent();
+    updateLastActivity();
+  } else if (isPollHupEvent(revents) || isPollErrEvent(revents)) {
+    result = _handlePollHupOrErr();
   }
 
-  // Receive data
-  CgiContext* cgiContext = _client->getCgiContext().get();
-  if (cgiContext != FT_NULLPTR) {
-    cgiContext->getShProcessCgiResponse().getState()->run();
-    if (cgiContext->getShProcessCgiResponse().isDone()) {
-      return Disconnect;
-    }
-  } else {
-    return Disconnect;
+  if (result == Disconnect) {
+    _log.info() << "CgiReadEventHandler: disconnect\n";
   }
-  updateLastActivity();
-  return Alive;
+  return result;
 } catch (const std::exception& e) {
   _log.error() << "CgiReadEventHandler exception: " << e.what() << '\n';
   _client->getResponse().setStatusCode(StatusCode::InternalServerError);
@@ -64,3 +59,35 @@ long CgiReadEventHandler::getTimeout() const
 
 /* ************************************************************************** */
 // PRIVATE
+
+CgiReadEventHandler::Result CgiReadEventHandler::_handlePollInEvent()
+{
+  // Receive data
+  CgiContext* cgiContext = _client->getCgiContext().get();
+  if (cgiContext != FT_NULLPTR) {
+    cgiContext->getShProcessCgiResponse().getState()->run();
+    if (cgiContext->getShProcessCgiResponse().isDone()) {
+      if (_client->alive()) {
+        SocketManager::getInstance().enablePollout(_client->getFd());
+      }
+      return Disconnect;
+    }
+  } else {
+    return Disconnect;
+  }
+  return Alive;
+}
+
+CgiReadEventHandler::Result CgiReadEventHandler::_handlePollHupOrErr()
+{
+  // Finish state
+  CgiContext* cgiContext = _client->getCgiContext().get();
+  if (cgiContext != FT_NULLPTR) {
+    cgiContext->setCgiReadEventHandlerReceivedPollHupErr(true);
+    cgiContext->getShProcessCgiResponse().getState()->run();
+    if (_client->alive()) {
+      SocketManager::getInstance().enablePollout(_client->getFd());
+    }
+  }
+  return Disconnect;
+}

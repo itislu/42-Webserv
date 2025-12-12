@@ -1,4 +1,5 @@
 #include "ExecuteCgi.hpp"
+#include "utils/buffer/IInOutBuffer.hpp"
 
 #include <cassert>
 #include <client/Client.hpp>
@@ -180,20 +181,24 @@ try {
 void ExecuteCgi::_provideBody()
 {
   Request& request = _client->getRequest();
+  IInOutBuffer& body = request.getBody();
   Pipe& pipeToCgi = getContext()->getPipeClientToCgi();
 
-  if (request.getBody().isEmpty()) {
+  if (body.isEmpty()) {
     return;
   }
 
   // Write TO CHILD (stdin)
-  const std::size_t toWrite =
-    std::min(request.getBody().size(), Client::maxChunk);
-  IBuffer::RawBytes msg = request.getBody().getRawBytes(0, toWrite);
+  const std::size_t toWrite = std::min(body.size(), Client::maxChunk);
+  IBuffer::RawBytes msg = body.getRawBytes(0, toWrite);
   const ssize_t res = write(pipeToCgi.getWriteFd(), msg.data(), msg.size());
   if (res < 0) {
     throw std::runtime_error("ExecuteCgi: write failed");
   }
+  if (res > 0) {
+    body.removeFront(res);
+  }
+
   _bytesWriten += res;
   if (_bytesWriten >= _contentLength) {
     pipeToCgi.closeWrite();

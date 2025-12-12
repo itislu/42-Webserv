@@ -22,7 +22,7 @@ public:
 private:
   struct ValidatorEntry;
   typedef void (CgiHeaderValidator::*fnPtrValid)(const std::string&);
-  static const int _validators = 3;
+  static const int _validators = 2;
   static const ft::array<ValidatorEntry, _validators> _validatorMap;
 
   void _validateContentLength(const std::string& value);

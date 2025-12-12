@@ -40,6 +40,8 @@ public:
   const char* getReason() const;
   std::string toString() const;
 
+  bool is2xxCode() const;
+
 private:
   void _findReason();
 

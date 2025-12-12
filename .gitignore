@@ -9,6 +9,7 @@
 !*.yaml
 !*.html
 !*.sh
+!*.py
 !.clang-format
 !.clang-tidy
 !.clang-uml

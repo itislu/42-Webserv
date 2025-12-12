@@ -14,6 +14,7 @@ const char* const host = "Host";
 const char* const contentLength = "Content-Length";
 const char* const transferEncoding = "Transfer-Encoding";
 const char* const contentType = "Content-Type";
+const char* const connection = "Connection";
 
 } // namespace header
 

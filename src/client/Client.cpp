@@ -160,11 +160,11 @@ bool Client::sendTo()
 {
   const ssize_t bytes = _outBuffQueue.send(getFd(), maxChunk);
   if (bytes > 0) {
-    _log.info() << "sent " << bytes << " bytes\n";
+    _log.info() << *this << "sent " << bytes << " bytes\n";
   } else if (bytes == 0) {
-    _log.warning() << "no data sent to client fd=" << getFd() << "\n";
+    _log.warning() << *this << "no data sent to client fd=" << getFd() << "\n";
   } else {
-    _log.error() << "send error for client fd=" << getFd() << ": "
+    _log.error() << *this << "send error for client fd=" << getFd() << ": "
                  << std::strerror(errno) << "\n";
     return false;
   }
@@ -190,7 +190,9 @@ void Client::prepareForNewRequest()
   _request = Request();
   _resource = Resource();
 
-  _cgiContext.reset();
+  // _cgiContext.reset();
+  ft::shared_ptr<CgiContext> nullPtr;
+  _cgiContext = ft::move(nullPtr);
 }
 
 void Client::setCloseConnection(bool value)

@@ -72,7 +72,7 @@ void EventManager::checkTimeouts()
 }
 
 // NOLINTBEGIN(performance-unnecessary-value-param)
-void EventManager::addHandler(ft::shared_ptr<EventHandler> handler)
+void EventManager::_addHandler(ft::shared_ptr<EventHandler> handler)
 {
   assert(handler->getFd() > 0);
   _handlers[handler->getFd()] = handler;
@@ -86,6 +86,12 @@ EventHandler* EventManager::getHandler(RawFd fdes) const
     return FT_NULLPTR;
   }
   return iter->second.get();
+}
+
+void EventManager::addCgiHandler(ft::shared_ptr<EventHandler> handler)
+{
+  _socketManager().addCgiFd(handler->getFd());
+  _addHandler(ft::move(handler));
 }
 
 /* ************************************************************************** */
@@ -134,7 +140,7 @@ void EventManager::_acceptClient(int fdes, const unsigned events)
     ft::shared_ptr<Client> client = ft::make_shared<Client>(clientFd, server);
     ft::shared_ptr<ClientEventHandler> handler =
       ft::make_shared<ClientEventHandler>(clientFd, ft::move(client));
-    addHandler(ft::move(handler));
+    _addHandler(ft::move(handler));
     _log.info() << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
     _log.error() << "[SERVER] accepting new client failed\n";
@@ -153,7 +159,6 @@ void EventManager::_disconnectEventHandler(EventHandler* handler)
   // remove from handler map
   _removeHandler(clientFd);
 
-  _log.info() << "[SERVER] Client fd=" << clientFd << " disconnected\n";
   _log.info() << "Client fd=" << clientFd << " disconnected\n";
 }
 
@@ -163,13 +168,15 @@ int EventManager::_calculateTimeout()
   if (_handlers.empty()) {
     const long timeout = Config::getDefaultTimeout();
     const int timeoutMs = convertSecondsToMs(timeout);
-    _log.info() << "No clients - use default timeout: " << timeoutMs << "ms\n";
+    // _log.info() << "No clients - use default timeout: " << timeoutMs <<
+    // "ms\n";
     return timeoutMs;
   }
 
   const long minRemaining = _getMinTimeout();
   const int timeoutMs = convertSecondsToMs(minRemaining);
-  _log.info() << "using client min remaining timeout: " << timeoutMs << "ms\n";
+  //_log.info() << "using client min remaining timeout: " << timeoutMs <<
+  //"ms\n";
 
   return timeoutMs;
 }

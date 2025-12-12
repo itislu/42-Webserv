@@ -18,6 +18,9 @@ public:
   long getTimeout() const;
 
 private:
+  Result _handlePollInEvent();
+  Result _handlePollHupOrErr();
+
   static Logger& _log;
   ft::shared_ptr<Client> _client;
 };

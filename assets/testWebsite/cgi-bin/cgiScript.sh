@@ -3,8 +3,8 @@
 OUTFILE="./cgi_dump.txt"
 
 # --- Write headers for the HTTP response ---
-echo "Content-Type: text/plain"
-echo
+printf "Content-Type: text/plain\r\n"
+printf "\r\n"
 
 echo "CGI DEBUG OUTPUT" 
 echo "================"

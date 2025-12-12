@@ -27,6 +27,11 @@ public:
   void setContentLengthAvailable();
   void setContentLength(std::size_t value);
 
+  void setCgiReadEventHandlerReceivedPollHupErr(bool value);
+  void setCgiWriteEventHandlerReceivedPollHupErr(bool value);
+  bool cgiReadEventHandlerReceivedPollHupErr() const;
+  bool cgiWriteEventHandlerReceivedPollHupErr() const;
+
 private:
   Client* _client;
   StateHandler<CgiContext> _shExecCgi;
@@ -34,11 +39,13 @@ private:
 
   std::map<std::string, std::string> _env;
 
-  bool _contentLengthAvailable;
-  std::size_t _contentLength;
-
   Pipe _pipeClientToCgi;
   Pipe _pipeCgiToClient;
+
+  std::size_t _contentLength;
+  bool _contentLengthAvailable;
+  bool _cgiReadEventHandlerReceivedPollHupErr;
+  bool _cgiWriteEventHandlerReceivedPollHupErr;
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "ClientEventHandler.hpp"
+#include "http/Response.hpp"
 
 #include <client/Client.hpp>
 #include <event/CgiReadEventHandler.hpp>
@@ -111,8 +112,11 @@ ClientEventHandler::Result ClientEventHandler::_handlePollOutEvent()
 void ClientEventHandler::_clientStateMachine()
 {
   StateHandler<Client>& handler = _client->getStateHandler();
+  const Response& response = _client->getResponse();
 
-  if (handler.isDone() && !_client->getInBuff().isEmpty()) {
+  if (handler.isDone() && !_client->getInBuff().isEmpty() &&
+      !_client->closeConnection() && response.getStatusCode().is2xxCode()) {
+    _log.info() << _client->getInBuff() << '\n';
     _client->prepareForNewRequest();
     _cgiEventHandlerAdded = false;
   }
@@ -156,10 +160,8 @@ void ClientEventHandler::_addCgiEventHandler()
   ft::shared_ptr<CgiReadEventHandler> cgiReadHandler =
     ft::make_shared<CgiReadEventHandler>(fdCgiToClient, _client);
 
-  eventManager.addHandler(ft::move(cgiWriteHandler));
-  eventManager.addHandler(ft::move(cgiReadHandler));
-
-  // todo add fds to socket manager pfds
+  eventManager.addCgiHandler(ft::move(cgiWriteHandler));
+  eventManager.addCgiHandler(ft::move(cgiReadHandler));
 
   // enable poll
   SocketManager::getInstance().enablePollout(fdClientToCgi);

@@ -85,6 +85,13 @@ std::ostream& operator<<(std::ostream& out, const StatusCode& statuscode)
   return out;
 }
 
+bool StatusCode::is2xxCode() const
+{
+  const int begin = 200;
+  const int end = 299;
+  return _code >= begin && _code <= end;
+}
+
 /* ************************************************************************** */
 // PRIVATE
 

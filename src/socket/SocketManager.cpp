@@ -117,6 +117,11 @@ int SocketManager::acceptClient(int fdes)
   return clientFd;
 }
 
+void SocketManager::addCgiFd(int fdes)
+{
+  addToPfd(fdes);
+}
+
 pollfd* SocketManager::getPollFd(int fdes)
 {
   for (std::vector<pollfd>::iterator it = _pfds.begin(); it != _pfds.end();

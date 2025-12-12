@@ -1,4 +1,5 @@
 #include "CgiWriteEventHandler.hpp"
+#include "socket/SocketManager.hpp"
 
 #include <client/Client.hpp>
 #include <event/EventHandler.hpp>
@@ -13,7 +14,7 @@
 /* ***************************************************************************/
 // INIT
 
-Logger& CgiWriteEventHandler::_log = Logger::getInstance(LOG_HTTP);
+Logger& CgiWriteEventHandler::_log = Logger::getInstance(LOG_SERVER);
 
 /* ************************************************************************** */
 // PUBLIC
@@ -32,26 +33,18 @@ try {
     return Disconnect;
   }
 
-  if (!isPollOutEvent(revents)) {
-    // should only be used for write
-    _log.error() << "CgiWriteEventHandler: invalid event\n";
-    return Disconnect;
+  Result result = Alive;
+  if (isPollOutEvent(revents)) {
+    result = _handlePollOutEvent();
+    updateLastActivity();
+  } else if (isPollHupEvent(revents) || isPollErrEvent(revents)) {
+    result = Disconnect;
   }
 
-  _log.info() << "CgiWriteEventHandler: called\n";
-
-  // Write data
-  CgiContext* cgiContext = _client->getCgiContext().get();
-  if (cgiContext != FT_NULLPTR) {
-    cgiContext->getShExecCgi().getState()->run();
-    if (cgiContext->getShExecCgi().isDone()) {
-      return Disconnect;
-    }
-  } else {
-    return Disconnect;
+  if (result == Disconnect) {
+    _log.info() << "CgiWriteEventHandler: disconnect\n";
   }
-  updateLastActivity();
-  return Alive;
+  return result;
 } catch (const std::exception& e) {
   _log.error() << "CgiWriteEventHandler exception: " << e.what() << '\n';
   _client->getResponse().setStatusCode(StatusCode::InternalServerError);
@@ -65,3 +58,24 @@ long CgiWriteEventHandler::getTimeout() const
 
 /* ************************************************************************** */
 // PRIVATE
+
+CgiWriteEventHandler::Result CgiWriteEventHandler::_handlePollOutEvent()
+{
+  // Write data
+  CgiContext* cgiContext = _client->getCgiContext().get();
+  if (cgiContext == FT_NULLPTR) {
+    return Disconnect;
+  }
+
+  cgiContext->getShExecCgi().getState()->run();
+  if (cgiContext->getShExecCgi().isDone()) {
+    return Disconnect;
+  }
+
+  // all sent so far -> disable pollout
+  if (_client->getRequest().getBody().isEmpty()) {
+    SocketManager::getInstance().disablePollout(
+      cgiContext->getPipeClientToCgi().getWriteFd());
+  }
+  return Alive;
+}
