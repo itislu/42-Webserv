@@ -3,25 +3,22 @@
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
-#include <http/abnfRules/generalRules.hpp>
-#include <http/abnfRules/headerLineRules.hpp>
-#include <http/abnfRules/ruleIds.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/readBody/ReadBody.hpp>
+#include <http/states/readHeaderLines/RequestHeaderValidator.hpp>
 #include <http/states/validateRequest/ValidateRequest.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
+#include <http/utils/HeaderParser.hpp>
 #include <libftpp/memory.hpp>
-#include <utils/BufferReader.hpp>
-#include <utils/abnfRules/Rule.hpp>
-#include <utils/abnfRules/RuleResult.hpp>
-#include <utils/abnfRules/SequenceRule.hpp>
+#include <libftpp/utility.hpp>
 #include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInOutBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <cstddef>
-#include <string>
 
 /* ***************************************************************************/
 // INIT
@@ -39,10 +36,7 @@ std::size_t ReadHeaderLines::_maxHeaderSize = _defaultMaxHeaderSize;
 ReadHeaderLines::ReadHeaderLines(Client* context)
   : IState(context)
   , _client(context)
-  , _buffReader()
-  , _sizeHeaders(0)
   , _done(false)
-  , _validator(_client)
 {
   _log.info() << *_client << " ReadHeaderLines\n";
   _init();
@@ -62,9 +56,12 @@ ReadHeaderLines::ReadHeaderLines(Client* context)
 void ReadHeaderLines::run()
 try {
   _readLines();
-  if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
-    _setNextState();
-    return;
+
+  const StatusCode& statusCode = _client->getResponse().getStatusCode();
+  if (statusCode != StatusCode::Ok) {
+    getContext()->getStateHandler().setState<PrepareResponse>();
+  } else if (_done) {
+    getContext()->getStateHandler().setState<ValidateRequest>();
   }
 } catch (const IBuffer::BufferException& e) {
   _log.error() << *_client << " ReadHeaderLines: " << e.what() << "\n";
@@ -94,117 +91,47 @@ void ReadHeaderLines::resetMaxHeaderSize()
 
 void ReadHeaderLines::_init()
 {
-  _buffReader.init(&_client->getInBuff());
-
-  _fieldLine = fieldLinePartRule();
-  _fieldLine->setBufferReader(&_buffReader);
-  _fieldLine->setResultMap(&_results);
-
-  _endOfLine = endOfLineRule();
-  _endOfLine->setBufferReader(&_buffReader);
-  _endOfLine->setResultMap(&_results);
-}
-
-bool ReadHeaderLines::_readingOk()
-{
-  const StatusCode& statuscode = _client->getResponse().getStatusCode();
-  if (statuscode != StatusCode::Ok) {
-    return false;
-  }
-  if (_buffReader.reachedEnd()) {
-    return false;
-  }
-  return true;
+  ft::shared_ptr<RequestHeaderValidator> validator =
+    ft::make_shared<RequestHeaderValidator>(_client);
+  validator->setMaxFieldLineSize(_maxFieldLineSize);
+  validator->setMaxHeaderSize(_maxHeaderSize);
+  _headerParser.setValidator(ft::move(validator));
 }
 
 void ReadHeaderLines::_readLines()
 {
-  _buffReader.resetPosInBuff();
-  while (_readingOk()) {
-    _results.clear();
-    _fieldLine->reset();
-    _endOfLine->reset();
-
-    if (_fieldLine->matches()) {
-      if (_fieldLine->reachedEnd()) {
-        const std::string fieldLine = _extractPart(FieldLinePart);
-        _addLineToHeaders(fieldLine);
-      }
-    } else if (_hasEndOfLine()) {
-      if (_endOfLine->reachedEnd()) {
-        _extractPart(EndOfLine);
-        _done = true;
-        return;
-      }
-    } else {
-      _log.error() << "ReadHeaderLines: Bad Request: Headers:\n";
-      _log.error() << _client->getRequest().getHeaders().toString() << '\n';
-      _client->getResponse().setStatusCode(StatusCode::BadRequest);
-      _done = true;
-      return;
-    }
-  }
-}
-
-void ReadHeaderLines::_setNextState()
-{
-  const StatusCode& statusCode = _client->getResponse().getStatusCode();
-
-  if (statusCode == StatusCode::Ok) {
-    getContext()->getStateHandler().setState<ValidateRequest>();
-  } else {
-    getContext()->getStateHandler().setState<PrepareResponse>();
-  }
-}
-
-bool ReadHeaderLines::_hasEndOfLine()
-{
-  _buffReader.resetPosInBuff();
-  return _endOfLine->matches();
-}
-
-std::string ReadHeaderLines::_extractPart(const Rule::RuleId& ruleId)
-{
-  const RuleResult& result = _results[ruleId];
-  const std::size_t pos = result.getEnd();
-
-  if (_headerTooLarge(pos)) {
-    return "";
-  }
-  const std::string part = _client->getInBuff().consumeFront(pos);
-  _buffReader.resetPosInBuff();
-  return part;
-}
-
-void ReadHeaderLines::_addLineToHeaders(const std::string& line)
-{
-  const std::size_t index = line.find(':');
-  const std::string name = line.substr(0, index);
-  const std::string value = line.substr(index + 1, line.size());
-
-  // validate header
-  _validator.run(name, value);
-
+  Response& response = _client->getResponse();
+  IInOutBuffer& buffer = _client->getInBuff();
   Headers& headers = _client->getRequest().getHeaders();
-  headers.addHeader(name, value);
-}
+  const HeaderParser::Result result =
+    _headerParser.parseIntoStruct(buffer, headers);
 
-bool ReadHeaderLines::_headerTooLarge(std::size_t newBytes)
-{
-  if (newBytes > _maxFieldLineSize) {
-    _client->getResponse().setStatusCode(
-      StatusCode::RequestHeaderFieldsTooLarge);
-    _log.error() << "ReadHeaderLines: field line too large\n";
-    return true;
+  switch (result) {
+    case HeaderParser::EndOfBuffer:
+      // header is not complete
+      break;
+    case HeaderParser::EndOfHeaders:
+      _done = true;
+      break;
+    case HeaderParser::SyntaxError:
+      _log.error() << "ReadHeaderLines: syntax error\n";
+      response.setStatusCode(StatusCode::BadRequest);
+      break;
+    case HeaderParser::FieldLineTooLarge:
+      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      _log.error() << "ReadHeaderLines: field line too large\n";
+      break;
+    case HeaderParser::HeaderTooLarge:
+      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      _log.error() << "ReadHeaderLines: header too large\n";
+      break;
+    case HeaderParser::InvalidHeader:
+      // Error code will be set by RequestHeaderValidator
+      if (response.getStatusCode() == StatusCode::Ok) {
+        _log.error()
+          << "ReadHeaderLines: validator failed to set error status\n";
+        response.setStatusCode(StatusCode::BadRequest);
+      }
+      break;
   }
-
-  if (_sizeHeaders + newBytes > _maxHeaderSize) {
-    _client->getResponse().setStatusCode(
-      StatusCode::RequestHeaderFieldsTooLarge);
-    _log.error() << "ReadHeaderLines: header too large\n";
-    return true;
-  }
-
-  _sizeHeaders += newBytes;
-  return false;
 }
