@@ -7,15 +7,18 @@
 #include "server/Server.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
+#include "utils/process/ChildProcessManager.hpp"
 #include <cerrno>
 #include <csignal>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <sys/signal.h>
 #include <vector>
 
 static volatile std::sig_atomic_t g_running = 0;
+static volatile std::sig_atomic_t g_childDied = 0;
 
 static void error(const std::string& msg)
 {
@@ -25,6 +28,11 @@ static void error(const std::string& msg)
 extern "C" void sigIntHandler(int /*sigNum*/)
 {
   g_running = 0;
+}
+
+extern "C" void sigChldHandler(int /*sigNum*/)
+{
+  g_childDied = 1;
 }
 
 ServerManager& ServerManager::getInstance()
@@ -37,6 +45,9 @@ ServerManager& ServerManager::getInstance()
 ServerManager::ServerManager(const Config& config)
 {
   if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
+    throw std::runtime_error("Failed to set SIGINT handler");
+  }
+  if (std::signal(SIGCHLD, sigChldHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
   }
   createServers(config.getServers());
@@ -134,6 +145,7 @@ const std::vector<ft::shared_ptr<const Server> >& ServerManager::getServers()
 
 void ServerManager::run()
 {
+  ChildProcessManager& childProcessManager = ChildProcessManager::getInstance();
   EventManager& eventManager = EventManager::getInstance();
   g_running = 1;
   while (g_running == 1) {
@@ -148,6 +160,10 @@ void ServerManager::run()
       break;
     }
     eventManager.checkTimeouts();
+    if (g_childDied == 1) {
+      g_childDied = 0;
+      childProcessManager.collectChilds();
+    }
   }
   std::cout << "Shutting down servers...\n";
 }

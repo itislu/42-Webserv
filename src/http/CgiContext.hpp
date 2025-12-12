@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <map>
 #include <string>
+#include <sys/types.h>
 
 class Client;
 
@@ -24,6 +25,9 @@ public:
   Pipe& getPipeClientToCgi();
   Pipe& getPipeCgiToClient();
 
+  void setChildPid(pid_t pid);
+  pid_t getChildPid() const;
+
   void setContentLengthAvailable();
   void setContentLength(std::size_t value);
 
@@ -31,6 +35,11 @@ public:
   void setCgiWriteEventHandlerReceivedPollHupErr(bool value);
   bool cgiReadEventHandlerReceivedPollHupErr() const;
   bool cgiWriteEventHandlerReceivedPollHupErr() const;
+
+  void setTimeoutRead(bool value);
+  void setTimeoutWrite(bool value);
+  bool timeoutRead() const;
+  bool timeoutWrite() const;
 
 private:
   Client* _client;
@@ -42,10 +51,13 @@ private:
   Pipe _pipeClientToCgi;
   Pipe _pipeCgiToClient;
 
+  pid_t _childPid;
   std::size_t _contentLength;
   bool _contentLengthAvailable;
   bool _cgiReadEventHandlerReceivedPollHupErr;
   bool _cgiWriteEventHandlerReceivedPollHupErr;
+  bool _timeoutRead;
+  bool _timeoutWrite;
 };
 
 #endif

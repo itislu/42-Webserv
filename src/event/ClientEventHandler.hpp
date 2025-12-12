@@ -15,6 +15,7 @@ public:
   explicit ClientEventHandler(int fdes, ft::shared_ptr<Client> client);
 
   Result handleEvent(unsigned revents);
+  Result onTimeout();
   long getTimeout() const;
 
 private:

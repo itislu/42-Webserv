@@ -1,5 +1,6 @@
 #include "ClientEventHandler.hpp"
 #include "http/Response.hpp"
+#include "utils/process/ChildProcessManager.hpp"
 
 #include <client/Client.hpp>
 #include <event/CgiReadEventHandler.hpp>
@@ -54,8 +55,6 @@ try {
   if (result != Alive) {
     _client->setAlive(false);
     _log.info() << *_client << " will disconnect\n";
-  } else {
-    updateLastActivity();
   }
   return result;
 } catch (const std::exception& e) {
@@ -64,6 +63,23 @@ try {
   _client->setAlive(false);
   _handleException();
   return Disconnect;
+}
+
+ClientEventHandler::Result ClientEventHandler::onTimeout()
+{
+  _log.info() << "ClientEventHandler: onTimeout\n";
+  if (_client == FT_NULLPTR || _client->getCgiContext() == FT_NULLPTR) {
+    return Disconnect;
+  }
+
+  const CgiContext& cgi = *_client->getCgiContext();
+  if (cgi.timeoutRead() && cgi.timeoutWrite()) {
+    _log.info() << "ClientEventHandler: onTimeout kill child\n";
+    ChildProcessManager::getInstance().killChild(cgi.getChildPid());
+    return Disconnect;
+  }
+  updateLastActivity();
+  return TimeoutExtended;
 }
 
 long ClientEventHandler::getTimeout() const
@@ -78,6 +94,7 @@ ClientEventHandler::Result ClientEventHandler::_handlePollInEvent()
 {
   const bool alive = _client->receive();
   if (alive) {
+    updateLastActivity();
     _clientStateMachine();
 
     if (_client->hasDataToSend()) {
@@ -96,6 +113,7 @@ ClientEventHandler::Result ClientEventHandler::_handlePollOutEvent()
 
   if (_client->hasDataToSend()) {
     const bool alive = _client->sendTo();
+    updateLastActivity();
 
     if (alive) {
       if (!_client->hasDataToSend() && _client->getInBuff().isEmpty()) {

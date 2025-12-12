@@ -5,7 +5,6 @@
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/headerRules.hpp>
 #include <http/abnfRules/ruleUtils.hpp>
-#include <iostream>
 #include <libftpp/array.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>

@@ -1,7 +1,6 @@
 #include "ExecuteCgi.hpp"
-#include "utils/buffer/IInOutBuffer.hpp"
+#include "utils/process/ChildProcessManager.hpp"
 
-#include <cassert>
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
@@ -14,10 +13,12 @@
 #include <libftpp/utility.hpp>
 #include <utils/Pipe.hpp>
 #include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInOutBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
@@ -128,12 +129,12 @@ void ExecuteCgi::_executeScript()
     _log.error() << "ExecuteCgi: fork failed\n";
     throw std::runtime_error("ExecuteCgi: fork failed");
   }
-
   if (pid == 0) {
     _handleChild();
   }
 
   _log.info() << "Run cgi script\n";
+  getContext()->setChildPid(pid);
 
   // Close child's ends
   pipeToCgi.closeRead();

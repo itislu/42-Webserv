@@ -11,13 +11,15 @@ public:
   enum Result
   {
     Alive,
-    Disconnect
+    Disconnect,
+    TimeoutExtended
   };
 
   explicit EventHandler(int fdes);
   virtual ~EventHandler() {}
 
   virtual Result handleEvent(unsigned revents) = 0;
+  virtual Result onTimeout() = 0;
   virtual long getTimeout() const = 0;
 
   const TimeStamp& getLastActivity() const;

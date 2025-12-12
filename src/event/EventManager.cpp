@@ -152,14 +152,14 @@ void EventManager::_disconnectEventHandler(EventHandler* handler)
   if (handler == FT_NULLPTR) {
     return;
   }
-  const int clientFd = handler->getFd();
+  const int handlerFd = handler->getFd();
   // Remove corresponding pollfd
-  _socketManager().removeFd(clientFd);
+  _socketManager().removeFd(handlerFd);
 
   // remove from handler map
-  _removeHandler(clientFd);
+  _removeHandler(handlerFd);
 
-  _log.info() << "Client fd=" << clientFd << " disconnected\n";
+  _log.info() << "Handler(" << handlerFd << ") disconnected\n";
 }
 
 int EventManager::_calculateTimeout()
@@ -199,9 +199,13 @@ void EventManager::_getTimedOutHandlers(
 {
   const TimeStamp now;
   for (const_iterHandler it = _handlers.begin(); it != _handlers.end(); ++it) {
-    const long timeout = it->second->getTimeout();
-    if (now - it->second->getLastActivity() >= timeout) {
-      timedOut.push_back(it->second);
+    EventHandler& handler = *(it->second);
+    const long timeout = handler.getTimeout();
+    if (now - handler.getLastActivity() >= timeout) {
+      const EventHandler::Result result = handler.onTimeout();
+      if (result == EventHandler::Disconnect) {
+        timedOut.push_back(it->second);
+      }
     }
   }
 }

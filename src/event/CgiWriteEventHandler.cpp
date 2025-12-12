@@ -51,6 +51,17 @@ try {
   return Disconnect;
 }
 
+CgiWriteEventHandler::Result CgiWriteEventHandler::onTimeout()
+{
+  if (_client == FT_NULLPTR || _client->getCgiContext() == FT_NULLPTR) {
+    return Disconnect;
+  }
+
+  CgiContext& cgi = *_client->getCgiContext();
+  cgi.setTimeoutWrite(true);
+  return Disconnect;
+}
+
 long CgiWriteEventHandler::getTimeout() const
 {
   return _client->getTimeout();
