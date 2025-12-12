@@ -20,7 +20,7 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
       { Unauthorized, "Unauthorized" },
       { Forbidden, "Forbidden" },
       { NotFound, "Not Found" },
-      { MethodNotAllowed, "Method not allowed" },
+      { MethodNotAllowed, "Method Not Allowed" },
       { NotAcceptable, "Not Acceptable" },
       { RequestTimeout, "Request Timeout" },
       { LengthRequired, "Length Required" },

@@ -1,9 +1,8 @@
 #include "ParseVersion.hpp"
-#include "http/Response.hpp"
-#include "http/http.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
@@ -89,11 +88,21 @@ void ParseVersion::_init()
   _sequence.setBufferReader(&_buffReader);
 }
 
+/**
+ * A server can send a 505 (HTTP Version Not Supported) response if it wishes,
+ * for any reason, to refuse service of the client's major protocol version.
+ * https://datatracker.ietf.org/doc/html/rfc9110#section-6.2-7
+ *
+ * The 505 (HTTP Version Not Supported) status code indicates that the server
+ * does not support, or refuses to support, the major version of HTTP that was
+ * used in the request message.
+ * https://datatracker.ietf.org/doc/html/rfc9110#name-505-http-version-not-suppor
+ */
 void ParseVersion::_validateVersion()
 {
   Response& response = _client->getResponse();
   const std::string& version = _client->getRequest().getVersion();
-  if (version != http::HTTP_1_0 && version != http::HTTP_1_1) {
+  if (!ft::starts_with(version, "HTTP/1.")) {
     response.setStatusCode(StatusCode::HttpVersionNotSupported);
   }
 }
