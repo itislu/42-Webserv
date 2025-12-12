@@ -360,15 +360,16 @@ void ValidateRequest::_validateHost()
       return;
     }
   } else {
-    std::string uriPort = _client->getRequest().getUri().getAuthority().getPort();
+    const std::string uriPort = _client->getRequest().getUri().getAuthority().getPort();
     if (!uriPort.empty())
     {
       hostPort = config::convert::toPort(_client->getRequest().getUri().getAuthority().getPort());
     }
   }
 
+  const int httpPort = 80;
   const Socket* const socket = _client->getSocket();
-  int port = (hostPort == -1) ? 80 : hostPort;
+  const int port = (hostPort == -1) ? httpPort : hostPort;
   if (socket->getPort() != port) {
     endState(StatusCode::BadRequest);
     return;
