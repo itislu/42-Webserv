@@ -331,6 +331,38 @@ TEST(ReadRequestLineTester, MultipleNulBytes)
   EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::BadRequest);
 }
 
+TEST(ReadRequestLineTester, Version0_9)
+{
+  std::string line("GET "
+                   "/ "
+                   "HTTP/0.9\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  EXPECT_EQ(response.getStatusCode().getCode(),
+            StatusCode::HttpVersionNotSupported);
+}
+
+TEST(ReadRequestLineTester, Version1_9)
+{
+  std::string line("GET "
+                   "/ "
+                   "HTTP/1.9\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  EXPECT_EQ(response.getStatusCode().getCode(), StatusCode::Ok);
+}
+
+TEST(ReadRequestLineTester, Version2_0)
+{
+  std::string line("GET "
+                   "/ "
+                   "HTTP/2.0\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  EXPECT_EQ(response.getStatusCode().getCode(),
+            StatusCode::HttpVersionNotSupported);
+}
+
 // NOLINTEND
 
 // Main function to run all tests
