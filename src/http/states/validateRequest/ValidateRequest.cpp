@@ -360,10 +360,14 @@ void ValidateRequest::_validateHost()
       return;
     }
   } else {
-    const std::string uriPort = _client->getRequest().getUri().getAuthority().getPort();
+    std::string uriPort = _client->getRequest().getUri().getAuthority().getPort();
     if (!uriPort.empty())
     {
-      hostPort = config::convert::toPort(_client->getRequest().getUri().getAuthority().getPort());
+      if (ft::starts_with(uriPort, ':'))
+      {
+        uriPort = uriPort.substr(1);
+      }
+      hostPort = config::convert::toPort(uriPort);
     }
   }
 
