@@ -102,6 +102,31 @@ TEST(RequestTester, CompleteBufferTest)
   EXPECT_EQ(value, "7");
 }
 
+TEST(RequestTester, Reset)
+{
+  std::string line("POST /test HTTP/1.1\r\n"
+                   "Host: example.com\r\n"
+                   "Content-Length: 5\r\n"
+                   "\r\n"
+                   "hello");
+  ft::unique_ptr<Client> client = requestTest(line);
+  Request& request = client->getRequest();
+
+  EXPECT_EQ(request.getMethod(), Request::POST);
+  EXPECT_EQ(request.getUri().getPath(), "/test");
+  EXPECT_EQ(request.getVersion(), "HTTP/1.1");
+  EXPECT_TRUE(request.getHeaders().contains("Host"));
+  EXPECT_EQ(request.getBody().size(), 5);
+
+  request.reset();
+
+  EXPECT_EQ(request.getMethod(), Request::UNDEFINED);
+  EXPECT_EQ(request.getUri().getPath(), "");
+  EXPECT_TRUE(request.getVersion().empty());
+  EXPECT_FALSE(request.getHeaders().contains("Host"));
+  EXPECT_EQ(request.getBody().size(), 0);
+}
+
 // NOLINTEND
 
 // Main function to run all tests

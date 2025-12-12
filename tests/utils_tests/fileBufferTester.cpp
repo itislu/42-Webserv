@@ -99,6 +99,21 @@ TEST(FileBufferTester, StaticFileBuffer)
   }
 }
 
+TEST(FileBufferTester, Reset)
+{
+  FileBuffer fileBuffer;
+  fileBuffer.append("HelloWorld");
+  fileBuffer.seek(4);
+
+  EXPECT_EQ(fileBuffer.size(), 10);
+  EXPECT_EQ(fileBuffer.pos(), 4);
+
+  fileBuffer.reset();
+
+  EXPECT_EQ(fileBuffer.size(), 0);
+  EXPECT_TRUE(fileBuffer.isEmpty());
+}
+
 // Main function to run all tests
 int main(int argc, char** argv)
 {

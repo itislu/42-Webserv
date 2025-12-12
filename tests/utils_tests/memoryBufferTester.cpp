@@ -68,6 +68,21 @@ TEST(MemoryBufferTester, MoveToFile)
   (void)std::remove(testFilePath.c_str());
 }
 
+TEST(MemoryBufferTester, Reset)
+{
+  MemoryBuffer memoryBuffer;
+  memoryBuffer.append("HelloWorld");
+  memoryBuffer.seek(4);
+
+  EXPECT_EQ(memoryBuffer.size(), 10);
+  EXPECT_EQ(memoryBuffer.pos(), 4);
+
+  memoryBuffer.reset();
+
+  EXPECT_EQ(memoryBuffer.size(), 0);
+  EXPECT_TRUE(memoryBuffer.isEmpty());
+}
+
 // Main function to run all tests
 int main(int argc, char** argv)
 {

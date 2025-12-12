@@ -79,6 +79,22 @@ TEST(SmartBufferTester, SwitchToFile)
     EXPECT_EQ(smartBuffer.size(), 3);
   }
 }
+
+TEST(SmartBufferTester, Reset)
+{
+  SmartBufferTest::setMemoryToFileThreshold(5);
+  SmartBufferTest smartBuffer;
+
+  smartBuffer.append("HelloWorld");
+  EXPECT_TRUE(smartBuffer.usesFile());
+  EXPECT_EQ(smartBuffer.size(), 10);
+
+  smartBuffer.reset();
+
+  EXPECT_FALSE(smartBuffer.usesFile());
+  EXPECT_EQ(smartBuffer.size(), 0);
+  EXPECT_TRUE(smartBuffer.isEmpty());
+}
 // NOLINTEND(readability-magic-numbers)
 
 // Main function to run all tests
