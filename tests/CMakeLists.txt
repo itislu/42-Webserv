@@ -142,3 +142,8 @@ add_my_test(configParserTester
 add_my_test(locationMatchTester
   ${CMAKE_CURRENT_SOURCE_DIR}/locations/locationMatchTester.cpp
 )
+
+# validateRequest
+add_my_test(validateRequestTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/validateRequestTester.cpp
+)
