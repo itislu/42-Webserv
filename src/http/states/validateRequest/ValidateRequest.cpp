@@ -361,12 +361,9 @@ void ValidateRequest::_validateHost()
       return;
     }
   } else {
-    std::string uriPort =
+    const std::string& uriPort =
       _client->getRequest().getUri().getAuthority().getPort();
     if (!uriPort.empty()) {
-      if (ft::starts_with(uriPort, ':')) {
-        uriPort = uriPort.substr(1);
-      }
       hostPort = config::convert::toPort(uriPort);
     }
   }
