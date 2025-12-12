@@ -12,11 +12,11 @@ class Resource
 public:
   enum Type
   {
+    Undefined,
     File,
     Autoindex,
     Cgi,
-    Error,
-    Undefined
+    Error
   };
 
   Resource();

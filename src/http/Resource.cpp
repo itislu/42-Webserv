@@ -72,6 +72,8 @@ ft::optional<std::string> Resource::getErrorPage(int code) const
 std::string Resource::_typeToString()
 {
   switch (_type) {
+    case Undefined:
+      return "Undefined";
     case File:
       return "File";
     case Autoindex:
@@ -80,8 +82,6 @@ std::string Resource::_typeToString()
       return "Cgi";
     case Error:
       return "Error";
-    case Undefined:
-      return "Undefined";
   }
   FT_UNREACHABLE();
 }
