@@ -376,8 +376,6 @@ void ValidateRequest::_validateHost()
     endState(StatusCode::MisdirectedRequest);
     return;
   }
-
-  _host = ft::to_lower(_host);
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
