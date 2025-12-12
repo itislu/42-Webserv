@@ -337,31 +337,43 @@ void ValidateRequest::endState(StatusCode::Code status)
 void ValidateRequest::_validateHost()
 {
   std::string hostHeader;
-
   const Headers& headers = _client->getRequest().getHeaders();
+
   if (headers.contains("host")) {
     hostHeader = headers.at("host");
   }
+
   // HTTP 1.1 MUST have a host header
-  if (_client->getRequest().getVersion() == http::HTTP_1_1 &&
-      hostHeader.empty()) {
+  if (_client->getRequest().getVersion() == http::HTTP_1_1 && hostHeader.empty()) {
     endState(StatusCode::BadRequest);
     return;
   }
 
+  int hostPort = -1;
   _host = _client->getRequest().getUri().getAuthority().getHost();
   if (_host.empty()) {
-    int port = -1;
-    _splitHostHeader(hostHeader, port);
-    // TODO: validate this is a necessary check
-    if (port != -1) {
-      const Socket* const socket = _client->getSocket();
-      if (socket->getPort() != port) {
-        endState(StatusCode::BadRequest);
-        return;
-      }
+    if (!hostHeader.empty()) {
+      _splitHostHeader(hostHeader, hostPort);
+    } else {
+      // HTTP/1.0 with no Host-Header or URI-host
+      // endState(StatusCode::BadRequest); depends on how we want to implent it
+      return;
+    }
+  } else {
+    std::string uriPort = _client->getRequest().getUri().getAuthority().getPort();
+    if (!uriPort.empty())
+    {
+      hostPort = config::convert::toPort(_client->getRequest().getUri().getAuthority().getPort());
     }
   }
+
+  const Socket* const socket = _client->getSocket();
+  int port = (hostPort == -1) ? 80 : hostPort;
+  if (socket->getPort() != port) {
+    endState(StatusCode::BadRequest);
+    return;
+  }
+
   _host = ft::to_lower(_host);
 }
 
