@@ -10,6 +10,7 @@ namespace http {
 extern const char* const CRLF;
 extern const char* const HTTP_1_0;
 extern const char* const HTTP_1_1;
+extern const char* const HTTP_2_0;
 
 bool isSchemeChar(char chr);
 bool isAuthChar(char chr);
