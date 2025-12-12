@@ -97,9 +97,7 @@ const Server* ServerManager::getServerByHost(const Socket* socket,
                                              const std::string& host) const
 {
   const const_SockToServIter iter = _socketToServers.find(socket);
-  if (iter == _socketToServers.end()) {
-    return FT_NULLPTR; // this should never happen
-  }
+  assert(iter != _socketToServers.end());
   const std::vector<const Server*>& servers = iter->second;
   for (std::size_t i = 0; i < servers.size(); ++i) {
     const std::vector<std::string>& serverNames = servers[i]->getHostnames();
