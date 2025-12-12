@@ -15,8 +15,6 @@
 #include "server/ServerManager.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
-#include <exception>
-#include <iostream>
 #include <string>
 
 #include <gtest/gtest.h>
