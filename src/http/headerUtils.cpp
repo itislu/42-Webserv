@@ -40,26 +40,26 @@ void setContentTypeHeader(Headers& headers, const std::string& filePath)
  *
  * #element => [ element ] *( OWS "," OWS [ element ] )
  *
- * - removes whitespace
+ * - trims whitespace from elements
  */
 std::vector<std::string> convertHeaderList(const std::string& rawList)
 {
   std::vector<std::string> result;
 
-  std::string token;
+  std::size_t tokenStart = 0;
   for (std::size_t i = 0; i < rawList.size(); ++i) {
     if (rawList[i] == ',') {
+      std::string token = rawList.substr(tokenStart, i - tokenStart);
       ft::trim(token);
       if (!token.empty()) {
         result.push_back(token);
-        token.clear();
       }
-    } else {
-      token += rawList[i];
+      tokenStart = i + 1;
     }
   }
 
-  ft::trim(token);
+  // Handle the last token after the last comma
+  const std::string token = ft::trim(rawList.substr(tokenStart));
   if (!token.empty()) {
     result.push_back(token);
   }

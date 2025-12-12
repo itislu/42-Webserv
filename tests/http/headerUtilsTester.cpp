@@ -7,16 +7,16 @@
 TEST(HeaderUtilsTester, ConvertHeaderList)
 {
   // 2 elements
-  std::vector<std::string> output = { "e1", "e2" };
-  EXPECT_EQ(convertHeaderList("e1, e2"), output);
-  EXPECT_EQ(convertHeaderList("e1, e2 , , , "), output);
-  EXPECT_EQ(convertHeaderList(", , , e1, e2 , , , "), output);
-  EXPECT_EQ(convertHeaderList(",e1,e2,"), output);
-  EXPECT_EQ(convertHeaderList("e1,e2,"), output);
+  std::vector<std::string> expectedResult = { "e1", "e2" };
+  EXPECT_EQ(convertHeaderList("e1, e2"), expectedResult);
+  EXPECT_EQ(convertHeaderList("e1, e2 , , , "), expectedResult);
+  EXPECT_EQ(convertHeaderList(", , , e1, e2 , , , "), expectedResult);
+  EXPECT_EQ(convertHeaderList(",e1,e2,"), expectedResult);
+  EXPECT_EQ(convertHeaderList("e1,e2,"), expectedResult);
 
   // 3 elements
-  output = { "e1", "e2", "e  3" };
-  EXPECT_EQ(convertHeaderList("e1,e2,e  3, ,"), output);
+  expectedResult = { "e1", "e2", "e  3" };
+  EXPECT_EQ(convertHeaderList("e1,e2,e  3, ,"), expectedResult);
 
   // empty
   EXPECT_EQ(convertHeaderList(",,,,"), std::vector<std::string>());

@@ -156,8 +156,8 @@ void ReadBody::_validateTransferEncoding()
     return;
   }
 
-  const std::string finalEncondig = ft::to_lower(elements.back());
-  if (finalEncondig != "chunked") {
+  const std::string finalEncoding = ft::to_lower(elements.back());
+  if (finalEncoding != "chunked") {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     _log.error() << "ReadBody: chunked is not final encoding\n";
     return;
