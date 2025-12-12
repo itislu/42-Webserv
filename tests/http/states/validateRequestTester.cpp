@@ -2,6 +2,7 @@
 // NOLINTBEGIN
 
 #include "client/Client.hpp"
+#include "event/EventManager.hpp"
 #include "http/Resource.hpp"
 #include "http/Response.hpp"
 #include "http/StatusCode.hpp"
@@ -15,9 +16,11 @@
 #include "server/ServerManager.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
+#include <iostream>
 #include <string>
 
 #include <gtest/gtest.h>
+#include <unistd.h>
 
 #ifndef ROOT
 #define ROOT "./assets/testWebsite/"
@@ -54,6 +57,18 @@ ft::unique_ptr<Client> requestTest(std::string& rawBuffer, int connection)
 // Hostheader Tests
 // =================================================================
 
+TEST(ValidateRequestTester, ValidHostHeader)
+{
+  std::string line("GET http://serv01:8080/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Resource& source = client->getResource();
+  std::string result = std::string(ROOT) + "serv01.html";
+
+  EXPECT_EQ(source.getPath(), result);
+}
+
 TEST(ValidateRequestTester, HostheaderMissingInHttp1_1)
 {
   std::string line("GET http://localhost:8080/ HTTP/1.1\r\n\r\n");
@@ -72,6 +87,67 @@ TEST(ValidateRequestTester, HostHeaderNoUriHost)
 
   Resource& source = client->getResource();
   std::string result = std::string(ROOT) + "index.html";
+
+  EXPECT_EQ(source.getPath(), result);
+}
+
+TEST(ValidateRequestTester, UriHostHasPrio)
+{
+  std::string line("GET http://serv01:8080/ HTTP/1.1\r\nHost: serv02\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Resource& source = client->getResource();
+  std::string result = std::string(ROOT) + "serv01.html";
+
+  EXPECT_EQ(source.getPath(), result);
+}
+
+TEST(ValidateRequestTester, UriHostHasPrio02)
+{
+  std::string line("GET http://serv02:8080/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Resource& source = client->getResource();
+  std::string result = std::string(ROOT) + "serv02.html";
+
+  EXPECT_EQ(source.getPath(), result);
+}
+
+TEST(ValidateRequestTester, UriHostHasPrio03)
+{
+  std::string line(
+    "GET http://localhost:8080/ HTTP/1.1\r\nHost: SomeOtherHost\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Resource& source = client->getResource();
+  std::string result = std::string(ROOT) + "serv01.html";
+
+  EXPECT_EQ(source.getPath(), result);
+}
+
+TEST(ValidateRequestTester, SlashInHostHeader)
+{
+  std::string line(
+    "GET http://serv02:8080/ HTTP/1.1\r\nHost: serv02/alarm\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, MatchCaseInsensitive)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: SERV02\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Resource& source = client->getResource();
+  std::string result = std::string(ROOT) + "serv02.html";
 
   EXPECT_EQ(source.getPath(), result);
 }
@@ -198,11 +274,15 @@ TEST(ValidateRequestTester, DecodeOnlyOneHex)
 // ss -tulpn | grep 8080
 int main(int argc, char** argv)
 {
+  if (chdir("../../../") == -1) {
+    std::cerr << "Failed to change directory to project root\n";
+    return 1;
+  }
+
   const std::string configPath =
     std::string(ASSETS_PATH) + "valid/validateRequest.conf";
   ConfigParser parser(configPath.c_str());
   parser.parseConfig();
-  ServerManager::getInstance();
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
