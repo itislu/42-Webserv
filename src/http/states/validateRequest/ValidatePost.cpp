@@ -38,8 +38,6 @@ void ValidatePost::run()
 
 void ValidatePost::validate()
 {
-  /* TODO: check order/codes of validations - with testing */
-
   if (_location != FT_NULLPTR && _location->isCgi()) {
     validateCGI();
     return;
@@ -51,6 +49,7 @@ void ValidatePost::validate()
 void ValidatePost::validateCGI()
 {
   _client->getResource().setType(Resource::Cgi);
+
   if (isDirectory(_path)) {
     endState(StatusCode::Forbidden);
     return;
@@ -63,34 +62,26 @@ void ValidatePost::validateCGI()
     endState(StatusCode::Forbidden);
     return;
   }
-  /* TODO: CGI Post doesn't need write permission? */
-  validateParentDirPermissions();
+  endState(StatusCode::Ok);
 }
 
 void ValidatePost::validateStaticPost()
 {
-  validateParentDirPermissions();
-}
+  if (isDirectory(_path)) {
+    if (!isWriteable(_path) || !isExecuteable(_path)) {
+      endState(StatusCode::Forbidden);
+      return;
+    }
+    endState(StatusCode::Ok);
+    return;
+  }
 
-void ValidatePost::validateParentDirPermissions()
-{
-  std::string dirPath = _path.substr(0, _path.find_last_of('/'));
-  if (dirPath.empty()) {
-    dirPath = "/";
-  }
-  if (!isDirectory(dirPath)) {
+  if (isFile(_path)) {
+    // Target exists but is a file. Method not allowed?
+    endState(StatusCode::MethodNotAllowed);
+  } else {
     endState(StatusCode::NotFound);
-    return;
   }
-  if (!isExecuteable(dirPath)) {
-    endState(StatusCode::NotFound);
-    return;
-  }
-  if (!isWriteable(dirPath)) {
-    endState(StatusCode::Forbidden);
-    return;
-  }
-  endState(StatusCode::Ok);
 }
 
 void ValidatePost::endState(StatusCode::Code status)
