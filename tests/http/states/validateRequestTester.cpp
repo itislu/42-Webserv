@@ -282,9 +282,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-    std::string configPath = std::string(ASSETS_PATH) + "valid/validateRequest.conf";
-    std::cout << "[DEBUG] Attempting to open: " << configPath << std::endl;
-
+    const std::string configPath = std::string(ASSETS_PATH) + "valid/validateRequest.conf";
     ConfigParser parser(configPath.c_str());
   parser.parseConfig();
 
