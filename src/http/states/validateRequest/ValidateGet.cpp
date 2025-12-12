@@ -47,6 +47,7 @@ void ValidateGet::validate()
     validateDirectory();
     return;
   }
+  _log.info() << "path not found\n";
   endState(StatusCode::NotFound);
 }
 
