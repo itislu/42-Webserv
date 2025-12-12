@@ -5,6 +5,7 @@
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/headerRules.hpp>
 #include <http/abnfRules/ruleUtils.hpp>
+#include <http/http.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
@@ -100,7 +101,7 @@ void RequestHeaderValidator::_validateTransferEncoding(const std::string& value)
     return;
   }
 
-  if (_client->getRequest().getVersion() == "HTTP/1.0") {
+  if (_client->getRequest().getVersion() == http::HTTP_1_0) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     _client->setCloseConnection(true);
     _log.error() << "RequestHeaderValidator: has Transfer-Encoding with "

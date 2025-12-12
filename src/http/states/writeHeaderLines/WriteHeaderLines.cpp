@@ -1,10 +1,11 @@
 #include "WriteHeaderLines.hpp"
-#include "http/headerUtils.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
+#include <http/headerUtils.hpp>
 #include <http/http.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
@@ -78,6 +79,9 @@ std::string WriteHeaderLines::_makeHttpDate()
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#name-persistence
+ */
 void WriteHeaderLines::_setConnectionHeader()
 {
   Request& request = _client->getRequest();
@@ -101,15 +105,15 @@ void WriteHeaderLines::_setConnectionHeader()
     return;
   }
 
-  // HTTP/1.1 -> connection persist
-  if (request.getVersion() == "HTTP/1.1") {
-    headers.setHeader(header::connection, "keep-alive");
+  // HTTP/1.1 (or later) -> connection persist
+  if (request.getVersion() >= http::HTTP_1_1) {
+    headers.addHeader("Connection", "keep-alive");
     return;
   }
 
   // HTTP/1.0 + keep-alive -> connection persist
-  if (request.getVersion() == "HTTP/1.0" && conn == "keep-alive") {
-    headers.setHeader(header::connection, "keep-alive");
+  if (request.getVersion() == http::HTTP_1_0 && conn == "keep-alive") {
+    headers.addHeader("Connection", "keep-alive");
     return;
   }
 
