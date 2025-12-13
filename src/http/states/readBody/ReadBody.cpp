@@ -8,9 +8,9 @@
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/http11Rules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
+#include <http/headerUtils.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/utils/HeaderParser.hpp>
-#include <libftpp/algorithm.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
 #include <utils/abnfRules/Extractor.hpp>
@@ -29,6 +29,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 /* ************************************************************************** */
 // INIT
@@ -114,7 +115,7 @@ Extractor<ReadBody>& ReadBody::_chunkExtractor()
 void ReadBody::_determineBodyFraming()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  const bool hasTransferEncoding = headers.contains("Transfer-Encoding");
+  const bool hasTransferEncoding = headers.contains(header::transferEncoding);
   const bool hasContentLength = headers.contains("Content-Length");
   if (hasContentLength) {
     _validateContentLength();
@@ -147,13 +148,38 @@ void ReadBody::_validateContentLength()
 void ReadBody::_validateTransferEncoding()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  const std::string& value = headers.at("Transfer-Encoding");
-  const std::string valueLower = ft::to_lower(value);
-  if (!ft::contains_subrange(valueLower, std::string("chunked"))) {
+  std::vector<std::string> elements =
+    convertHeaderList(headers.at(header::transferEncoding));
+  if (elements.empty()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: transfer encoding unsupported\n";
+    _log.error() << "ReadBody: Transfer-Encoding invalid\n";
     return;
   }
+
+  const std::string finalEncoding = ft::to_lower(elements.back());
+  if (finalEncoding != "chunked") {
+    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _log.error() << "ReadBody: chunked is not final encoding\n";
+    return;
+  }
+
+  std::size_t chunkedCount = 0;
+  for (std::size_t i = 0; i < elements.size(); ++i) {
+    std::string& encoding = elements[i];
+    if (ft::to_lower(encoding) == "chunked") {
+      ++chunkedCount;
+    } else {
+      _client->getResponse().setStatusCode(StatusCode::NotImplemented);
+      _log.error() << "ReadBody: encoding not implemented\n";
+      return;
+    }
+    if (chunkedCount > 1) {
+      _client->getResponse().setStatusCode(StatusCode::BadRequest);
+      _log.error() << "ReadBody: multiple chunked encoding\n";
+      return;
+    }
+  }
+
   _chunkedBody = true;
 }
 

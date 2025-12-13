@@ -5,6 +5,7 @@
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/headerRules.hpp>
 #include <http/abnfRules/ruleUtils.hpp>
+#include <http/headerUtils.hpp>
 #include <http/http.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/memory.hpp>
@@ -77,7 +78,7 @@ void RequestHeaderValidator::_validateHost(const std::string& value)
 
 void RequestHeaderValidator::_validateContentLength(const std::string& value)
 {
-  const bool hasTransferEncoding = _headers->contains("Transfer-Encoding");
+  const bool hasTransferEncoding = _headers->contains(header::transferEncoding);
   if (hasTransferEncoding) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
     _closeConnection = true;
