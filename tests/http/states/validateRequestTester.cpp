@@ -77,6 +77,16 @@ TEST(ValidateRequestTester, HostheaderMissingInHttp1_1)
   EXPECT_EQ(res.getStatusCode(), StatusCode::BadRequest);
 }
 
+TEST(ValidateRequestTester, HostheaderMissingInHttp1_9)
+{
+  std::string line("GET http://localhost:8080/ HTTP/1.9\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& res = client->getResponse();
+  EXPECT_EQ(res.getStatusCode(), StatusCode::BadRequest);
+}
+
 TEST(ValidateRequestTester, HostHeaderNoUriHost)
 {
   std::string line("GET /index.html HTTP/1.1\r\nHost: localhost:8080\r\n\r\n");
@@ -150,6 +160,50 @@ TEST(ValidateRequestTester, MatchCaseInsensitive)
   std::string result = std::string(ROOT) + "serv02.html";
 
   EXPECT_EQ(source.getPath(), result);
+}
+
+TEST(ValidateRequestTester, PortMismatchUriHost)
+{
+  std::string line("GET http://serv01:8081/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
+}
+
+TEST(ValidateRequestTester, PortMismatchHostHeader)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01:8081\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
+}
+
+TEST(ValidateRequestTester, PortMismatchDefaultPortAbsoluteForm)
+{
+  std::string line("GET http://serv01/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080); // Not 80.
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
+}
+
+TEST(ValidateRequestTester, PortMismatchDefaultPortOriginForm)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080); // Not 80.
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
 }
 
 // =================================================================
