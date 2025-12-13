@@ -1,4 +1,5 @@
 #include "EventManager.hpp"
+#include "socket/Socket.hpp"
 
 #include <client/Client.hpp>
 #include <client/ClientManager.hpp>
@@ -139,8 +140,9 @@ void EventManager::acceptClient(int fdes, const unsigned events)
 
   const int clientFd = _socketManager().acceptClient(fdes);
   if (clientFd > 0) {
-    const Server* const server = _serverManager().getInitServer(fdes);
-    _clientManager().addClient(clientFd, server);
+    const Socket& socket = SocketManager::getInstance().getSocket(fdes);
+    const Server* const server = _serverManager().getInitServer(socket);
+    _clientManager().addClient(clientFd, server, socket);
     std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
   } else {
     std::cerr << "[SERVER] accepting new client failed\n";
