@@ -1,6 +1,3 @@
-
-// NOLINTBEGIN
-
 #include "client/Client.hpp"
 #include "event/EventManager.hpp"
 #include "http/Resource.hpp"
@@ -16,7 +13,6 @@
 #include "server/ServerManager.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
-#include <iostream>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -25,6 +21,8 @@
 #ifndef ROOT
 #define ROOT "./assets/testWebsite/"
 #endif
+
+// NOLINTBEGIN
 
 namespace {
 
@@ -274,9 +272,6 @@ TEST(ValidateRequestTester, DecodeOnlyOneHex)
 
 // Main function to run all tests
 // ss -tulpn | grep 8080
-#include <limits.h> // For PATH_MAX
-#include <unistd.h>
-
 int main(int argc, char** argv)
 {
   if (chdir(PROJECT_ROOT) == -1) {
