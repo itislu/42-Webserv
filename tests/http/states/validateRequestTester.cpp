@@ -205,6 +205,50 @@ TEST(ValidateRequestTester, PortMismatchDefaultPortOriginForm)
   EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
 }
 
+TEST(ValidateRequestTester, PortTooHighUriHost)
+{
+  std::string line("GET http://serv01:65536/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, PortTooHighHostHeader)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01:65536\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, PortZeroUriHost)
+{
+  std::string line("GET http://serv01:0/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, PortZeroHostHeader)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01:0\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
 // =================================================================
 // Append Root Tests
 // =================================================================
