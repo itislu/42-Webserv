@@ -6,7 +6,6 @@
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <libftpp/string.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -68,12 +67,8 @@ std::string HandlePost::_getFileName(const std::string& directory)
 
 void HandlePost::_createData()
 {
-  std::string directory = _client->getResource().getPath();
+  const std::string directory = _client->getResource().getPath();
 
-  // todo this should be done in validate request ?
-  if (!ft::ends_with(directory, '/')) {
-    directory.append("/");
-  }
   _log.info() << "HandlePost: " << directory << '\n';
 
   const std::string newFilePath = _getFileName(directory);
