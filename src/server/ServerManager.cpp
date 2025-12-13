@@ -154,10 +154,13 @@ void ServerManager::run()
       std::cout << "poll: timeout\n";
     }
     if (res < 0) {
-      if (errno != EINTR) {
+      if (errno == EINTR) {
+        // ok interupted by singnal;
+      } else {
         error("poll: failed");
+        std::cerr << "exit: poll failed\n";
+        break;
       }
-      break;
     }
     eventManager.checkTimeouts();
     if (g_childDied == 1) {

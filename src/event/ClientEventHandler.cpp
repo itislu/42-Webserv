@@ -72,8 +72,10 @@ ClientEventHandler::Result ClientEventHandler::onTimeout()
     return Disconnect;
   }
 
-  const CgiContext& cgi = *_client->getCgiContext();
-  if (cgi.timeoutRead() && cgi.timeoutWrite()) {
+  CgiContext& cgi = *_client->getCgiContext();
+  const bool writeDone = cgi.getShExecCgi().isDone();
+  const bool readDone = cgi.getShProcessCgiResponse().isDone();
+  if ((writeDone || cgi.timeoutWrite()) && (readDone || cgi.timeoutRead())) {
     _log.info() << "ClientEventHandler: onTimeout kill child\n";
     ChildProcessManager::getInstance().killChild(cgi.getChildPid());
     return Disconnect;

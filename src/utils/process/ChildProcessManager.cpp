@@ -1,5 +1,6 @@
 #include "ChildProcessManager.hpp"
 
+#include <csignal>
 #include <utils/logger/Logger.hpp>
 
 #include <algorithm>
@@ -29,6 +30,7 @@ ChildProcessManager::ChildProcessManager() {}
 
 ChildProcessManager::~ChildProcessManager()
 {
+  _log.info() << "ChildProcessManager ends\n";
   for (std::vector<pid_t>::iterator it = _childs.begin(); it != _childs.end();
        ++it) {
     ::kill(*it, SIGTERM);
@@ -49,8 +51,9 @@ void ChildProcessManager::collectChilds()
       // child still alive
     } else if (result == pid) {
       if (WIFEXITED(status)) {
-        _log.info() << "Child(" << pid << ") collected, ";
-        _log.info() << "Exit code: " << WEXITSTATUS(status) << "\n";
+        _log.info() << "Child(" << pid
+                    << ") collected, Exit code: " << WEXITSTATUS(status)
+                    << "\n";
       }
       remove = true;
     } else {
@@ -103,8 +106,7 @@ void ChildProcessManager::killChild(pid_t pid)
   const std::vector<pid_t>::const_iterator iter =
     std::find(_childs.begin(), _childs.end(), pid);
   if (iter != _childs.end()) {
-    ::kill(pid, SIGTERM);
     _log.info() << "Child(" << pid << ") killed\n";
-    _childs.erase(iter);
+    ::kill(pid, SIGKILL);
   }
 }

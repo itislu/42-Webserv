@@ -131,6 +131,7 @@ void ExecuteCgi::_executeScript()
   }
   if (pid == 0) {
     _handleChild();
+    _exit(1);
   }
 
   _log.info() << "Run cgi script\n";
