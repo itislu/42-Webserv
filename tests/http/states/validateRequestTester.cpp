@@ -1,28 +1,27 @@
-#include "client/Client.hpp"
-#include "event/EventManager.hpp"
-#include "http/Resource.hpp"
-#include "http/Response.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/readRequestLine/ReadRequestLine.hpp"
-#include "http/states/validateRequest/ValidateRequest.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
+#include <client/Client.hpp>
 #include <config/parser/ConfigParser.hpp>
-
-#include "server/Server.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/Socket.hpp"
-#include "socket/SocketManager.hpp"
-#include <string>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <server/ServerManager.hpp>
+#include <socket/Socket.hpp>
+#include <socket/SocketManager.hpp>
 
 #include <gtest/gtest.h>
+#include <iostream>
+#include <string>
 #include <unistd.h>
+
+// NOLINTBEGIN
 
 #ifndef ROOT
 #define ROOT "./assets/testWebsite/"
 #endif
-
-// NOLINTBEGIN
 
 namespace {
 

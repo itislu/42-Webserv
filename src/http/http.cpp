@@ -4,6 +4,7 @@
 #include <libftpp/ctype.hpp>
 
 #include <map>
+#include <netinet/in.h>
 #include <string>
 
 namespace http {
@@ -23,6 +24,7 @@ const char* const CRLF = "\r\n";
 const char* const HTTP_1_0 = "HTTP/1.0";
 const char* const HTTP_1_1 = "HTTP/1.1";
 const char* const HTTP_2_0 = "HTTP/2.0";
+const in_port_t httpPort = 80;
 
 /**
  * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
