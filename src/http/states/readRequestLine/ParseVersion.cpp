@@ -1,15 +1,14 @@
 #include "ParseVersion.hpp"
 
 #include <client/Client.hpp>
-#include <http/Request.hpp>
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
+#include <http/http.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/ctype.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
-#include <utils/BufferReader.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/RangeRule.hpp>
 #include <utils/logger/Logger.hpp>
@@ -65,11 +64,23 @@ void ParseVersion::run()
   }
 }
 
+/**
+ * A recipient that receives a message with a major version number that it
+ * implements and a minor version number higher than what it implements SHOULD
+ * process the message as if it were in the highest minor version within that
+ * major version to which the recipient is conformant.
+ *
+ * https://datatracker.ietf.org/doc/html/rfc9110#section-6.2-8
+ */
 void ParseVersion::_extractVersion()
 {
   const std::size_t index = _buffReader.getPosInBuff();
   std::string version = _client->getInBuff().consumeFront(index);
-  _client->getRequest().setVersion(ft::trim(version));
+  ft::trim(version);
+  if (version > http::HTTP_1_1 && version < http::HTTP_2_0) {
+    version = http::HTTP_1_1;
+  }
+  _client->getRequest().setVersion(version);
 }
 
 /* ************************************************************************** */

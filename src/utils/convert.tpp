@@ -4,10 +4,9 @@
 #include "convert.hpp"
 #endif
 
-#include <libftpp/expected.hpp>
 #include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
 
-#include <new>
 #include <stdexcept>
 #include <string>
 
@@ -15,19 +14,19 @@ namespace utils {
 
 template<typename To>
 To toNumber(const std::string& str)
-{
+try {
   std::string::size_type validChars = 0;
-  const ft::expected<To, ft::from_string_exception> number =
-    ft::from_string<To>(str, std::nothrow, &validChars);
-
-  if (!number.has_value()) {
-    throw std::invalid_argument("invalid number: " + str);
-  }
+  const To number = ft::from_string<To>(str, &validChars);
   if (validChars != str.size()) {
-    throw std::invalid_argument("excess characters after number: " + str);
+    throw std::invalid_argument("excess characters after number: \"" + str +
+                                "\"");
   }
-
-  return *number;
+  return number;
+} catch (const ft::from_string_range_exception& e) {
+  const std::string typeName = ft::demangle(e.type_id());
+  throw std::invalid_argument("number out of range (" + typeName + "): " + str);
+} catch (const ft::from_string_exception&) {
+  throw std::invalid_argument("invalid number: " + str);
 }
 
 } // namespace utils

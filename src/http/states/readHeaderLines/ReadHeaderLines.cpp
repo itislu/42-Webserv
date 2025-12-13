@@ -1,15 +1,12 @@
 #include "ReadHeaderLines.hpp"
 
+#include "RequestHeaderValidator.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
-#include <http/Request.hpp>
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
-#include <http/states/readBody/ReadBody.hpp>
-#include <http/states/readHeaderLines/RequestHeaderValidator.hpp>
 #include <http/states/validateRequest/ValidateRequest.hpp>
-#include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <http/utils/HeaderParser.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
@@ -20,7 +17,7 @@
 
 #include <cstddef>
 
-/* ***************************************************************************/
+/* ************************************************************************** */
 // INIT
 
 Logger& ReadHeaderLines::_log = Logger::getInstance(LOG_HTTP);

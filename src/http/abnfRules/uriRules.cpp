@@ -142,7 +142,6 @@ ft::shared_ptr<SequenceRule> authorityRule()
   userinfoSeq->addRule(userinfoRule());
   userinfoSeq->addRule(ft::make_shared<LiteralRule>("@"));
   userinfoSeq->setDebugTag("userinfoSeq");
-  userinfoSeq->setRuleId(UserInfo);
 
   ft::shared_ptr<RepetitionRule> optUserinfo =
     ft::make_shared<RepetitionRule>(ft::move(userinfoSeq));
@@ -159,7 +158,6 @@ ft::shared_ptr<SequenceRule> authorityRule()
   ft::shared_ptr<SequenceRule> portSeq = ft::make_shared<SequenceRule>();
   portSeq->addRule(ft::make_shared<LiteralRule>(":"));
   portSeq->addRule(portRule());
-  portSeq->setRuleId(Port);
 
   ft::shared_ptr<RepetitionRule> optPort =
     ft::make_shared<RepetitionRule>(ft::move(portSeq));
@@ -187,6 +185,7 @@ ft::shared_ptr<RepetitionRule> userinfoRule()
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::move(alter));
   rep->setDebugTag("userinfoRule");
+  rep->setRuleId(UserInfo);
   return rep;
 }
 
@@ -214,6 +213,7 @@ ft::shared_ptr<RepetitionRule> portRule()
   const ft::shared_ptr<RepetitionRule> rep =
     ft::make_shared<RepetitionRule>(ft::make_shared<RangeRule>(ft::isdigit));
   rep->setDebugTag("portRule");
+  rep->setRuleId(Port);
   return rep;
 }
 

@@ -2,7 +2,7 @@
 #ifndef READ_HEADER_LINES_HPP
 #define READ_HEADER_LINES_HPP
 
-#include <http/states/readHeaderLines/RequestHeaderValidator.hpp>
+#include "RequestHeaderValidator.hpp"
 #include <http/utils/HeaderParser.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>

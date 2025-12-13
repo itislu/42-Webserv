@@ -143,7 +143,7 @@ void Entries<ServerConfig>::setPorts(const std::vector<std::string>& values,
   for (std::size_t i = 0; i < values.size(); ++i) {
     int port = 0;
     try {
-      port = convert::toPort(values[i]);
+      port = utils::toPort(values[i]);
       config.addPort(port);
     } catch (const std::exception& e) {
       throw std::invalid_argument(std::string("listen: invalid argument: ") +

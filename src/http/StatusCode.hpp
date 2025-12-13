@@ -25,6 +25,7 @@ public:
     LengthRequired = 411,
     ContentTooLarge = 413,
     UriTooLong = 414,
+    MisdirectedRequest = 421,
     RequestHeaderFieldsTooLarge = 431,
     InternalServerError = 500,
     NotImplemented = 501,
@@ -45,7 +46,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 16;
+  static const int _codes = 17;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;
