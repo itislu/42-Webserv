@@ -2,7 +2,6 @@
 
 #include "client/Client.hpp"
 #include "config/LocationConfig.hpp"
-#include "config/parser/Converters.hpp"
 #include "http/Headers.hpp"
 #include "http/Request.hpp"
 #include "http/Resource.hpp"
@@ -364,7 +363,7 @@ void ValidateRequest::_validateHost()
       return;
     }
   } catch (const std::invalid_argument&) {
-    // Invalid port reported by config::convert::toPort().
+    // Invalid port reported by utils::toPort().
     endState(StatusCode::BadRequest);
     return;
   }
@@ -385,7 +384,7 @@ void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
     _host = hostHeader.substr(0, pos);
     const std::string portStr = hostHeader.substr(pos + 1);
     if (!portStr.empty()) {
-      port = config::convert::toPort(portStr);
+      port = utils::toPort(portStr);
     }
   } else {
     _host = hostHeader;
@@ -397,7 +396,7 @@ void ValidateRequest::_setPortFromUri(int& port)
   const std::string& uriPort =
     _client->getRequest().getUri().getAuthority().getPort();
   if (!uriPort.empty()) {
-    port = config::convert::toPort(uriPort);
+    port = utils::toPort(uriPort);
   }
 }
 
