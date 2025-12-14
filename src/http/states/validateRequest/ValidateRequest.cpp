@@ -113,6 +113,7 @@ void ValidateRequest::_init()
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
+    return;
   }
   _log.info() << "method is VALID\n";
 
