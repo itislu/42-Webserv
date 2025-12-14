@@ -86,7 +86,7 @@ Logger::Logger(const std::string& filename)
 
 bool Logger::_openFile()
 {
-  if (!_loggerEnabled) {
+  if (!_loggerEnabled || _filename.empty()) {
     if (_file.is_open()) {
       _file.close();
     }
