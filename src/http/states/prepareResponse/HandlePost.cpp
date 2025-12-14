@@ -6,6 +6,7 @@
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
+#include <libftpp/string.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -41,7 +42,7 @@ void HandlePost::_setNextState()
 {
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
 
-  if (statusCode == StatusCode::Ok) {
+  if (statusCode == StatusCode::Ok || statusCode == StatusCode::Created) {
     getContext()->getStateHandler().setDone();
   } else {
     getContext()->getStateHandler().setState<HandleError>();
@@ -67,8 +68,13 @@ std::string HandlePost::_getFileName(const std::string& directory)
 
 void HandlePost::_createData()
 {
-  // todo get path from resource
-  const std::string directory = "./assets/testWebsite/upload/";
+  std::string directory = _client->getResource().getPath();
+
+  // todo this should be done in validate request ?
+  if (!ft::ends_with(directory, '/')) {
+    directory.append("/");
+  }
+  _log.info() << "HandlePost: " << directory << '\n';
 
   const std::string newFilePath = _getFileName(directory);
   _client->getRequest().getBody().moveBufferToFile(newFilePath);

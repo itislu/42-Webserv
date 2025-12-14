@@ -2,6 +2,7 @@
 #ifndef WRITE_HEADER_LINES_HPP
 #define WRITE_HEADER_LINES_HPP
 
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -21,7 +22,10 @@ private:
   static Logger& _log;
   static std::string _makeHttpDate();
 
+  void _setConnectionHeader();
+
   Client* _client;
+  SmartBuffer* _buffer;
 };
 
 #endif

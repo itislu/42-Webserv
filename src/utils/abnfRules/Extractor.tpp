@@ -4,9 +4,10 @@
 #endif
 
 #include <libftpp/optional.hpp>
-#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Rule.hpp>
 #include <utils/abnfRules/RuleResult.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInBuffer.hpp>
 
 #include <cstddef>
 
@@ -23,7 +24,7 @@ Extractor<T>& Extractor<T>::addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr)
 template<typename T>
 void Extractor<T>::run(T& obj,
                        const Rule::ResultMap& resultMap,
-                       IBuffer& buffer) const
+                       IInBuffer& buffer) const
 {
   for (typename Setters::const_iterator setterIter = _setters.begin();
        setterIter != _setters.end();
@@ -46,7 +47,7 @@ void Extractor<T>::run(T& obj,
 template<typename T>
 typename Extractor<T>::OptionStr Extractor<T>::_getString(
   const RuleResult& result,
-  IBuffer& buffer)
+  IInBuffer& buffer)
 {
   const std::size_t start = result.getStart();
   const std::size_t end = result.getEnd();

@@ -18,7 +18,9 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
       { Created, "Created" },
       { BadRequest, "Bad Request" },
       { Unauthorized, "Unauthorized" },
+      { Forbidden, "Forbidden" },
       { NotFound, "Not Found" },
+      { MethodNotAllowed, "Method Not Allowed" },
       { NotAcceptable, "Not Acceptable" },
       { RequestTimeout, "Request Timeout" },
       { LengthRequired, "Length Required" },
@@ -26,8 +28,8 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
       { UriTooLong, "URI Too Long" },
       { RequestHeaderFieldsTooLarge, "Request Header Fields Too Large" },
       { InternalServerError, "Internal Server Error" },
-      { NotImplemented, "Not Implemented" } }
-
+      { NotImplemented, "Not Implemented" },
+      { HttpVersionNotSupported, "HTTP Version Not Supported" } }
   };
 
 /* ***************************************************************************/

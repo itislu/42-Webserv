@@ -1,5 +1,5 @@
-#include "utils/SmartBuffer.hpp"
 #include "utils/abnfRules/RepetitionRule.hpp"
+#include "utils/buffer/SmartBuffer.hpp"
 #include <http/abnfRules/http11Rules.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/BufferReader.hpp>
@@ -31,7 +31,8 @@ bool runParser(const std::string& str, Rule& rule)
   }
   return matches;
 }
-}
+
+} // namespace
 
 /**
  * origin-form = absolute-path [ "?" query ]
@@ -156,6 +157,20 @@ TEST(Http11RulesTester, ChunkSize)
 {
   const ft::shared_ptr<RepetitionRule> rule = chunkSizeRule();
   EXPECT_TRUE(runParser("FF", *rule));
+  EXPECT_TRUE(runParser("0", *rule));
+  EXPECT_TRUE(runParser("ABCDEFabcdef0123456789", *rule));
+
+  // Invalid: non-hex
+  EXPECT_FALSE(runParser("G", *rule));
+  EXPECT_FALSE(runParser("0G", *rule));
+  EXPECT_FALSE(runParser("1G2", *rule));
+  EXPECT_FALSE(runParser("XYZ", *rule));
+
+  // Invalid: non-ASCII
+  EXPECT_FALSE(runParser("\x80", *rule));
+  EXPECT_FALSE(runParser("\xFF", *rule));
+  EXPECT_FALSE(runParser("A\x80", *rule));
+  EXPECT_FALSE(runParser("\xC0", *rule));
 }
 
 // Main function to run all tests

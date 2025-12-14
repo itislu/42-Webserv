@@ -8,6 +8,7 @@
 #include <utils/state/IState.hpp>
 
 #include <cstdio>
+#include <string>
 
 /* ************************************************************************** */
 // INIT
@@ -46,9 +47,8 @@ void HandleDelete::_setNextState()
 
 void HandleDelete::_deleteFile()
 {
-  return; // todo get file from resource
-  const char* const filepath = "";
-  const int res = std::remove(filepath);
+  const std::string filepath = _client->getResource().getPath();
+  const int res = std::remove(filepath.c_str());
   if (res != 0) {
     _client->getResponse().setStatusCode(StatusCode::InternalServerError);
     _log.error() << "HandleDelete failed to delete file\n";

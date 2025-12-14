@@ -47,7 +47,7 @@
     <h1>Post Tests</h1>
     <p>This page allows you to upload a file for POST testing.</p>
 
-    <form action="/post" method="POST" enctype="multipart/form-data">
+    <form action="/upload" method="POST" enctype="multipart/form-data">
       <input type="file" name="testFile" required />
       <br />
       <button type="submit">Upload File</button>
@@ -66,7 +66,7 @@
   function sendRaw() {
     const text = document.getElementById("rawInput").value;
 
-    fetch("/post", {
+    fetch("/upload", {
       method: "POST",
       headers: {
         "Content-Type": "text/plain",

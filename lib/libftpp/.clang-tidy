@@ -29,6 +29,7 @@ Checks:
     -cppcoreguidelines-avoid-magic-numbers,
     -cppcoreguidelines-c-copy-assignment-signature,
     -cppcoreguidelines-non-private-member-variables-in-classes,
+    -hicpp-avoid-c-arrays,
     -hicpp-avoid-goto,
     -hicpp-braces-around-statements,
     -hicpp-deprecated-headers,
@@ -41,6 +42,7 @@ Checks:
     -hicpp-use-auto,
     -hicpp-use-equals-delete,
     -hicpp-use-nullptr,
+    -hicpp-vararg,
 
 CheckOptions:
   - key: bugprone-empty-catch.IgnoreCatchWithKeywords

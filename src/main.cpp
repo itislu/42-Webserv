@@ -1,7 +1,7 @@
-#include "config/Config.hpp"
-#include "config/ConfigParser.hpp"
-#include "config/ServerConfig.hpp"
-#include "server/ServerManager.hpp"
+#include <config/Config.hpp>
+#include <config/ServerConfig.hpp>
+#include <config/parser/ConfigParser.hpp>
+#include <server/ServerManager.hpp>
 #include <utils/logger/Logger.hpp>
 
 #include <exception>
@@ -17,15 +17,14 @@ int main(int argc, char* argv[])
   }
 
   try {
-
     Logger::getInstance(LOG_GENERAL).info() << "webserv started\n";
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    const config::Config config = config::ConfigParser(argv[1]).parseConfig();
-    std::cout << config;
+    config::ConfigParser(argv[1]).parseConfig();
+    std::cout << Config::getConfig();
 
-    ServerManager serverManager(config);
-    serverManager.run();
+    ServerManager::getInstance();
+    ServerManager::run();
 
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";

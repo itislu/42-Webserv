@@ -1,32 +1,35 @@
 #include "ReadBody.hpp"
 
-#include "libftpp/utility.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
-#include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/http11Rules.hpp>
 #include <http/abnfRules/ruleIds.hpp>
+#include <http/headerUtils.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
-#include <libftpp/algorithm.hpp>
+#include <http/utils/HeaderParser.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
-#include <utils/IBuffer.hpp>
 #include <utils/abnfRules/Extractor.hpp>
+#include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
-#include <utils/abnfRules/RuleResult.hpp>
 #include <utils/abnfRules/SequenceRule.hpp>
+#include <utils/buffer/IBuffer.hpp>
+#include <utils/buffer/IInOutBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 /* ************************************************************************** */
 // INIT
@@ -48,21 +51,19 @@ ReadBody::ReadBody(Client* context)
   , _chunkedBody(false)
   , _done(false)
 {
-  _log.info() << "ReadBody\n";
+  _log.info() << *_client << " ReadBody\n";
 
   _determineBodyFraming();
   _buffReader.init(&_client->getInBuff());
   _chunkInfoRule().setBufferReader(&_buffReader);
   _endOfLineRule().setBufferReader(&_buffReader);
-  _fieldLineRule().setBufferReader(&_buffReader);
 
   _chunkInfoRule().setResultMap(&_results);
   _endOfLineRule().setResultMap(&_results);
-  _fieldLineRule().setResultMap(&_results);
 }
 
 void ReadBody::run()
-{
+try {
   if (_fixedLengthBody) {
     _readFixedLengthBody();
   } else if (_chunkedBody) {
@@ -72,6 +73,10 @@ void ReadBody::run()
   if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
     getContext()->getStateHandler().setState<PrepareResponse>();
   }
+} catch (const std::exception& e) {
+  _log.error() << *_client << " ReadBody: " << e.what() << "\n";
+  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
+  getContext()->getStateHandler().setState<PrepareResponse>();
 }
 
 /* ************************************************************************** */
@@ -85,38 +90,14 @@ void ReadBody::run()
  */
 SequenceRule& ReadBody::_chunkInfoRule()
 {
-  static SequenceRule rule;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    rule.addRule(chunkInfoRule());
-  }
-  return rule;
+  static const ft::shared_ptr<SequenceRule> rule = chunkInfoRule();
+  return *rule;
 }
 
-SequenceRule& ReadBody::_endOfLineRule()
+LiteralRule& ReadBody::_endOfLineRule()
 {
-  static SequenceRule rule;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    rule.addRule(endOfLineRule());
-  }
-  return rule;
-}
-
-/**
- * field-line CRLF
- */
-SequenceRule& ReadBody::_fieldLineRule()
-{
-  static SequenceRule rule;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    rule.addRule(fieldLinePartRule());
-  }
-  return rule;
+  static const ft::shared_ptr<LiteralRule> rule = endOfLineRule();
+  return *rule;
 }
 
 Extractor<ReadBody>& ReadBody::_chunkExtractor()
@@ -131,14 +112,8 @@ Extractor<ReadBody>& ReadBody::_chunkExtractor()
 void ReadBody::_determineBodyFraming()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  const bool hasTransferEncoding = headers.contains("Transfer-Encoding");
+  const bool hasTransferEncoding = headers.contains(header::transferEncoding);
   const bool hasContentLength = headers.contains("Content-Length");
-  // todo add grammar rules for these headers
-  if (hasContentLength && hasTransferEncoding) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: has Transfer-Encoding AND Content-Length\n";
-    return;
-  }
   if (hasContentLength) {
     _validateContentLength();
     return;
@@ -156,11 +131,8 @@ void ReadBody::_determineBodyFraming()
 void ReadBody::_validateContentLength()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  std::istringstream strBodyLen(headers.at("Content-Length"));
-  strBodyLen >> _bodyLength;
-  if (strBodyLen.fail() || !strBodyLen.eof()) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: invalid Content-Length\n";
+  const std::string strLen = headers.at("Content-Length");
+  if (!_setBodyLength(strLen, std::ios::dec)) {
     return;
   }
   if (_bodyLength == 0) {
@@ -173,13 +145,38 @@ void ReadBody::_validateContentLength()
 void ReadBody::_validateTransferEncoding()
 {
   const Headers& headers = _client->getRequest().getHeaders();
-  const std::string& value = headers.at("Transfer-Encoding");
-  const std::string valueLower = ft::to_lower(value);
-  if (!ft::contains_subrange(valueLower, std::string("chunked"))) {
+  std::vector<std::string> elements =
+    convertHeaderList(headers.at(header::transferEncoding));
+  if (elements.empty()) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: transfer encoding unsupported\n";
+    _log.error() << "ReadBody: Transfer-Encoding invalid\n";
     return;
   }
+
+  const std::string finalEncoding = ft::to_lower(elements.back());
+  if (finalEncoding != "chunked") {
+    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _log.error() << "ReadBody: chunked is not final encoding\n";
+    return;
+  }
+
+  std::size_t chunkedCount = 0;
+  for (std::size_t i = 0; i < elements.size(); ++i) {
+    std::string& encoding = elements[i];
+    if (ft::to_lower(encoding) == "chunked") {
+      ++chunkedCount;
+    } else {
+      _client->getResponse().setStatusCode(StatusCode::NotImplemented);
+      _log.error() << "ReadBody: encoding not implemented\n";
+      return;
+    }
+    if (chunkedCount > 1) {
+      _client->getResponse().setStatusCode(StatusCode::BadRequest);
+      _log.error() << "ReadBody: multiple chunked encoding\n";
+      return;
+    }
+  }
+
   _chunkedBody = true;
 }
 
@@ -259,29 +256,38 @@ void ReadBody::_readChunkDataEnd()
 
 void ReadBody::_readTrailerSection()
 {
-  _buffReader.resetPosInBuff();
-  while (_readingOk()) {
-    _results.clear();
-    _fieldLineRule().reset();
-    _endOfLineRule().reset();
+  Response& response = _client->getResponse();
+  IInOutBuffer& buffer = _client->getInBuff();
+  Headers& trailers = _client->getRequest().getTrailers();
+  const HeaderParser::Result result =
+    _headerParser.parseIntoStruct(buffer, trailers);
 
-    if (_fieldLineRule().matches()) {
-      if (_fieldLineRule().reachedEnd()) {
-        const std::string fieldLine = _extractPart(FieldLinePart);
-        _addLineToHeaders(fieldLine);
-      }
-    } else if (_hasEndOfLine()) {
-      if (_endOfLineRule().reachedEnd()) {
-        _extractPart(EndOfLine);
-        _done = true;
-        return;
-      }
-    } else {
-      _client->getResponse().setStatusCode(StatusCode::BadRequest);
-      _log.error() << "ReadBody: failed to read trailer section\n";
+  switch (result) {
+    case HeaderParser::EndOfBuffer:
+      // header is not complete
+      break;
+    case HeaderParser::EndOfHeaders:
       _done = true;
-      return;
-    }
+      break;
+    case HeaderParser::SyntaxError:
+      _log.error() << "ReadBody: trailer syntax error\n";
+      response.setStatusCode(StatusCode::BadRequest);
+      break;
+    case HeaderParser::FieldLineTooLarge:
+      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      _log.error() << "ReadBody: trailer line too large\n";
+      break;
+    case HeaderParser::HeaderTooLarge:
+      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      _log.error() << "ReadBody: trailer too large\n";
+      break;
+    case HeaderParser::InvalidHeader:
+      // will only be set if custom validator used
+      if (response.getStatusCode() == StatusCode::Ok) {
+        _log.error() << "ReadBody: validator failed to set error status\n";
+        response.setStatusCode(StatusCode::BadRequest);
+      }
+      break;
   }
 }
 
@@ -294,50 +300,10 @@ bool ReadBody::_readingOk()
   return !_done && !_buffReader.reachedEnd();
 }
 
-bool ReadBody::_hasEndOfLine()
-{
-  _buffReader.resetPosInBuff();
-  return _endOfLineRule().matches();
-}
-
-std::string ReadBody::_extractPart(const Rule::RuleId& ruleId)
-{
-  const RuleResult& result = _results[ruleId];
-  const std::size_t index = result.getEnd();
-  const std::string res = _client->getInBuff().consumeFront(index);
-  _buffReader.resetPosInBuff();
-  return res;
-}
-
-void ReadBody::_addLineToHeaders(const std::string& line)
-{
-  const std::size_t index = line.find(':');
-  if (index == std::string::npos) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: invalid fieldline\n";
-    return;
-  }
-  const std::string name = line.substr(0, index);
-  const std::string value = line.substr(index + 1, line.size());
-  Headers& headers = _client->getRequest().getHeaders();
-  headers.addHeader(name, value);
-}
-
-// NOLINTBEGIN(misc-const-correctness)
 void ReadBody::_setChunkSize(const std::string& hexNum)
 {
-  char* end = FT_NULLPTR;
-  const short base = 16;
-  const long value = std::strtol(hexNum.c_str(), &end, base);
-  if (end == hexNum.c_str() || value < 0) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _log.error() << "ReadBody: failed to parse chunk size\n";
-    return;
-  }
-  _log.info() << "body size: " << value << '\n';
-  _bodyLength = static_cast<std::size_t>(value);
+  _setBodyLength(hexNum, std::ios::hex);
 }
-// NOLINTEND(misc-const-correctness)
 
 void ReadBody::_setChunkExt(const std::string& value)
 {
@@ -351,7 +317,7 @@ void ReadBody::_setChunkExt(const std::string& value)
  */
 void ReadBody::_readBody()
 {
-  IBuffer& inBuffer = _client->getInBuff();
+  IInOutBuffer& inBuffer = _client->getInBuff();
   Request& request = _client->getRequest();
 
   std::size_t toConsume = std::min(_readChunkSize, _bodyLength - _consumed);
@@ -383,4 +349,26 @@ bool ReadBody::_contentTooLarge(std::size_t newBytes)
     return true;
   }
   return false;
+}
+
+bool ReadBody::_setBodyLength(const std::string& numStr, std::ios::fmtflags fmt)
+{
+  std::istringstream iss(numStr);
+  iss.flags(fmt);
+  iss >> _bodyLength;
+  if (iss.fail()) {
+    // Overflow is the only possible error since grammar ensures valid digits.
+    _client->getResponse().setStatusCode(StatusCode::ContentTooLarge);
+    _log.error() << "ReadBody: body length too large\n";
+    return false;
+  }
+  // todo get from config ?
+  const std::size_t maxBodySize = 2147483647;
+  if (_bodyLength > maxBodySize) {
+    _client->getResponse().setStatusCode(StatusCode::ContentTooLarge);
+    _log.error() << "ReadBody: body length bigger than max body size\n";
+    return false;
+  }
+  _log.info() << "body length: " << _bodyLength << '\n';
+  return true;
 }

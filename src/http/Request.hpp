@@ -5,7 +5,7 @@
 #include <http/Headers.hpp>
 #include <http/Uri.hpp>
 #include <libftpp/array.hpp>
-#include <utils/SmartBuffer.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 
 #include <cstddef>
 #include <string>
@@ -23,22 +23,23 @@ public:
   };
 
   Request();
+  ~Request() {}
+  Request(const Request& other);
+  Request& operator=(const Request& other);
 
   static const std::size_t MaxMethodLen;
   static Method strToMethod(const std::string& strMethod);
 
   Method getMethod() const;
-  void setMethod(Method method);
-
   const Uri& getUri() const;
-  void setUri(const Uri& uri);
-
   const std::string& getVersion() const;
-  void setVersion(const std::string& version);
-
   Headers& getHeaders();
-
   SmartBuffer& getBody();
+  Headers& getTrailers();
+
+  void setMethod(Method method);
+  void setUri(const Uri& uri);
+  void setVersion(const std::string& version);
 
   std::string toString();
 
@@ -54,6 +55,7 @@ private:
   std::string _version;
   Headers _headers;
   SmartBuffer _body;
+  Headers _trailers;
 };
 
 struct Request::MethodMap
