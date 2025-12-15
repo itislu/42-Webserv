@@ -91,7 +91,7 @@ void ChildProcessManager::waitForChild(pid_t pid)
 
   _log.info() << "Child(" << pid << ") collected\n";
 
-  const std::vector<pid_t>::const_iterator iter =
+  const std::vector<pid_t>::iterator iter =
     std::find(_childs.begin(), _childs.end(), pid);
   if (iter != _childs.end()) {
     _childs.erase(iter);
