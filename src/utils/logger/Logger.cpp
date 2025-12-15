@@ -1,5 +1,6 @@
 #include "Logger.hpp"
 
+#include "libftpp/array.hpp"
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 
@@ -153,7 +154,6 @@ bool& Logger::_loggerEnabled()
   return _loggerEnabled;
 }
 
-// NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 bool Logger::_initLoggingFromEnv() throw()
 {
   const char* const envValue = std::getenv(_envVar);
@@ -161,14 +161,12 @@ bool Logger::_initLoggingFromEnv() throw()
     return false;
   }
 
-  const char* const enablers[] = {
-    "1", "true", "True", "TRUE", "on", "On", "ON"
-  };
-  for (unsigned i = 0; i < FT_COUNTOF(enablers); ++i) {
+  const ft::array<const char*, 7> enablers = { "1",  "true", "True", "TRUE",
+                                               "on", "On",   "ON" };
+  for (unsigned i = 0; i < enablers.size(); ++i) {
     if (std::strcmp(envValue, enablers[i]) == 0) {
       return true;
     }
   }
   return false;
 }
-// NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
