@@ -60,6 +60,9 @@ bool RequestHeaderValidator::isValid(const std::string& name,
 /* ************************************************************************** */
 // PRIVATE
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-3.2-6
+ */
 void RequestHeaderValidator::_validateHost(const std::string& value)
 {
   if (_headers->contains("Host")) {
@@ -76,6 +79,9 @@ void RequestHeaderValidator::_validateHost(const std::string& value)
   }
 }
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-6.1-15
+ */
 void RequestHeaderValidator::_validateContentLength(const std::string& value)
 {
   const bool hasTransferEncoding = _headers->contains(header::transferEncoding);
@@ -95,6 +101,10 @@ void RequestHeaderValidator::_validateContentLength(const std::string& value)
   }
 }
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-6.1-15
+ * https://datatracker.ietf.org/doc/html/rfc9112#section-6.1-16
+ */
 void RequestHeaderValidator::_validateTransferEncoding(const std::string& value)
 {
   const bool hasContentLength = _headers->contains("Content-Length");

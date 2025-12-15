@@ -1,11 +1,8 @@
 #include "ValidateRequest.hpp"
-#include "config/parser/Converters.hpp"
-#include "http/Headers.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/Socket.hpp"
 
 #include <client/Client.hpp>
 #include <config/LocationConfig.hpp>
+#include <http/Headers.hpp>
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
@@ -20,6 +17,8 @@
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
+#include <server/ServerManager.hpp>
+#include <socket/Socket.hpp>
 #include <utils/convert.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -30,6 +29,7 @@
 #include <exception>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 /* ************************************************************************** */
@@ -413,53 +413,51 @@ void ValidateRequest::_validateHost()
 
   int hostPort = -1;
   _host = _client->getRequest().getUri().getAuthority().getHost();
-  if (_host.empty()) {
-    if (!hostHeader.empty()) {
+  try {
+    if (!_host.empty()) {
+      _setPortFromUri(hostPort);
+    } else if (!hostHeader.empty()) {
       _splitHostHeader(hostHeader, hostPort);
     } else {
       // HTTP/1.0 with no Host-Header or URI-host
-      // endState(StatusCode::BadRequest); depends on how we want to implent it
+      // endState(StatusCode::BadRequest); depends how we want to implement it
       return;
     }
-  } else {
-    std::string uriPort =
-      _client->getRequest().getUri().getAuthority().getPort();
-    if (!uriPort.empty()) {
-      if (ft::starts_with(uriPort, ':')) {
-        uriPort = uriPort.substr(1);
-      }
-      hostPort = config::convert::toPort(uriPort);
-    }
-  }
-
-  const int httpPort = 80;
-  const Socket* const socket = _client->getSocket();
-  const int port = (hostPort == -1) ? httpPort : hostPort;
-  if (socket->getPort() != port) {
+  } catch (const std::invalid_argument&) {
+    // Invalid port reported by utils::toPort().
     endState(StatusCode::BadRequest);
     return;
   }
 
-  _host = ft::to_lower(_host);
+  const Socket* const socket = _client->getSocket();
+  const int port = (hostPort == -1) ? http::httpPort : hostPort;
+  if (socket->getPort() != port) {
+    // https://datatracker.ietf.org/doc/html/rfc9110#name-rejecting-misdirected-reque
+    endState(StatusCode::MisdirectedRequest);
+    return;
+  }
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
 {
-  const std::size_t pos = hostHeader.find(':');
+  const std::string::size_type pos = hostHeader.find(':');
   if (pos != std::string::npos) {
     _host = hostHeader.substr(0, pos);
-    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
+    const std::string portStr = hostHeader.substr(pos + 1);
     if (!portStr.empty()) {
-      try {
-        port = config::convert::toPort(portStr);
-      } catch (const std::exception& e) {
-        // NOTE: not sure if this is even possible
-        endState(StatusCode::BadRequest);
-        return;
-      }
+      port = utils::toPort(portStr);
     }
   } else {
     _host = hostHeader;
+  }
+}
+
+void ValidateRequest::_setPortFromUri(int& port)
+{
+  const std::string& uriPort =
+    _client->getRequest().getUri().getAuthority().getPort();
+  if (!uriPort.empty()) {
+    port = utils::toPort(uriPort);
   }
 }
 

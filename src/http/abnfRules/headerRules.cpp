@@ -3,7 +3,6 @@
 #include <http/abnfRules/generalRules.hpp>
 #include <http/abnfRules/headerLineRules.hpp>
 #include <http/abnfRules/http11Rules.hpp>
-#include <http/abnfRules/ruleIds.hpp>
 #include <http/abnfRules/uriRules.hpp>
 #include <libftpp/ctype.hpp>
 #include <libftpp/memory.hpp>
@@ -43,7 +42,6 @@ ft::shared_ptr<SequenceRule> hostHeaderRule()
   ft::shared_ptr<SequenceRule> portSeq = ft::make_shared<SequenceRule>();
   portSeq->addRule(ft::make_shared<LiteralRule>(":"));
   portSeq->addRule(portRule());
-  portSeq->setRuleId(Port);
 
   ft::shared_ptr<RepetitionRule> optPort =
     ft::make_shared<RepetitionRule>(ft::move(portSeq));
@@ -69,11 +67,11 @@ ft::shared_ptr<RepetitionRule> contentLengthRule()
 }
 
 /**
- *
  * Sender:
  * Transfer-Encoding = [ transfer-coding *( OWS "," OWS transfer-coding ) ]
  *
- * Receipient:
+ * Recipient:
+ * Transfer-Encoding = #transfer-coding
  * #element => [ element ] *( OWS "," OWS [ element ] )
  */
 ft::shared_ptr<SequenceRule> transferEncodingRule()
