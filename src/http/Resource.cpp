@@ -5,14 +5,31 @@
 #include <sstream>
 #include <string>
 
+Resource::Resource()
+  : _type(Undefined)
+  , _location(FT_NULLPTR)
+  , _server(FT_NULLPTR)
+{
+}
+
 const std::string& Resource::getPath() const
 {
   return _path;
 }
 
+const std::string& Resource::getNoRootPath() const
+{
+  return _noRootPath;
+}
+
 void Resource::setPath(const std::string& path)
 {
   _path = path;
+}
+
+void Resource::setNoRootPath(const std::string& noRootPath)
+{
+  _noRootPath = noRootPath;
 }
 
 Resource::Type Resource::getType() const
@@ -73,6 +90,8 @@ std::string Resource::_typeToString()
       return "Cgi";
     case Error:
       return "Error";
+    case Undefined:
+      return "Undefined";
   }
   FT_UNREACHABLE();
 }
