@@ -2,7 +2,10 @@
 #ifndef HANDLE_GET_HPP
 #define HANDLE_GET_HPP
 
-#include "utils/state/IState.hpp"
+#include <utils/buffer/SmartBuffer.hpp>
+#include <utils/state/IState.hpp>
+
+#include <string>
 
 class Logger;
 class Client;
@@ -20,6 +23,9 @@ private:
   void _setNextState();
   void _handleAutoIndex();
   void _handleStaticFile();
+  void _generateAutoindex(const std::string& dirPath,
+                          const std::string& path,
+                          SmartBuffer& html);
 
   static Logger& _log;
   PrepareResponse* _prepareResponse;

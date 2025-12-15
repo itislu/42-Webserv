@@ -18,7 +18,6 @@ private:
   void validate();
   void validateCGI();
   void validateStaticPost();
-  void validateParentDirPermissions();
 
   void endState(StatusCode::Code status);
 

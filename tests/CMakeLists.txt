@@ -128,8 +128,19 @@ add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
 )
 
+# http
+
+add_my_test(headerUtilsTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/headerUtilsTester.cpp
+)
+
+
 add_my_test(writeBodyTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/writeBodyTester.cpp
+)
+
+add_my_test(removeDotsTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/removeDotsTester.cpp
 )
 
 add_my_test(validateRequestTester

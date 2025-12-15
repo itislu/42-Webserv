@@ -1,39 +1,36 @@
 #include "ValidateRequest.hpp"
 
-#include "client/Client.hpp"
-#include "config/LocationConfig.hpp"
-#include "http/Headers.hpp"
-#include "http/Request.hpp"
-#include "http/Resource.hpp"
-#include "http/StatusCode.hpp"
-#include "http/http.hpp"
-#include "http/states/prepareResponse/PrepareResponse.hpp"
-#include "http/states/readBody/ReadBody.hpp"
-#include "http/states/validateRequest/ValidateDelete.hpp"
-#include "http/states/validateRequest/ValidateGet.hpp"
-#include "http/states/validateRequest/ValidatePost.hpp"
-#include "libftpp/algorithm.hpp"
-#include "libftpp/optional.hpp"
-#include "libftpp/string.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/Socket.hpp"
-#include "utils/convert.hpp"
-#include "utils/logger/Logger.hpp"
-#include "utils/state/IState.hpp"
-#include "utils/state/StateHandler.hpp"
+#include <client/Client.hpp>
+#include <config/LocationConfig.hpp>
+#include <http/Headers.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/StatusCode.hpp>
+#include <http/http.hpp>
+#include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/states/readBody/ReadBody.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/validateRequest/ValidateDelete.hpp>
+#include <http/states/validateRequest/ValidateGet.hpp>
+#include <http/states/validateRequest/ValidatePost.hpp>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <server/ServerManager.hpp>
+#include <socket/Socket.hpp>
+#include <utils/convert.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/state/IState.hpp>
+#include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
 #include <cstdlib>
 #include <exception>
-#include <http/states/readRequestLine/ReadRequestLine.hpp>
-#include <iostream>
 #include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <vector>
 
 /* ************************************************************************** */
 // INIT
@@ -125,6 +122,7 @@ void ValidateRequest::_init()
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
+    return;
   }
   _log.info() << "method is VALID\n";
 
@@ -187,7 +185,7 @@ static bool alwaysDecode(char /*unused*/)
 
 /**
  * 1. Decode unreserved characters.
- * 2. Normalize path (collapse . | .. | //).
+ * 2. Normalize path (collapse '.' & '..').
  * 3. Decode all other characters (first decoding cannot produce more '%').
  * 4. Check for illegal characters (NUL).
  * 5. Check that path is not going out of root.
@@ -201,8 +199,8 @@ void ValidateRequest::_initRequestPath()
   std::string decoded = decodePath(_path, http::isUnreserved);
   _log.info() << "decode unreserved - path: " << decoded << "\n";
 
-  // 2. Normalize path (collapse . | .. | //).
-  decoded = normalizePath(decoded, CapAtRoot).value();
+  // 2. Normalize path (collapse '.' & '..').
+  decoded = removeDotSegments(decoded);
   _log.info() << "normalizePath - path: " << decoded << "\n";
 
   // 3. Decode all other characters.
@@ -216,10 +214,14 @@ void ValidateRequest::_initRequestPath()
   }
 
   // 5. Check that path is not going out of root.
-  if (!normalizePath(decoded, FailAboveRoot).has_value()) {
-    endState(StatusCode::BadRequest);
+  if (!isPathRootBound(decoded)) {
+    endState(StatusCode::Forbidden);
     return;
   }
+
+  // Store this path in resource so we can use it when generating autoindex
+  // without exposing internal filesystem
+  _client->getResource().setNoRootPath(decoded);
 
   // 6. Combine with root.
   if (_location != FT_NULLPTR) {
@@ -263,37 +265,96 @@ bool ValidateRequest::validateChars(const std::string& path)
   return !ft::contains(path, '\0');
 }
 
-ft::optional<std::string> ValidateRequest::normalizePath(
-  const std::string& path,
-  NormalizationMode mode)
+void ValidateRequest::removeLastSegment(std::string& output)
 {
-  std::vector<std::string> segments;
-  std::string token;
-  std::stringstream stream(path);
+  const std::size_t lastSlash = output.rfind('/');
+  if (lastSlash == std::string::npos) {
+    output.clear();
+  } else {
+    output.erase(lastSlash);
+  }
+}
 
-  while (!std::getline(stream, token, '/').fail()) {
-    if (token.empty() || token == ".") {
+/**
+ * https://datatracker.ietf.org/doc/html/rfc3986#section-5.2.4
+ */
+std::string ValidateRequest::removeDotSegments(const std::string& path)
+{
+  std::string input = path;
+  std::string output;
+
+  while (!input.empty()) {
+    // A. If the input buffer begins with a prefix of "../" or "./",
+    //    then remove that prefix from the input buffer.
+    if (ft::starts_with(input, "../")) {
+      input.erase(0, 3);
+    } else if (ft::starts_with(input, "./")) {
+      input.erase(0, 2);
+    }
+
+    // B. If the input buffer begins with a prefix of "/./" or "/.",
+    //    where "." is a complete path segment, then replace that prefix with
+    //    "/"
+    else if (ft::starts_with(input, "/./")) {
+      input.replace(0, 3, "/");
+    } else if (input == "/.") {
+      input.replace(0, 2, "/");
+    }
+
+    // C. If the input buffer begins with a prefix of "/../" or "/..",
+    //    where ".." is a complete path segment, then replace that prefix with
+    //    "/" and remove the last segment from the output buffer.
+    else if (ft::starts_with(input, "/../")) {
+      input.replace(0, 4, "/");
+      removeLastSegment(output);
+    } else if (input == "/..") {
+      input.replace(0, 3, "/");
+      removeLastSegment(output);
+    }
+
+    // D. If the input buffer consists only of "." or "..", then remove
+    //    that from the input buffer.
+    else if (input == "." || input == "..") {
+      input.clear();
+    }
+
+    // E. Move the first path segment in the input buffer to the end of
+    //    the output buffer, including the initial "/" character (if any)
+    //    and any subsequent characters up to, but not including, the next "/"
+    else {
+      const std::size_t nextSlash = input.find('/', 1);
+      if (nextSlash == std::string::npos) {
+        output += input;
+        input.clear();
+      } else {
+        output += input.substr(0, nextSlash);
+        input.erase(0, nextSlash);
+      }
+    }
+  }
+  return output;
+}
+
+bool ValidateRequest::isPathRootBound(const std::string& path)
+{
+  std::istringstream pathStream(path);
+  std::string segment;
+  std::size_t depth = 0;
+
+  while (!std::getline(pathStream, segment, '/').fail()) {
+    if (segment.empty() || segment == ".") {
       continue;
     }
-    if (token == "..") {
-      if (!segments.empty()) {
-        segments.pop_back();
-      } else if (mode == FailAboveRoot) {
-        return ft::nullopt;
+    if (segment == "..") {
+      if (depth == 0) {
+        return false;
       }
+      --depth;
     } else {
-      segments.push_back(token);
+      ++depth;
     }
   }
-
-  std::string final = "/";
-  for (std::size_t i = 0; i < segments.size(); ++i) {
-    final += segments[i];
-    if (i + 1 < segments.size()) {
-      final += "/";
-    }
-  }
-  return final;
+  return true;
 }
 
 std::string ValidateRequest::removePrefix(const std::string& uriPath,

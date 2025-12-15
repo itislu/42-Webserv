@@ -23,6 +23,7 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
       { MethodNotAllowed, "Method Not Allowed" },
       { NotAcceptable, "Not Acceptable" },
       { RequestTimeout, "Request Timeout" },
+      { Conflict, "Conflict" },
       { LengthRequired, "Length Required" },
       { ContentTooLarge, "Content Too Large" },
       { UriTooLong, "URI Too Long" },
