@@ -82,8 +82,7 @@ void ValidatePost::validateStaticPost()
   }
 
   if (isFile(_path)) {
-    // Target exists but is a file. Method not allowed?
-    endState(StatusCode::MethodNotAllowed);
+    endState(StatusCode::Conflict);
   } else {
     endState(StatusCode::NotFound);
   }
