@@ -66,7 +66,7 @@ void HandleGet::_handleAutoIndex()
   Response& response = _client->getResponse();
   ft::shared_ptr<SmartBuffer> buffer = ft::make_shared<SmartBuffer>();
   const Resource& resource = _client->getResource();
-  _generateAutoindex(resource.getNoRootPath(), *buffer);
+  _generateAutoindex(resource.getPath(), resource.getNoRootPath(), *buffer);
   response.setBody(ft::move(buffer));
 
   // set headers
@@ -92,9 +92,11 @@ void HandleGet::_handleStaticFile()
   present. If the entry in the folder is directory it generates a clickable
   link. If the entry is a regular file it just lists the name.
 */
-void HandleGet::_generateAutoindex(const std::string& path, SmartBuffer& html)
+void HandleGet::_generateAutoindex(const std::string& dirPath,
+                                   const std::string& path,
+                                   SmartBuffer& html)
 {
-  DIR* const dir = opendir(path.c_str());
+  DIR* const dir = opendir(dirPath.c_str());
   if (dir == FT_NULLPTR) {
     _client->getResponse().setStatusCode(StatusCode::InternalServerError);
     return;

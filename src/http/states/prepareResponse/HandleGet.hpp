@@ -23,7 +23,7 @@ private:
   void _setNextState();
   void _handleAutoIndex();
   void _handleStaticFile();
-  void _generateAutoindex(const std::string& path, SmartBuffer& html);
+  void _generateAutoindex(const std::string& dirPath, const std::string& path, SmartBuffer& html);
 
   static Logger& _log;
   PrepareResponse* _prepareResponse;
