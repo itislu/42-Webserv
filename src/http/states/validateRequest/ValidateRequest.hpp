@@ -37,10 +37,13 @@ public:
 private:
   void _init();
   void _initResource();
-  void _initServer();
   void _initConfigs();
   void _initState(const Request::Method& method);
   void _initRequestPath();
+
+  void _validateHost();
+  void _splitHostHeader(const std::string& hostHeader, int& port);
+  void _setServerByHost();
 
   static std::string removePrefix(const std::string& uriPath,
                                   const std::string& locPath);
@@ -59,6 +62,7 @@ private:
   static Logger& _log;
   StateHandler<ValidateRequest> _stateHandler;
   std::string _path;
+  std::string _host;
   const ServerConfig* _server;
   const LocationConfig* _location;
 };

@@ -24,7 +24,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <exception>
-#include <iostream>
 #include <set>
 #include <string>
 
@@ -95,19 +94,25 @@ StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
 
 void ValidateRequest::_init()
 {
+  _validateHost();
+  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+    return;
+  }
+
   if (!_client->hasServer()) {
-    _initServer();
+    _setServerByHost();
   }
 
   _path = _client->getRequest().getUri().getPath();
   _initConfigs();
   _initResource();
 
+  _log.info() << "Root: " << _server->getRoot() << "\n";
+
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
   const Request::Method method = _client->getRequest().getMethod();
-  _log.info() << _client->getRequest().getMethod() << "\n";
 
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
@@ -133,18 +138,6 @@ bool ValidateRequest::validateMethod(
     }
   }
   return false;
-}
-
-void ValidateRequest::_initServer()
-{
-  /*
-    TODO:
-    - get host from Request
-    - host should be in Uri -> authority -> getHost()
-    - look up servers from client socket and find matching servername -> host
-    - if no exact match, use default server for that socket
-    - set server in client
-  */
 }
 
 void ValidateRequest::_initConfigs()
@@ -361,4 +354,81 @@ void ValidateRequest::endState(StatusCode::Code status)
     _client->getResource().setType(Resource::Error);
     _stateHandler.setDone();
   }
+}
+
+void ValidateRequest::_validateHost()
+{
+  std::string hostHeader;
+  const Headers& headers = _client->getRequest().getHeaders();
+
+  if (headers.contains("host")) {
+    hostHeader = headers.at("host");
+  }
+
+  // HTTP 1.1 MUST have a host header
+  if (_client->getRequest().getVersion() == http::HTTP_1_1 &&
+      hostHeader.empty()) {
+    endState(StatusCode::BadRequest);
+    return;
+  }
+
+  int hostPort = -1;
+  _host = _client->getRequest().getUri().getAuthority().getHost();
+  if (_host.empty()) {
+    if (!hostHeader.empty()) {
+      _splitHostHeader(hostHeader, hostPort);
+    } else {
+      // HTTP/1.0 with no Host-Header or URI-host
+      // endState(StatusCode::BadRequest); depends on how we want to implent it
+      return;
+    }
+  } else {
+    std::string uriPort =
+      _client->getRequest().getUri().getAuthority().getPort();
+    if (!uriPort.empty()) {
+      if (ft::starts_with(uriPort, ':')) {
+        uriPort = uriPort.substr(1);
+      }
+      hostPort = config::convert::toPort(uriPort);
+    }
+  }
+
+  const int httpPort = 80;
+  const Socket* const socket = _client->getSocket();
+  const int port = (hostPort == -1) ? httpPort : hostPort;
+  if (socket->getPort() != port) {
+    endState(StatusCode::BadRequest);
+    return;
+  }
+
+  _host = ft::to_lower(_host);
+}
+
+void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
+{
+  const std::size_t pos = hostHeader.find(':');
+  if (pos != std::string::npos) {
+    _host = hostHeader.substr(0, pos);
+    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
+    if (!portStr.empty()) {
+      try {
+        port = config::convert::toPort(portStr);
+      } catch (const std::exception& e) {
+        // NOTE: not sure if this is even possible
+        endState(StatusCode::BadRequest);
+        return;
+      }
+    }
+  } else {
+    _host = hostHeader;
+  }
+}
+
+void ValidateRequest::_setServerByHost()
+{
+  const Socket* const socket = _client->getSocket();
+  const Server* const server =
+    ServerManager::getInstance().getServerByHost(socket, _host);
+  _log.info() << "Found server for host: " << _host << "\n";
+  _client->setServer(server);
 }
