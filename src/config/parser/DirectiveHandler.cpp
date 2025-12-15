@@ -227,7 +227,13 @@ void Entries<LocationConfig>::setCgiExtension(
   if (values.size() != 1) {
     throw std::invalid_argument("cgi_extension: invalid number of arguments");
   }
-  config.setCgiExtension(values[0]);
+
+  std::string ext = values[0];
+  if (!ft::starts_with(ext, '.')) {
+    ext.insert(0, ".");
+  }
+
+  config.setCgiExtension(ext);
 }
 
 void Entries<LocationConfig>::setRedirect(
