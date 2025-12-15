@@ -55,6 +55,7 @@ private:
   static bool validateChars(const std::string& path);
 
   static void removeLastSegment(std::string& output);
+  static bool isPathRootBound(const std::string& path);
 
   void endState(StatusCode::Code status);
 

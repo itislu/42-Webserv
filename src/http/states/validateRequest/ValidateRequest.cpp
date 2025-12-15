@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <exception>
 #include <set>
+#include <sstream>
 #include <string>
 
 /* ************************************************************************** */
@@ -121,6 +122,7 @@ void ValidateRequest::_init()
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
+    return;
   }
   _log.info() << "method is VALID\n";
 
@@ -183,7 +185,7 @@ static bool alwaysDecode(char /*unused*/)
 
 /**
  * 1. Decode unreserved characters.
- * 2. Normalize path (collapse . | .. | //).
+ * 2. Normalize path (collapse '.' & '..').
  * 3. Decode all other characters (first decoding cannot produce more '%').
  * 4. Check for illegal characters (NUL).
  * 5. Check that path is not going out of root.
@@ -197,7 +199,7 @@ void ValidateRequest::_initRequestPath()
   std::string decoded = decodePath(_path, http::isUnreserved);
   _log.info() << "decode unreserved - path: " << decoded << "\n";
 
-  // 2. Normalize path (collapse . | .. | //).
+  // 2. Normalize path (collapse '.' & '..').
   decoded = removeDotSegments(decoded);
   _log.info() << "normalizePath - path: " << decoded << "\n";
 
@@ -210,8 +212,12 @@ void ValidateRequest::_initRequestPath()
     endState(StatusCode::BadRequest);
     return;
   }
+
   // 5. Check that path is not going out of root.
-  decoded = removeDotSegments(decoded);
+  if (!isPathRootBound(decoded)) {
+    endState(StatusCode::Forbidden);
+    return;
+  }
 
   // Store this path in resource so we can use it when generating autoindex
   // without exposing internal filesystem
@@ -269,6 +275,9 @@ void ValidateRequest::removeLastSegment(std::string& output)
   }
 }
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc3986#section-5.2.4
+ */
 std::string ValidateRequest::removeDotSegments(const std::string& path)
 {
   std::string input = path;
@@ -324,6 +333,28 @@ std::string ValidateRequest::removeDotSegments(const std::string& path)
     }
   }
   return output;
+}
+
+bool ValidateRequest::isPathRootBound(const std::string& path)
+{
+  std::istringstream pathStream(path);
+  std::string segment;
+  std::size_t depth = 0;
+
+  while (!std::getline(pathStream, segment, '/').fail()) {
+    if (segment.empty() || segment == ".") {
+      continue;
+    }
+    if (segment == "..") {
+      if (depth == 0) {
+        return false;
+      }
+      --depth;
+    } else {
+      ++depth;
+    }
+  }
+  return true;
 }
 
 std::string ValidateRequest::removePrefix(const std::string& uriPath,
