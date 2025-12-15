@@ -1,5 +1,6 @@
 #include "ValidateRequest.hpp"
 #include "config/parser/Converters.hpp"
+#include "http/Headers.hpp"
 #include "server/ServerManager.hpp"
 #include "socket/Socket.hpp"
 
