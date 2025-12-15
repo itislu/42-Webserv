@@ -66,7 +66,7 @@ void HandleGet::_handleAutoIndex()
   Response& response = _client->getResponse();
   ft::shared_ptr<SmartBuffer> buffer = ft::make_shared<SmartBuffer>();
   const Resource& resource = _client->getResource();
-  _generateAutoindex(resource.getPath(), *buffer);
+  _generateAutoindex(resource.getNoRootPath(), *buffer);
   response.setBody(ft::move(buffer));
 
   // set headers
