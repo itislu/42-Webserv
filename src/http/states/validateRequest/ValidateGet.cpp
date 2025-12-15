@@ -60,7 +60,6 @@ void ValidateGet::validateFile()
 
   if (_location != FT_NULLPTR && _location->isCgi()) {
     // TODO??: check file extension if file is cgi
-    _location->getCgiExtension();
     _client->getResource().setType(Resource::Cgi);
     if (!isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
