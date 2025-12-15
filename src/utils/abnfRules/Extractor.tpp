@@ -15,12 +15,10 @@
 // PUBLIC
 
 template<typename T>
-void Extractor<T>::addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr)
+Extractor<T>& Extractor<T>::addMapItem(Rule::RuleId ruleId, FuncPtr funcPtr)
 {
-  SetterPair pair;
-  pair.first = ruleId;
-  pair.second = funcPtr;
-  _setters.push_back(pair);
+  _setters.push_back(std::make_pair(ruleId, funcPtr));
+  return *this;
 }
 
 template<typename T>

@@ -102,13 +102,10 @@ LiteralRule& ReadBody::_endOfLineRule()
 
 Extractor<ReadBody>& ReadBody::_chunkExtractor()
 {
-  static Extractor<ReadBody> extractor;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    extractor.addMapItem(ChunkSize, &ReadBody::_setChunkSize);
-    extractor.addMapItem(ChunkExt, &ReadBody::_setChunkExt);
-  }
+  static Extractor<ReadBody> extractor =
+    Extractor<ReadBody>()
+      .addMapItem(ChunkSize, &ReadBody::_setChunkSize)
+      .addMapItem(ChunkExt, &ReadBody::_setChunkExt);
   return extractor;
 }
 
