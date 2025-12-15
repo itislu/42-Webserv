@@ -1,4 +1,7 @@
 #include "ValidateRequest.hpp"
+#include "config/parser/Converters.hpp"
+#include "server/ServerManager.hpp"
+#include "socket/Socket.hpp"
 
 #include <client/Client.hpp>
 #include <config/LocationConfig.hpp>
