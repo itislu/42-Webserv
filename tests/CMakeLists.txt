@@ -40,6 +40,7 @@ function(add_my_test test_name)
   add_executable(${test_name} ${ARGN})
 
   target_compile_definitions(${test_name}
+    PRIVATE PROJECT_ROOT="${PROJECT_SOURCE_DIR}/"
     PRIVATE ASSETS_PATH="${PROJECT_SOURCE_DIR}/tests/assets/"
   )
 
@@ -127,8 +128,19 @@ add_my_test(requestTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/requestTester.cpp
 )
 
+# http
+
+add_my_test(headerUtilsTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/headerUtilsTester.cpp
+)
+
+
 add_my_test(writeBodyTester
   ${CMAKE_CURRENT_SOURCE_DIR}/http/states/writeBodyTester.cpp
+)
+
+add_my_test(validateRequestTester
+  ${CMAKE_CURRENT_SOURCE_DIR}/http/states/validateRequestTester.cpp
 )
 
 # config

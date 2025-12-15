@@ -1,4 +1,5 @@
 #include "Client.hpp"
+#include "socket/Socket.hpp"
 
 #include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
@@ -37,6 +38,7 @@ const std::size_t Client::maxChunk;
 Client::Client()
   : _fd(-1)
   , _server()
+  , _socket()
   , _stateHandler(this)
 {
   _stateHandler.setState<ReadRequestLine>();
@@ -45,14 +47,16 @@ Client::Client()
 Client::Client(int fdes)
   : _fd(fdes)
   , _server()
+  , _socket()
   , _stateHandler(this)
 {
   _stateHandler.setState<ReadRequestLine>();
 }
 
-Client::Client(int fdes, const Server* server)
+Client::Client(int fdes, const Server* server, const Socket* socket)
   : _fd(fdes)
   , _server(server)
+  , _socket(socket)
   , _stateHandler(this)
 {
   _stateHandler.setState<ReadRequestLine>();
@@ -116,9 +120,19 @@ const Server* Client::getServer() const
   return _server;
 }
 
+const Socket* Client::getSocket() const
+{
+  return _socket;
+}
+
 void Client::setServer(const Server* server)
 {
   _server = server;
+}
+
+void Client::setSocket(const Socket* socket)
+{
+  _socket = socket;
 }
 
 bool Client::receive()

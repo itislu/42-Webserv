@@ -15,9 +15,11 @@ public:
     File,
     Autoindex,
     Cgi,
-    Error
+    Error,
+    Undefined
   };
 
+  Resource();
   Type getType() const;
   const std::string& getPath() const;
   const LocationConfig* getLocation();

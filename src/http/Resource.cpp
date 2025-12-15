@@ -5,6 +5,13 @@
 #include <sstream>
 #include <string>
 
+Resource::Resource()
+  : _type(Undefined)
+  , _location(FT_NULLPTR)
+  , _server(FT_NULLPTR)
+{
+}
+
 const std::string& Resource::getPath() const
 {
   return _path;
@@ -73,6 +80,8 @@ std::string Resource::_typeToString()
       return "Cgi";
     case Error:
       return "Error";
+    case Undefined:
+      return "Undefined";
   }
   FT_UNREACHABLE();
 }

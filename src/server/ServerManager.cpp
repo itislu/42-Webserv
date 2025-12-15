@@ -7,6 +7,7 @@
 #include "server/Server.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
+#include <cassert>
 #include <cerrno>
 #include <csignal>
 #include <cstring>
@@ -88,19 +89,27 @@ void ServerManager::mapServerToSocket(
   }
 }
 
-const Server* ServerManager::getServerFromSocket(const Socket* socket) const
+/*
+  Tries to find the best server for the given hostname. If no hostname matches
+  it defaults to the first server that is associated with this socket.
+*/
+const Server* ServerManager::getServerByHost(const Socket* socket,
+                                             const std::string& host) const
 {
-  if (socket == FT_NULLPTR) {
-    return FT_NULLPTR;
-  }
   const const_SockToServIter iter = _socketToServers.find(socket);
   if (iter == _socketToServers.end()) {
-    return FT_NULLPTR;
+    return FT_NULLPTR; // this should never happen
   }
   const std::vector<const Server*>& servers = iter->second;
-  if (servers.size() != 1) {
-    return FT_NULLPTR;
+  for (std::size_t i = 0; i < servers.size(); ++i) {
+    const std::vector<std::string>& serverNames = servers[i]->getHostnames();
+    for (std::size_t name = 0; name < serverNames.size(); ++name) {
+      if (host == serverNames[name]) {
+        return servers[i];
+      }
+    }
   }
+  assert(!servers.empty());
   return servers[0];
 }
 
@@ -111,9 +120,8 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
   Until then, return nullptr to indicate client is not associated with a
   specific server yet.
 */
-const Server* ServerManager::getInitServer(int fdes) const
+const Server* ServerManager::getInitServer(const Socket& socket) const
 {
-  const Socket& socket = SocketManager::getInstance().getSocket(fdes);
   const const_SockToServIter iter = _socketToServers.find(&socket);
   if (iter != _socketToServers.end() && iter->second.size() == 1) {
     return iter->second[0];
