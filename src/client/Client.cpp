@@ -10,6 +10,7 @@
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
+#include <socket/Socket.hpp>
 #include <utils/buffer/BufferQueue.hpp>
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/buffer/IInBuffer.hpp>
@@ -38,6 +39,7 @@ const std::size_t Client::maxChunk;
 Client::Client()
   : _fd(-1)
   , _server()
+  , _socket()
   , _stateHandler(this)
   , _closeConnection(false)
   , _alive(true)
@@ -48,6 +50,7 @@ Client::Client()
 Client::Client(int fdes)
   : _fd(fdes)
   , _server()
+  , _socket()
   , _stateHandler(this)
   , _closeConnection(false)
   , _alive(true)
@@ -55,9 +58,10 @@ Client::Client(int fdes)
   _stateHandler.setState<ReadRequestLine>();
 }
 
-Client::Client(int fdes, const Server* server)
+Client::Client(int fdes, const Server* server, const Socket* socket)
   : _fd(fdes)
   , _server(server)
+  , _socket(socket)
   , _stateHandler(this)
   , _closeConnection(false)
   , _alive(true)
@@ -128,9 +132,19 @@ const Server* Client::getServer() const
   return _server;
 }
 
+const Socket* Client::getSocket() const
+{
+  return _socket;
+}
+
 void Client::setServer(const Server* server)
 {
   _server = server;
+}
+
+void Client::setSocket(const Socket* socket)
+{
+  _socket = socket;
 }
 
 bool Client::receive()

@@ -22,6 +22,7 @@ public:
     MethodNotAllowed = 405,
     NotAcceptable = 406,
     RequestTimeout = 408,
+    Conflict = 409,
     LengthRequired = 411,
     ContentTooLarge = 413,
     UriTooLong = 414,
@@ -47,7 +48,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 16;
+  static const int _codes = 17;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;

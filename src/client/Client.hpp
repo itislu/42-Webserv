@@ -8,6 +8,7 @@
 #include <libftpp/memory.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
+#include <socket/Socket.hpp>
 #include <utils/buffer/BufferQueue.hpp>
 #include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
@@ -22,7 +23,7 @@ class Client
 public:
   Client();
   explicit Client(int fdes);
-  Client(int fdes, const Server* server);
+  Client(int fdes, const Server* server, const Socket* socket);
 
   static const std::size_t maxChunk = 1024;
 
@@ -32,11 +33,15 @@ public:
   SmartBuffer& getInBuff();
   BufferQueue& getOutBuffQueue();
   const Server* getServer() const;
+  const Socket* getSocket() const;
   StateHandler<Client>& getStateHandler();
   Request& getRequest();
   Response& getResponse();
   Resource& getResource();
   ft::shared_ptr<CgiContext>& getCgiContext();
+
+  void setSocket(const Socket* socket);
+
   long getTimeout() const;
   bool closeConnection() const;
   bool alive() const;
@@ -58,6 +63,7 @@ private:
 
   AutoFd _fd;
   const Server* _server;
+  const Socket* _socket;
   std::string _host;
   SmartBuffer _inBuff;
   BufferQueue _outBuffQueue;

@@ -1,4 +1,5 @@
 #include "EventManager.hpp"
+#include "socket/Socket.hpp"
 
 #include <client/Client.hpp>
 #include <client/TimeStamp.hpp>
@@ -136,8 +137,10 @@ void EventManager::_acceptClient(int fdes, const unsigned events)
 
   const int clientFd = _socketManager().acceptClient(fdes);
   if (clientFd > 0) {
-    const Server* const server = _serverManager().getInitServer(fdes);
-    ft::shared_ptr<Client> client = ft::make_shared<Client>(clientFd, server);
+    const Socket& socket = _socketManager().getSocket(fdes);
+    const Server* const server = _serverManager().getInitServer(socket);
+    ft::shared_ptr<Client> client =
+      ft::make_shared<Client>(clientFd, server, &socket);
     ft::shared_ptr<ClientEventHandler> handler =
       ft::make_shared<ClientEventHandler>(clientFd, ft::move(client));
     _addHandler(ft::move(handler));

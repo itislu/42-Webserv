@@ -107,6 +107,60 @@ TEST(ReadBodyTester, ChunkedWithTrailer)
   EXPECT_EQ(value, "value2");
 }
 
+TEST(ReadBodyTester, TransferEncodingEmpty)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding", "");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+}
+
+TEST(ReadBodyTester, ChunkedIsNotFinalEncoding)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding", "chunke");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding",
+                                                "chunked, zip");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+}
+
+TEST(ReadBodyTester, TransferEncodingMultipleChunked)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding",
+                                                "chunked, CHUNKED");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+  }
+}
+
+TEST(ReadBodyTester, TransferEncodingNotImplemented)
+{
+  {
+    const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+    client->getRequest().getHeaders().addHeader("Transfer-Encoding",
+                                                ", zip, chunked");
+    StateTest(*client, "not important");
+    const Response& response = client->getResponse();
+    EXPECT_EQ(response.getStatusCode(), StatusCode::NotImplemented);
+  }
+}
+
 TEST(ReadBodyTester, FixedLength)
 {
   const std::string line("0123456789\r\n");

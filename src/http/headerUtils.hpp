@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 
 namespace header {
 
@@ -19,5 +20,6 @@ extern const char* const connection;
 
 void setContentLengthHeader(Headers& headers, std::size_t length);
 void setContentTypeHeader(Headers& headers, const std::string& filePath);
+std::vector<std::string> convertHeaderList(const std::string& rawList);
 
 #endif

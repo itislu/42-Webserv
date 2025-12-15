@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 
 namespace header {
 
@@ -33,4 +34,35 @@ void setContentTypeHeader(Headers& headers, const std::string& filePath)
   if (type != extToType.end()) {
     headers.setHeader(header::contentType, type->second);
   }
+}
+
+/**
+ * @brief Convert raw header list to vector of strings.
+ *
+ * #element => [ element ] *( OWS "," OWS [ element ] )
+ *
+ * - trims whitespace from elements
+ */
+std::vector<std::string> convertHeaderList(const std::string& rawList)
+{
+  std::vector<std::string> result;
+
+  std::size_t tokenStart = 0;
+  for (std::size_t i = 0; i < rawList.size(); ++i) {
+    if (rawList[i] == ',') {
+      std::string token = rawList.substr(tokenStart, i - tokenStart);
+      ft::trim(token);
+      if (!token.empty()) {
+        result.push_back(token);
+      }
+      tokenStart = i + 1;
+    }
+  }
+
+  // Handle the last token after the last comma
+  const std::string token = ft::trim(rawList.substr(tokenStart));
+  if (!token.empty()) {
+    result.push_back(token);
+  }
+  return result;
 }

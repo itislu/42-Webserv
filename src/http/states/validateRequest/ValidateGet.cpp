@@ -47,6 +47,7 @@ void ValidateGet::validate()
     validateDirectory();
     return;
   }
+  _log.info() << "path not found\n";
   endState(StatusCode::NotFound);
 }
 
@@ -58,9 +59,8 @@ void ValidateGet::validateFile()
   }
 
   if (_location != FT_NULLPTR && _location->isCgi()) {
-    _client->getResource().setType(Resource::Cgi);
     // TODO??: check file extension if file is cgi
-    // TODO??: check if parent directory is executable
+    _client->getResource().setType(Resource::Cgi);
     if (!isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
       return;
