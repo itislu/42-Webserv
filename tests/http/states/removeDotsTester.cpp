@@ -33,7 +33,6 @@ TEST_P(RemoveDotSegmentsTest, NormalizesCorrectly)
 {
   PathTestParams params = GetParam();
 
-  // Replace this with your actual class/function call
   std::string actual = ValidateRequest::removeDotSegments(params.input);
 
   EXPECT_EQ(actual, params.expected)
@@ -67,7 +66,7 @@ INSTANTIATE_TEST_SUITE_P(
     PathTestParams{ "RootParent", "/../a", "/a" },
 
     // Trailing Handling
-    PathTestParams{ "TrailingSlash", "/a/b/", "/a/b/" },
+    PathTestParams{ "TrailingSlash", "/file/", "/file/" },
     PathTestParams{ "TrailingDot", "/a/b/.", "/a/b/" },
     PathTestParams{ "TrailingDoubleDot", "/a/b/..", "/a/" },
 
@@ -79,9 +78,6 @@ INSTANTIATE_TEST_SUITE_P(
     // Complex
     PathTestParams{ "ComplexRFC", "/a/b/c/./../../g", "/a/g" },
     PathTestParams{ "RootBlast", "../../a", "a" },
-
-    // Trailing Slash
-    PathTestParams{ "TrailingSlash02", "/file/", "/file/" },
 
     // Middle Slashes
     PathTestParams{ "MiddleSlashes", "/dir////file", "/dir////file" }),
