@@ -1,4 +1,5 @@
 #include "ValidateGet.hpp"
+#include "libftpp/string.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
@@ -59,16 +60,18 @@ void ValidateGet::validateFile()
   }
 
   if (_location != FT_NULLPTR && _location->isCgi()) {
-    _client->getResource().setType(Resource::Cgi);
-    // TODO??: check file extension if file is cgi
-    // TODO??: check if parent directory is executable
-    if (!isExecuteable(_path)) {
-      endState(StatusCode::Forbidden);
+    const std::string& ext = _location->getCgiExtension();
+    if (!ext.empty() && ft::ends_with(_path, ext)) {
+      if (!isExecuteable(_path)) {
+        endState(StatusCode::Forbidden);
+        return;
+      }
+      // is CGI
+      _log.info() << "Is a CGI-Script!\n";
+      _client->getResource().setType(Resource::Cgi);
+      endState(StatusCode::Ok);
       return;
     }
-    // is CGI
-    endState(StatusCode::Ok);
-    return;
   }
   endState(StatusCode::Ok);
 }
