@@ -96,7 +96,7 @@ void HandleGet::_generateAutoindex(const std::string& path, SmartBuffer& html)
 {
   DIR* const dir = opendir(path.c_str());
   if (dir == FT_NULLPTR) {
-    _client->getResponse().setStatusCode(StatusCode::Forbidden);
+    _client->getResponse().setStatusCode(StatusCode::InternalServerError);
     return;
   }
   try {
