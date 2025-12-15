@@ -47,11 +47,11 @@ private:
   std::ostream& _log(LogLevel level);
   static InstanceMap& _instances();
   static std::string _currentTime();
+  static bool& _loggerEnabled();
   static bool _initLoggingFromEnv() throw();
 
   static const int _widthLevelStr = 7;
   static const char* const _envVar;
-  static bool _loggerEnabled;
 
   std::ofstream _file;
   std::string _filename;

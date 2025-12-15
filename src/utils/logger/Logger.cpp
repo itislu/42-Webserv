@@ -17,7 +17,6 @@
 // INIT
 
 const char* const Logger::_envVar = "WEBSERV_LOGGING";
-bool Logger::_loggerEnabled = Logger::_initLoggingFromEnv();
 
 /* ************************************************************************** */
 // PUBLIC
@@ -59,12 +58,12 @@ std::ostream& Logger::error()
 
 void Logger::enableLogging()
 {
-  _loggerEnabled = true;
+  _loggerEnabled() = true;
 }
 
 void Logger::disableLogging()
 {
-  _loggerEnabled = false;
+  _loggerEnabled() = false;
 }
 
 /* ***************************************************************************/
@@ -86,7 +85,7 @@ Logger::Logger(const std::string& filename)
 
 bool Logger::_openFile()
 {
-  if (!_loggerEnabled || _filename.empty()) {
+  if (!_loggerEnabled() || _filename.empty()) {
     if (_file.is_open()) {
       _file.close();
     }
@@ -147,6 +146,12 @@ std::string Logger::_currentTime()
   return buff;
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+
+bool& Logger::_loggerEnabled()
+{
+  static bool _loggerEnabled = _initLoggingFromEnv();
+  return _loggerEnabled;
+}
 
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 bool Logger::_initLoggingFromEnv() throw()
