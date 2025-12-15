@@ -75,6 +75,7 @@ void ValidatePost::validateStaticPost()
     }
     if (!ft::ends_with(_path, '/')) {
       _path.append("/");
+      _client->getResource().setPath(_path);
     }
     endState(StatusCode::Ok);
     return;
