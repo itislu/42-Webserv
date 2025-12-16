@@ -7,11 +7,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <fstream>
 #include <iomanip>
 #include <ios>
 #include <iostream>
-#include <map>
 #include <string>
 
 /* ************************************************************************** */
@@ -67,7 +65,7 @@ void Logger::disableLogging()
   _loggerEnabled() = false;
 }
 
-/* ***************************************************************************/
+/* ************************************************************************** */
 // PRIVATE
 
 Logger::Logger() throw()
@@ -102,8 +100,8 @@ bool Logger::_openFile()
     std::cerr << "Failed to open log file: " << _filename << '\n';
     return false;
   }
-
   _isFileCreated = true;
+
   return true;
 }
 
