@@ -7,6 +7,7 @@
 #include <http/Response.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/movable.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
@@ -58,8 +59,10 @@ Client::Client(int fdes)
   _stateHandler.setState<ReadRequestLine>();
 }
 
-Client::Client(int fdes, const Server* server, const Socket* socket)
-  : _fd(fdes)
+Client::Client(ft::rvalue<AutoFd>& fdes,
+               const Server* server,
+               const Socket* socket)
+  : _fd(ft::move(fdes))
   , _server(server)
   , _socket(socket)
   , _stateHandler(this)

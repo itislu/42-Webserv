@@ -1,5 +1,4 @@
 #include "EventManager.hpp"
-#include "socket/Socket.hpp"
 
 #include <client/Client.hpp>
 #include <client/TimeStamp.hpp>
@@ -12,6 +11,8 @@
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
 #include <server/ServerManager.hpp>
+#include <socket/AutoFd.hpp>
+#include <socket/Socket.hpp>
 #include <socket/SocketManager.hpp>
 #include <utils/logger/Logger.hpp>
 
@@ -135,16 +136,17 @@ void EventManager::_acceptClient(int fdes, const unsigned events)
     return;
   }
 
-  const int clientFd = _socketManager().acceptClient(fdes);
-  if (clientFd > 0) {
+  AutoFd clientFd = _socketManager().acceptClient(fdes);
+  const int clientFdRaw = clientFd.get();
+  if (clientFdRaw > 0) {
     const Socket& socket = _socketManager().getSocket(fdes);
     const Server* const server = _serverManager().getInitServer(socket);
-    ft::shared_ptr<Client> client =
-      ft::make_shared<Client>(clientFd, server, &socket);
+    ft::shared_ptr<Client> client(
+      new Client(ft::move(clientFd), server, &socket));
     ft::shared_ptr<ClientEventHandler> handler =
-      ft::make_shared<ClientEventHandler>(clientFd, ft::move(client));
+      ft::make_shared<ClientEventHandler>(clientFdRaw, ft::move(client));
     _addHandler(ft::move(handler));
-    _log.info() << "[SERVER] new client connected, fd=" << clientFd << '\n';
+    _log.info() << "[SERVER] new client connected, fd=" << clientFdRaw << '\n';
   } else {
     _log.error() << "[SERVER] accepting new client failed\n";
   }
