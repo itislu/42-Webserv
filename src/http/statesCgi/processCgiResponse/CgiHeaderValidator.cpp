@@ -35,8 +35,6 @@ CgiHeaderValidator::CgiHeaderValidator(Client* client)
 {
 }
 
-// todo check returned statuscodes
-
 bool CgiHeaderValidator::isValid(const std::string& name,
                                  const std::string& value)
 {
@@ -59,7 +57,7 @@ void CgiHeaderValidator::_validateContentLength(const std::string& value)
 {
   const bool hasTransferEncoding = _headers->contains("Transfer-Encoding");
   if (hasTransferEncoding) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _client->getResponse().setStatusCode(StatusCode::BadGateway);
     _log.error()
       << "CgiHeaderValidator: has Transfer-Encoding AND Content-Length\n";
     return;
@@ -68,7 +66,7 @@ void CgiHeaderValidator::_validateContentLength(const std::string& value)
   static const ft::shared_ptr<SequenceRule> rule =
     fieldLineWrapper(contentLengthRule());
   if (!isValidString(*rule, value)) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _client->getResponse().setStatusCode(StatusCode::BadGateway);
     _log.error() << "CgiHeaderValidator: invalid Content-Length header\n";
   }
 }
@@ -77,14 +75,14 @@ void CgiHeaderValidator::_validateTransferEncoding(const std::string& value)
 {
   const bool hasContentLength = _headers->contains("Content-Length");
   if (hasContentLength) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _client->getResponse().setStatusCode(StatusCode::BadGateway);
     _log.error()
       << "CgiHeaderValidator: has Transfer-Encoding AND Content-Length\n";
     return;
   }
 
   if (_client->getRequest().getVersion() == "HTTP/1.0") {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _client->getResponse().setStatusCode(StatusCode::BadGateway);
     _log.error() << "CgiHeaderValidator: has Transfer-Encoding with "
                     "version HTTP/1.0\n";
     return;
@@ -93,7 +91,7 @@ void CgiHeaderValidator::_validateTransferEncoding(const std::string& value)
   static const ft::shared_ptr<SequenceRule> rule =
     fieldLineWrapper(transferEncodingRule());
   if (!isValidString(*rule, value)) {
-    _client->getResponse().setStatusCode(StatusCode::BadRequest);
+    _client->getResponse().setStatusCode(StatusCode::BadGateway);
     _log.error() << "CgiHeaderValidator: invalid Transfer-Encoding header\n";
   }
 }

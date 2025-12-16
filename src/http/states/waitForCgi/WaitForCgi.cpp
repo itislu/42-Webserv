@@ -31,12 +31,17 @@ WaitForCgi::WaitForCgi(Client* context)
 
 void WaitForCgi::run()
 try {
+  // Error happend
+  if (!_client->getResponse().getStatusCode().is2xxCode()) {
+    getContext()->getStateHandler().setState<PrepareResponse>();
+    return;
+  }
+
+  // Ok
   if (_client->getCgiContext()->getShProcessCgiResponse().isDone()) {
     _log.info() << *_client << " WaitForCgi done\n";
     _client->getCgiContext().reset();
     _client->getStateHandler().setState<WriteStatusLine>();
-  } else if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
-    getContext()->getStateHandler().setState<PrepareResponse>();
   }
 } catch (const std::exception& e) {
   _log.error() << *_client << " WaitForCgi: " << e.what() << "\n";
