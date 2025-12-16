@@ -20,7 +20,7 @@ RangeRule::RangeRule(const char* range)
 // NOLINTEND(cppcoreguidelines-pro-type-union-access)
 
 // NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
-RangeRule::RangeRule(int (*func)(int))
+RangeRule::RangeRule(bool (*func)(char))
   : _range()
 {
   _range.func = func;
@@ -43,10 +43,10 @@ bool RangeRule::matches()
   bool matches = false;
   switch (_range.type) {
     case Func:
-      matches = _range.func(chr) != 0;
+      matches = _range.func(chr);
       break;
     case Charset:
-      matches = std::strchr(_range.set, chr) != FT_NULLPTR;
+      matches = (chr != '\0') && (std::strchr(_range.set, chr) != FT_NULLPTR);
       break;
   }
 

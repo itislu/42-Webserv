@@ -41,7 +41,7 @@ void HandlePost::_setNextState()
 {
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
 
-  if (statusCode == StatusCode::Ok) {
+  if (statusCode == StatusCode::Ok || statusCode == StatusCode::Created) {
     getContext()->getStateHandler().setDone();
   } else {
     getContext()->getStateHandler().setState<HandleError>();
@@ -67,8 +67,9 @@ std::string HandlePost::_getFileName(const std::string& directory)
 
 void HandlePost::_createData()
 {
-  // todo get path from resource
-  const std::string directory = "./assets/testWebsite/upload/";
+  const std::string directory = _client->getResource().getPath();
+
+  _log.info() << "HandlePost: " << directory << '\n';
 
   const std::string newFilePath = _getFileName(directory);
   _client->getRequest().getBody().moveBufferToFile(newFilePath);

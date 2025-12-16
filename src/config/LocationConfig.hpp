@@ -7,8 +7,6 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 class ServerConfig;
 
 class LocationConfig
@@ -46,6 +44,8 @@ public:
   void setErrorPages(const std::vector<int>& codes, const std::string& path);
   void addErrorPage(int code, const std::string& path);
   void addAllowedMethod(const std::string& method);
+
+  void clearAllowedMethods();
 
   void setAutoIndex(bool autoindex);
 
@@ -94,7 +94,5 @@ If autoindex is:
 that folder.
 ❌ false → the server returns a 403 Forbidden (or sometimes 404 Not Found).
 */
-
-} // namespace config
 
 #endif

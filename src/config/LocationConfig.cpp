@@ -6,14 +6,13 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 LocationConfig::LocationConfig(const ServerConfig& serverConfig)
   : _root(serverConfig.getRoot())
   , _autoindex(false)
   , _allowedMethods(serverConfig.getAllowedMethods())
   , _index(serverConfig.getIndex())
   , _maxBodysize(serverConfig.getMaxBodySize())
+  , _errorPages(serverConfig.getErrorPages())
   , _cgiEnabled(false)
   , _redirect(false)
   , _redirectCode()
@@ -86,12 +85,12 @@ const std::map<int, std::string>& LocationConfig::getErrorPages() const
   return _errorPages;
 }
 
-/* returns an empty string at the moment if not found */
 const std::string& LocationConfig::getErrorPage(int code) const
 {
   const std::map<int, std::string>::const_iterator iter =
     _errorPages.find(code);
   if (iter != _errorPages.end()) {
+    // TODO: check if this should be appended to root
     return iter->second;
   }
   static const std::string empty;
@@ -117,6 +116,11 @@ void LocationConfig::setAutoIndex(bool autoindex)
 void LocationConfig::addAllowedMethod(const std::string& method)
 {
   _allowedMethods.insert(method);
+}
+
+void LocationConfig::clearAllowedMethods()
+{
+  _allowedMethods.clear();
 }
 
 void LocationConfig::setErrorPages(const std::vector<int>& codes,
@@ -171,5 +175,3 @@ void LocationConfig::setRedirectCode(int code)
 {
   _redirectCode = code;
 }
-
-} // namespace config

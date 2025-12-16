@@ -1,35 +1,35 @@
-#include "config/Config.hpp"
-#include "config/ConfigParser.hpp"
-#include "config/ServerConfig.hpp"
-#include "server/ServerManager.hpp"
+#include <config/Config.hpp>
+#include <config/ServerConfig.hpp>
+#include <config/parser/ConfigParser.hpp>
+#include <server/ServerManager.hpp>
 #include <utils/logger/Logger.hpp>
 
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic): argv.
 int main(int argc, char* argv[])
-{
+try {
   Logger::enableLogging();
+  Logger& logger = Logger::getInstance(LOG_GENERAL);
 
   if (argc != 2) {
-    std::cerr << "Error: Usage: ./webserv [configuration file]\n";
-    return 1;
+    std::cerr << "Usage: " << argv[0] << " <configuration file>\n";
+    return EXIT_FAILURE;
   }
 
-  try {
+  logger.info() << "parsing config...\n";
+  config::ConfigParser(argv[1]).parseConfig();
+  std::cout << Config::getConfig();
 
-    Logger::getInstance(LOG_GENERAL).info() << "webserv started\n";
+  logger.info() << "starting server...\n";
+  ServerManager::getInstance();
+  ServerManager::run();
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    const config::Config config = config::ConfigParser(argv[1]).parseConfig();
-    std::cout << config;
-
-    ServerManager serverManager(config);
-    serverManager.run();
-
-  } catch (const std::exception& e) {
-    std::cerr << "Error: " << e.what() << "\n";
-    return 1;
-  }
-  return 0;
+  return EXIT_SUCCESS;
+} catch (const std::exception& e) {
+  std::cerr << "Error: " << e.what() << '\n';
+  return EXIT_FAILURE;
 }
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)

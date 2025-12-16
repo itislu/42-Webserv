@@ -4,12 +4,20 @@
 #include "libftpp/memory.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
+#include "socket/Socket.hpp"
 #include <algorithm>
 #include <climits>
 #include <cstddef>
 #include <map>
 #include <utility>
 #include <vector>
+
+ClientManager& ClientManager::getInstance()
+{
+  static ClientManager clientManager;
+
+  return clientManager;
+}
 
 Client* ClientManager::getClient(int fdes) const
 {
@@ -25,9 +33,12 @@ std::size_t ClientManager::getClientCount() const
   return _clients.size();
 }
 
-void ClientManager::addClient(int fdes, const Server* server)
+void ClientManager::addClient(int fdes,
+                              const Server* server,
+                              const Socket& socket)
 {
-  _clients.insert(std::make_pair(fdes, ft::make_shared<Client>(fdes, server)));
+  _clients.insert(
+    std::make_pair(fdes, ft::make_shared<Client>(fdes, server, &socket)));
 }
 
 void ClientManager::removeClient(int fdes)

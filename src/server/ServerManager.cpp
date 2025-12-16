@@ -1,11 +1,15 @@
 #include "ServerManager.hpp"
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
+#include "event/EventManager.hpp"
+#include "libftpp/algorithm.hpp"
 #include "libftpp/memory.hpp"
+#include "libftpp/string.hpp"
 #include "libftpp/utility.hpp"
 #include "server/Server.hpp"
 #include "socket/Socket.hpp"
 #include "socket/SocketManager.hpp"
+#include <cassert>
 #include <cerrno>
 #include <csignal>
 #include <cstring>
@@ -26,23 +30,25 @@ extern "C" void sigIntHandler(int /*sigNum*/)
   g_running = 0;
 }
 
-ServerManager::ServerManager(const config::Config& config)
-  : _config(&config)
-  , _socketManager(config)
-  , _eventManager(_clientManager, _socketManager, *this)
+ServerManager& ServerManager::getInstance()
+{
+  static ServerManager serverManager(Config::getConfig());
+
+  return serverManager;
+}
+
+ServerManager::ServerManager(const Config& config)
 {
   if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
   }
-  createServers(_config->getServers());
+  createServers(config.getServers());
 }
 
-void ServerManager::createServers(
-  const std::vector<config::ServerConfig>& configs)
+void ServerManager::createServers(const std::vector<ServerConfig>& configs)
 {
   _servers.reserve(configs.size());
-  for (config::Config::const_ServConfIter it = configs.begin();
-       it != configs.end();
+  for (Config::const_ServConfIter it = configs.begin(); it != configs.end();
        ++it) {
     const std::vector<const Socket*> listeners =
       createListeners(it->getPorts());
@@ -55,16 +61,17 @@ std::vector<const Socket*> ServerManager::createListeners(
 {
   std::vector<const Socket*> listeners;
   listeners.reserve(ports.size());
+  const SocketManager& socketManager = SocketManager::getInstance();
   for (std::vector<int>::const_iterator it = ports.begin(); it != ports.end();
        ++it) {
     const int port = *it;
-    const Socket& sock = _socketManager.getListener(port);
+    const Socket& sock = socketManager.getListener(port);
     listeners.push_back(&sock);
   }
   return listeners;
 }
 
-void ServerManager::addServer(const config::ServerConfig& config,
+void ServerManager::addServer(const ServerConfig& config,
                               const std::vector<const Socket*>& listeners)
 {
   const ft::shared_ptr<const Server> server =
@@ -84,19 +91,25 @@ void ServerManager::mapServerToSocket(
   }
 }
 
-const Server* ServerManager::getServerFromSocket(const Socket* socket) const
+/*
+  Tries to find the best server for the given hostname, case insensitive. If no
+  hostname matches it defaults to the first server that is associated with this
+  socket.
+*/
+const Server* ServerManager::getServerByHost(const Socket* socket,
+                                             const std::string& host) const
 {
-  if (socket == FT_NULLPTR) {
-    return FT_NULLPTR;
-  }
+  const std::string lowerHost = ft::to_lower(host);
   const const_SockToServIter iter = _socketToServers.find(socket);
-  if (iter == _socketToServers.end()) {
-    return FT_NULLPTR;
-  }
+  assert(iter != _socketToServers.end());
   const std::vector<const Server*>& servers = iter->second;
-  if (servers.size() != 1) {
-    return FT_NULLPTR;
+  for (std::size_t i = 0; i < servers.size(); ++i) {
+    const std::vector<std::string>& serverNames = servers[i]->getHostnames();
+    if (ft::contains(serverNames, lowerHost)) {
+      return servers[i];
+    }
   }
+  assert(!servers.empty());
   return servers[0];
 }
 
@@ -107,9 +120,8 @@ const Server* ServerManager::getServerFromSocket(const Socket* socket) const
   Until then, return nullptr to indicate client is not associated with a
   specific server yet.
 */
-const Server* ServerManager::getInitServer(int fdes) const
+const Server* ServerManager::getInitServer(const Socket& socket) const
 {
-  const Socket& socket = _socketManager.getSocket(fdes);
   const const_SockToServIter iter = _socketToServers.find(&socket);
   if (iter != _socketToServers.end() && iter->second.size() == 1) {
     return iter->second[0];
@@ -132,7 +144,7 @@ void ServerManager::run()
 {
   g_running = 1;
   while (g_running == 1) {
-    const int res = _eventManager.check();
+    const int res = EventManager::check();
     if (res == 0) {
       std::cout << "poll: timeout\n";
     }
@@ -142,7 +154,7 @@ void ServerManager::run()
       }
       break;
     }
-    _eventManager.checkTimeouts();
+    EventManager::checkTimeouts();
   }
   std::cout << "Shutting down servers...\n";
 }

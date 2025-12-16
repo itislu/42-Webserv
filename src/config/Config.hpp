@@ -10,14 +10,14 @@
 #include <string>
 #include <vector>
 
-namespace config {
-
 class Config
 {
 public:
-  explicit Config();
   typedef std::vector<ServerConfig>::iterator ServConfIter;
   typedef std::vector<ServerConfig>::const_iterator const_ServConfIter;
+
+  static Config& getConfig();
+  static void reset();
 
   // Getters
   const std::vector<ServerConfig>& getServers() const;
@@ -47,6 +47,8 @@ public:
                                            const std::string& path) const;
 
 private:
+  Config();
+
   static const char* const defaultRoot;
   static const std::size_t defaultMaxBodySize;
   static const int defaultTimeout;
@@ -60,7 +62,5 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const Config& config);
-
-} // namespace config
 
 #endif

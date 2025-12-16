@@ -1,12 +1,16 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "socket/Socket.hpp"
 #include <client/TimeStamp.hpp>
 #include <http/Request.hpp>
+#include <http/Resource.hpp>
 #include <http/Response.hpp>
+#include <ostream>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
-#include <utils/SmartBuffer.hpp>
+#include <utils/buffer/BufferQueue.hpp>
+#include <utils/buffer/SmartBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/StateHandler.hpp>
 
@@ -18,18 +22,24 @@ class Client
 public:
   Client();
   explicit Client(int fdes);
-  Client(int fdes, const Server* server);
+  Client(int fdes, const Server* server, const Socket* socket);
+
+  static const std::size_t maxChunk = 1024;
 
   int getFd() const;
+  bool hasServer() const;
   const std::string& getHost() const;
   SmartBuffer& getInBuff();
-  SmartBuffer& getOutBuff();
+  BufferQueue& getOutBuffQueue();
   const Server* getServer() const;
+  const Socket* getSocket() const;
   StateHandler<Client>& getStateHandler();
   Request& getRequest();
   Response& getResponse();
+  Resource& getResource();
 
   void setServer(const Server* server);
+  void setSocket(const Socket* socket);
 
   const TimeStamp& getLastActivity() const;
   long getTimeout() const;
@@ -38,21 +48,26 @@ public:
   bool sendTo();
   bool receive();
 
+  void prepareForNewRequest();
+
 private:
   void updateLastActivity();
 
   static Logger& _log;
-  static const std::size_t _maxChunk = 1024;
 
   AutoFd _fd;
   const Server* _server;
+  const Socket* _socket;
   std::string _host;
   TimeStamp _lastActivity;
   SmartBuffer _inBuff;
-  SmartBuffer _outBuff;
+  BufferQueue _outBuffQueue;
   StateHandler<Client> _stateHandler;
   Request _request;
   Response _response;
+  Resource _resource;
 };
+
+std::ostream& operator<<(std::ostream& out, const Client& client);
 
 #endif
