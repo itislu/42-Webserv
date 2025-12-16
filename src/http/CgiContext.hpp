@@ -6,8 +6,6 @@
 #include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
-#include <map>
-#include <string>
 #include <sys/types.h>
 
 class Client;
@@ -45,8 +43,6 @@ private:
   Client* _client;
   StateHandler<CgiContext> _shExecCgi;
   StateHandler<CgiContext> _shProcessCgiResponse;
-
-  std::map<std::string, std::string> _env;
 
   Pipe _pipeClientToCgi;
   Pipe _pipeCgiToClient;

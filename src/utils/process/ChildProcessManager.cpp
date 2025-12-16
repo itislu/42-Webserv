@@ -1,10 +1,11 @@
 #include "ChildProcessManager.hpp"
 
-#include <csignal>
+#include <libftpp/algorithm.hpp>
 #include <utils/logger/Logger.hpp>
 
 #include <algorithm>
 #include <cerrno>
+#include <csignal>
 #include <cstddef>
 #include <cstring>
 #include <signal.h>
@@ -38,7 +39,6 @@ ChildProcessManager::~ChildProcessManager()
     _log.info() << "Child(" << *it << ") collected\n";
   }
 }
-
 void ChildProcessManager::collectChilds()
 {
   std::size_t index = 0;
@@ -58,7 +58,8 @@ void ChildProcessManager::collectChilds()
       remove = true;
     } else {
       // result == -1
-      _log.info() << "Child(" << pid << ") error waitpid: " << strerror(errno);
+      _log.info() << "Child(" << pid << ") error waitpid: " << strerror(errno)
+                  << "\n";
       remove = true;
     }
 
@@ -74,6 +75,9 @@ void ChildProcessManager::collectChilds()
 void ChildProcessManager::addChild(pid_t pid)
 {
   if (pid <= 0) {
+    return;
+  }
+  if (ft::contains(_childs, pid)) {
     return;
   }
 

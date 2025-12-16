@@ -192,7 +192,7 @@ long EventManager::_getMinTimeout() const
     const long clientTimeout = it->second->getTimeout();
     const long remaining =
       clientTimeout - (now - it->second->getLastActivity());
-    minRemaining = std::min(remaining, minRemaining);
+    minRemaining = std::min(std::max(0L, remaining), minRemaining);
   }
   return minRemaining;
 }

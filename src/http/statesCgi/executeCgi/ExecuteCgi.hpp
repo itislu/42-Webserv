@@ -41,7 +41,7 @@ private:
   State _state;
   std::vector<std::string> _env;
   std::size_t _contentLength;
-  std::size_t _bytesWriten;
+  std::size_t _bytesWritten;
 };
 
 #endif

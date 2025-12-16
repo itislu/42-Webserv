@@ -1,5 +1,4 @@
 #include "ExecuteCgi.hpp"
-#include "utils/process/ChildProcessManager.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -7,7 +6,6 @@
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
 #include <http/headerUtils.hpp>
-#include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
@@ -42,7 +40,7 @@ ExecuteCgi::ExecuteCgi(CgiContext* context)
   , _client(context->getClient())
   , _state(PrepareEnv)
   , _contentLength(0)
-  , _bytesWriten(0)
+  , _bytesWritten(0)
 {
   _log.info() << *_client << " ExecuteCgi\n";
 }
@@ -126,8 +124,7 @@ void ExecuteCgi::_executeScript()
 
   const pid_t pid = fork();
   if (pid < 0) {
-    _log.error() << "ExecuteCgi: fork failed\n";
-    throw std::runtime_error("ExecuteCgi: fork failed");
+    throw std::runtime_error("fork failed");
   }
   if (pid == 0) {
     _handleChild();
@@ -186,23 +183,20 @@ void ExecuteCgi::_provideBody()
   IInOutBuffer& body = request.getBody();
   Pipe& pipeToCgi = getContext()->getPipeClientToCgi();
 
-  if (body.isEmpty()) {
-    return;
+  if (!body.isEmpty()) {
+    // Write TO CHILD (stdin)
+    const std::size_t toWrite = std::min(body.size(), Client::maxChunk);
+    IBuffer::RawBytes msg = body.getRawBytes(0, toWrite);
+    const ssize_t res = write(pipeToCgi.getWriteFd(), msg.data(), msg.size());
+    if (res < 0) {
+      throw std::runtime_error("ExecuteCgi: write failed");
+    }
+    if (res > 0) {
+      body.removeFront(res);
+    }
+    _bytesWritten += res;
   }
-
-  // Write TO CHILD (stdin)
-  const std::size_t toWrite = std::min(body.size(), Client::maxChunk);
-  IBuffer::RawBytes msg = body.getRawBytes(0, toWrite);
-  const ssize_t res = write(pipeToCgi.getWriteFd(), msg.data(), msg.size());
-  if (res < 0) {
-    throw std::runtime_error("ExecuteCgi: write failed");
-  }
-  if (res > 0) {
-    body.removeFront(res);
-  }
-
-  _bytesWriten += res;
-  if (_bytesWriten >= _contentLength) {
+  if (_bytesWritten >= _contentLength) {
     pipeToCgi.closeWrite();
     _state = Done;
   }

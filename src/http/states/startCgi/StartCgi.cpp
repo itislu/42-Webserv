@@ -12,7 +12,6 @@
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <cstddef>
 #include <cstdlib>
 #include <exception>
 
@@ -37,8 +36,8 @@ try {
   _client->getStateHandler().setState<ReadBody>();
 } catch (const std::exception& e) {
   _log.error() << *_client << " StartCgi: " << e.what() << "\n";
-  getContext()->getResponse().setStatusCode(StatusCode::InternalServerError);
-  getContext()->getStateHandler().setState<PrepareResponse>();
+  _client->getResponse().setStatusCode(StatusCode::InternalServerError);
+  _client->getStateHandler().setState<PrepareResponse>();
 }
 
 /* ************************************************************************** */

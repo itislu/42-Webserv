@@ -1,6 +1,6 @@
 #pragma once
-#ifndef REQUEST_HEADER_VALIDATOR_HPP
-#define REQUEST_HEADER_VALIDATOR_HPP
+#ifndef CGI_HEADER_VALIDATOR_HPP
+#define CGI_HEADER_VALIDATOR_HPP
 
 #include <http/Headers.hpp>
 #include <http/utils/BaseHeaderValidator.hpp>

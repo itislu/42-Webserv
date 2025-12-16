@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 printf "Content-Type: text/plain\r\n"
 printf "\r\n"

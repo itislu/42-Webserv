@@ -18,6 +18,11 @@ const TimeStamp& EventHandler::getLastActivity() const
   return _lastActivity;
 }
 
+int EventHandler::getFd() const
+{
+  return _fdes;
+}
+
 /* ************************************************************************** */
 // PROTECTED
 
@@ -48,8 +53,3 @@ bool EventHandler::isPollErrEvent(unsigned events)
 
 /* ************************************************************************** */
 // PRIVATE
-
-int EventHandler::getFd() const
-{
-  return _fdes;
-}

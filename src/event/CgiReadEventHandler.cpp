@@ -29,8 +29,7 @@ CgiReadEventHandler::CgiReadEventHandler(int fdes,
 
 CgiReadEventHandler::Result CgiReadEventHandler::handleEvent(unsigned revents)
 try {
-  if (_client == FT_NULLPTR || !_client->alive() ||
-      _client->getCgiContext() == FT_NULLPTR) {
+  if (!_client->alive() || _client->getCgiContext() == FT_NULLPTR) {
     return Disconnect;
   }
 
@@ -54,7 +53,7 @@ try {
 
 CgiReadEventHandler::Result CgiReadEventHandler::onTimeout()
 {
-  if (_client == FT_NULLPTR || _client->getCgiContext() == FT_NULLPTR) {
+  if (!_client->alive() || _client->getCgiContext() == FT_NULLPTR) {
     return Disconnect;
   }
 

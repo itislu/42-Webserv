@@ -204,9 +204,7 @@ void Client::prepareForNewRequest()
   _request = Request();
   _resource = Resource();
 
-  // _cgiContext.reset();
-  ft::shared_ptr<CgiContext> nullPtr;
-  _cgiContext = ft::move(nullPtr);
+  _cgiContext.reset();
 }
 
 void Client::setCloseConnection(bool value)

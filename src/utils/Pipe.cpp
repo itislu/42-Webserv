@@ -21,6 +21,9 @@ Pipe::~Pipe()
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 void Pipe::init()
 {
+  if (_pipefd[0] != -1 || _pipefd[1] != -1) {
+    close();
+  }
   if (pipe(_pipefd) == -1) {
     throw PipeException();
   }

@@ -32,13 +32,14 @@ ClientEventHandler::ClientEventHandler(int fdes, ft::shared_ptr<Client> client)
   : EventHandler(fdes)
   , _client(ft::move(client))
   , _cgiEventHandlerAdded(false)
+  , _sending(false)
 {
 }
 
 ClientEventHandler::Result ClientEventHandler::handleEvent(unsigned revents)
 try {
   Result result = Alive;
-  if (_client == FT_NULLPTR && !_client->alive()) {
+  if (!_client->alive()) {
     result = Disconnect;
   }
 
@@ -58,7 +59,7 @@ try {
   }
   return result;
 } catch (const std::exception& e) {
-  _log.error() << "CgiWriteEventHandler exception: " << e.what() << '\n';
+  _log.error() << "ClientEventHandler exception: " << e.what() << '\n';
   _client->getResponse().setStatusCode(StatusCode::InternalServerError);
   _client->setAlive(false);
   _handleException();
@@ -68,7 +69,7 @@ try {
 ClientEventHandler::Result ClientEventHandler::onTimeout()
 {
   _log.info() << "ClientEventHandler: onTimeout\n";
-  if (_client == FT_NULLPTR || _client->getCgiContext() == FT_NULLPTR) {
+  if (_client->getCgiContext() == FT_NULLPTR) {
     return Disconnect;
   }
 
@@ -114,6 +115,7 @@ ClientEventHandler::Result ClientEventHandler::_handlePollOutEvent()
   _clientStateMachine();
 
   if (_client->hasDataToSend()) {
+    _sending = true;
     const bool alive = _client->sendTo();
     updateLastActivity();
 
@@ -121,6 +123,7 @@ ClientEventHandler::Result ClientEventHandler::_handlePollOutEvent()
       if (!_client->hasDataToSend() && _client->getInBuff().isEmpty()) {
         _log.info() << "Pollout disabled\n";
         SocketManager::getInstance().disablePollout(_client->getFd());
+        _sending = false;
       }
     } else {
       return Disconnect;
@@ -154,13 +157,11 @@ void ClientEventHandler::_clientStateMachine()
 
 void ClientEventHandler::_handleException()
 {
-  /**  //todo
-   * should send response message only if nothing has been sent yet.
-   * tricky for piped requests
-   */
-  const char* const msg = http::minResponse500;
-  const std::size_t msgLen = std::strlen(msg);
-  (void)send(getFd(), msg, msgLen, 0);
+  if (!_sending) {
+    const char* const msg = http::minResponse500;
+    const std::size_t msgLen = std::strlen(msg);
+    (void)send(getFd(), msg, msgLen, 0);
+  }
 }
 
 void ClientEventHandler::_addCgiEventHandler()

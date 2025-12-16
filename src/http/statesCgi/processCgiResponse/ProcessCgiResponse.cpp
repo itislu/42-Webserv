@@ -90,8 +90,7 @@ void ProcessCgiResponse::_readCgiResponse()
     read(pipe.getReadFd(), buffer.data(), buffer.size());
   if (bytesRead > 0) {
     _smartBuffer->append(buffer, bytesRead);
-    _log.info() << "ProcessCgiResponse: read " << bytesRead << " bytes\n"
-                << "data: '" << buffer.data() << "'\n";
+    _log.info() << "ProcessCgiResponse: read " << bytesRead << " bytes\n";
   } else if (bytesRead == 0) {
     _done = true;
     _log.info() << "ProcessCgiResponse: read returned 0 (EOF)\n";
@@ -143,10 +142,11 @@ void ProcessCgiResponse::_checkBody()
 {
   // todo just set body size here?
   Response& response = _client->getResponse();
-  if (response.getBody()->isEmpty()) {
+  if (response.getBody() == FT_NULLPTR || response.getBody()->isEmpty()) {
     ft::shared_ptr<IInBuffer> nullBuffer;
     response.setBody(ft::move(nullBuffer));
     setContentLengthHeader(response.getHeaders(), 0);
+    return;
   }
   setContentLengthHeader(response.getHeaders(), response.getBody()->size());
 }

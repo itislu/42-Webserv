@@ -7,6 +7,7 @@
 #include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
+#include <sys/types.h>
 
 /* ************************************************************************** */
 // PUBLIC

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Read entire POST body
-BODY="$(cat)"
+BODY="$(head -c "$CONTENT_LENGTH")"
 
 # Required CGI header
 printf "Content-Type: application/octet-stream\r\n"

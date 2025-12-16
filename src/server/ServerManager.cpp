@@ -51,7 +51,7 @@ ServerManager::ServerManager(const Config& config)
     throw std::runtime_error("Failed to set SIGINT handler");
   }
   if (std::signal(SIGCHLD, sigChldHandler) == SIG_ERR) {
-    throw std::runtime_error("Failed to set SIGINT handler");
+    throw std::runtime_error("Failed to set SIGCHLD handler");
   }
   createServers(config.getServers());
 }

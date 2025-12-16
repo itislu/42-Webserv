@@ -1,5 +1,4 @@
 #include "CgiWriteEventHandler.hpp"
-#include "socket/SocketManager.hpp"
 
 #include <client/Client.hpp>
 #include <event/EventHandler.hpp>
@@ -7,6 +6,7 @@
 #include <http/StatusCode.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
+#include <socket/SocketManager.hpp>
 #include <utils/logger/Logger.hpp>
 
 #include <exception>
@@ -28,8 +28,7 @@ CgiWriteEventHandler::CgiWriteEventHandler(int fdes,
 
 CgiWriteEventHandler::Result CgiWriteEventHandler::handleEvent(unsigned revents)
 try {
-  if (_client == FT_NULLPTR || !_client->alive() ||
-      _client->getCgiContext() == FT_NULLPTR) {
+  if (!_client->alive() || _client->getCgiContext() == FT_NULLPTR) {
     return Disconnect;
   }
 
@@ -53,7 +52,7 @@ try {
 
 CgiWriteEventHandler::Result CgiWriteEventHandler::onTimeout()
 {
-  if (_client == FT_NULLPTR || _client->getCgiContext() == FT_NULLPTR) {
+  if (!_client->alive() || _client->getCgiContext() == FT_NULLPTR) {
     return Disconnect;
   }
 

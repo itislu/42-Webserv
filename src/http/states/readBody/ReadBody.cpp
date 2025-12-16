@@ -393,7 +393,12 @@ void ReadBody::_updateCgi()
 
   if (_done || _fixedLengthBody) {
     cgiContext->setContentLengthAvailable();
-    cgiContext->setContentLength(_bodyLength);
+    if (_fixedLengthBody) {
+      cgiContext->setContentLength(_bodyLength);
+    } else if (_chunkedBody) {
+      const IInOutBuffer& body = _client->getRequest().getBody();
+      cgiContext->setContentLength(body.size());
+    }
   }
 
   // new data -> enable cgi pollout

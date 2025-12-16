@@ -30,6 +30,7 @@ private:
   ft::shared_ptr<Client> _client;
 
   bool _cgiEventHandlerAdded;
+  bool _sending;
 };
 
 #endif

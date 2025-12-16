@@ -78,7 +78,7 @@ std::string HandleError::_makeErrorBody(const StatusCode& statuscode)
 }
 
 /**
- * @brief Reset response i case some state before already set Headers.
+ * @brief Reset response in case some state before already set Headers.
  *
  * - for example CGI
  */
