@@ -3,7 +3,9 @@
 #include <config/Config.hpp>
 #include <config/ServerConfig.hpp>
 #include <event/EventManager.hpp>
+#include <libftpp/algorithm.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
 #include <socket/Socket.hpp>
@@ -96,23 +98,21 @@ void ServerManager::mapServerToSocket(
 }
 
 /*
-  Tries to find the best server for the given hostname. If no hostname matches
-  it defaults to the first server that is associated with this socket.
+  Tries to find the best server for the given hostname, case insensitive. If no
+  hostname matches it defaults to the first server that is associated with this
+  socket.
 */
 const Server* ServerManager::getServerByHost(const Socket* socket,
                                              const std::string& host) const
 {
+  const std::string lowerHost = ft::to_lower(host);
   const const_SockToServIter iter = _socketToServers.find(socket);
-  if (iter == _socketToServers.end()) {
-    return FT_NULLPTR; // this should never happen
-  }
+  assert(iter != _socketToServers.end());
   const std::vector<const Server*>& servers = iter->second;
   for (std::size_t i = 0; i < servers.size(); ++i) {
     const std::vector<std::string>& serverNames = servers[i]->getHostnames();
-    for (std::size_t name = 0; name < serverNames.size(); ++name) {
-      if (host == serverNames[name]) {
-        return servers[i];
-      }
+    if (ft::contains(serverNames, lowerHost)) {
+      return servers[i];
     }
   }
   assert(!servers.empty());

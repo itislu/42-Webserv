@@ -43,6 +43,7 @@ private:
 
   void _validateHost();
   void _splitHostHeader(const std::string& hostHeader, int& port);
+  void _setPortFromUri(int& port);
   void _setServerByHost();
 
   static std::string removePrefix(const std::string& uriPath,
