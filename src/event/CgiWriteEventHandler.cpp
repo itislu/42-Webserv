@@ -5,11 +5,14 @@
 #include <http/CgiContext.hpp>
 #include <http/StatusCode.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <socket/SocketManager.hpp>
 #include <utils/logger/Logger.hpp>
 
+#include <algorithm>
 #include <exception>
+#include <string>
 
 /* ***************************************************************************/
 // INIT
@@ -41,17 +44,18 @@ try {
   }
 
   if (result == Disconnect) {
-    _log.info() << "CgiWriteEventHandler: disconnect\n";
+    _log.info() << logName() << "disconnect\n";
   }
   return result;
 } catch (const std::exception& e) {
-  _log.error() << "CgiWriteEventHandler exception: " << e.what() << '\n';
+  _log.error() << logName() << "exception: " << e.what() << '\n';
   _client->getResponse().setStatusCode(StatusCode::InternalServerError);
   return Disconnect;
 }
 
 CgiWriteEventHandler::Result CgiWriteEventHandler::onTimeout()
 {
+  _log.info() << logName() << "onTimeout\n";
   if (!_client->alive() || _client->getCgiContext() == FT_NULLPTR) {
     return Disconnect;
   }
@@ -63,7 +67,16 @@ CgiWriteEventHandler::Result CgiWriteEventHandler::onTimeout()
 
 long CgiWriteEventHandler::getTimeout() const
 {
-  return _client->getTimeout();
+  const long oneSecond = 1000;
+  return std::max(_client->getTimeout() - oneSecond, oneSecond);
+}
+
+std::string CgiWriteEventHandler::logName() const
+{
+  std::string name = "CgiWriteEventHandler(";
+  name.append(ft::to_string(getFd()));
+  name.append("): ");
+  return name;
 }
 
 /* ************************************************************************** */

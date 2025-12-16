@@ -6,6 +6,8 @@
 #include <libftpp/memory.hpp>
 #include <utils/logger/Logger.hpp>
 
+#include <string>
+
 class Client;
 
 /* ************************************************************************** */
@@ -17,6 +19,7 @@ public:
   Result handleEvent(unsigned revents);
   Result onTimeout();
   long getTimeout() const;
+  std::string logName() const;
 
 private:
   Result _handlePollInEvent();
@@ -25,6 +28,7 @@ private:
   void _handleException();
   void _addCgiEventHandler();
   void _prepareForNewRequest();
+  void _sendMinResponse(const char* msg);
 
   static Logger& _log;
   ft::shared_ptr<Client> _client;

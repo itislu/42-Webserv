@@ -48,16 +48,20 @@ void ChildProcessManager::collectChilds()
     int status = 0;
     const pid_t pid = _childs[index];
     const pid_t result = waitpid(pid, &status, WNOHANG);
-    if (result == pid) {
+    if (result == 0) {
+      _log.warning() << "Child(" << pid << ") alive\n";
+    } else if (result == pid) {
       if (WIFEXITED(status)) {
         _log.info() << "Child(" << pid
                     << ") collected, Exit code: " << WEXITSTATUS(status)
                     << "\n";
+      } else {
+        _log.warning() << "Child(" << pid << ") collected, no exitcode\n";
       }
       remove = true;
-    } else if (result < 0) {
-      _log.info() << "Child(" << pid << ") error waitpid: " << strerror(errno)
-                  << "\n";
+    } else {
+      _log.error() << "Child(" << pid << ") error waitpid: " << strerror(errno)
+                   << "\n";
       remove = true;
     }
 

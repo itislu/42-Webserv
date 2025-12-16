@@ -66,8 +66,7 @@ void EventManager::checkTimeouts()
   std::vector<ft::shared_ptr<EventHandler> > timedOut;
   _getTimedOutHandlers(timedOut);
   for (std::size_t i = 0; i < timedOut.size(); ++i) {
-    _log.info() << "[SERVER] Client fd=" << timedOut[i]->getFd()
-                << " timed out.\n";
+    _log.info() << timedOut[i]->logName() << "timed out.\n";
     _disconnectEventHandler(timedOut[i].get());
   }
 }
@@ -155,14 +154,14 @@ void EventManager::_disconnectEventHandler(EventHandler* handler)
   if (handler == FT_NULLPTR) {
     return;
   }
+  _log.info() << handler->logName() << "disconnected\n";
+
   const int handlerFd = handler->getFd();
   // Remove corresponding pollfd
   _socketManager().removeFd(handlerFd);
 
   // remove from handler map
   _removeHandler(handlerFd);
-
-  _log.info() << "Handler(" << handlerFd << ") disconnected\n";
 }
 
 int EventManager::_calculateTimeout()
@@ -178,8 +177,8 @@ int EventManager::_calculateTimeout()
 
   const long minRemaining = _getMinTimeout();
   const int timeoutMs = convertSecondsToMs(minRemaining);
-  //_log.info() << "using client min remaining timeout: " << timeoutMs <<
-  //"ms\n";
+  // _log.info() << "using client min remaining timeout: " << timeoutMs <<
+  // "ms\n";
 
   return timeoutMs;
 }
