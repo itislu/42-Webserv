@@ -11,6 +11,8 @@
 class ChildProcessManager
 {
 public:
+  typedef std::vector<pid_t> PidVector;
+
   static ChildProcessManager& getInstance();
   ~ChildProcessManager();
 
@@ -25,7 +27,7 @@ private:
   ChildProcessManager& operator=(const ChildProcessManager& other);
 
   static Logger& _log;
-  std::vector<pid_t> _childs;
+  PidVector _childs;
 };
 
 #endif

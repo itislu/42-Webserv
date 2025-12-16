@@ -8,34 +8,30 @@
 #include <server/Server.hpp>
 #include <socket/Socket.hpp>
 #include <socket/SocketManager.hpp>
+#include <utils/logger/Logger.hpp>
 #include <utils/process/ChildProcessManager.hpp>
 
 #include <cassert>
 #include <cerrno>
 #include <csignal>
 #include <cstring>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <sys/signal.h>
 #include <vector>
 
-static volatile std::sig_atomic_t g_running = 0;
-static volatile std::sig_atomic_t g_childDied = 0;
+/* ***************************************************************************/
+// INIT
 
-static void error(const std::string& msg)
-{
-  std::cerr << "Error: " << msg << " (" << std::strerror(errno) << ")\n";
-}
+static volatile std::sig_atomic_t g_running = 0;
+
+Logger& ServerManager::_log = Logger::getInstance(LOG_SERVER);
+
+/* ************************************************************************** */
 
 extern "C" void sigIntHandler(int /*sigNum*/)
 {
   g_running = 0;
-}
-
-extern "C" void sigChldHandler(int /*sigNum*/)
-{
-  g_childDied = 1;
 }
 
 ServerManager& ServerManager::getInstance()
@@ -49,9 +45,6 @@ ServerManager::ServerManager(const Config& config)
 {
   if (std::signal(SIGINT, sigIntHandler) == SIG_ERR) {
     throw std::runtime_error("Failed to set SIGINT handler");
-  }
-  if (std::signal(SIGCHLD, sigChldHandler) == SIG_ERR) {
-    throw std::runtime_error("Failed to set SIGCHLD handler");
   }
   createServers(config.getServers());
 }
@@ -161,22 +154,13 @@ void ServerManager::run()
   while (g_running == 1) {
     const int res = eventManager.check();
     if (res == 0) {
-      std::cout << "poll: timeout\n";
+      _log.info() << "poll: timeout\n";
     }
     if (res < 0) {
-      if (errno == EINTR) {
-        // ok interupted by singnal;
-      } else {
-        error("poll: failed");
-        std::cerr << "exit: poll failed\n";
-        break;
-      }
+      _log.error() << "poll error: " << strerror(errno) << '\n';
     }
     eventManager.checkTimeouts();
-    if (g_childDied == 1) {
-      g_childDied = 0;
-      childProcessManager.collectChilds();
-    }
+    childProcessManager.collectChilds();
   }
-  std::cout << "Shutting down servers...\n";
+  _log.info() << "Shutting down servers...\n";
 }

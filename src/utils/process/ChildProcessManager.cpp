@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstring>
 #include <signal.h>
+#include <sys/signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <vector>
@@ -32,13 +33,13 @@ ChildProcessManager::ChildProcessManager() {}
 ChildProcessManager::~ChildProcessManager()
 {
   _log.info() << "ChildProcessManager ends\n";
-  for (std::vector<pid_t>::iterator it = _childs.begin(); it != _childs.end();
-       ++it) {
+  for (PidVector::iterator it = _childs.begin(); it != _childs.end(); ++it) {
     ::kill(*it, SIGTERM);
     ::waitpid(*it, 0, 0);
     _log.info() << "Child(" << *it << ") collected\n";
   }
 }
+
 void ChildProcessManager::collectChilds()
 {
   std::size_t index = 0;
@@ -47,17 +48,14 @@ void ChildProcessManager::collectChilds()
     int status = 0;
     const pid_t pid = _childs[index];
     const pid_t result = waitpid(pid, &status, WNOHANG);
-    if (result == 0) {
-      // child still alive
-    } else if (result == pid) {
+    if (result == pid) {
       if (WIFEXITED(status)) {
         _log.info() << "Child(" << pid
                     << ") collected, Exit code: " << WEXITSTATUS(status)
                     << "\n";
       }
       remove = true;
-    } else {
-      // result == -1
+    } else if (result < 0) {
       _log.info() << "Child(" << pid << ") error waitpid: " << strerror(errno)
                   << "\n";
       remove = true;
@@ -65,7 +63,7 @@ void ChildProcessManager::collectChilds()
 
     if (remove) {
       _childs.erase(_childs.begin() +
-                    static_cast<std::vector<pid_t>::difference_type>(index));
+                    static_cast<PidVector::difference_type>(index));
     } else {
       index++;
     }
@@ -95,7 +93,7 @@ void ChildProcessManager::waitForChild(pid_t pid)
 
   _log.info() << "Child(" << pid << ") collected\n";
 
-  const std::vector<pid_t>::iterator iter =
+  const PidVector::iterator iter =
     std::find(_childs.begin(), _childs.end(), pid);
   if (iter != _childs.end()) {
     _childs.erase(iter);
@@ -107,7 +105,7 @@ void ChildProcessManager::killChild(pid_t pid)
   if (pid <= 0) {
     return;
   }
-  const std::vector<pid_t>::const_iterator iter =
+  const PidVector::const_iterator iter =
     std::find(_childs.begin(), _childs.end(), pid);
   if (iter != _childs.end()) {
     _log.info() << "Child(" << pid << ") killed\n";
