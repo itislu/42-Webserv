@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 #include "ExecuteCgi.hpp"
 
 #include <client/Client.hpp>
@@ -23,7 +25,6 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
-#include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 
@@ -162,7 +163,7 @@ try {
   }
   pipeFromCgi.close();
 
-  const std::string& interpreter = "/bin/bash"; // todo get interpreter
+  const std::string& interpreter = resource.getLocation()->getCgiPass();
   const std::string& script = resource.getPath();
   ft::array<char* const, 3> args = {
     const_cast<char*>(interpreter.c_str()),

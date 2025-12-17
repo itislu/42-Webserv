@@ -2,9 +2,10 @@
 #ifndef CHILD_PROCESS_MANAGER_HPP
 #define CHILD_PROCESS_MANAGER_HPP
 
+#include <sys/types.h>
+
 #include <utils/logger/Logger.hpp>
 
-#include <sys/types.h>
 #include <vector>
 
 /* ************************************************************************** */

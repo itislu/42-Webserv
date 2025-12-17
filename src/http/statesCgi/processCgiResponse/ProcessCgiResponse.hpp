@@ -19,6 +19,7 @@ public:
   void run();
 
 private:
+  void _setNextState();
   bool _ok();
   void _readCgiResponse();
   void _parseCgiHeader();

@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 #include "ChildProcessManager.hpp"
 
 #include <libftpp/algorithm.hpp>
@@ -5,12 +7,9 @@
 
 #include <algorithm>
 #include <cerrno>
-#include <csignal>
-#include <cstddef>
 #include <cstring>
 #include <signal.h>
-#include <sys/signal.h>
-#include <sys/types.h>
+#include <stdlib.h>
 #include <sys/wait.h>
 #include <vector>
 

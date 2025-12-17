@@ -1,7 +1,7 @@
 #include "HandleError.hpp"
-#include "http/Headers.hpp"
 
 #include <client/Client.hpp>
+#include <http/Headers.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>

@@ -67,7 +67,6 @@ VALGRINDFLAGS := --errors-for-leak-kinds=all \
 									--num-callers=50 \
 									--show-error-list=yes \
 									--show-leak-kinds=all \
-									--trace-children=yes \
 									--track-origins=yes \
 									--track-fds=all
 
