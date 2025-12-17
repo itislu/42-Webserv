@@ -109,13 +109,10 @@ void ValidateRequest::_init()
   }
 
   _path = _client->getRequest().getUri().getPath();
-
   _initRequestPath();
   if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
     return;
   }
-
-  _initConfigs();
   _initResource();
 
   _log.info() << "Root: " << _server->getRoot() << "\n";
@@ -132,7 +129,6 @@ void ValidateRequest::_init()
   }
   _log.info() << "method is VALID\n";
 
-  _appendPathToRoot();
   _initState(method);
 }
 
@@ -207,17 +203,20 @@ void ValidateRequest::_initRequestPath()
   _decoded = removeDotSegments(_decoded);
   _log.info() << "normalizePath - path: " << _decoded << "\n";
 
-  // 3. Decode all other characters.
+  // 3. Check decoded path and try to match to best location.
+  _initConfigs();
+
+  // 4. Decode all other characters.
   _decoded = decodePath(_decoded, alwaysDecode);
   _log.info() << "decode all - path: " << _decoded << "\n";
 
-  // 4. Check for illegal characters (NUL).
+  // 5. Check for illegal characters (NUL).
   if (!validateChars(_decoded)) {
     endState(StatusCode::BadRequest);
     return;
   }
 
-  // 5. Check that path is not going out of root.
+  // 6. Check that path is not going out of root.
   if (!isPathRootBound(_decoded)) {
     endState(StatusCode::Forbidden);
     return;
