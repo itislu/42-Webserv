@@ -65,6 +65,7 @@ private:
   Client* _client;
   static Logger& _log;
   StateHandler<ValidateRequest> _stateHandler;
+  std::string _decoded;
   std::string _path;
   std::string _host;
   const ServerConfig* _server;
