@@ -151,7 +151,6 @@ void ClientEventHandler::_clientStateMachine()
 
   if (handler.isDone() && !_client->getInBuff().isEmpty() &&
       !_client->closeConnection() && response.getStatusCode().is2xxCode()) {
-    _log.info() << _client->getInBuff() << '\n';
     _client->prepareForNewRequest();
     _cgiEventHandlerAdded = false;
   }

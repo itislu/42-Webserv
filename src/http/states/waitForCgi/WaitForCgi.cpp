@@ -4,8 +4,6 @@
 #include <http/CgiContext.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
-#include <http/states/readBody/ReadBody.hpp>
-#include <http/states/writeBody/WriteBody.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
 #include <libftpp/memory.hpp>
 #include <utils/logger/Logger.hpp>
@@ -31,7 +29,7 @@ WaitForCgi::WaitForCgi(Client* context)
 
 void WaitForCgi::run()
 try {
-  // Error happend
+  // Error happened
   if (!_client->getResponse().getStatusCode().is2xxCode()) {
     getContext()->getStateHandler().setState<PrepareResponse>();
     return;

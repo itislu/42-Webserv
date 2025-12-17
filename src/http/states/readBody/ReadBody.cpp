@@ -398,6 +398,8 @@ void ReadBody::_updateCgi()
     } else if (_chunkedBody) {
       const IInOutBuffer& body = _client->getRequest().getBody();
       cgiContext->setContentLength(body.size());
+    } else {
+      cgiContext->setContentLength(0);
     }
   }
 
