@@ -33,7 +33,7 @@ ChildProcessManager::~ChildProcessManager()
 {
   _log.info() << "ChildProcessManager ends\n";
   for (PidVector::iterator it = _childs.begin(); it != _childs.end(); ++it) {
-    ::kill(*it, SIGTERM);
+    ::kill(*it, SIGKILL);
     ::waitpid(*it, 0, 0);
     _log.info() << "Child(" << *it << ") collected\n";
   }
