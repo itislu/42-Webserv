@@ -61,7 +61,7 @@ StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
 
 void PrepareResponse::_init()
 {
-  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+  if (!_client->getResponse().getStatusCode().is2xxCode()) {
     _stateHandler.setState<HandleError>();
   } else {
     const Request::Method method = _client->getRequest().getMethod();

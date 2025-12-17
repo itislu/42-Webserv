@@ -294,7 +294,7 @@ void ReadBody::_readTrailerSection()
       break;
     case HeaderParser::InvalidHeader:
       // will only be set if custom validator used
-      if (response.getStatusCode() == StatusCode::Ok) {
+      if (!response.getStatusCode().is2xxCode()) {
         _log.error() << "ReadBody: validator failed to set error status\n";
         response.setStatusCode(StatusCode::BadRequest);
       }
@@ -305,7 +305,7 @@ void ReadBody::_readTrailerSection()
 bool ReadBody::_readingOk()
 {
   const StatusCode& statuscode = _client->getResponse().getStatusCode();
-  if (statuscode != StatusCode::Ok) {
+  if (!statuscode.is2xxCode()) {
     return false;
   }
   return !_done && !_buffReader.reachedEnd();
