@@ -59,8 +59,8 @@ void ChildProcessManager::collectChilds()
       }
       remove = true;
     } else {
-      _log.error() << "Child(" << pid << ") error waitpid: " << strerror(errno)
-                   << "\n";
+      _log.error() << "Child(" << pid
+                   << ") error waitpid: " << std::strerror(errno) << "\n";
       remove = true;
     }
 

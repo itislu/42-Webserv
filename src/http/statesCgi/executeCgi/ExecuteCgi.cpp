@@ -18,7 +18,6 @@
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
@@ -109,11 +108,11 @@ std::vector<char*> ExecuteCgi::_buildEnvp()
   envpOut.clear();
   envpOut.reserve(_env.size() + 1);
 
-  for (size_t i = 0; i < _env.size(); ++i) {
+  for (std::size_t i = 0; i < _env.size(); ++i) {
     envpOut.push_back(const_cast<char*>(_env[i].c_str()));
   }
 
-  envpOut.push_back(NULL);
+  envpOut.push_back(FT_NULLPTR);
   return envpOut;
 }
 // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
@@ -151,14 +150,14 @@ try {
   // Redirect stdin
   if (dup2(pipeToCgi.getReadFd(), STDIN_FILENO) == -1) {
     throw std::runtime_error(std::string("dup2(stdin) failed: ") +
-                             strerror(errno));
+                             std::strerror(errno));
   }
   pipeToCgi.close();
 
   // Redirect stdout
   if (dup2(pipeFromCgi.getWriteFd(), STDOUT_FILENO) == -1) {
     throw std::runtime_error(std::string("dup2(stdout) failed: ") +
-                             strerror(errno));
+                             std::strerror(errno));
   }
   pipeFromCgi.close();
 
@@ -170,10 +169,15 @@ try {
     FT_NULLPTR,
   };
   execve(interpreter.c_str(), args.data(), _buildEnvp().data());
-  throw std::runtime_error(std::string("execve failed: ") + strerror(errno));
+  throw std::runtime_error(std::string("execve failed: ") +
+                           std::strerror(errno));
 } catch (const std::exception& e) {
-  _log.error() << "CgiChild: exception: " << e.what() << '\n';
-  std::exit(1);
+  try {
+    _log.error() << "CgiChild: exception: " << e.what() << '\n';
+  } catch (...) {
+    // EMPTY: Exit in all cases.
+  }
+  std::exit(EXIT_FAILURE);
 }
 // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
 
