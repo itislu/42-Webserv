@@ -66,7 +66,9 @@ try {
     _log.info() << "ValidateRequest result\n"
                 << _client->getResource().toString() << "\n";
     _log.info() << _client->getResponse().getStatusCode() << "\n";
-    if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
+    /* TODO: statuscodes here */
+    if (getContext()->getResponse().getStatusCode() == StatusCode::Ok ||
+        getContext()->getResponse().getStatusCode() == StatusCode::Found) {
       if (_client->getResource().getType() == Resource::Cgi) {
         getContext()->getStateHandler().setState<StartCgi>();
       } else {
@@ -484,17 +486,17 @@ void ValidateRequest::_setServerByHost()
   _client->setServer(server);
 }
 
-/* TODO: this */
 bool ValidateRequest::_checkRedirection()
 {
   if (_location == FT_NULLPTR || !_location->isRedirect()) {
     return false;
   }
-  _log.info() << "REDIRECTION!\n";
   _client->getResource().setPath(_location->getRedirection());
-  _client->getResponse().setStatusCode(StatusCode::MovedPermanently);
+  _client->getResource().setType(Resource::Redirect);
+
+  const StatusCode code(_location->getRedirectCode());
+  _client->getResponse().setStatusCode(code.getCode());
+
   _stateHandler.setDone();
   return true;
-
-  // endState(StatusCode::MovedPermanently);
 }

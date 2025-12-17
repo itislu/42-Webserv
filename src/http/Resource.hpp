@@ -16,6 +16,7 @@ public:
     File,
     Autoindex,
     Cgi,
+    Redirect,
     Error
   };
 

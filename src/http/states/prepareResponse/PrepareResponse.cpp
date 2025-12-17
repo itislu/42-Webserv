@@ -62,10 +62,12 @@ StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
 
 void PrepareResponse::_init()
 {
-  /* TODO: This */
-  if (_client->getResponse().getStatusCode() == StatusCode::MovedPermanently) {
+  if (_client->getResponse().getStatusCode().isRedirectCode()) {
     _stateHandler.setState<HandleRedirect>();
-  } else if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+    return;
+  }
+
+  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
     _stateHandler.setState<HandleError>();
   } else {
     const Request::Method method = _client->getRequest().getMethod();

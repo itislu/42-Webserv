@@ -38,7 +38,6 @@ void HandleRedirect::run()
 {
   Response& response = _client->getResponse();
 
-  // set body
   const std::string& path = _client->getResource().getPath();
   _log.info() << "PATH: " << path << "\n";
 
