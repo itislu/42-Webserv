@@ -40,7 +40,10 @@ void ValidatePost::run()
 void ValidatePost::validate()
 {
   if (_location != FT_NULLPTR && _location->isCgi()) {
-    validateCGI();
+    const std::string& ext = _location->getCgiExtension();
+    if (!ext.empty() && ft::ends_with(_path, ext)) {
+      validateCGI();
+    }
     return;
   }
 
