@@ -116,8 +116,7 @@ void ValidateRequest::_init()
   _path = _client->getRequest().getUri().getPath();
   _initConfigs();
   _initResource();
-
-  _log.info() << "Root: " << _server->getRoot() << "\n";
+  _checkRedirection();
 
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
@@ -473,4 +472,13 @@ void ValidateRequest::_setServerByHost()
     ServerManager::getInstance().getServerByHost(socket, _host);
   _log.info() << "Found server for host: " << _host << "\n";
   _client->setServer(server);
+}
+
+void ValidateRequest::_checkRedirection()
+{
+  if (_location == FT_NULLPTR || !_location->isRedirect()) {
+    return;
+  }
+  _client->getResource().setPath(_location->getRedirection());
+  endState(StatusCode::MovedPermanently);
 }

@@ -46,6 +46,8 @@ private:
   void _setPortFromUri(int& port);
   void _setServerByHost();
 
+  void _checkRedirection();
+
   static std::string removePrefix(const std::string& uriPath,
                                   const std::string& locPath);
   static bool validateMethod(const std::set<std::string>& allowedMethods,
