@@ -108,12 +108,12 @@ void ValidateRequest::_init()
     _setServerByHost();
   }
 
+  _initResource();
   _path = _client->getRequest().getUri().getPath();
   _initRequestPath();
   if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
     return;
   }
-  _initResource();
 
   _log.info() << "Root: " << _server->getRoot() << "\n";
 
@@ -150,13 +150,13 @@ void ValidateRequest::_initConfigs()
 {
   _server = &_client->getServer()->getConfig();
   _location = _server->getBestMatchLocation(_decoded);
+  _client->getResource().setLocation(_location);
 }
 
 void ValidateRequest::_initResource()
 {
   _client->getResource().setType(Resource::File);
   _client->getResource().setServer(_server);
-  _client->getResource().setLocation(_location);
 }
 
 void ValidateRequest::_initState(const Request::Method& method)
