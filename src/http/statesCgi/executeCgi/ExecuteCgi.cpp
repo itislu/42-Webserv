@@ -172,8 +172,12 @@ try {
   throw std::runtime_error(std::string("execve failed: ") +
                            std::strerror(errno));
 } catch (const std::exception& e) {
-  _log.error() << "CgiChild: exception: " << e.what() << '\n';
-  std::exit(1);
+  try {
+    _log.error() << "CgiChild: exception: " << e.what() << '\n';
+  } catch (...) {
+    // EMPTY: Exit in all cases.
+  }
+  std::exit(EXIT_FAILURE);
 }
 // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
 
