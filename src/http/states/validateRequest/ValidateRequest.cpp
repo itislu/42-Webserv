@@ -124,10 +124,9 @@ void ValidateRequest::_init()
     return;
   }
 
-  _checkRedirection();
-  // if ()
-
-    _log.info() << "Root: " << _server->getRoot() << "\n";
+  if (_checkRedirection()) {
+    return;
+  }
 
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
@@ -486,11 +485,16 @@ void ValidateRequest::_setServerByHost()
 }
 
 /* TODO: this */
-void ValidateRequest::_checkRedirection()
+bool ValidateRequest::_checkRedirection()
 {
   if (_location == FT_NULLPTR || !_location->isRedirect()) {
-    return;
+    return false;
   }
+  _log.info() << "REDIRECTION!\n";
   _client->getResource().setPath(_location->getRedirection());
-  endState(StatusCode::MovedPermanently);
+  _client->getResponse().setStatusCode(StatusCode::MovedPermanently);
+  _stateHandler.setDone();
+  return true;
+
+  // endState(StatusCode::MovedPermanently);
 }

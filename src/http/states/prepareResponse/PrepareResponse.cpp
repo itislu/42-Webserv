@@ -1,4 +1,5 @@
 #include "PrepareResponse.hpp"
+#include "http/states/prepareResponse/HandleRedirect.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
@@ -61,7 +62,10 @@ StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
 
 void PrepareResponse::_init()
 {
-  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+  /* TODO: This */
+  if (_client->getResponse().getStatusCode() == StatusCode::MovedPermanently) {
+    _stateHandler.setState<HandleRedirect>();
+  } else if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
     _stateHandler.setState<HandleError>();
   } else {
     const Request::Method method = _client->getRequest().getMethod();

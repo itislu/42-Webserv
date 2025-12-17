@@ -46,7 +46,7 @@ private:
   void _setPortFromUri(int& port);
   void _setServerByHost();
 
-  void _checkRedirection();
+  bool _checkRedirection();
 
   static std::string removePrefix(const std::string& uriPath,
                                   const std::string& locPath);
