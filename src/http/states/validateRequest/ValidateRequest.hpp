@@ -40,6 +40,7 @@ private:
   void _initConfigs();
   void _initState(const Request::Method& method);
   void _initRequestPath();
+  void _appendPathToRoot();
 
   void _validateHost();
   void _splitHostHeader(const std::string& hostHeader, int& port);
@@ -63,6 +64,7 @@ private:
   Client* _client;
   static Logger& _log;
   StateHandler<ValidateRequest> _stateHandler;
+  std::string _decoded;
   std::string _path;
   std::string _host;
   const ServerConfig* _server;
