@@ -1,4 +1,5 @@
 #include "ValidateRequest.hpp"
+#include "http/Response.hpp"
 
 #include <client/Client.hpp>
 #include <config/LocationConfig.hpp>
@@ -104,8 +105,11 @@ StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
 
 void ValidateRequest::_init()
 {
+  const Request& request = _client->getRequest();
+  const Response& response = _client->getResponse();
+
   _validateHost();
-  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+  if (response.getStatusCode() != StatusCode::Ok) {
     return;
   }
 
@@ -113,18 +117,22 @@ void ValidateRequest::_init()
     _setServerByHost();
   }
 
-  _path = _client->getRequest().getUri().getPath();
+  _initResource();
+  _path = request.getUri().getPath();
   _initRequestPath();
-  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+  if (response.getStatusCode() != StatusCode::Ok) {
     return;
   }
-  _initResource();
+
   _checkRedirection();
+  // if ()
+
+    _log.info() << "Root: " << _server->getRoot() << "\n";
 
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
-  const Request::Method method = _client->getRequest().getMethod();
+  const Request::Method method = request.getMethod();
 
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
@@ -154,13 +162,13 @@ void ValidateRequest::_initConfigs()
 {
   _server = &_client->getServer()->getConfig();
   _location = _server->getBestMatchLocation(_decoded);
+  _client->getResource().setLocation(_location);
 }
 
 void ValidateRequest::_initResource()
 {
   _client->getResource().setType(Resource::File);
   _client->getResource().setServer(_server);
-  _client->getResource().setLocation(_location);
 }
 
 void ValidateRequest::_initState(const Request::Method& method)
@@ -477,6 +485,7 @@ void ValidateRequest::_setServerByHost()
   _client->setServer(server);
 }
 
+/* TODO: this */
 void ValidateRequest::_checkRedirection()
 {
   if (_location == FT_NULLPTR || !_location->isRedirect()) {
