@@ -40,7 +40,6 @@ private:
   void _initConfigs();
   void _initState(const Request::Method& method);
   void _initRequestPath();
-  void _appendPathToRoot();
 
   void _validateHost();
   void _splitHostHeader(const std::string& hostHeader, int& port);

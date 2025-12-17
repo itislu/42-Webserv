@@ -225,11 +225,8 @@ void ValidateRequest::_initRequestPath()
   // Store this path in resource so we can use it when generating autoindex
   // without exposing internal filesystem
   _client->getResource().setNoRootPath(_decoded);
-}
 
-void ValidateRequest::_appendPathToRoot()
-{
-  // 6. Combine with root.
+  // 7. Combine with root.
   if (_location != FT_NULLPTR) {
     _path = removePrefix(_decoded, _location->getPath());
     _log.info() << "remove Prefix - path: " << _path << "\n";
