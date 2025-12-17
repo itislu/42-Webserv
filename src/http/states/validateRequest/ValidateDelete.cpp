@@ -1,4 +1,6 @@
 #include "ValidateDelete.hpp"
+#include "libftpp/string.hpp"
+#include "libftpp/utility.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
@@ -22,6 +24,7 @@ ValidateDelete::ValidateDelete(ValidateRequest* context)
   : IState<ValidateRequest>(context)
   , _client(context->getContext())
   , _path(context->getPath())
+  , _location(context->getLocation())
 {
   _log.info() << "Validate DELETE\n";
 }
@@ -34,9 +37,40 @@ void ValidateDelete::run()
 
 void ValidateDelete::validate()
 {
+  if (_location != FT_NULLPTR && _location->isCgi()) {
+    const std::string& ext = _location->getCgiExtension();
+    if (!ext.empty() && ft::ends_with(_path, ext)) {
+      validateCGI();
+      return;
+    }
+  }
+
+  validateStaticDelete();
+}
+
+void ValidateDelete::validateCGI()
+{
+  _client->getResource().setType(Resource::Cgi);
+
   if (isDirectory(_path)) {
-    // 403 most servers dont allow deleting directories
-    // some allow deleting empty directories...
+    endState(StatusCode::Forbidden);
+    return;
+  }
+  if (!isFile(_path)) {
+    endState(StatusCode::NotFound);
+    return;
+  }
+  if (!isExecuteable(_path)) {
+    endState(StatusCode::Forbidden);
+    return;
+  }
+  endState(StatusCode::Ok);
+}
+
+void ValidateDelete::validateStaticDelete()
+{
+  if (isDirectory(_path)) {
+    // 403: Most servers don't allow deleting directories via HTTP
     endState(StatusCode::Forbidden);
     return;
   }

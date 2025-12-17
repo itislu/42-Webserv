@@ -1,6 +1,7 @@
 #ifndef VALIDATEDELETE_HPP
 #define VALIDATEDELETE_HPP
 
+#include "config/LocationConfig.hpp"
 #include "http/StatusCode.hpp"
 #include "http/states/validateRequest/ValidateRequest.hpp"
 #include "utils/logger/Logger.hpp"
@@ -15,13 +16,16 @@ public:
   void run();
 
 private:
+  void validateCGI();
   void validate();
+  void validateStaticDelete();
   void validateParentDirPermissions();
   void endState(StatusCode::Code);
 
   Client* _client;
   static Logger& _log;
   std::string _path;
+  const LocationConfig* _location;
 };
 
 #endif
