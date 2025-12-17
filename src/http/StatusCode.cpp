@@ -27,9 +27,11 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
       { LengthRequired, "Length Required" },
       { ContentTooLarge, "Content Too Large" },
       { UriTooLong, "URI Too Long" },
+      { MisdirectedRequest, "Misdirected Request" },
       { RequestHeaderFieldsTooLarge, "Request Header Fields Too Large" },
       { InternalServerError, "Internal Server Error" },
       { NotImplemented, "Not Implemented" },
+      { BadGateway, "Bad Gateway" },
       { HttpVersionNotSupported, "HTTP Version Not Supported" } }
   };
 

@@ -29,4 +29,5 @@
 !assets/**/*.sh
 .VSCodeCounter/
 build/
+nginx/
 latex/

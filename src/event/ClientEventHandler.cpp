@@ -1,6 +1,4 @@
 #include "ClientEventHandler.hpp"
-#include "http/Response.hpp"
-#include "utils/process/ChildProcessManager.hpp"
 
 #include <client/Client.hpp>
 #include <event/CgiReadEventHandler.hpp>
@@ -8,22 +6,26 @@
 #include <event/EventHandler.hpp>
 #include <event/EventManager.hpp>
 #include <http/CgiContext.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/http.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <socket/SocketManager.hpp>
 #include <utils/logger/Logger.hpp>
+#include <utils/process/ChildProcessManager.hpp>
 #include <utils/state/StateHandler.hpp>
 
 #include <cstring>
 #include <exception>
+#include <string>
 #include <sys/socket.h>
 
 /* ***************************************************************************/
 // INIT
 
-Logger& ClientEventHandler::_log = Logger::getInstance(LOG_HTTP);
+Logger& ClientEventHandler::_log = Logger::getInstance(LOG_SERVER);
 
 /* ************************************************************************** */
 // PUBLIC
@@ -59,7 +61,7 @@ try {
   }
   return result;
 } catch (const std::exception& e) {
-  _log.error() << "ClientEventHandler exception: " << e.what() << '\n';
+  _log.error() << logName() << "exception: " << e.what() << '\n';
   _client->getResponse().setStatusCode(StatusCode::InternalServerError);
   _client->setAlive(false);
   _handleException();
@@ -68,8 +70,9 @@ try {
 
 ClientEventHandler::Result ClientEventHandler::onTimeout()
 {
-  _log.info() << "ClientEventHandler: onTimeout\n";
+  _log.info() << logName() << "onTimeout\n";
   if (_client->getCgiContext() == FT_NULLPTR) {
+    _sendMinResponse(http::minResponse408);
     return Disconnect;
   }
 
@@ -77,8 +80,9 @@ ClientEventHandler::Result ClientEventHandler::onTimeout()
   const bool writeDone = cgi.getShExecCgi().isDone();
   const bool readDone = cgi.getShProcessCgiResponse().isDone();
   if ((writeDone || cgi.timeoutWrite()) && (readDone || cgi.timeoutRead())) {
-    _log.info() << "ClientEventHandler: onTimeout kill child\n";
+    _log.info() << logName() << "onTimeout kill child\n";
     ChildProcessManager::getInstance().killChild(cgi.getChildPid());
+    _sendMinResponse(http::minResponse408);
     return Disconnect;
   }
   updateLastActivity();
@@ -88,6 +92,14 @@ ClientEventHandler::Result ClientEventHandler::onTimeout()
 long ClientEventHandler::getTimeout() const
 {
   return _client->getTimeout();
+}
+
+std::string ClientEventHandler::logName() const
+{
+  std::string name = "ClientEventHandler(";
+  name.append(ft::to_string(getFd()));
+  name.append("): ");
+  return name;
 }
 
 /* ************************************************************************** */
@@ -139,7 +151,6 @@ void ClientEventHandler::_clientStateMachine()
 
   if (handler.isDone() && !_client->getInBuff().isEmpty() &&
       !_client->closeConnection() && response.getStatusCode().is2xxCode()) {
-    _log.info() << _client->getInBuff() << '\n';
     _client->prepareForNewRequest();
     _cgiEventHandlerAdded = false;
   }
@@ -157,11 +168,7 @@ void ClientEventHandler::_clientStateMachine()
 
 void ClientEventHandler::_handleException()
 {
-  if (!_sending) {
-    const char* const msg = http::minResponse500;
-    const std::size_t msgLen = std::strlen(msg);
-    (void)send(getFd(), msg, msgLen, 0);
-  }
+  _sendMinResponse(http::minResponse500);
 }
 
 void ClientEventHandler::_addCgiEventHandler()
@@ -188,4 +195,12 @@ void ClientEventHandler::_addCgiEventHandler()
   SocketManager::getInstance().enablePollout(fdClientToCgi);
 
   _cgiEventHandlerAdded = true;
+}
+
+void ClientEventHandler::_sendMinResponse(const char* msg)
+{
+  if (!_sending) {
+    const std::size_t msgLen = std::strlen(msg);
+    (void)send(getFd(), msg, msgLen, 0);
+  }
 }

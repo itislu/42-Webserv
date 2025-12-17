@@ -155,12 +155,6 @@ bool Client::receive()
   static IInBuffer::RawBytes buffer(maxChunk);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
-    /* TODO: remove this! */
-    std::cout << "Client " << getFd() << ": ";
-    // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
-    std::cout.write(reinterpret_cast<const char*>(buffer.data()),
-                    static_cast<std::streamsize>(bytes));
-    // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
     _inBuff.append(buffer, bytes);
   } else if (bytes == 0) {
     std::cout << "[CLIENT] wants to disconnect\n";

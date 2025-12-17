@@ -117,22 +117,21 @@ void ProcessCgiResponse::_parseCgiHeader()
       break;
     case HeaderParser::SyntaxError:
       _log.error() << "ProcessCgiResponse: header syntax error\n";
-      response.setStatusCode(StatusCode::BadRequest);
+      response.setStatusCode(StatusCode::BadGateway);
       break;
     case HeaderParser::FieldLineTooLarge:
-      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      response.setStatusCode(StatusCode::BadGateway);
       _log.error() << "ProcessCgiResponse: header line too large\n";
       break;
     case HeaderParser::HeaderTooLarge:
-      response.setStatusCode(StatusCode::RequestHeaderFieldsTooLarge);
+      response.setStatusCode(StatusCode::BadGateway);
       _log.error() << "ProcessCgiResponse: header too large\n";
       break;
     case HeaderParser::InvalidHeader:
-      // will only be set if custom validator used
       if (response.getStatusCode() == StatusCode::Ok) {
         _log.error()
           << "ProcessCgiResponse: validator failed to set error status\n";
-        response.setStatusCode(StatusCode::BadRequest);
+        response.setStatusCode(StatusCode::BadGateway);
       }
       break;
   }

@@ -58,8 +58,6 @@ public:
   void prepareForNewRequest();
 
 private:
-  void updateLastActivity();
-
   static Logger& _log;
 
   AutoFd _fd;

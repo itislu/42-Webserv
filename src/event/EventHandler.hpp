@@ -4,6 +4,8 @@
 
 #include <client/TimeStamp.hpp>
 
+#include <string>
+
 /* ************************************************************************** */
 class EventHandler
 {
@@ -21,6 +23,7 @@ public:
   virtual Result handleEvent(unsigned revents) = 0;
   virtual Result onTimeout() = 0;
   virtual long getTimeout() const = 0;
+  virtual std::string logName() const = 0;
 
   const TimeStamp& getLastActivity() const;
   int getFd() const;

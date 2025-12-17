@@ -6,8 +6,8 @@
 
 enum HttpRuleId
 {
-  Undefined = -1,
-  EndOfRule,
+  EndOfRule = -1,
+  Undefined,
 
   // GeneralRules
   EndOfLine,
