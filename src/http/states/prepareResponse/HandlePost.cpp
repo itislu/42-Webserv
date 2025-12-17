@@ -2,6 +2,9 @@
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
@@ -67,14 +70,32 @@ std::string HandlePost::_getFileName(const std::string& directory)
 
 void HandlePost::_createData()
 {
-  const std::string directory = _client->getResource().getPath();
+  Request& request = _client->getRequest();
+  Response& response = _client->getResponse();
+  const Resource& resource = _client->getResource();
+
+  const std::string directory = resource.getPath();
+  const std::string newFilePath = _getFileName(directory);
+  request.getBody().moveBufferToFile(newFilePath);
+  response.setStatusCode(StatusCode::Created);
+  Headers& headers = response.getHeaders();
+  headers.addHeader("Location", _createNoRootLocation(newFilePath));
+  headers.addHeader("Content-Length", "0");
 
   _log.info() << "HandlePost: " << directory << '\n';
+}
 
-  const std::string newFilePath = _getFileName(directory);
-  _client->getRequest().getBody().moveBufferToFile(newFilePath);
-  _client->getResponse().setStatusCode(StatusCode::Created);
-  Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Location", newFilePath);
-  headers.addHeader("Content-Length", "0");
+std::string HandlePost::_createNoRootLocation(const std::string& absLocation)
+{
+  const Resource& resource = _client->getResource();
+
+  std::string responseLocation = absLocation;
+  const std::string::size_type pos = responseLocation.find(resource.getPath());
+  if (pos != std::string::npos) {
+    responseLocation.replace(
+      pos, resource.getPath().size(), resource.getNoRootPath());
+  } else {
+    responseLocation = "";
+  }
+  return responseLocation;
 }
