@@ -54,7 +54,7 @@ void HandleGet::run()
 void HandleGet::_setNextState()
 {
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
-  if (statusCode == StatusCode::Ok) {
+  if (statusCode.is2xxCode()) {
     getContext()->getStateHandler().setDone();
   } else {
     getContext()->getStateHandler().setState<HandleError>();

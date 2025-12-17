@@ -11,7 +11,6 @@
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic): argv.
 int main(int argc, char* argv[])
 try {
-  Logger::enableLogging();
   Logger& logger = Logger::getInstance(LOG_GENERAL);
 
   if (argc != 2) {
@@ -27,6 +26,7 @@ try {
   ServerManager::getInstance();
   ServerManager::run();
 
+  logger.info() << "server stoped\n";
   return EXIT_SUCCESS;
 } catch (const std::exception& e) {
   std::cerr << "Error: " << e.what() << '\n';
