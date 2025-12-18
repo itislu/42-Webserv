@@ -15,6 +15,7 @@ public:
   {
     Ok = 200,
     Created = 201,
+    NoContent = 204,
     BadRequest = 400,
     Unauthorized = 401,
     Forbidden = 403,
@@ -50,7 +51,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 19;
+  static const int _codes = 20;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;

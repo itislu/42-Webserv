@@ -2,9 +2,10 @@
 #ifndef CHILD_PROCESS_MANAGER_HPP
 #define CHILD_PROCESS_MANAGER_HPP
 
+#include <sys/types.h>
+
 #include <utils/logger/Logger.hpp>
 
-#include <sys/types.h>
 #include <vector>
 
 /* ************************************************************************** */
@@ -16,7 +17,7 @@ public:
   static ChildProcessManager& getInstance();
   ~ChildProcessManager();
 
-  void collectChilds();
+  void collectChildren();
   void addChild(pid_t pid);
   void waitForChild(pid_t pid);
   void killChild(pid_t pid);
@@ -27,7 +28,7 @@ private:
   ChildProcessManager& operator=(const ChildProcessManager& other);
 
   static Logger& _log;
-  PidVector _childs;
+  PidVector _children;
 };
 
 #endif

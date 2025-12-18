@@ -73,8 +73,9 @@ void AutoFd::_close()
 
 void AutoFd::_notifyClose()
 {
-  for (std::set<AutoFdSubscriber*>::iterator it = _subscribers.begin();
-       it != _subscribers.end();
+  const std::set<AutoFdSubscriber*> subscribersCopy = _subscribers;
+  for (std::set<AutoFdSubscriber*>::iterator it = subscribersCopy.begin();
+       it != subscribersCopy.end();
        ++it) {
     (*it)->onClose(_fd);
   }

@@ -42,6 +42,27 @@
       }
     },
     {
+      "name": "release",
+      "displayName": "Release",
+      "description": "Build with -O3 and assertions disabled",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic"
+      }
+    },
+    {
+      "name": "release-libc++",
+      "displayName": "Release with libc++",
+      "description": "Build with -O3 and assertions disabled, and use libc++ as standard library (Clang only)",
+      "binaryDir": "${sourceDir}/build/release-libc++",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic -stdlib=libc++",
+        "CMAKE_CXX_LINK_FLAGS": "-stdlib=libc++"
+      }
+    },
+    {
       "name": "san",
       "displayName": "Debug with ASan+UBSan",
       "description": "Build with AddressSanitizer and UndefinedBehaviorSanitizer",
@@ -80,6 +101,14 @@
     {
       "name": "debug-libc++",
       "configurePreset": "debug-libc++"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "release-libc++",
+      "configurePreset": "release-libc++"
     },
     {
       "name": "san",

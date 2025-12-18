@@ -5,6 +5,7 @@
 #include <config/ServerConfig.hpp>
 #include <libftpp/optional.hpp>
 
+#include <cstddef>
 #include <string>
 
 class Resource
@@ -25,14 +26,17 @@ public:
   const std::string& getNoRootPath() const;
   const LocationConfig* getLocation() const;
   const ServerConfig* getServer() const;
+  int getPort() const;
 
   void setPath(const std::string& path);
   void setNoRootPath(const std::string& noRootPath);
   void setType(Type type);
   void setLocation(const LocationConfig* location);
   void setServer(const ServerConfig* server);
+  void setPort(int port);
 
   ft::optional<std::string> getErrorPage(int code) const;
+  std::size_t getMaxBodySize() const;
 
   std::string toString() const;
 
@@ -44,6 +48,7 @@ private:
   std::string _noRootPath;
   const LocationConfig* _location;
   const ServerConfig* _server;
+  int _port;
 };
 
 #endif

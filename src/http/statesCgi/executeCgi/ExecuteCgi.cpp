@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 #include "ExecuteCgi.hpp"
 
 #include <client/Client.hpp>
@@ -16,14 +18,12 @@
 #include <utils/state/IState.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <stdexcept>
 #include <string>
-#include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 
@@ -84,12 +84,15 @@ void ExecuteCgi::_prepareEnv()
   _addEnvVar("GATEWAY_INTERFACE", "CGI/1.1");
   _addEnvVar("SERVER_PROTOCOL", "HTTP/1.1");
   _addEnvVar("REQUEST_METHOD", request.getStrMethod());
-  _addEnvVar("CONTENT_LENGTH", ft::to_string(_contentLength));
+  if (_contentLength > 0) {
+    _addEnvVar("CONTENT_LENGTH", ft::to_string(_contentLength));
+  }
   if (reqHeaders.contains(header::contentType)) {
     _addEnvVar("CONTENT_TYPE", reqHeaders.at(header::contentType));
   }
-  _addEnvVar("SCRIPT_NAME", resource.getPath());
+  _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
   _addEnvVar("QUERY_STRING", request.getUri().getQuery());
+  _addEnvVar("SERVER_PORT", ft::to_string(resource.getPort()));
   _state = ExecuteScript;
 }
 
@@ -105,14 +108,13 @@ void ExecuteCgi::_addEnvVar(const std::string& key, const std::string& value)
 std::vector<char*> ExecuteCgi::_buildEnvp()
 {
   std::vector<char*> envpOut;
-  envpOut.clear();
   envpOut.reserve(_env.size() + 1);
 
-  for (size_t i = 0; i < _env.size(); ++i) {
+  for (std::size_t i = 0; i < _env.size(); ++i) {
     envpOut.push_back(const_cast<char*>(_env[i].c_str()));
   }
 
-  envpOut.push_back(NULL);
+  envpOut.push_back(FT_NULLPTR);
   return envpOut;
 }
 // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
@@ -128,7 +130,6 @@ void ExecuteCgi::_executeScript()
   }
   if (pid == 0) {
     _handleChild();
-    _exit(1);
   }
 
   _log.info() << "Run cgi script\n";
@@ -151,29 +152,35 @@ try {
   // Redirect stdin
   if (dup2(pipeToCgi.getReadFd(), STDIN_FILENO) == -1) {
     throw std::runtime_error(std::string("dup2(stdin) failed: ") +
-                             strerror(errno));
+                             std::strerror(errno));
   }
   pipeToCgi.close();
 
   // Redirect stdout
   if (dup2(pipeFromCgi.getWriteFd(), STDOUT_FILENO) == -1) {
     throw std::runtime_error(std::string("dup2(stdout) failed: ") +
-                             strerror(errno));
+                             std::strerror(errno));
   }
   pipeFromCgi.close();
 
-  const std::string& interpreter = "/bin/bash"; // todo get interpreter
+  const std::string& interpreter = resource.getLocation()->getCgiPass();
   const std::string& script = resource.getPath();
   ft::array<char* const, 3> args = {
     const_cast<char*>(interpreter.c_str()),
     const_cast<char*>(script.c_str()),
     FT_NULLPTR,
   };
-  execve(interpreter.c_str(), args.data(), _buildEnvp().data());
-  throw std::runtime_error(std::string("execve failed: ") + strerror(errno));
+  const std::vector<char*> envp = _buildEnvp();
+  execve(interpreter.c_str(), args.data(), envp.data());
+  throw std::runtime_error(std::string("execve failed: ") +
+                           std::strerror(errno));
 } catch (const std::exception& e) {
-  _log.error() << "CgiChild: exception: " << e.what() << '\n';
-  std::exit(1);
+  try {
+    _log.error() << "CgiChild: exception: " << e.what() << '\n';
+  } catch (...) {
+    // EMPTY: Exit in all cases.
+  }
+  std::exit(EXIT_FAILURE);
 }
 // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
 
@@ -192,6 +199,7 @@ void ExecuteCgi::_provideBody()
       throw std::runtime_error("ExecuteCgi: write failed");
     }
     if (res > 0) {
+      _log.info() << "write " << res << " bytes to cgi\n";
       body.removeFront(res);
     }
     _bytesWritten += res;

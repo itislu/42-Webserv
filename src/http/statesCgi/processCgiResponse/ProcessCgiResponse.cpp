@@ -58,20 +58,25 @@ try {
   if (_done && _ok()) {
     _checkBody();
   }
-
-  if (!_ok()) {
-    _log.info() << *_client << " ProcessCgiResponse failed\n";
-    getContext()->getShProcessCgiResponse().setDone();
-  }
-  if (_done) {
-    _log.info() << *_client << " ProcessCgiResponse done\n";
-    getContext()->getShProcessCgiResponse().setDone();
+  if (_done || !_ok()) {
+    _setNextState();
   }
 } catch (const std::exception& e) {
   Client* client = _client;
   _log.error() << *client << " ProcessCgiResponse: " << e.what() << "\n";
   client->getResponse().setStatusCode(StatusCode::InternalServerError);
   getContext()->getShProcessCgiResponse().setDone();
+}
+
+void ProcessCgiResponse::_setNextState()
+{
+  if (!_ok()) {
+    _log.info() << *_client << " ProcessCgiResponse failed\n";
+    getContext()->getShProcessCgiResponse().setDone();
+  } else if (_done) {
+    _log.info() << *_client << " ProcessCgiResponse done\n";
+    getContext()->getShProcessCgiResponse().setDone();
+  }
 }
 
 bool ProcessCgiResponse::_ok()
@@ -139,8 +144,12 @@ void ProcessCgiResponse::_parseCgiHeader()
 
 void ProcessCgiResponse::_checkBody()
 {
-  // todo just set body size here?
   Response& response = _client->getResponse();
+  if (!_headersParsed) {
+    response.setStatusCode(StatusCode::InternalServerError);
+    return;
+  }
+
   if (response.getBody() == FT_NULLPTR || response.getBody()->isEmpty()) {
     ft::shared_ptr<IInBuffer> nullBuffer;
     response.setBody(ft::move(nullBuffer));
