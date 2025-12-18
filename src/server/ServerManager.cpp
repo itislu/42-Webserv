@@ -160,7 +160,7 @@ void ServerManager::run()
       _log.error() << "poll error: " << std::strerror(errno) << '\n';
     }
     eventManager.checkTimeouts();
-    childProcessManager.collectChilds();
+    childProcessManager.collectChildren();
   }
   _log.info() << "Shutting down servers...\n";
 }

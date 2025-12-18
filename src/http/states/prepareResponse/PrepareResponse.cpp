@@ -28,10 +28,6 @@ PrepareResponse::PrepareResponse(Client* context)
 {
   _log.info() << *_client << " PrepareResponse\n";
   _init();
-
-  // todo remove this log after testing
-  _log.info() << "PrepareResponse Request:\n\n"
-              << getContext()->getRequest().toString() << "\n\n";
 }
 
 void PrepareResponse::run()

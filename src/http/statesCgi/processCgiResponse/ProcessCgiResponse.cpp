@@ -150,7 +150,6 @@ void ProcessCgiResponse::_checkBody()
     return;
   }
 
-  // todo just set body size here?
   if (response.getBody() == FT_NULLPTR || response.getBody()->isEmpty()) {
     ft::shared_ptr<IInBuffer> nullBuffer;
     response.setBody(ft::move(nullBuffer));
