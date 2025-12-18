@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 #include "ClientEventHandler.hpp"
 
 #include <client/Client.hpp>
@@ -57,6 +59,7 @@ try {
 
   if (result != Alive) {
     _client->setAlive(false);
+    _killCgiProcess();
     _log.info() << *_client << " will disconnect\n";
   }
   return result;
@@ -168,6 +171,7 @@ void ClientEventHandler::_clientStateMachine()
 
 void ClientEventHandler::_handleException()
 {
+  _killCgiProcess();
   _sendMinResponse(http::minResponse500);
 }
 
@@ -195,6 +199,14 @@ void ClientEventHandler::_addCgiEventHandler()
   SocketManager::getInstance().enablePollout(fdClientToCgi);
 
   _cgiEventHandlerAdded = true;
+}
+
+void ClientEventHandler::_killCgiProcess()
+{
+  if (_client->getCgiContext() != FT_NULLPTR) {
+    const pid_t cgiPid = _client->getCgiContext()->getChildPid();
+    ChildProcessManager::getInstance().killChild(cgiPid);
+  }
 }
 
 void ClientEventHandler::_sendMinResponse(const char* msg)
