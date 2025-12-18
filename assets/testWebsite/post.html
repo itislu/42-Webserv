@@ -41,38 +41,65 @@
         border-radius: 6px;
         cursor: pointer;
       }
+
+      .result {
+        margin-top: 20px;
+        background: rgba(0, 0, 0, 0.25);
+        padding: 12px;
+        border-radius: 8px;
+        width: 420px;
+        font-family: monospace;
+      }
     </style>
   </head>
   <body>
     <h1>Post Tests</h1>
     <p>This page allows you to upload a file for POST testing.</p>
 
-    <form action="/upload" method="POST" enctype="multipart/form-data">
+    <form action="/upload/" method="POST" enctype="multipart/form-data">
       <input type="file" name="testFile" required />
       <br />
       <button type="submit">Upload File</button>
-      <br />
     </form>
+
     <br />
+
     <textarea id="rawInput" rows="6" cols="40">hello world</textarea>
     <br />
     <button onclick="sendRaw()">Send Raw POST</button>
 
+    <div class="result" id="result">
+      Status: -<br />
+      Location: -
+    </div>
+
     <a href="index.html">⬅ Back to Home</a>
+
+    <script>
+      function sendRaw() {
+        const text = document.getElementById("rawInput").value;
+        const result = document.getElementById("result");
+
+        fetch("/upload/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+          body: text,
+        })
+          .then((res) => {
+            const location = res.headers.get("Location");
+            result.innerHTML =
+              "Status: " +
+              res.status +
+              "<br />" +
+              "Location: " +
+              (location ? location : "(none)");
+          })
+          .catch(() => {
+            result.innerHTML = "Request failed";
+          });
+      }
+    </script>
   </body>
 </html>
-
-<script>
-  function sendRaw() {
-    const text = document.getElementById("rawInput").value;
-
-    fetch("/upload", {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain",
-        "Content-Length": text.length,
-      },
-      body: text,
-    });
-  }
-</script>

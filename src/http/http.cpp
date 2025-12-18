@@ -231,7 +231,15 @@ const ExtToTypeMap& getExtToType()
   return map;
 }
 
+const char* const minResponse408 = "HTTP/1.1 408 Request Timeout\r\n"
+                                   "Content-Length: 0\r\n"
+                                   "Connection: close\r\n\r\n";
+
 const char* const minResponse500 = "HTTP/1.1 500 Internal Server Error\r\n"
+                                   "Content-Length: 0\r\n"
+                                   "Connection: close\r\n\r\n";
+
+const char* const minResponse504 = "HTTP/1.1 504 Gateway Timeout\r\n"
                                    "Content-Length: 0\r\n"
                                    "Connection: close\r\n\r\n";
 

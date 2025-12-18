@@ -38,7 +38,7 @@ void HandleDelete::run()
 void HandleDelete::_setNextState()
 {
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
-  if (statusCode == StatusCode::Ok) {
+  if (statusCode.is2xxCode()) {
     getContext()->getStateHandler().setDone();
   } else {
     getContext()->getStateHandler().setState<HandleError>();
@@ -52,5 +52,7 @@ void HandleDelete::_deleteFile()
   if (res != 0) {
     _client->getResponse().setStatusCode(StatusCode::InternalServerError);
     _log.error() << "HandleDelete failed to delete file\n";
+    return;
   }
+  _client->getResponse().setStatusCode(StatusCode::NoContent);
 }

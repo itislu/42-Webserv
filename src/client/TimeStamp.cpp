@@ -4,14 +4,13 @@
 #include <algorithm>
 #include <climits>
 #include <ctime>
-#include <new>
 
 int convertSecondsToMs(long timeoutSecs)
 {
   const long ms_mult = 1000L;
   timeoutSecs = std::max(timeoutSecs, 0L);
   const long timeoutMs = ft::mul_sat(timeoutSecs, ms_mult);
-  return ft::numeric_cast<int>(timeoutMs, std::nothrow).value_or(INT_MAX);
+  return static_cast<int>(std::min(timeoutMs, static_cast<long>(INT_MAX)));
 }
 
 TimeStamp::TimeStamp()
