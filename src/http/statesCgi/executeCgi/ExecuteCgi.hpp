@@ -30,7 +30,7 @@ public:
 
 private:
   void _prepareEnv();
-  void _addNonDefaultHeader(const Headers& headers);
+  void _addNonDefaultHeaders(const Headers& headers);
   static bool _isDefaultHeader(const std::string& headerName);
   static std::string _convertHeader(const std::string& headerName);
   void _addEnvVar(const std::string& key, const std::string& value);

@@ -1,6 +1,7 @@
 #include <sys/types.h>
 
 #include "ExecuteCgi.hpp"
+#include "libftpp/ctype.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
@@ -94,16 +95,16 @@ void ExecuteCgi::_prepareEnv()
   _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
   _addEnvVar("QUERY_STRING", request.getUri().getQuery());
   _addEnvVar("SERVER_PORT", ft::to_string(resource.getPort()));
-  _addNonDefaultHeader(reqHeaders);
+  _addNonDefaultHeaders(reqHeaders);
   _state = ExecuteScript;
 }
 
-void ExecuteCgi::_addNonDefaultHeader(const Headers& headers)
+void ExecuteCgi::_addNonDefaultHeaders(const Headers& headers)
 {
   for (Headers::const_iter iter = headers.begin(); iter != headers.end();
        ++iter) {
     const Headers::HeaderPair pair = iter->second;
-    if (_isDefaultHeader(pair.name)) {
+    if (_isDefaultHeader(iter->first)) {
       continue;
     }
     _addEnvVar(_convertHeader(pair.name), pair.value);
@@ -112,8 +113,9 @@ void ExecuteCgi::_addNonDefaultHeader(const Headers& headers)
 
 bool ExecuteCgi::_isDefaultHeader(const std::string& headerName)
 {
-  return headerName == header::contentType ||
-         headerName == header::contentLength;
+  static const char* const contentType = "content-type";
+  static const char* const contentLength = "content-length";
+  return headerName == contentType || headerName == contentLength;
 }
 
 std::string ExecuteCgi::_convertHeader(const std::string& headerName)
