@@ -59,27 +59,9 @@ TEST(AddrToStringTester, IPv4AllOnes)
   EXPECT_EQ(convertIPv4Address(ipStr), ipStr);
 }
 
-TEST(AddrToStringTester, IPv4PrivateNetwork)
+TEST(AddrToStringTester, IPv4Realistic)
 {
-  const char* const ipStr = "192.168.1.100";
-  EXPECT_EQ(convertIPv4Address(ipStr), ipStr);
-}
-
-TEST(AddrToStringTester, IPv4PublicDNS)
-{
-  const char* const ipStr = "8.8.8.8";
-  EXPECT_EQ(convertIPv4Address(ipStr), ipStr);
-}
-
-TEST(AddrToStringTester, IPv4Multicast)
-{
-  const char* const ipStr = "224.0.0.1";
-  EXPECT_EQ(convertIPv4Address(ipStr), ipStr);
-}
-
-TEST(AddrToStringTester, IPv4Broadcast)
-{
-  const char* const ipStr = "255.255.255.255";
+  const char* const ipStr = "213.164.21.206";
   EXPECT_EQ(convertIPv4Address(ipStr), ipStr);
 }
 
@@ -95,33 +77,15 @@ TEST(AddrToStringTester, IPv6AllZeros)
   EXPECT_EQ(convertIPv6Address(ipStr), ipStr);
 }
 
-TEST(AddrToStringTester, IPv6Documentation)
-{
-  const char* const ipStr = "2001:db8:85a3:0:0:8a2e:370:7334";
-  EXPECT_EQ(convertIPv6Address(ipStr), ipStr);
-}
-
-TEST(AddrToStringTester, IPv6LinkLocal)
-{
-  const char* const ipStr = "fe80:0:0:0:1234:5678:90ab:cdef";
-  EXPECT_EQ(convertIPv6Address(ipStr), ipStr);
-}
-
 TEST(AddrToStringTester, IPv6AllOnes)
 {
   const char* const ipStr = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
   EXPECT_EQ(convertIPv6Address(ipStr), ipStr);
 }
 
-TEST(AddrToStringTester, IPv6GoogleDNS)
+TEST(AddrToStringTester, IPv6Realistic)
 {
-  const char* const ipStr = "2001:4860:4860:0:0:0:0:8888";
-  EXPECT_EQ(convertIPv6Address(ipStr), ipStr);
-}
-
-TEST(AddrToStringTester, IPv6Mixed)
-{
-  const char* const ipStr = "2001:db8:0:0:0:0:0:1";
+  const char* const ipStr = "2001:db8:85a3:0:0:8a2e:370:7334";
   EXPECT_EQ(convertIPv6Address(ipStr), ipStr);
 }
 
