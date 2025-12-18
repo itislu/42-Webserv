@@ -14,6 +14,7 @@ extern const char* const host;
 extern const char* const contentLength;
 extern const char* const transferEncoding;
 extern const char* const contentType;
+extern const char* const connection;
 
 } // namespace header
 

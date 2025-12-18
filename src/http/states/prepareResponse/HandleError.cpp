@@ -1,6 +1,7 @@
 #include "HandleError.hpp"
 
 #include <client/Client.hpp>
+#include <http/Headers.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>
@@ -35,6 +36,8 @@ HandleError::HandleError(PrepareResponse* context)
 
 void HandleError::run()
 try {
+  _resetResponse();
+
   const Response& response = _client->getResponse();
   const Resource& resource = _client->getResource();
   const ft::optional<std::string> optErrPage =
@@ -72,6 +75,17 @@ std::string HandleError::_makeErrorBody(const StatusCode& statuscode)
   oss << "</body>\n</html>\n";
 
   return oss.str();
+}
+
+/**
+ * @brief Reset response in case some state before already set Headers.
+ *
+ * - for example CGI
+ */
+void HandleError::_resetResponse()
+{
+  Response& response = _client->getResponse();
+  response.getHeaders() = Headers();
 }
 
 void HandleError::_customErrorPage(const std::string& errPage)

@@ -2,10 +2,13 @@
 #define SERVERMANAGER_HPP
 
 #include "Server.hpp"
-#include "config/ServerConfig.hpp"
-#include "event/EventManager.hpp"
-#include "libftpp/memory.hpp"
-#include "socket/Socket.hpp"
+
+#include <config/ServerConfig.hpp>
+#include <event/EventManager.hpp>
+#include <libftpp/memory.hpp>
+#include <socket/Socket.hpp>
+#include <utils/logger/Logger.hpp>
+
 #include <cstddef>
 #include <map>
 #include <string>
@@ -46,6 +49,7 @@ private:
   ServerManager(const ServerManager& other);
   ServerManager& operator=(const ServerManager& other);
 
+  static Logger& _log;
   std::vector<ft::shared_ptr<const Server> > _servers;
   std::map<const Socket*, std::vector<const Server*> > _socketToServers;
 };

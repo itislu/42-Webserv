@@ -138,13 +138,11 @@ SmartBuffer::RawBytes SmartBuffer::getRawBytes(std::size_t start,
 
 void SmartBuffer::replace(RawBytes& rawData)
 {
-  // todo maybe check size first
   _buffer->replace(rawData);
 }
 
 void SmartBuffer::moveBufferToFile(const std::string& filepath)
 {
-  // todo maybe check size first
   _buffer->moveBufferToFile(filepath);
 }
 

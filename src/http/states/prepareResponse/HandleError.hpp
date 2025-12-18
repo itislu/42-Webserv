@@ -22,6 +22,7 @@ public:
 private:
   static std::string _makeErrorBody(const StatusCode& statuscode);
 
+  void _resetResponse();
   void _customErrorPage(const std::string& errPage);
   void _defaultErrorPage();
 

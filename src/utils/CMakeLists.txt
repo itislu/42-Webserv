@@ -25,9 +25,12 @@ add_library(${LIB_NAME} STATIC
 
   logger/Logger.cpp
 
+  process/ChildProcessManager.cpp
+
   BufferReader.cpp
   convert.cpp
   fileUtils.cpp
+  Pipe.cpp
   printUtils.cpp
 )
 
