@@ -3,7 +3,6 @@
 #include "libftpp/optional.hpp"
 #include "libftpp/utility.hpp"
 #include <cstddef>
-#include <limits>
 #include <sstream>
 #include <string>
 
@@ -11,6 +10,7 @@ Resource::Resource()
   : _type(Undefined)
   , _location(FT_NULLPTR)
   , _server(FT_NULLPTR)
+  , _port(0)
 {
 }
 
