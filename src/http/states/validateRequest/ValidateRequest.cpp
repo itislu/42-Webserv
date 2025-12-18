@@ -1,11 +1,8 @@
 #include "ValidateRequest.hpp"
-#include "config/parser/Converters.hpp"
-#include "http/Headers.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/Socket.hpp"
 
 #include <client/Client.hpp>
 #include <config/LocationConfig.hpp>
+#include <http/Headers.hpp>
 #include <http/Request.hpp>
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
@@ -20,6 +17,8 @@
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
+#include <server/ServerManager.hpp>
+#include <socket/Socket.hpp>
 #include <utils/convert.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -29,6 +28,8 @@
 #include <cstdlib>
 #include <exception>
 #include <set>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 /* ************************************************************************** */
@@ -121,6 +122,7 @@ void ValidateRequest::_init()
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
     endState(StatusCode::MethodNotAllowed);
+    return;
   }
   _log.info() << "method is VALID\n";
 
@@ -183,7 +185,7 @@ static bool alwaysDecode(char /*unused*/)
 
 /**
  * 1. Decode unreserved characters.
- * 2. Normalize path (collapse . | .. | //).
+ * 2. Normalize path (collapse '.' & '..').
  * 3. Decode all other characters (first decoding cannot produce more '%').
  * 4. Check for illegal characters (NUL).
  * 5. Check that path is not going out of root.
@@ -197,7 +199,7 @@ void ValidateRequest::_initRequestPath()
   std::string decoded = decodePath(_path, http::isUnreserved);
   _log.info() << "decode unreserved - path: " << decoded << "\n";
 
-  // 2. Normalize path (collapse . | .. | //).
+  // 2. Normalize path (collapse '.' & '..').
   decoded = removeDotSegments(decoded);
   _log.info() << "normalizePath - path: " << decoded << "\n";
 
@@ -210,8 +212,12 @@ void ValidateRequest::_initRequestPath()
     endState(StatusCode::BadRequest);
     return;
   }
+
   // 5. Check that path is not going out of root.
-  decoded = removeDotSegments(decoded);
+  if (!isPathRootBound(decoded)) {
+    endState(StatusCode::Forbidden);
+    return;
+  }
 
   // Store this path in resource so we can use it when generating autoindex
   // without exposing internal filesystem
@@ -269,6 +275,9 @@ void ValidateRequest::removeLastSegment(std::string& output)
   }
 }
 
+/**
+ * https://datatracker.ietf.org/doc/html/rfc3986#section-5.2.4
+ */
 std::string ValidateRequest::removeDotSegments(const std::string& path)
 {
   std::string input = path;
@@ -324,6 +333,28 @@ std::string ValidateRequest::removeDotSegments(const std::string& path)
     }
   }
   return output;
+}
+
+bool ValidateRequest::isPathRootBound(const std::string& path)
+{
+  std::istringstream pathStream(path);
+  std::string segment;
+  std::size_t depth = 0;
+
+  while (!std::getline(pathStream, segment, '/').fail()) {
+    if (segment.empty() || segment == ".") {
+      continue;
+    }
+    if (segment == "..") {
+      if (depth == 0) {
+        return false;
+      }
+      --depth;
+    } else {
+      ++depth;
+    }
+  }
+  return true;
 }
 
 std::string ValidateRequest::removePrefix(const std::string& uriPath,
@@ -382,53 +413,51 @@ void ValidateRequest::_validateHost()
 
   int hostPort = -1;
   _host = _client->getRequest().getUri().getAuthority().getHost();
-  if (_host.empty()) {
-    if (!hostHeader.empty()) {
+  try {
+    if (!_host.empty()) {
+      _setPortFromUri(hostPort);
+    } else if (!hostHeader.empty()) {
       _splitHostHeader(hostHeader, hostPort);
     } else {
       // HTTP/1.0 with no Host-Header or URI-host
-      // endState(StatusCode::BadRequest); depends on how we want to implent it
+      // endState(StatusCode::BadRequest); depends how we want to implement it
       return;
     }
-  } else {
-    std::string uriPort =
-      _client->getRequest().getUri().getAuthority().getPort();
-    if (!uriPort.empty()) {
-      if (ft::starts_with(uriPort, ':')) {
-        uriPort = uriPort.substr(1);
-      }
-      hostPort = config::convert::toPort(uriPort);
-    }
-  }
-
-  const int httpPort = 80;
-  const Socket* const socket = _client->getSocket();
-  const int port = (hostPort == -1) ? httpPort : hostPort;
-  if (socket->getPort() != port) {
+  } catch (const std::invalid_argument&) {
+    // Invalid port reported by utils::toPort().
     endState(StatusCode::BadRequest);
     return;
   }
 
-  _host = ft::to_lower(_host);
+  const Socket* const socket = _client->getSocket();
+  const int port = (hostPort == -1) ? http::httpPort : hostPort;
+  if (socket->getPort() != port) {
+    // https://datatracker.ietf.org/doc/html/rfc9110#name-rejecting-misdirected-reque
+    endState(StatusCode::MisdirectedRequest);
+    return;
+  }
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
 {
-  const std::size_t pos = hostHeader.find(':');
+  const std::string::size_type pos = hostHeader.find(':');
   if (pos != std::string::npos) {
     _host = hostHeader.substr(0, pos);
-    const std::string portStr = hostHeader.substr(pos + 1, hostHeader.size());
+    const std::string portStr = hostHeader.substr(pos + 1);
     if (!portStr.empty()) {
-      try {
-        port = config::convert::toPort(portStr);
-      } catch (const std::exception& e) {
-        // NOTE: not sure if this is even possible
-        endState(StatusCode::BadRequest);
-        return;
-      }
+      port = utils::toPort(portStr);
     }
   } else {
     _host = hostHeader;
+  }
+}
+
+void ValidateRequest::_setPortFromUri(int& port)
+{
+  const std::string& uriPort =
+    _client->getRequest().getUri().getAuthority().getPort();
+  if (!uriPort.empty()) {
+    port = utils::toPort(uriPort);
   }
 }
 

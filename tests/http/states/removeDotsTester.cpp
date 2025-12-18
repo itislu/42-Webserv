@@ -66,7 +66,7 @@ INSTANTIATE_TEST_SUITE_P(
     PathTestParams{ "RootParent", "/../a", "/a" },
 
     // Trailing Handling
-    PathTestParams{ "TrailingSlash", "/file/", "/file/" },
+    PathTestParams{ "TrailingSlash", "/a/b/", "/a/b/" },
     PathTestParams{ "TrailingDot", "/a/b/.", "/a/b/" },
     PathTestParams{ "TrailingDoubleDot", "/a/b/..", "/a/" },
 

@@ -43,6 +43,7 @@ private:
 
   void _validateHost();
   void _splitHostHeader(const std::string& hostHeader, int& port);
+  void _setPortFromUri(int& port);
   void _setServerByHost();
 
   static std::string removePrefix(const std::string& uriPath,
@@ -55,6 +56,7 @@ private:
   static bool validateChars(const std::string& path);
 
   static void removeLastSegment(std::string& output);
+  static bool isPathRootBound(const std::string& path);
 
   void endState(StatusCode::Code status);
 
