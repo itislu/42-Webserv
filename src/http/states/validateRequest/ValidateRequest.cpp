@@ -502,12 +502,13 @@ bool ValidateRequest::_validateCgi()
     if (endPos == _path.length() || _path[endPos] == '/') {
       const std::string cgiPath = _path.substr(0, endPos);
       if (isFile(cgiPath)) {
-        _stateHandler.setState<ValidateCgi>();
-        _client->getResource().setPath(cgiPath);
         if (endPos < _path.length()) {
           const std::string pathInfo = _path.substr(endPos);
           _client->getResource().setPathInfo(pathInfo);
         }
+        _path = cgiPath;
+        _client->getResource().setPath(cgiPath);
+        _stateHandler.setState<ValidateCgi>();
         return true;
       }
     }
