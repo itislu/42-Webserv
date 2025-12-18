@@ -503,7 +503,6 @@ bool ValidateRequest::_validateCgi()
       const std::string cgiPath = _path.substr(0, endPos);
       if (isFile(cgiPath)) {
         _stateHandler.setState<ValidateCgi>();
-        _client->getResource().setType(Resource::Cgi);
         _client->getResource().setPath(cgiPath);
         if (endPos < _path.length()) {
           const std::string pathInfo = _path.substr(endPos);

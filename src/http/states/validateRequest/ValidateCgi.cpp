@@ -36,14 +36,6 @@ void ValidateCgi::validate()
 {
   _client->getResource().setType(Resource::Cgi);
 
-  if (isDirectory(_path)) {
-    endState(StatusCode::Forbidden);
-    return;
-  }
-  if (!isFile(_path)) {
-    endState(StatusCode::NotFound);
-    return;
-  }
   if (!isExecuteable(_path)) {
     endState(StatusCode::Forbidden);
     return;
@@ -58,11 +50,3 @@ void ValidateCgi::endState(StatusCode::Code status)
     _client->getResource().setType(Resource::Error);
   }
 }
-
-/*
-  204 No Content if deleted successfully
-  404 Not Found if the file doesn’t exist
-  403 Forbidden if not allowed
-  409 Conflict if the directory isn’t empty (optional)
-  500 Internal Server Error if deletion fails unexpectedly
-*/
