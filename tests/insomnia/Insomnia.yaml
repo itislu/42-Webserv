@@ -18,7 +18,7 @@ collection:
     meta:
       id: fld_f49856e3f6ef4ef0999bf5eff55e1ee1
       created: 1764947791370
-      modified: 1766062096941
+      modified: 1766083587933
       sortKey: -1764947791370
       description: ""
     children:
@@ -27,7 +27,7 @@ collection:
         meta:
           id: req_92ba901df3e34b2aa6e2a2d6ff7699eb
           created: 1757691288661
-          modified: 1766061756728
+          modified: 1766076245469
           isPrivate: false
           description: ""
           sortKey: -1764947796016
@@ -43,6 +43,14 @@ collection:
             value: insomnia/11.6.0
           - name: Connection
             value: close
+            description: ""
+            disabled: false
+          - name: Test-Alarm
+            value: hello woooorld
+            description: ""
+            disabled: false
+          - name: Test_Alarm
+            value: underscore prefix
             description: ""
             disabled: false
         scripts:
@@ -66,10 +74,10 @@ collection:
         meta:
           id: req_6af2164d552e4872848d9c70dd9e3de9
           created: 1761142474184
-          modified: 1764947800257
+          modified: 1766083465550
           isPrivate: false
           description: ""
-          sortKey: -1764947796216
+          sortKey: -1764947804243.5
         method: GET
         headers:
           - name: User-Agent
@@ -233,7 +241,7 @@ collection:
         meta:
           id: req_6644248650bf4f4aab786761bf9fc121
           created: 1765561806404
-          modified: 1765923478681
+          modified: 1766067007869
           isPrivate: false
           description: ""
           sortKey: -1764089851869.5
@@ -256,8 +264,8 @@ collection:
             
 
             // Statuscode
-            insomnia.test('Check if status is 408', () => {
-                insomnia.expect(insomnia.response.code).to.eql(408);
+            insomnia.test('Check if status is 504', () => {
+                insomnia.expect(insomnia.response.code).to.eql(504);
             });
         settings:
           renderRequestBody: true
@@ -412,16 +420,65 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: http://localhost:8080/upload/
+        name: BodyTooLarge
+        meta:
+          id: req_21329298c1974d7baf8a23b19b12a21d
+          created: 1766083320212
+          modified: 1766083458990
+          isPrivate: false
+          description: ""
+          sortKey: -1766083320212
+        method: POST
+        body:
+          mimeType: text/plain
+          text: |-
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+            1234567890
+        headers:
+          - name: Content-Type
+            value: text/plain
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
     id: jar_99d30891da4bdcebc63947a8fc17f076de878684
     created: 1761142460751
-    modified: 1766062096939
+    modified: 1766083587931
 environments:
   name: Base Environment
   meta:
     id: env_99d30891da4bdcebc63947a8fc17f076de878684
     created: 1761142460750
-    modified: 1766062096940
+    modified: 1766083587933
     isPrivate: false
