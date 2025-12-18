@@ -29,9 +29,8 @@ void Pipe::init()
   }
 
   // make fds non-blocking
-  // todo non block ?
-  // _setFdNonBlocking(_pipefd[0]);
-  // _setFdNonBlocking(_pipefd[1]);
+  _setFdNonBlocking(_pipefd[0]);
+  _setFdNonBlocking(_pipefd[1]);
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 

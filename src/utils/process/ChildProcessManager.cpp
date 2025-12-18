@@ -32,20 +32,21 @@ ChildProcessManager::ChildProcessManager() {}
 ChildProcessManager::~ChildProcessManager()
 {
   _log.info() << "ChildProcessManager ends\n";
-  for (PidVector::iterator it = _childs.begin(); it != _childs.end(); ++it) {
+  for (PidVector::iterator it = _children.begin(); it != _children.end();
+       ++it) {
     ::kill(*it, SIGKILL);
     ::waitpid(*it, 0, 0);
     _log.info() << "Child(" << *it << ") collected\n";
   }
 }
 
-void ChildProcessManager::collectChilds()
+void ChildProcessManager::collectChildren()
 {
   std::size_t index = 0;
-  while (index < _childs.size()) {
+  while (index < _children.size()) {
     bool remove = false;
     int status = 0;
-    const pid_t pid = _childs[index];
+    const pid_t pid = _children[index];
     const pid_t result = waitpid(pid, &status, WNOHANG);
     if (result == 0) {
       _log.warning() << "Child(" << pid << ") alive\n";
@@ -65,8 +66,8 @@ void ChildProcessManager::collectChilds()
     }
 
     if (remove) {
-      _childs[index] = _childs.back();
-      _childs.pop_back();
+      _children[index] = _children.back();
+      _children.pop_back();
     } else {
       index++;
     }
@@ -78,12 +79,12 @@ void ChildProcessManager::addChild(pid_t pid)
   if (pid <= 0) {
     return;
   }
-  if (ft::contains(_childs, pid)) {
+  if (ft::contains(_children, pid)) {
     return;
   }
 
   _log.info() << "Child(" << pid << ") created\n";
-  _childs.push_back(pid);
+  _children.push_back(pid);
 }
 
 void ChildProcessManager::waitForChild(pid_t pid)
@@ -97,9 +98,9 @@ void ChildProcessManager::waitForChild(pid_t pid)
   _log.info() << "Child(" << pid << ") collected\n";
 
   const PidVector::iterator iter =
-    std::find(_childs.begin(), _childs.end(), pid);
-  if (iter != _childs.end()) {
-    _childs.erase(iter);
+    std::find(_children.begin(), _children.end(), pid);
+  if (iter != _children.end()) {
+    _children.erase(iter);
   }
 }
 
@@ -109,8 +110,8 @@ void ChildProcessManager::killChild(pid_t pid)
     return;
   }
   const PidVector::const_iterator iter =
-    std::find(_childs.begin(), _childs.end(), pid);
-  if (iter != _childs.end()) {
+    std::find(_children.begin(), _children.end(), pid);
+  if (iter != _children.end()) {
     _log.info() << "Child(" << pid << ") killed\n";
     ::kill(pid, SIGKILL);
   }

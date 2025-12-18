@@ -28,10 +28,6 @@ PrepareResponse::PrepareResponse(Client* context)
 {
   _log.info() << *_client << " PrepareResponse\n";
   _init();
-
-  // todo remove this log after testing
-  _log.info() << "PrepareResponse Request:\n\n"
-              << getContext()->getRequest().toString() << "\n\n";
 }
 
 void PrepareResponse::run()
@@ -61,7 +57,7 @@ StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
 
 void PrepareResponse::_init()
 {
-  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+  if (!_client->getResponse().getStatusCode().is2xxCode()) {
     _stateHandler.setState<HandleError>();
   } else {
     const Request::Method method = _client->getRequest().getMethod();
