@@ -43,8 +43,8 @@ void ValidatePost::validate()
     const std::string& ext = _location->getCgiExtension();
     if (!ext.empty() && ft::ends_with(_path, ext)) {
       validateCGI();
+      return;
     }
-    return;
   }
 
   validateStaticPost();
