@@ -1,16 +1,18 @@
 #ifndef SOCKETMANAGER_HPP
 #define SOCKETMANAGER_HPP
 
-#include "config/Config.hpp"
-#include "config/ServerConfig.hpp"
-#include "libftpp/memory.hpp"
-#include "socket/Socket.hpp"
+#include <config/Config.hpp>
+#include <config/ServerConfig.hpp>
+#include <libftpp/memory.hpp>
+#include <socket/AutoFd.hpp>
+#include <socket/Socket.hpp>
+
 #include <cstddef>
 #include <map>
 #include <sys/poll.h>
 #include <vector>
 
-class SocketManager
+class SocketManager : public AutoFdSubscriber
 {
 public:
   static SocketManager& getInstance();
@@ -22,7 +24,7 @@ public:
   const std::vector<pollfd>& getPfds() const;
   pollfd* getPfdStart();
 
-  int acceptClient(int fdes);
+  AutoFd acceptClient(int fdes);
   void addCgiFd(int fdes);
 
   void enablePollout(int fdes);
@@ -32,6 +34,9 @@ public:
   const Socket& getListener(int port) const;
 
   void removeFd(int fdes);
+
+  // AutoFdSubscriber
+  void onClose(int fdes);
 
 private:
   typedef std::vector<ft::shared_ptr<const Socket> >::iterator SockIter;
