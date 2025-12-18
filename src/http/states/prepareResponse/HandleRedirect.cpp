@@ -4,18 +4,10 @@
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
-#include <http/StatusCode.hpp>
-#include <http/headerUtils.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
-#include <libftpp/memory.hpp>
-#include <libftpp/optional.hpp>
-#include <utils/buffer/MemoryBuffer.hpp>
-#include <utils/buffer/StaticFileBuffer.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
-#include <exception>
-#include <sstream>
 #include <string>
 
 /* ************************************************************************** */
