@@ -69,9 +69,8 @@ int toRedirectCode(const std::string& str)
 {
   const int code = utils::toNumber<int>(str);
   static const ft::array<int, 5> allowed = { 301, 302, 303, 307, 308 };
-  static const int size = sizeof(allowed) / sizeof(allowed[0]);
 
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < allowed.size(); ++i) {
     if (code == allowed[i]) {
       return code;
     }
