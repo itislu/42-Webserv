@@ -1,6 +1,7 @@
 
 #include "ValidatePost.hpp"
 #include "libftpp/string.hpp"
+#include "libftpp/utility.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
@@ -39,6 +40,10 @@ void ValidatePost::run()
 void ValidatePost::validate()
 {
   if (isDirectory(_path)) {
+    if (_location != FT_NULLPTR && _location->isCgi()) {
+      endState(StatusCode::Forbidden);
+      return;
+    }
     if (!isWriteable(_path) || !isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
       return;
