@@ -14,6 +14,7 @@
 #include <socket/AutoFd.hpp>
 #include <socket/Socket.hpp>
 #include <socket/SocketManager.hpp>
+#include <stdexcept>
 #include <utils/logger/Logger.hpp>
 
 #include <algorithm>
@@ -63,13 +64,15 @@ int EventManager::check()
 }
 
 void EventManager::checkTimeouts()
-{
+try {
   std::vector<ft::shared_ptr<EventHandler> > timedOut;
   _getTimedOutHandlers(timedOut);
   for (std::size_t i = 0; i < timedOut.size(); ++i) {
     _log.info() << timedOut[i]->logName() << "timed out.\n";
-    _disconnectEventHandler(timedOut[i].get());
+    _disconnectEventHandler(*timedOut[i]);
   }
+} catch (...) {
+  // EMPTY: Handle the ones we could collect already.
 }
 
 void EventManager::_addHandler(ft::shared_ptr<EventHandler> handler)
@@ -79,13 +82,13 @@ void EventManager::_addHandler(ft::shared_ptr<EventHandler> handler)
   _handlers[fdes] = ft::move(handler);
 }
 
-EventHandler* EventManager::getHandler(RawFd fdes) const
+EventHandler& EventManager::getHandler(RawFd fdes) const
 {
   const const_iterHandler iter = _handlers.find(fdes);
   if (iter == _handlers.end()) {
-    return FT_NULLPTR;
+    throw std::runtime_error("EventManager: fd not found");
   }
-  return iter->second.get();
+  return *iter->second;
 }
 
 void EventManager::addCgiHandler(ft::shared_ptr<EventHandler> handler)
@@ -117,8 +120,8 @@ void EventManager::_checkActivity()
       _acceptClient(pfds[i].fd, events);
       i++;
     } else {
-      EventHandler* const handler = getHandler(pfds[i].fd);
-      const EventHandler::Result result = handler->handleEvent(events);
+      EventHandler& handler = getHandler(pfds[i].fd);
+      const EventHandler::Result result = handler.handleEvent(events);
       if (result == EventHandler::Disconnect) {
         _disconnectEventHandler(handler);
       } else {
@@ -150,14 +153,12 @@ void EventManager::_acceptClient(int fdes, const unsigned events)
   }
 }
 
-void EventManager::_disconnectEventHandler(EventHandler* handler)
+void EventManager::_disconnectEventHandler(const EventHandler& handler)
 {
-  if (handler == FT_NULLPTR) {
-    return;
-  }
-  _log.info() << handler->logName() << "disconnected\n";
+  _log.info() << handler.logName() << "disconnected\n";
 
-  const int handlerFd = handler->getFd();
+  const int handlerFd = handler.getFd();
+
   // Remove corresponding pollfd
   _socketManager().removeFd(handlerFd);
 
@@ -199,7 +200,7 @@ long EventManager::_getMinTimeout() const
 
 void EventManager::_getTimedOutHandlers(
   std::vector<ft::shared_ptr<EventHandler> >& timedOut) const
-{
+try {
   const TimeStamp now;
   for (const_iterHandler it = _handlers.begin(); it != _handlers.end(); ++it) {
     EventHandler& handler = *(it->second);
@@ -211,6 +212,8 @@ void EventManager::_getTimedOutHandlers(
       }
     }
   }
+} catch (...) {
+  // EMPTY: Handle the ones we could collect already.
 }
 
 void EventManager::_removeHandler(RawFd fdes)

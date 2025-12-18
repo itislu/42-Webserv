@@ -25,7 +25,7 @@ public:
   int check();
   void checkTimeouts();
 
-  EventHandler* getHandler(RawFd fdes) const;
+  EventHandler& getHandler(RawFd fdes) const;
   void addCgiHandler(ft::shared_ptr<EventHandler> handler);
 
 private:
@@ -39,7 +39,7 @@ private:
   /* EVENTS */
   void _checkActivity();
   void _acceptClient(int fdes, unsigned events);
-  void _disconnectEventHandler(EventHandler* handler);
+  void _disconnectEventHandler(const EventHandler& handler);
 
   /* TIMEOUT */
   int _calculateTimeout();
