@@ -90,7 +90,6 @@ const std::string& LocationConfig::getErrorPage(int code) const
   const std::map<int, std::string>::const_iterator iter =
     _errorPages.find(code);
   if (iter != _errorPages.end()) {
-    // TODO: check if this should be appended to root
     return iter->second;
   }
   static const std::string empty;

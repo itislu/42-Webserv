@@ -176,6 +176,10 @@ std::ostream& operator<<(std::ostream& out, const Config& config)
           << "    root: " << locIt->getRoot() << "\n"
           << "    autoindex: " << (locIt->isAutoIndex() ? "on" : "off") << "\n"
           << "    cgi: " << (locIt->isCgi() ? "on" : "off") << "\n";
+      if (locIt->isCgi()) {
+        out << "    cgi_ext: " << locIt->getCgiExtension() << "\n"
+            << "    cgi_pass: " << locIt->getCgiPass() << "\n";
+      }
     }
   }
   out << "Lowest Timeout(Default): " << Config::getDefaultTimeout() << "s\n";
