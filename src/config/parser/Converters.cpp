@@ -70,7 +70,7 @@ int toRedirectCode(const std::string& str)
   const int code = utils::toNumber<int>(str);
   static const ft::array<int, 5> allowed = { 301, 302, 303, 307, 308 };
 
-  for (int i = 0; i < allowed.size(); ++i) {
+  for (std::size_t i = 0; i < allowed.size(); ++i) {
     if (code == allowed[i]) {
       return code;
     }
