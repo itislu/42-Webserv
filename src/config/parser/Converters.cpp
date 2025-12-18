@@ -1,4 +1,5 @@
 #include "Converters.hpp"
+#include "libftpp/array.hpp"
 #include <cstddef>
 #include <libftpp/ctype.hpp>
 #include <libftpp/string.hpp>
@@ -61,6 +62,22 @@ int toCode(const std::string& str)
   }
   throw std::invalid_argument("invalid errorcode: " + str +
                               " (must be between 300 and 599)");
+}
+
+// 301, 302, 303, 307, 308
+int toRedirectCode(const std::string& str)
+{
+  const int code = utils::toNumber<int>(str);
+  static const ft::array<int, 5> allowed = { 301, 302, 303, 307, 308 };
+  static const int size = sizeof(allowed) / sizeof(allowed[0]);
+
+  for (int i = 0; i < size; ++i) {
+    if (code == allowed[i]) {
+      return code;
+    }
+  }
+  throw std::invalid_argument("invalid redirect code: " + str +
+                              " (allowed: 301, 302, 303, 307, 308)");
 }
 
 bool toBool(const std::string& str)
