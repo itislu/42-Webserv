@@ -3,7 +3,7 @@ import time
 
 HOST = "localhost"
 PORT = 8080
-PATH = "/cgi-bin/mirror_delay.sh"
+PATH = "/cgi-bin-py/mirrorDelay.py"
 
 chunk1 = b"A" * 5000
 chunk2 = b"B" * 5000

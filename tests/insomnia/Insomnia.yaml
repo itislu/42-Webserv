@@ -3,38 +3,31 @@ schema_version: "5.1"
 name: Scratch Pad
 meta:
   id: wrk_scratchpad
-  created: 1753525703470
-  modified: 1753525703470
+  created: 1761142447914
+  modified: 1761142447914
   description: ""
 collection:
-  - name: Go Webserver
-    meta:
-      id: fld_f9aaa33d296242709cb43044b3bf7838
-      created: 1757691231318
-      modified: 1757691330702
-      sortKey: -1757691231318
-      description: ""
   - name: 42WebserverNginx
     meta:
-      id: fld_dc2d7ceda5e243d09b20d828b5786e72
+      id: fld_f7bc38322f6c476590d12edae16bcb91
       created: 1763231871214
       modified: 1765923516140
       sortKey: -1763231871214
       description: ""
   - name: Webserv
     meta:
-      id: fld_f84c6abdf1c14353a6be061c0b5ceb3d
+      id: fld_f49856e3f6ef4ef0999bf5eff55e1ee1
       created: 1764947791370
-      modified: 1765924778361
+      modified: 1766062096941
       sortKey: -1764947791370
       description: ""
     children:
-      - url: http://127.0.0.1:8080/cgi-bin/cgiScript.sh
+      - url: http://127.0.0.1:8080/cgi-bin-py/debugScript.py
         name: CgiTest
         meta:
-          id: req_1665133cd3404ea7804d4c16b30d5018
+          id: req_92ba901df3e34b2aa6e2a2d6ff7699eb
           created: 1757691288661
-          modified: 1765561790079
+          modified: 1766061756728
           isPrivate: false
           description: ""
           sortKey: -1764947796016
@@ -71,7 +64,7 @@ collection:
       - url: http://localhost:8080/get.html
         name: BasicRequest
         meta:
-          id: req_413d6dda478b41fa8dd5b25d187b5c3b
+          id: req_6af2164d552e4872848d9c70dd9e3de9
           created: 1761142474184
           modified: 1764947800257
           isPrivate: false
@@ -103,7 +96,7 @@ collection:
       - url: http://localhost:8080/get.html
         name: MethodNotAllowed
         meta:
-          id: req_0ec00139b3714c88a026632283a1fd9d
+          id: req_05997aecc2fa404ba6fa9af59f119bb3
           created: 1764946608857
           modified: 1764947797312
           isPrivate: false
@@ -126,7 +119,7 @@ collection:
       - url: http://localhost:8080/notfoundshit.html
         name: CustomErrPage
         meta:
-          id: req_6cfd2096f5a34ea59f7f22659109db12
+          id: req_454be9425aca4186830a48967cf7a664
           created: 1764947050228
           modified: 1764947804220
           isPrivate: false
@@ -156,9 +149,9 @@ collection:
       - url: http://localhost:8080/upload/
         name: Upload
         meta:
-          id: req_49ee4c671a4f4a40828e047a9e79a379
+          id: req_cd0a877d047a4bdd8e53791818255278
           created: 1764947828326
-          modified: 1765920866836
+          modified: 1765982807771
           isPrivate: false
           description: ""
           sortKey: -1764947828326
@@ -174,8 +167,8 @@ collection:
             value: insomnia/12.1.0
             description: ""
             disabled: false
-          - name: Content-Length
-            value: "10"
+          - name: Connection
+            value: keep-alive
             description: ""
             disabled: false
         scripts:
@@ -197,7 +190,7 @@ collection:
       - url: upload/
         name: UploadRelative
         meta:
-          id: req_f302e153f7ff428fa33fa1f56fdae4cd
+          id: req_31e8826032d94487baabf7bb9adad637
           created: 1764952067561
           modified: 1764952973512
           isPrivate: false
@@ -238,7 +231,7 @@ collection:
       - url: http://127.0.0.1:8080/cgi-bin/endlessLies.sh
         name: CgiLoop
         meta:
-          id: req_95cb0add453f416b9cd9fe9b9b3f4550
+          id: req_6644248650bf4f4aab786761bf9fc121
           created: 1765561806404
           modified: 1765923478681
           isPrivate: false
@@ -277,7 +270,7 @@ collection:
       - url: http://127.0.0.1:8080/cgi-bin/badGateway.sh
         name: CgiBadGateway
         meta:
-          id: req_33c6aa2bc3e1423196e5e4eb906ff3f7
+          id: req_6e517142175840fab909165f2cea7436
           created: 1765919561719
           modified: 1765919640996
           isPrivate: false
@@ -313,16 +306,122 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: http://127.0.0.1:8080/cgi-bin/emptyBody.sh
+        name: CgiEmptyBody
+        meta:
+          id: req_ad82de93a64c424ca8bf2649fc99dcb9
+          created: 1765971536839
+          modified: 1765971558422
+          isPrivate: false
+          description: ""
+          sortKey: -1764733309979.375
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.0
+          - name: Connection
+            value: close
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |
+            
+
+            // Statuscode
+            insomnia.test('Check if status is 200', () => {
+                insomnia.expect(insomnia.response.code).to.eql(200);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://127.0.0.1:8080/cgi-bin/invalid/add.sh
+        name: CgiTestInvalidInterpreter
+        meta:
+          id: req_5fc66604f66348849292153e7b2fc4d4
+          created: 1765975169433
+          modified: 1766062008137
+          isPrivate: false
+          description: ""
+          sortKey: -1764840552997.6875
+        method: GET
+        body:
+          mimeType: text/plain
+          text: |
+            HelloWorld
+        headers:
+          - name: Content-Type
+            value: text/plain
+          - name: User-Agent
+            value: insomnia/11.6.0
+          - name: Connection
+            value: close
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |
+            
+
+            // Statuscode
+            insomnia.test('Check if status is 500', () => {
+                insomnia.expect(insomnia.response.code).to.eql(500);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/upload/
+        name: Delete
+        meta:
+          id: req_e9055872559642cbadf71ed31f904638
+          created: 1765986287150
+          modified: 1765986334687
+          isPrivate: false
+          description: ""
+          sortKey: -1764947820298.5
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+          - name: Connection
+            value: keep-alive
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |
+            
+
+            insomnia.test('Check if status is 405', () => {
+                insomnia.expect(insomnia.response.code).to.eql(405);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
     id: jar_99d30891da4bdcebc63947a8fc17f076de878684
-    created: 1753525725266
-    modified: 1765924778358
+    created: 1761142460751
+    modified: 1766062096939
 environments:
   name: Base Environment
   meta:
     id: env_99d30891da4bdcebc63947a8fc17f076de878684
-    created: 1753525725217
-    modified: 1765924778360
+    created: 1761142460750
+    modified: 1766062096940
     isPrivate: false
