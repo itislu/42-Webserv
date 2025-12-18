@@ -29,13 +29,9 @@ private:
   void _validateContentLength(const std::string& value);
   void _validateTransferEncoding(const std::string& value);
 
-  void _setResponseConnectionHeader();
-
   static Logger& _log;
   Client* _client;
   Headers* _headers;
-
-  bool _closeConnection;
 };
 
 struct RequestHeaderValidator::ValidatorEntry

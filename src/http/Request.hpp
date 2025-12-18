@@ -31,6 +31,7 @@ public:
   static Method strToMethod(const std::string& strMethod);
 
   Method getMethod() const;
+  std::string getStrMethod() const;
   const Uri& getUri() const;
   const std::string& getVersion() const;
   Headers& getHeaders();
@@ -41,7 +42,7 @@ public:
   void setUri(const Uri& uri);
   void setVersion(const std::string& version);
 
-  std::string toString();
+  std::string toString() const;
 
 private:
   struct MethodMap;

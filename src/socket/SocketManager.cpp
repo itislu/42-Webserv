@@ -1,16 +1,16 @@
 #include "SocketManager.hpp"
+
+#include "AutoFd.hpp"
 #include "Socket.hpp"
-#include "config/Config.hpp"
-#include "config/ServerConfig.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
+#include <config/Config.hpp>
+#include <config/ServerConfig.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
+
 #include <cassert>
 #include <cstddef>
-#include <exception>
-#include <map>
 #include <sys/poll.h>
 #include <sys/socket.h>
-#include <unistd.h>
 #include <utility>
 #include <vector>
 
@@ -96,25 +96,25 @@ pollfd* SocketManager::getPfdStart()
   return _pfds.data();
 }
 
-int SocketManager::acceptClient(int fdes)
+AutoFd SocketManager::acceptClient(int fdes)
 {
-  const int clientFd = accept(fdes, FT_NULLPTR, FT_NULLPTR);
-  if (clientFd < 0) {
-    return -1;
+  AutoFd clientFd(accept(fdes, FT_NULLPTR, FT_NULLPTR));
+  if (clientFd.get() < 0) {
+    return ft::move(clientFd);
   }
+  clientFd.subscribe(*this);
 
-  try {
-    Socket::setFlags(clientFd);
-    addToPfd(clientFd);
-    const Socket& listener = getSocket(fdes);
-    _fdToSocket[clientFd] = &listener;
-  } catch (const std::exception&) {
-    removePfd(clientFd);
-    close(clientFd);
-    return -1;
-  }
+  Socket::setFlags(clientFd.get());
+  addToPfd(clientFd.get());
+  const Socket& listener = getSocket(fdes);
+  _fdToSocket[clientFd.get()] = &listener;
 
-  return clientFd;
+  return ft::move(clientFd);
+}
+
+void SocketManager::addCgiFd(int fdes)
+{
+  addToPfd(fdes);
 }
 
 pollfd* SocketManager::getPollFd(int fdes)
@@ -189,4 +189,9 @@ void SocketManager::removeFd(int fdes)
 {
   removePfd(fdes);
   removeFdFromMap(fdes);
+}
+
+void SocketManager::onClose(int fdes)
+{
+  removeFd(fdes);
 }

@@ -4,6 +4,7 @@
 #include <libftpp/ctype.hpp>
 
 #include <map>
+#include <netinet/in.h>
 #include <string>
 
 namespace http {
@@ -22,6 +23,8 @@ const char* const CRLF = "\r\n";
 
 const char* const HTTP_1_0 = "HTTP/1.0";
 const char* const HTTP_1_1 = "HTTP/1.1";
+const char* const HTTP_2_0 = "HTTP/2.0";
+const in_port_t httpPort = 80;
 
 /**
  * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
@@ -228,7 +231,15 @@ const ExtToTypeMap& getExtToType()
   return map;
 }
 
+const char* const minResponse408 = "HTTP/1.1 408 Request Timeout\r\n"
+                                   "Content-Length: 0\r\n"
+                                   "Connection: close\r\n\r\n";
+
 const char* const minResponse500 = "HTTP/1.1 500 Internal Server Error\r\n"
+                                   "Content-Length: 0\r\n"
+                                   "Connection: close\r\n\r\n";
+
+const char* const minResponse504 = "HTTP/1.1 504 Gateway Timeout\r\n"
                                    "Content-Length: 0\r\n"
                                    "Connection: close\r\n\r\n";
 

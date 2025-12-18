@@ -50,17 +50,6 @@ std::size_t toMaxBodySize(const std::string& str)
   return value * multiplier;
 }
 
-// 65535
-int toPort(const std::string& str)
-{
-  const int port = utils::toNumber<int>(str);
-  const int maxPort = 65535;
-  if (port > 0 && port <= maxPort) {
-    return port;
-  }
-  throw std::invalid_argument("invalid port: " + str);
-}
-
 // 300 - 599
 int toCode(const std::string& str)
 {

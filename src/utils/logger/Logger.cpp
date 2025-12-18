@@ -1,20 +1,21 @@
 #include "Logger.hpp"
 
+#include "libftpp/array.hpp"
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 
+#include <cstdlib>
+#include <cstring>
 #include <ctime>
-#include <fstream>
 #include <iomanip>
 #include <ios>
 #include <iostream>
-#include <map>
 #include <string>
 
 /* ************************************************************************** */
 // INIT
 
-bool Logger::_loggerEnabled = false;
+const char* const Logger::_envVar = "WEBSERV_LOGGING";
 
 /* ************************************************************************** */
 // PUBLIC
@@ -56,28 +57,57 @@ std::ostream& Logger::error()
 
 void Logger::enableLogging()
 {
-  _loggerEnabled = true;
+  _loggerEnabled() = true;
 }
 
 void Logger::disableLogging()
 {
-  _loggerEnabled = false;
+  _loggerEnabled() = false;
 }
 
-/* ***************************************************************************/
+/* ************************************************************************** */
 // PRIVATE
-Logger::Logger(const std::string& filename)
+
+Logger::Logger() throw()
+  : _isFileCreated(false)
 {
-  _file.open(filename.c_str(), std::ios::out | std::ios::trunc);
-  _file << std::unitbuf; // enables automatic flush
-  if (!_file) {
-    std::cerr << "Failed to open log file: " << filename << '\n';
+  _file << std::unitbuf;
+}
+
+Logger::Logger(const std::string& filename)
+  : _filename(filename)
+  , _isFileCreated(false)
+{
+  _file << std::unitbuf;
+  _openFile();
+}
+
+bool Logger::_openFile()
+{
+  if (!_loggerEnabled() || _filename.empty()) {
+    if (_file.is_open()) {
+      _file.close();
+    }
+    return false;
   }
+  if (_file.is_open()) {
+    return true;
+  }
+
+  _file.open(_filename.c_str(),
+             _isFileCreated ? std::ios::app : std::ios::trunc);
+  if (!_file.is_open()) {
+    std::cerr << "Failed to open log file: " << _filename << '\n';
+    return false;
+  }
+  _isFileCreated = true;
+
+  return true;
 }
 
 std::ostream& Logger::_log(LogLevel level)
 {
-  if (!_file.is_open() || !_loggerEnabled) {
+  if (!_openFile()) {
     return _file;
   }
   std::string levelStr;
@@ -115,3 +145,26 @@ std::string Logger::_currentTime()
   return buff;
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+
+bool& Logger::_loggerEnabled()
+{
+  static bool _loggerEnabled = _initLoggingFromEnv();
+  return _loggerEnabled;
+}
+
+bool Logger::_initLoggingFromEnv() throw()
+{
+  const char* const envValue = std::getenv(_envVar);
+  if (envValue == FT_NULLPTR) {
+    return false;
+  }
+
+  const ft::array<const char*, 7> enablers = { "1",  "true", "True", "TRUE",
+                                               "on", "On",   "ON" };
+  for (unsigned i = 0; i < enablers.size(); ++i) {
+    if (std::strcmp(envValue, enablers[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}

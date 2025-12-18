@@ -3,7 +3,9 @@
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
+#include <http/headerUtils.hpp>
 #include <http/http.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
@@ -38,8 +40,8 @@ WriteHeaderLines::WriteHeaderLines(Client* context)
 void WriteHeaderLines::run()
 try {
   Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Date", _makeHttpDate());
-  headers.addHeader("Server", "webserv"); // TODO from config probably ?
+  headers.setHeader("Date", _makeHttpDate());
+  headers.setHeader("Server", "webserv");
 
   _setConnectionHeader();
 
@@ -83,22 +85,23 @@ std::string WriteHeaderLines::_makeHttpDate()
 void WriteHeaderLines::_setConnectionHeader()
 {
   Request& request = _client->getRequest();
+  const Response& response = _client->getResponse();
   const Headers& reqHeaders = request.getHeaders();
   Headers& headers = _client->getResponse().getHeaders();
 
-  // previously set
-  if (headers.contains("Connection")) {
+  if (_client->closeConnection() || !response.getStatusCode().is2xxCode()) {
+    headers.setHeader(header::connection, "close");
     return;
   }
 
   std::string conn;
-  if (reqHeaders.contains("Connection")) {
-    conn = ft::to_lower(reqHeaders.at("Connection"));
+  if (reqHeaders.contains(header::connection)) {
+    conn = ft::to_lower(reqHeaders.at(header::connection));
   }
 
   // close connection present
   if (conn == "close") {
-    headers.addHeader("Connection", "close");
+    headers.setHeader(header::connection, "close");
     return;
   }
 
@@ -114,5 +117,5 @@ void WriteHeaderLines::_setConnectionHeader()
     return;
   }
 
-  headers.addHeader("Connection", "close");
+  headers.setHeader(header::connection, "close");
 }

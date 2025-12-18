@@ -23,6 +23,7 @@ private:
 
   void _setNextState();
   void _createData();
+  std::string _createNoRootLocation(const std::string& absLocation);
 
   static Logger& _log;
 

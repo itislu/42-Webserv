@@ -1,8 +1,10 @@
 #include "ReadBody.hpp"
 
 #include <client/Client.hpp>
+#include <http/CgiContext.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
+#include <http/Resource.hpp>
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/abnfRules/generalRules.hpp>
@@ -10,9 +12,12 @@
 #include <http/abnfRules/ruleIds.hpp>
 #include <http/headerUtils.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
+#include <http/states/waitForCgi/WaitForCgi.hpp>
 #include <http/utils/HeaderParser.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+#include <socket/SocketManager.hpp>
 #include <utils/abnfRules/Extractor.hpp>
 #include <utils/abnfRules/LiteralRule.hpp>
 #include <utils/abnfRules/Rule.hpp>
@@ -70,8 +75,14 @@ try {
     _readChunkedBody();
   }
 
+  _updateCgi();
+
   if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
-    getContext()->getStateHandler().setState<PrepareResponse>();
+    if (_client->getResource().getType() == Resource::Cgi) {
+      getContext()->getStateHandler().setState<WaitForCgi>();
+    } else {
+      getContext()->getStateHandler().setState<PrepareResponse>();
+    }
   }
 } catch (const std::exception& e) {
   _log.error() << *_client << " ReadBody: " << e.what() << "\n";
@@ -102,13 +113,10 @@ LiteralRule& ReadBody::_endOfLineRule()
 
 Extractor<ReadBody>& ReadBody::_chunkExtractor()
 {
-  static Extractor<ReadBody> extractor;
-  static bool init = false;
-  if (!init) {
-    init = true;
-    extractor.addMapItem(ChunkSize, &ReadBody::_setChunkSize);
-    extractor.addMapItem(ChunkExt, &ReadBody::_setChunkExt);
-  }
+  static Extractor<ReadBody> extractor =
+    Extractor<ReadBody>()
+      .addMapItem(ChunkSize, &ReadBody::_setChunkSize)
+      .addMapItem(ChunkExt, &ReadBody::_setChunkExt);
   return extractor;
 }
 
@@ -286,7 +294,7 @@ void ReadBody::_readTrailerSection()
       break;
     case HeaderParser::InvalidHeader:
       // will only be set if custom validator used
-      if (response.getStatusCode() == StatusCode::Ok) {
+      if (response.getStatusCode().is2xxCode()) {
         _log.error() << "ReadBody: validator failed to set error status\n";
         response.setStatusCode(StatusCode::BadRequest);
       }
@@ -297,7 +305,7 @@ void ReadBody::_readTrailerSection()
 bool ReadBody::_readingOk()
 {
   const StatusCode& statuscode = _client->getResponse().getStatusCode();
-  if (statuscode != StatusCode::Ok) {
+  if (!statuscode.is2xxCode()) {
     return false;
   }
   return !_done && !_buffReader.reachedEnd();
@@ -343,8 +351,7 @@ void ReadBody::_readBody()
  */
 bool ReadBody::_contentTooLarge(std::size_t newBytes)
 {
-  // todo get from config ?
-  const std::size_t maxBodySize = 2147483647;
+  const std::size_t maxBodySize = _client->getResource().getMaxBodySize();
   const std::size_t sizeBody = _client->getRequest().getBody().size();
   if (sizeBody + newBytes > maxBodySize) {
     _client->getResponse().setStatusCode(StatusCode::ContentTooLarge);
@@ -365,8 +372,7 @@ bool ReadBody::_setBodyLength(const std::string& numStr, std::ios::fmtflags fmt)
     _log.error() << "ReadBody: body length too large\n";
     return false;
   }
-  // todo get from config ?
-  const std::size_t maxBodySize = 2147483647;
+  const std::size_t maxBodySize = _client->getResource().getMaxBodySize();
   if (_bodyLength > maxBodySize) {
     _client->getResponse().setStatusCode(StatusCode::ContentTooLarge);
     _log.error() << "ReadBody: body length bigger than max body size\n";
@@ -374,4 +380,28 @@ bool ReadBody::_setBodyLength(const std::string& numStr, std::ios::fmtflags fmt)
   }
   _log.info() << "body length: " << _bodyLength << '\n';
   return true;
+}
+
+void ReadBody::_updateCgi()
+{
+  CgiContext* cgiContext = _client->getCgiContext().get();
+  if (cgiContext == FT_NULLPTR) {
+    return;
+  }
+
+  if (_done || _fixedLengthBody) {
+    cgiContext->setContentLengthAvailable();
+    if (_fixedLengthBody) {
+      cgiContext->setContentLength(_bodyLength);
+    } else if (_chunkedBody) {
+      const IInOutBuffer& body = _client->getRequest().getBody();
+      cgiContext->setContentLength(body.size());
+    } else {
+      cgiContext->setContentLength(0);
+    }
+  }
+
+  // new data -> enable cgi pollout
+  SocketManager::getInstance().enablePollout(
+    cgiContext->getPipeClientToCgi().getWriteFd());
 }

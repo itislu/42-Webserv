@@ -1,27 +1,35 @@
 #include "ServerManager.hpp"
-#include "config/Config.hpp"
-#include "config/ServerConfig.hpp"
-#include "event/EventManager.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
-#include "server/Server.hpp"
-#include "socket/Socket.hpp"
-#include "socket/SocketManager.hpp"
+
+#include <config/Config.hpp>
+#include <config/ServerConfig.hpp>
+#include <event/EventManager.hpp>
+#include <libftpp/algorithm.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/string.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <socket/Socket.hpp>
+#include <socket/SocketManager.hpp>
+#include <utils/logger/Logger.hpp>
+#include <utils/process/ChildProcessManager.hpp>
+
 #include <cassert>
 #include <cerrno>
 #include <csignal>
 #include <cstring>
-#include <iostream>
 #include <stdexcept>
 #include <string>
+#include <sys/signal.h>
 #include <vector>
+
+/* ***************************************************************************/
+// INIT
 
 static volatile std::sig_atomic_t g_running = 0;
 
-static void error(const std::string& msg)
-{
-  std::cerr << "Error: " << msg << " (" << std::strerror(errno) << ")\n";
-}
+Logger& ServerManager::_log = Logger::getInstance(LOG_SERVER);
+
+/* ************************************************************************** */
 
 extern "C" void sigIntHandler(int /*sigNum*/)
 {
@@ -90,23 +98,21 @@ void ServerManager::mapServerToSocket(
 }
 
 /*
-  Tries to find the best server for the given hostname. If no hostname matches
-  it defaults to the first server that is associated with this socket.
+  Tries to find the best server for the given hostname, case insensitive. If no
+  hostname matches it defaults to the first server that is associated with this
+  socket.
 */
 const Server* ServerManager::getServerByHost(const Socket* socket,
                                              const std::string& host) const
 {
+  const std::string lowerHost = ft::to_lower(host);
   const const_SockToServIter iter = _socketToServers.find(socket);
-  if (iter == _socketToServers.end()) {
-    return FT_NULLPTR; // this should never happen
-  }
+  assert(iter != _socketToServers.end());
   const std::vector<const Server*>& servers = iter->second;
   for (std::size_t i = 0; i < servers.size(); ++i) {
     const std::vector<std::string>& serverNames = servers[i]->getHostnames();
-    for (std::size_t name = 0; name < serverNames.size(); ++name) {
-      if (host == serverNames[name]) {
-        return servers[i];
-      }
+    if (ft::contains(serverNames, lowerHost)) {
+      return servers[i];
     }
   }
   assert(!servers.empty());
@@ -142,19 +148,19 @@ const std::vector<ft::shared_ptr<const Server> >& ServerManager::getServers()
 
 void ServerManager::run()
 {
+  ChildProcessManager& childProcessManager = ChildProcessManager::getInstance();
+  EventManager& eventManager = EventManager::getInstance();
   g_running = 1;
   while (g_running == 1) {
-    const int res = EventManager::check();
+    const int res = eventManager.check();
     if (res == 0) {
-      std::cout << "poll: timeout\n";
+      _log.info() << "poll: timeout\n";
     }
     if (res < 0) {
-      if (errno != EINTR) {
-        error("poll: failed");
-      }
-      break;
+      _log.error() << "poll error: " << std::strerror(errno) << '\n';
     }
-    EventManager::checkTimeouts();
+    eventManager.checkTimeouts();
+    childProcessManager.collectChildren();
   }
-  std::cout << "Shutting down servers...\n";
+  _log.info() << "Shutting down servers...\n";
 }

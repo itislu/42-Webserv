@@ -2,6 +2,7 @@
 #ifndef UTILS_CONVERT_HPP
 #define UTILS_CONVERT_HPP
 
+#include <netinet/in.h>
 #include <string>
 
 namespace utils {
@@ -20,6 +21,12 @@ int hexToInt(char chr);
  */
 template<typename To>
 To toNumber(const std::string& str);
+
+/**
+ * @throws std::invalid_argument If `str` does not represent a valid port
+ * number (1-65535).
+ */
+in_port_t toPort(const std::string& str);
 
 } // namespace utils
 

@@ -1,26 +1,23 @@
-
-// NOLINTBEGIN
-
-#include "client/Client.hpp"
-#include "event/EventManager.hpp"
-#include "http/Resource.hpp"
-#include "http/Response.hpp"
-#include "http/StatusCode.hpp"
-#include "http/states/readRequestLine/ReadRequestLine.hpp"
-#include "http/states/validateRequest/ValidateRequest.hpp"
-#include "libftpp/memory.hpp"
-#include "libftpp/utility.hpp"
+#include <client/Client.hpp>
 #include <config/parser/ConfigParser.hpp>
-
-#include "server/Server.hpp"
-#include "server/ServerManager.hpp"
-#include "socket/Socket.hpp"
-#include "socket/SocketManager.hpp"
-#include <iostream>
-#include <string>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
+#include <http/StatusCode.hpp>
+#include <http/states/readRequestLine/ReadRequestLine.hpp>
+#include <http/states/validateRequest/ValidateRequest.hpp>
+#include <libftpp/memory.hpp>
+#include <libftpp/utility.hpp>
+#include <server/Server.hpp>
+#include <server/ServerManager.hpp>
+#include <socket/Socket.hpp>
+#include <socket/SocketManager.hpp>
 
 #include <gtest/gtest.h>
+#include <iostream>
+#include <string>
 #include <unistd.h>
+
+// NOLINTBEGIN
 
 #ifndef ROOT
 #define ROOT "./assets/testWebsite/"
@@ -53,9 +50,9 @@ ft::unique_ptr<Client> requestTest(std::string& rawBuffer, int connection)
 
 } // namespace
 
-// =================================================================
+// ==========================================================================
 // Hostheader Tests
-// =================================================================
+// ==========================================================================
 
 TEST(ValidateRequestTester, ValidHostHeader)
 {
@@ -72,6 +69,16 @@ TEST(ValidateRequestTester, ValidHostHeader)
 TEST(ValidateRequestTester, HostheaderMissingInHttp1_1)
 {
   std::string line("GET http://localhost:8080/ HTTP/1.1\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& res = client->getResponse();
+  EXPECT_EQ(res.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, HostheaderMissingInHttp1_9)
+{
+  std::string line("GET http://localhost:8080/ HTTP/1.9\r\n\r\n");
 
   ft::unique_ptr<Client> client = requestTest(line, 8080);
 
@@ -154,9 +161,97 @@ TEST(ValidateRequestTester, MatchCaseInsensitive)
   EXPECT_EQ(source.getPath(), result);
 }
 
-// =================================================================
+TEST(ValidateRequestTester, PortMismatchUriHost)
+{
+  std::string line("GET http://serv01:8081/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
+}
+
+TEST(ValidateRequestTester, PortMismatchHostHeader)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01:8081\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
+}
+
+TEST(ValidateRequestTester, PortMismatchDefaultPortAbsoluteForm)
+{
+  std::string line("GET http://serv01/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080); // Not 80.
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
+}
+
+TEST(ValidateRequestTester, PortMismatchDefaultPortOriginForm)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080); // Not 80.
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::MisdirectedRequest);
+}
+
+TEST(ValidateRequestTester, PortTooHighUriHost)
+{
+  std::string line("GET http://serv01:65536/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, PortTooHighHostHeader)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01:65536\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, PortZeroUriHost)
+{
+  std::string line("GET http://serv01:0/ HTTP/1.1\r\nHost: serv01\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ValidateRequestTester, PortZeroHostHeader)
+{
+  std::string line("GET / HTTP/1.1\r\nHost: serv01:0\r\n\r\n");
+
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+// ==========================================================================
 // Append Root Tests
-// =================================================================
+// ==========================================================================
 
 TEST(ValidateRequestTester, RootAppend)
 {
@@ -171,9 +266,9 @@ TEST(ValidateRequestTester, RootAppend)
   EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::NotFound);
 }
 
-// ============================================================================
+// ==========================================================================
 // Method Tests
-// ============================================================================
+// ==========================================================================
 
 TEST(ValidateRequestTester, MethodNotAllowedPost)
 {
@@ -197,9 +292,9 @@ TEST(ValidateRequestTester, MethodNotAllowedDelete)
   EXPECT_EQ(res.getStatusCode(), StatusCode::MethodNotAllowed);
 }
 
-// ============================================================================
+// ==========================================================================
 // Decode Tests
-// ============================================================================
+// ==========================================================================
 
 TEST(ValidateRequestTester, DecodePercentSpace)
 {
@@ -270,13 +365,100 @@ TEST(ValidateRequestTester, DecodeOnlyOneHex)
   EXPECT_EQ(client->getResponse().getStatusCode(), StatusCode::BadRequest);
 }
 
+// ==========================================================================
+// Normalize Path Tests
+// ==========================================================================
+
+TEST(ValidateRequestTester, NormalizePath)
+{
+  std::string line("GET /../c/./d.html HTTP/1.1\r\n"
+                   "Host: localhost:8080\r\n\r\n");
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(client->getResource().getNoRootPath(), "/c/d.html");
+  EXPECT_EQ(response.getStatusCode(), StatusCode::NotFound);
+}
+
+TEST(ValidateRequestTester, NormalizePathEncodedPrecedence)
+{
+  std::string line("GET /dir%2F%2E%2E%2F/%2E%2E/file HTTP/1.1\r\n"
+                   "Host: localhost:8080\r\n\r\n");
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+  Resource& resource = client->getResource();
+
+  EXPECT_EQ(resource.getNoRootPath(), "/file");
+  EXPECT_EQ(response.getStatusCode(), StatusCode::NotFound);
+}
+
+TEST(ValidateRequestTester, NormalizePathEncodedDots)
+{
+  std::string line("GET /dir/%2E%2E/file HTTP/1.1\r\n"
+                   "Host: localhost:8080\r\n\r\n");
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+  Resource& resource = client->getResource();
+
+  EXPECT_EQ(resource.getNoRootPath(), "/file");
+  EXPECT_EQ(response.getStatusCode(), StatusCode::NotFound);
+}
+
+TEST(ValidateRequestTester, NormalizePathEncodedPSlashes)
+{
+  std::string line("GET /dir%2F..%2Ffile HTTP/1.1\r\n"
+                   "Host: localhost:8080\r\n\r\n");
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+  Resource& resource = client->getResource();
+
+  EXPECT_EQ(resource.getNoRootPath(), "/dir/../file");
+  EXPECT_EQ(response.getStatusCode(), StatusCode::NotFound);
+}
+
+TEST(ValidateRequestTester, NormalizePathEncodedDotsAndSlashes)
+{
+  std::string line("GET /dir%2F%2E%2E%2Ffile HTTP/1.1\r\n"
+                   "Host: localhost:8080\r\n\r\n");
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+  Resource& resource = client->getResource();
+
+  EXPECT_EQ(resource.getNoRootPath(), "/dir/../file");
+  EXPECT_EQ(response.getStatusCode(), StatusCode::NotFound);
+}
+
+TEST(ValidateRequestTester, NormalizePathEncodedOutsideRoot)
+{
+  std::string line("GET /%2F%2E%2E HTTP/1.1\r\n"
+                   "Host: localhost:8080\r\n\r\n");
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::Forbidden);
+}
+
+TEST(ValidateRequestTester, NormalizePathEncodedOutsideRootBackIn)
+{
+  std::string line("GET /%2F%2E%2E%2FtestWebsite/dir HTTP/1.1\r\n"
+                   "Host: localhost:8080\r\n\r\n");
+  ft::unique_ptr<Client> client = requestTest(line, 8080);
+
+  Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::Forbidden);
+}
+
 // NOLINTEND
 
 // Main function to run all tests
 // ss -tulpn | grep 8080
-#include <limits.h> // For PATH_MAX
-#include <unistd.h>
-
 int main(int argc, char** argv)
 {
   if (chdir(PROJECT_ROOT) == -1) {

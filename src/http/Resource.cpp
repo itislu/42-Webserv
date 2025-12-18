@@ -2,6 +2,7 @@
 #include "config/LocationConfig.hpp"
 #include "libftpp/optional.hpp"
 #include "libftpp/utility.hpp"
+#include <cstddef>
 #include <sstream>
 #include <string>
 
@@ -9,6 +10,7 @@ Resource::Resource()
   : _type(Undefined)
   , _location(FT_NULLPTR)
   , _server(FT_NULLPTR)
+  , _port(0)
 {
 }
 
@@ -17,9 +19,19 @@ const std::string& Resource::getPath() const
   return _path;
 }
 
+const std::string& Resource::getNoRootPath() const
+{
+  return _noRootPath;
+}
+
 void Resource::setPath(const std::string& path)
 {
   _path = path;
+}
+
+void Resource::setNoRootPath(const std::string& noRootPath)
+{
+  _noRootPath = noRootPath;
 }
 
 Resource::Type Resource::getType() const
@@ -27,14 +39,19 @@ Resource::Type Resource::getType() const
   return _type;
 }
 
-const LocationConfig* Resource::getLocation()
+const LocationConfig* Resource::getLocation() const
 {
   return _location;
 }
 
-const ServerConfig* Resource::getServer()
+const ServerConfig* Resource::getServer() const
 {
   return _server;
+}
+
+int Resource::getPort() const
+{
+  return _port;
 }
 
 void Resource::setType(Type type)
@@ -69,9 +86,32 @@ ft::optional<std::string> Resource::getErrorPage(int code) const
   return ft::nullopt;
 }
 
-std::string Resource::_typeToString()
+std::size_t Resource::getMaxBodySize() const
+{
+  std::size_t maxBody = 0;
+  if (_location != FT_NULLPTR) {
+    maxBody = _location->getMaxBodySize();
+  } else if (_server != FT_NULLPTR) {
+    maxBody = _server->getMaxBodySize();
+  }
+  return maxBody;
+}
+
+std::string Resource::toString() const
+{
+  std::ostringstream oss;
+  oss << " Resource:\n";
+  oss << "  path: " << _path << "\n";
+  oss << "  type: " << _typeToString() << "\n";
+
+  return oss.str();
+}
+
+std::string Resource::_typeToString() const
 {
   switch (_type) {
+    case Undefined:
+      return "Undefined";
     case File:
       return "File";
     case Autoindex:
@@ -80,18 +120,11 @@ std::string Resource::_typeToString()
       return "Cgi";
     case Error:
       return "Error";
-    case Undefined:
-      return "Undefined";
   }
   FT_UNREACHABLE();
 }
 
-std::string Resource::toString()
+void Resource::setPort(int port)
 {
-  std::stringstream oss;
-  oss << " Resource:\n";
-  oss << "  path: " << _path << "\n";
-  oss << "  type: " << _typeToString() << "\n";
-
-  return oss.str();
+  _port = port;
 }

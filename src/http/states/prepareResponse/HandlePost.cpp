@@ -2,11 +2,13 @@
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
+#include <http/Request.hpp>
+#include <http/Resource.hpp>
+#include <http/Response.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/prepareResponse/HandleError.hpp>
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <http/states/writeStatusLine/WriteStatusLine.hpp>
-#include <libftpp/string.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -42,7 +44,7 @@ void HandlePost::_setNextState()
 {
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
 
-  if (statusCode == StatusCode::Ok || statusCode == StatusCode::Created) {
+  if (statusCode.is2xxCode()) {
     getContext()->getStateHandler().setDone();
   } else {
     getContext()->getStateHandler().setState<HandleError>();
@@ -68,18 +70,32 @@ std::string HandlePost::_getFileName(const std::string& directory)
 
 void HandlePost::_createData()
 {
-  std::string directory = _client->getResource().getPath();
+  Request& request = _client->getRequest();
+  Response& response = _client->getResponse();
+  const Resource& resource = _client->getResource();
 
-  // todo this should be done in validate request ?
-  if (!ft::ends_with(directory, '/')) {
-    directory.append("/");
-  }
-  _log.info() << "HandlePost: " << directory << '\n';
-
+  const std::string directory = resource.getPath();
   const std::string newFilePath = _getFileName(directory);
-  _client->getRequest().getBody().moveBufferToFile(newFilePath);
-  _client->getResponse().setStatusCode(StatusCode::Created);
-  Headers& headers = _client->getResponse().getHeaders();
-  headers.addHeader("Location", newFilePath);
+  request.getBody().moveBufferToFile(newFilePath);
+  response.setStatusCode(StatusCode::Created);
+  Headers& headers = response.getHeaders();
+  headers.addHeader("Location", _createNoRootLocation(newFilePath));
   headers.addHeader("Content-Length", "0");
+
+  _log.info() << "HandlePost: " << directory << '\n';
+}
+
+std::string HandlePost::_createNoRootLocation(const std::string& absLocation)
+{
+  const Resource& resource = _client->getResource();
+
+  std::string responseLocation = absLocation;
+  const std::string::size_type pos = responseLocation.find(resource.getPath());
+  if (pos != std::string::npos) {
+    responseLocation.replace(
+      pos, resource.getPath().size(), resource.getNoRootPath());
+  } else {
+    responseLocation = "";
+  }
+  return responseLocation;
 }
