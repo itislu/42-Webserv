@@ -1,7 +1,8 @@
 #include "HandleError.hpp"
+#include "http/Headers.hpp"
+#include "libftpp/utility.hpp"
 
 #include <client/Client.hpp>
-#include <http/Headers.hpp>
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
 #include <http/StatusCode.hpp>
@@ -9,6 +10,7 @@
 #include <http/states/prepareResponse/PrepareResponse.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/optional.hpp>
+#include <set>
 #include <utils/buffer/MemoryBuffer.hpp>
 #include <utils/buffer/StaticFileBuffer.hpp>
 #include <utils/logger/Logger.hpp>
@@ -48,6 +50,9 @@ try {
   } else {
     _defaultErrorPage();
   }
+  if (response.getStatusCode() == StatusCode::MethodNotAllowed) {
+    _generateAllowHeader();
+  }
 
   getContext()->getStateHandler().setDone();
 } catch (const std::exception& e) {
@@ -75,6 +80,28 @@ std::string HandleError::_makeErrorBody(const StatusCode& statuscode)
   oss << "</body>\n</html>\n";
 
   return oss.str();
+}
+
+void HandleError::_generateAllowHeader()
+{
+  Response& response = _client->getResponse();
+  const Resource& resource = _client->getResource();
+
+  const std::set<std::string>& methods =
+    resource.getLocation() != FT_NULLPTR
+      ? resource.getLocation()->getAllowedMethods()
+      : resource.getServer()->getAllowedMethods();
+
+  std::string allowedMethods;
+  for (std::set<std::string>::const_iterator it = methods.begin();
+       it != methods.end();
+       ++it) {
+    if (it != methods.begin()) {
+      allowedMethods += ", ";
+    }
+    allowedMethods += *it;
+  }
+  response.getHeaders().setHeader("Allow", allowedMethods);
 }
 
 /**
