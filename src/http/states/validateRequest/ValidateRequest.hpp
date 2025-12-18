@@ -38,9 +38,10 @@ private:
   void _init();
   void _initResource();
   void _initConfigs();
-  void _initState(const Request::Method& method);
+  void _initMethodState(const Request::Method& method);
   void _initRequestPath();
 
+  bool _validateCgi();
   void _validateHost();
   void _splitHostHeader(const std::string& hostHeader, int& port);
   void _setPortFromUri(int& port);

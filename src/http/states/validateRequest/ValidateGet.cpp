@@ -58,31 +58,11 @@ void ValidateGet::validateFile()
     endState(StatusCode::Forbidden);
     return;
   }
-
-  if (_location != FT_NULLPTR && _location->isCgi()) {
-    const std::string& ext = _location->getCgiExtension();
-    if (!ext.empty() && ft::ends_with(_path, ext)) {
-      if (!isExecuteable(_path)) {
-        endState(StatusCode::Forbidden);
-        return;
-      }
-      // is CGI
-      _log.info() << "Is a CGI-Script!\n";
-      _client->getResource().setType(Resource::Cgi);
-      endState(StatusCode::Ok);
-      return;
-    }
-  }
   endState(StatusCode::Ok);
 }
 
 void ValidateGet::validateDirectory()
 {
-  // if (_location != FT_NULLPTR && _location->isCgi()) {
-  //   endState(StatusCode::Forbidden);
-  //   return;
-  // }
-
   if (!isExecuteable(_path) || !isReadable(_path)) {
     endState(StatusCode::Forbidden);
     return;

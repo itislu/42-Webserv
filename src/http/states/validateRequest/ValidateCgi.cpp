@@ -1,6 +1,4 @@
-#include "ValidateDelete.hpp"
-#include "libftpp/string.hpp"
-#include "libftpp/utility.hpp"
+#include "ValidateCgi.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
@@ -15,30 +13,30 @@
 /* ************************************************************************** */
 // INIT
 
-Logger& ValidateDelete::_log = Logger::getInstance(LOG_HTTP);
+Logger& ValidateCgi::_log = Logger::getInstance(LOG_HTTP);
 
 /* ************************************************************************** */
 // PUBLIC
 
-ValidateDelete::ValidateDelete(ValidateRequest* context)
+ValidateCgi::ValidateCgi(ValidateRequest* context)
   : IState<ValidateRequest>(context)
   , _client(context->getContext())
   , _path(context->getPath())
-  , _location(context->getLocation())
 {
-  _log.info() << "Validate DELETE\n";
+  _log.info() << "Validate CGI\n";
 }
 
-void ValidateDelete::run()
+void ValidateCgi::run()
 {
   validate();
   getContext()->getStateHandler().setDone();
 }
 
-void ValidateDelete::validate()
+void ValidateCgi::validate()
 {
+  _client->getResource().setType(Resource::Cgi);
+
   if (isDirectory(_path)) {
-    // 403: Most servers don't allow deleting directories via HTTP
     endState(StatusCode::Forbidden);
     return;
   }
@@ -46,34 +44,25 @@ void ValidateDelete::validate()
     endState(StatusCode::NotFound);
     return;
   }
-  validateParentDirPermissions();
-}
-
-void ValidateDelete::validateParentDirPermissions()
-{
-  std::string dirPath = _path.substr(0, _path.find_last_of('/'));
-  if (dirPath.empty()) {
-    dirPath = "/";
-  }
-  if (!isDirectory(dirPath)) {
-    endState(StatusCode::NotFound);
-    return;
-  }
-  if (!isExecuteable(dirPath)) {
-    endState(StatusCode::NotFound);
-    return;
-  }
-  if (!isWriteable(dirPath)) {
+  if (!isExecuteable(_path)) {
     endState(StatusCode::Forbidden);
     return;
   }
   endState(StatusCode::Ok);
 }
 
-void ValidateDelete::endState(StatusCode::Code status)
+void ValidateCgi::endState(StatusCode::Code status)
 {
   _client->getResponse().setStatusCode(status);
   if (status != StatusCode::Ok) {
     _client->getResource().setType(Resource::Error);
   }
 }
+
+/*
+  204 No Content if deleted successfully
+  404 Not Found if the file doesn’t exist
+  403 Forbidden if not allowed
+  409 Conflict if the directory isn’t empty (optional)
+  500 Internal Server Error if deletion fails unexpectedly
+*/

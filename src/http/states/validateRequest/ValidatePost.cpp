@@ -39,38 +39,6 @@ void ValidatePost::run()
 
 void ValidatePost::validate()
 {
-  if (_location != FT_NULLPTR && _location->isCgi()) {
-    const std::string& ext = _location->getCgiExtension();
-    if (!ext.empty() && ft::ends_with(_path, ext)) {
-      validateCGI();
-      return;
-    }
-  }
-
-  validateStaticPost();
-}
-
-void ValidatePost::validateCGI()
-{
-  _client->getResource().setType(Resource::Cgi);
-
-  if (isDirectory(_path)) {
-    endState(StatusCode::Forbidden);
-    return;
-  }
-  if (!isFile(_path)) {
-    endState(StatusCode::NotFound);
-    return;
-  }
-  if (!isExecuteable(_path)) {
-    endState(StatusCode::Forbidden);
-    return;
-  }
-  endState(StatusCode::Ok);
-}
-
-void ValidatePost::validateStaticPost()
-{
   if (isDirectory(_path)) {
     if (!isWriteable(_path) || !isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
