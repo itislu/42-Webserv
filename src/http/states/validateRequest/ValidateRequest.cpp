@@ -148,7 +148,6 @@ bool ValidateRequest::validateMethod(
 
 void ValidateRequest::_initConfigs()
 {
-  _server = &_client->getServer()->getConfig();
   _location = _server->getBestMatchLocation(_decoded);
   _client->getResource().setLocation(_location);
 }
@@ -471,4 +470,5 @@ void ValidateRequest::_setServerByHost()
     ServerManager::getInstance().getServerByHost(socket, _host);
   _log.info() << "Found server for host: " << _host << "\n";
   _client->setServer(server);
+  _server = &server->getConfig();
 }
