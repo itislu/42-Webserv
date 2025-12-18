@@ -1,3 +1,5 @@
+include utils.mk
+
 # **************************************************************************** #
 # ROOT MAKEFILE
 # **************************************************************************** #
@@ -62,12 +64,17 @@ export UBSAN_OPTIONS := print_stacktrace=1: \
 												print_summary=1: \
 												$(UBSAN_OPTIONS)
 
+IGNORED_PATHS := /bin/* \
+									/usr/bin/* \
+									/usr/sbin/*
+
 VALGRINDFLAGS := --errors-for-leak-kinds=all \
 									--leak-check=full \
 									--num-callers=50 \
 									--show-error-list=yes \
 									--show-leak-kinds=all \
 									--trace-children=yes \
+									--trace-children-skip=$(subst $(SPACE),$(COMMA),$(IGNORED_PATHS)) \
 									--track-origins=yes \
 									--track-fds=all
 
@@ -104,6 +111,3 @@ copy-compile-commands:
 		echo "Error: $(BUILD_DIR_PRESET)/compile_commands.json not found. Did you run cmake --preset=$(PRESET)?"; \
 		exit 1; \
 	fi
-
-
-include utils.mk

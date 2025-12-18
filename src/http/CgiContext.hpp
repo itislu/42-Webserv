@@ -2,11 +2,12 @@
 #ifndef CGI_CONTEXT_HPP
 #define CGI_CONTEXT_HPP
 
+#include <sys/types.h>
+
 #include <utils/Pipe.hpp>
 #include <utils/state/StateHandler.hpp>
 
 #include <cstddef>
-#include <sys/types.h>
 
 class Client;
 

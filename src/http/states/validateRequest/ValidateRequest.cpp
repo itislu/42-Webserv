@@ -452,6 +452,7 @@ void ValidateRequest::_validateHost()
     endState(StatusCode::MisdirectedRequest);
     return;
   }
+  _client->getResource().setPort(port);
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)

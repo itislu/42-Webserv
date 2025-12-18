@@ -15,6 +15,7 @@ public:
   {
     Ok = 200,
     Created = 201,
+    NoContent = 204,
     MovedPermanently = 301,
     Found = 302,
     SeeOther = 303,
@@ -59,7 +60,7 @@ private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 24;
+  static const int _codes = 25;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;

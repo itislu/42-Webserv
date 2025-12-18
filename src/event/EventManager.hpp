@@ -20,7 +20,7 @@ public:
   typedef std::map<RawFd, ft::shared_ptr<EventHandler> >::const_iterator
     const_iterHandler;
 
-  ~EventManager() {}; // todo close fds??
+  ~EventManager() {};
   static EventManager& getInstance();
   int check();
   void checkTimeouts();

@@ -16,6 +16,7 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
   StatusCode::_codeMap = {
     { { Ok, "OK" },
       { Created, "Created" },
+      { NoContent, "No Content" },
       { MovedPermanently, "Moved Permanently" },
       { Found, "Found" },
       { SeeOther, "See Other" },
