@@ -1,6 +1,5 @@
 #include "config/Config.hpp"
 #include "config/ServerConfig.hpp"
-#include "server/Server.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
