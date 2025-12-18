@@ -1,7 +1,6 @@
 #include <sys/types.h>
 
 #include "ExecuteCgi.hpp"
-#include "libftpp/ctype.hpp"
 
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
