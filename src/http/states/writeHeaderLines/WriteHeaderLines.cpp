@@ -41,7 +41,7 @@ void WriteHeaderLines::run()
 try {
   Headers& headers = _client->getResponse().getHeaders();
   headers.setHeader("Date", _makeHttpDate());
-  headers.setHeader("Server", "webserv"); // TODO from config probably ?
+  headers.setHeader("Server", "webserv");
 
   _setConnectionHeader();
 
