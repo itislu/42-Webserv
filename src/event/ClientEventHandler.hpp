@@ -27,7 +27,7 @@ private:
   void _clientStateMachine();
   void _handleException();
   void _addCgiEventHandler();
-  void _prepareForNewRequest();
+  void _killCgiProcess();
   void _sendMinResponse(const char* msg);
 
   static Logger& _log;
