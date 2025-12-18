@@ -3,7 +3,6 @@
 #include "libftpp/optional.hpp"
 #include "libftpp/utility.hpp"
 #include <cstddef>
-#include <limits>
 #include <sstream>
 #include <string>
 
@@ -11,6 +10,7 @@ Resource::Resource()
   : _type(Undefined)
   , _location(FT_NULLPTR)
   , _server(FT_NULLPTR)
+  , _port(0)
 {
 }
 
@@ -88,7 +88,7 @@ ft::optional<std::string> Resource::getErrorPage(int code) const
 
 std::size_t Resource::getMaxBodySize() const
 {
-  std::size_t maxBody = 10; // force user to set max body
+  std::size_t maxBody = 0;
   if (_location != FT_NULLPTR) {
     maxBody = _location->getMaxBodySize();
   } else if (_server != FT_NULLPTR) {
