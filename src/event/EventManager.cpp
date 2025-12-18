@@ -72,13 +72,12 @@ void EventManager::checkTimeouts()
   }
 }
 
-// NOLINTBEGIN(performance-unnecessary-value-param)
 void EventManager::_addHandler(ft::shared_ptr<EventHandler> handler)
 {
-  assert(handler->getFd() > 0);
-  _handlers[handler->getFd()] = handler;
+  const int fdes = handler->getFd();
+  assert(fdes > 0);
+  _handlers[fdes] = ft::move(handler);
 }
-// NOLINTEND(performance-unnecessary-value-param)
 
 EventHandler* EventManager::getHandler(RawFd fdes) const
 {
