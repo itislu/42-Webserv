@@ -113,9 +113,12 @@ void ValidateRequest::_init()
     _setServerByHost();
   }
 
-  _path = _client->getRequest().getUri().getPath();
-  _initConfigs();
   _initResource();
+  _path = _client->getRequest().getUri().getPath();
+  _initRequestPath();
+  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+    return;
+  }
 
   _log.info() << "Root: " << _server->getRoot() << "\n";
 
@@ -131,10 +134,7 @@ void ValidateRequest::_init()
   }
   _log.info() << "method is VALID\n";
 
-  _initRequestPath();
-  if (_client->getResponse().getStatusCode() == StatusCode::Ok) {
-    _initState(method);
-  }
+  _initState(method);
 }
 
 bool ValidateRequest::validateMethod(
@@ -153,15 +153,14 @@ bool ValidateRequest::validateMethod(
 
 void ValidateRequest::_initConfigs()
 {
-  _server = &_client->getServer()->getConfig();
-  _location = _server->getBestMatchLocation(_path);
+  _location = _server->getBestMatchLocation(_decoded);
+  _client->getResource().setLocation(_location);
 }
 
 void ValidateRequest::_initResource()
 {
   _client->getResource().setType(Resource::File);
   _client->getResource().setServer(_server);
-  _client->getResource().setLocation(_location);
 }
 
 void ValidateRequest::_initState(const Request::Method& method)
@@ -201,40 +200,43 @@ void ValidateRequest::_initRequestPath()
   _log.info() << "init request path - path: " << _path << "\n";
 
   // 1. Decode unreserved characters.
-  std::string decoded = decodePath(_path, http::isUnreserved);
-  _log.info() << "decode unreserved - path: " << decoded << "\n";
+  _decoded = decodePath(_path, http::isUnreserved);
+  _log.info() << "decode unreserved - path: " << _decoded << "\n";
 
   // 2. Normalize path (collapse '.' & '..').
-  decoded = removeDotSegments(decoded);
-  _log.info() << "normalizePath - path: " << decoded << "\n";
+  _decoded = removeDotSegments(_decoded);
+  _log.info() << "normalizePath - path: " << _decoded << "\n";
 
-  // 3. Decode all other characters.
-  decoded = decodePath(decoded, alwaysDecode);
-  _log.info() << "decode all - path: " << decoded << "\n";
+  // 3. Check decoded path and try to match to best location.
+  _initConfigs();
 
-  // 4. Check for illegal characters (NUL).
-  if (!validateChars(decoded)) {
+  // 4. Decode all other characters.
+  _decoded = decodePath(_decoded, alwaysDecode);
+  _log.info() << "decode all - path: " << _decoded << "\n";
+
+  // 5. Check for illegal characters (NUL).
+  if (!validateChars(_decoded)) {
     endState(StatusCode::BadRequest);
     return;
   }
 
-  // 5. Check that path is not going out of root.
-  if (!isPathRootBound(decoded)) {
+  // 6. Check that path is not going out of root.
+  if (!isPathRootBound(_decoded)) {
     endState(StatusCode::Forbidden);
     return;
   }
 
   // Store this path in resource so we can use it when generating autoindex
   // without exposing internal filesystem
-  _client->getResource().setNoRootPath(decoded);
+  _client->getResource().setNoRootPath(_decoded);
 
-  // 6. Combine with root.
+  // 7. Combine with root.
   if (_location != FT_NULLPTR) {
-    _path = removePrefix(decoded, _location->getPath());
+    _path = removePrefix(_decoded, _location->getPath());
     _log.info() << "remove Prefix - path: " << _path << "\n";
     _path = appendToRoot(_path, _location->getRoot());
   } else {
-    _path = appendToRoot(decoded, _server->getRoot());
+    _path = appendToRoot(_decoded, _server->getRoot());
   }
   _log.info() << "appendToRoot - path: " << _path << "\n";
   _client->getResource().setPath(_path);
@@ -474,4 +476,5 @@ void ValidateRequest::_setServerByHost()
     ServerManager::getInstance().getServerByHost(socket, _host);
   _log.info() << "Found server for host: " << _host << "\n";
   _client->setServer(server);
+  _server = &server->getConfig();
 }
