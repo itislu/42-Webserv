@@ -67,7 +67,7 @@ CgiWriteEventHandler::Result CgiWriteEventHandler::onTimeout()
 
 long CgiWriteEventHandler::getTimeout() const
 {
-  const long oneSecond = 1000;
+  const long oneSecond = 1;
   return std::max(_client->getTimeout() - oneSecond, oneSecond);
 }
 
