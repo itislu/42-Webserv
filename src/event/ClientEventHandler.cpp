@@ -82,7 +82,7 @@ ClientEventHandler::Result ClientEventHandler::onTimeout()
   if ((writeDone || cgi.timeoutWrite()) && (readDone || cgi.timeoutRead())) {
     _log.info() << logName() << "onTimeout kill child\n";
     ChildProcessManager::getInstance().killChild(cgi.getChildPid());
-    _sendMinResponse(http::minResponse408);
+    _sendMinResponse(http::minResponse504);
     return Disconnect;
   }
   updateLastActivity();
