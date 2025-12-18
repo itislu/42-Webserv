@@ -199,6 +199,7 @@ void ExecuteCgi::_provideBody()
       throw std::runtime_error("ExecuteCgi: write failed");
     }
     if (res > 0) {
+      _log.info() << "write " << res << " bytes to cgi\n";
       body.removeFront(res);
     }
     _bytesWritten += res;

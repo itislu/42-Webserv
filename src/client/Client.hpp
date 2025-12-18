@@ -6,6 +6,7 @@
 #include <http/Resource.hpp>
 #include <http/Response.hpp>
 #include <libftpp/memory.hpp>
+#include <libftpp/movable.hpp>
 #include <server/Server.hpp>
 #include <socket/AutoFd.hpp>
 #include <socket/Socket.hpp>
@@ -23,7 +24,7 @@ class Client
 public:
   Client();
   explicit Client(int fdes);
-  Client(int fdes, const Server* server, const Socket* socket);
+  Client(ft::rvalue<AutoFd>& fdes, const Server* server, const Socket* socket);
 
   static const std::size_t maxChunk = 1024;
 

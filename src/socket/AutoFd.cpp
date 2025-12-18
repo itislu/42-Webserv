@@ -1,4 +1,8 @@
 #include "AutoFd.hpp"
+
+#include <libftpp/movable.hpp>
+
+#include <set>
 #include <unistd.h>
 
 AutoFd::AutoFd(int fdes)
@@ -6,11 +10,32 @@ AutoFd::AutoFd(int fdes)
 {
 }
 
+AutoFd::AutoFd(ft::rvalue<AutoFd>& other)
+  : _fd(other._fd)
+{
+  other._fd = -1;
+  _subscribers.swap(other._subscribers);
+}
+
+AutoFd& AutoFd::operator=(ft::rvalue<AutoFd>& other)
+{
+  if (&other == this) {
+    return *this;
+  }
+  _close();
+
+  _fd = other._fd;
+  other._fd = -1;
+
+  _subscribers.swap(other._subscribers);
+  other._subscribers.clear();
+
+  return *this;
+}
+
 AutoFd::~AutoFd()
 {
-  if (_fd >= 0) {
-    ::close(_fd);
-  }
+  _close();
 }
 
 void AutoFd::set(int fdes)
@@ -19,13 +44,39 @@ void AutoFd::set(int fdes)
     return;
   }
 
-  if (_fd >= 0) {
-    ::close(_fd);
-  }
+  _close();
   _fd = fdes;
 }
 
 int AutoFd::get() const
 {
   return _fd;
+}
+
+void AutoFd::subscribe(AutoFdSubscriber& subscriber)
+{
+  _subscribers.insert(&subscriber);
+}
+
+void AutoFd::unsubscribe(AutoFdSubscriber& subscriber)
+{
+  _subscribers.erase(&subscriber);
+}
+
+void AutoFd::_close()
+{
+  if (_fd >= 0) {
+    _notifyClose();
+    ::close(_fd);
+  }
+}
+
+void AutoFd::_notifyClose()
+{
+  const std::set<AutoFdSubscriber*> subscribersCopy = _subscribers;
+  for (std::set<AutoFdSubscriber*>::iterator it = subscribersCopy.begin();
+       it != subscribersCopy.end();
+       ++it) {
+    (*it)->onClose(_fd);
+  }
 }
