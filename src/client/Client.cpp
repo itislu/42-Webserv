@@ -39,6 +39,7 @@ const std::size_t Client::maxChunk;
 
 Client::Client()
   : _fd(-1)
+  , _addr()
   , _server()
   , _socket()
   , _stateHandler(this)
@@ -50,6 +51,7 @@ Client::Client()
 
 Client::Client(int fdes)
   : _fd(fdes)
+  , _addr()
   , _server()
   , _socket()
   , _stateHandler(this)
