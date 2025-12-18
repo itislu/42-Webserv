@@ -1,3 +1,6 @@
+#include "config/Config.hpp"
+#include "config/ServerConfig.hpp"
+#include "server/Server.hpp"
 #include <client/Client.hpp>
 #include <http/Headers.hpp>
 #include <http/Request.hpp>
@@ -21,6 +24,8 @@ namespace {
 
 void StateTest(Client& client, const std::string& bodyLines)
 {
+  const ServerConfig serverConf(Config::getConfig());
+  client.getResource().setServer(&serverConf);
   client.getInBuff().append(bodyLines);
   client.getStateHandler().setState<ReadBody>();
   client.getStateHandler().getState()->run();
