@@ -2,10 +2,7 @@
 #ifndef HANDLE_REDIRECT_HPP
 #define HANDLE_REDIRECT_HPP
 
-#include <http/StatusCode.hpp>
 #include <utils/state/IState.hpp>
-
-#include <string>
 
 class Logger;
 class Client;
