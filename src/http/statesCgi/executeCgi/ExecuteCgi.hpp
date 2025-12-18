@@ -3,6 +3,7 @@
 #define EXECUTE_CGI_HPP
 
 #include <client/Client.hpp>
+#include <http/Headers.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -29,6 +30,9 @@ public:
 
 private:
   void _prepareEnv();
+  void _addNonDefaultHeader(const Headers& headers);
+  static bool _isDefaultHeader(const std::string& headerName);
+  static std::string _convertHeader(const std::string& headerName);
   void _addEnvVar(const std::string& key, const std::string& value);
   std::vector<char*> _buildEnvp();
   void _executeScript();

@@ -8,6 +8,7 @@
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
 #include <http/headerUtils.hpp>
+#include <libftpp/algorithm.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/string.hpp>
 #include <libftpp/utility.hpp>
@@ -93,7 +94,39 @@ void ExecuteCgi::_prepareEnv()
   _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
   _addEnvVar("QUERY_STRING", request.getUri().getQuery());
   _addEnvVar("SERVER_PORT", ft::to_string(resource.getPort()));
+  _addNonDefaultHeader(reqHeaders);
   _state = ExecuteScript;
+}
+
+void ExecuteCgi::_addNonDefaultHeader(const Headers& headers)
+{
+  for (Headers::const_iter iter = headers.begin(); iter != headers.end();
+       ++iter) {
+    const Headers::HeaderPair pair = iter->second;
+    if (_isDefaultHeader(pair.name)) {
+      continue;
+    }
+    _addEnvVar(_convertHeader(pair.name), pair.value);
+  }
+}
+
+bool ExecuteCgi::_isDefaultHeader(const std::string& headerName)
+{
+  return headerName == header::contentType ||
+         headerName == header::contentLength;
+}
+
+std::string ExecuteCgi::_convertHeader(const std::string& headerName)
+{
+  std::string cgiName = "HTTP_";
+  if (ft::contains(headerName, '_')) {
+    cgiName.insert(cgiName.begin(), '_');
+  }
+
+  cgiName.append(headerName);
+  ft::to_upper(cgiName);
+  std::replace(cgiName.begin(), cgiName.end(), '-', '_');
+  return cgiName;
 }
 
 void ExecuteCgi::_addEnvVar(const std::string& key, const std::string& value)

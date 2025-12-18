@@ -83,6 +83,15 @@ bool Headers::contains(const std::string& key) const
   return _headers.find(ft::to_lower(key)) != _headers.end();
 }
 
+Headers::const_iter Headers::begin() const
+{
+  return _headers.begin();
+}
+Headers::const_iter Headers::end() const
+{
+  return _headers.end();
+}
+
 /* ************************************************************************** */
 // PRIVATE
 
