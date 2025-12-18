@@ -214,7 +214,9 @@ try {
   } catch (...) {
     // EMPTY: Exit in all cases.
   }
-  std::exit(EXIT_FAILURE);
+  ::close(STDIN_FILENO);
+  ::close(STDOUT_FILENO);
+  throw EXIT_FAILURE;
 }
 // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
 
