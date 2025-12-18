@@ -1,5 +1,4 @@
 #include "ValidateGet.hpp"
-#include "libftpp/string.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
@@ -68,12 +67,9 @@ void ValidateGet::validateDirectory()
     return;
   }
 
-  std::string indexName;
-  if (_location != FT_NULLPTR) {
-    indexName = _location->getIndex();
-  } else {
-    indexName = _server->getIndex();
-  }
+  const std::string indexName =
+    _location != FT_NULLPTR ? _location->getIndex() : _server->getIndex();
+
   _log.info() << "indexName: " << indexName << "\n";
   _log.info() << "Path: " << _path << "\n";
 

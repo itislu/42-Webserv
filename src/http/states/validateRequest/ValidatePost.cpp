@@ -6,7 +6,6 @@
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/validateRequest/ValidateRequest.hpp>
-#include <libftpp/utility.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>

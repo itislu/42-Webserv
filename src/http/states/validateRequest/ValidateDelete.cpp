@@ -1,6 +1,4 @@
 #include "ValidateDelete.hpp"
-#include "libftpp/string.hpp"
-#include "libftpp/utility.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
@@ -24,7 +22,6 @@ ValidateDelete::ValidateDelete(ValidateRequest* context)
   : IState<ValidateRequest>(context)
   , _client(context->getContext())
   , _path(context->getPath())
-  , _location(context->getLocation())
 {
   _log.info() << "Validate DELETE\n";
 }
