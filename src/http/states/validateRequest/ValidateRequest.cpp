@@ -1,5 +1,6 @@
 #include "ValidateRequest.hpp"
 #include "http/Response.hpp"
+#include "http/states/validateRequest/ValidateCgi.hpp"
 
 #include <client/Client.hpp>
 #include <config/LocationConfig.hpp>
@@ -22,6 +23,7 @@
 #include <server/ServerManager.hpp>
 #include <socket/Socket.hpp>
 #include <utils/convert.hpp>
+#include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 #include <utils/state/StateHandler.hpp>
@@ -142,8 +144,9 @@ void ValidateRequest::_init()
     return;
   }
   _log.info() << "method is VALID\n";
-
-  _initState(method);
+  if (!_validateCgi()) {
+    _initMethodState(method);
+  }
 }
 
 bool ValidateRequest::validateMethod(
@@ -172,7 +175,7 @@ void ValidateRequest::_initResource()
   _client->getResource().setServer(_server);
 }
 
-void ValidateRequest::_initState(const Request::Method& method)
+void ValidateRequest::_initMethodState(const Request::Method& method)
 {
   switch (method) {
     case Request::GET:
@@ -500,4 +503,38 @@ bool ValidateRequest::_checkRedirection()
 
   _stateHandler.setDone();
   return true;
+}
+// Full Path: /cgi-bin/add.sh/path/whatever
+//      Path: /cgi-bin/add.sh
+//      Info: /path/whatever
+bool ValidateRequest::_validateCgi()
+{
+  if (_location == FT_NULLPTR || !_location->isCgi()) {
+    return false;
+  }
+
+  const std::string& ext = _location->getCgiExtension();
+  if (ext.empty()) {
+    return false;
+  }
+
+  std::size_t pos = _path.find(ext);
+  while (pos != std::string::npos) {
+    const std::size_t endPos = pos + ext.length();
+    if (endPos == _path.length() || _path[endPos] == '/') {
+      const std::string cgiPath = _path.substr(0, endPos);
+      if (isFile(cgiPath)) {
+        if (endPos < _path.length()) {
+          const std::string pathInfo = _path.substr(endPos);
+          _client->getResource().setPathInfo(pathInfo);
+        }
+        _path = cgiPath;
+        _client->getResource().setPath(cgiPath);
+        _stateHandler.setState<ValidateCgi>();
+        return true;
+      }
+    }
+    pos = _path.find(ext, pos + 1);
+  }
+  return false;
 }

@@ -16,9 +16,6 @@ public:
 
 private:
   void validate();
-  void validateCGI();
-  void validateStaticPost();
-
   void endState(StatusCode::Code status);
 
   static Logger& _log;

@@ -1,12 +1,12 @@
 
 #include "ValidatePost.hpp"
 #include "libftpp/string.hpp"
+#include "libftpp/utility.hpp"
 
 #include <client/Client.hpp>
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
 #include <http/states/validateRequest/ValidateRequest.hpp>
-#include <libftpp/utility.hpp>
 #include <utils/fileUtils.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
@@ -39,36 +39,11 @@ void ValidatePost::run()
 
 void ValidatePost::validate()
 {
-  if (_location != FT_NULLPTR && _location->isCgi()) {
-    validateCGI();
-    return;
-  }
-
-  validateStaticPost();
-}
-
-void ValidatePost::validateCGI()
-{
-  _client->getResource().setType(Resource::Cgi);
-
   if (isDirectory(_path)) {
-    endState(StatusCode::Forbidden);
-    return;
-  }
-  if (!isFile(_path)) {
-    endState(StatusCode::NotFound);
-    return;
-  }
-  if (!isExecuteable(_path)) {
-    endState(StatusCode::Forbidden);
-    return;
-  }
-  endState(StatusCode::Ok);
-}
-
-void ValidatePost::validateStaticPost()
-{
-  if (isDirectory(_path)) {
+    if (_location != FT_NULLPTR && _location->isCgi()) {
+      endState(StatusCode::Forbidden);
+      return;
+    }
     if (!isWriteable(_path) || !isExecuteable(_path)) {
       endState(StatusCode::Forbidden);
       return;

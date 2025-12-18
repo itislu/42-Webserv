@@ -19,6 +19,11 @@ const std::string& Resource::getPath() const
   return _path;
 }
 
+const std::string& Resource::getPathInfo() const
+{
+  return _pathInfo;
+}
+
 const std::string& Resource::getNoRootPath() const
 {
   return _noRootPath;
@@ -27,6 +32,11 @@ const std::string& Resource::getNoRootPath() const
 void Resource::setPath(const std::string& path)
 {
   _path = path;
+}
+
+void Resource::setPathInfo(const std::string& pathInfo)
+{
+  _pathInfo = pathInfo;
 }
 
 void Resource::setNoRootPath(const std::string& noRootPath)
