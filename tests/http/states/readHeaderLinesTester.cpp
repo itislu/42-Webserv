@@ -144,10 +144,32 @@ TEST(ReadHeaderLinesTester, TransferEncAndContentLen)
   EXPECT_EQ(statusCode, StatusCode::BadRequest);
 }
 
-TEST(ReadHeaderLinesTester, InvalidContentLength)
+TEST(ReadHeaderLinesTester, InvalidContentLengthNonNumeric)
 {
   std::string line("TestHeader1: hi\r\n"
                    "Content-Length: 7a\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, InvalidContentLengthMultipleValues)
+{
+  std::string line("TestHeader1: hi\r\n"
+                   "Content-Length: 10 10\r\n"
+                   "\r\n");
+  ft::unique_ptr<Client> client = StateTest(line);
+  Response& response = client->getResponse();
+  const StatusCode& statusCode = response.getStatusCode();
+  EXPECT_EQ(statusCode, StatusCode::BadRequest);
+}
+
+TEST(ReadHeaderLinesTester, NegativeContentLength)
+{
+  std::string line("TestHeader1: hi\r\n"
+                   "Content-Length: -10\r\n"
                    "\r\n");
   ft::unique_ptr<Client> client = StateTest(line);
   Response& response = client->getResponse();
