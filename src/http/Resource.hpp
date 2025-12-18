@@ -23,7 +23,7 @@ public:
   Resource();
   Type getType() const;
   const std::string& getPath() const;
-  const std::string& getPathInfo() const;
+  const std::string& getCgiPathInfo() const;
   const std::string& getNoRootPath() const;
   const LocationConfig* getLocation() const;
   const ServerConfig* getServer() const;
@@ -35,7 +35,7 @@ public:
   void setLocation(const LocationConfig* location);
   void setServer(const ServerConfig* server);
   void setPort(int port);
-  void setPathInfo(const std::string& pathInfo);
+  void setCgiPathInfo(const std::string& cgiPathInfo);
 
   ft::optional<std::string> getErrorPage(int code) const;
   std::size_t getMaxBodySize() const;
@@ -47,7 +47,7 @@ private:
 
   Type _type;
   std::string _path;
-  std::string _pathInfo;
+  std::string _cgiPathInfo;
   std::string _noRootPath;
   const LocationConfig* _location;
   const ServerConfig* _server;

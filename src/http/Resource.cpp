@@ -19,9 +19,9 @@ const std::string& Resource::getPath() const
   return _path;
 }
 
-const std::string& Resource::getPathInfo() const
+const std::string& Resource::getCgiPathInfo() const
 {
-  return _pathInfo;
+  return _cgiPathInfo;
 }
 
 const std::string& Resource::getNoRootPath() const
@@ -34,9 +34,9 @@ void Resource::setPath(const std::string& path)
   _path = path;
 }
 
-void Resource::setPathInfo(const std::string& pathInfo)
+void Resource::setCgiPathInfo(const std::string& cgiPathInfo)
 {
-  _pathInfo = pathInfo;
+  _cgiPathInfo = cgiPathInfo;
 }
 
 void Resource::setNoRootPath(const std::string& noRootPath)

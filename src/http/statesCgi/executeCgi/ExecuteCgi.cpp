@@ -82,18 +82,19 @@ void ExecuteCgi::_prepareEnv()
 
   _contentLength = getContext()->getContentLength();
 
-  _addEnvVar("GATEWAY_INTERFACE", "CGI/1.1");
-  _addEnvVar("SERVER_PROTOCOL", "HTTP/1.1");
-  _addEnvVar("REQUEST_METHOD", request.getStrMethod());
   if (_contentLength > 0) {
     _addEnvVar("CONTENT_LENGTH", ft::to_string(_contentLength));
   }
   if (reqHeaders.contains(header::contentType)) {
     _addEnvVar("CONTENT_TYPE", reqHeaders.at(header::contentType));
   }
-  _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
+  _addEnvVar("GATEWAY_INTERFACE", "CGI/1.1");
+  _addEnvVar("PATH_INFO", resource.getCgiPathInfo());
   _addEnvVar("QUERY_STRING", request.getUri().getQuery());
+  _addEnvVar("REQUEST_METHOD", request.getStrMethod());
+  _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
   _addEnvVar("SERVER_PORT", ft::to_string(resource.getPort()));
+  _addEnvVar("SERVER_PROTOCOL", "HTTP/1.1");
   _addNonDefaultHeaders(reqHeaders);
   _state = ExecuteScript;
 }
