@@ -225,7 +225,7 @@ TEST(ReadBodyTester, ChunkedSpecialBytes)
   EXPECT_EQ(body, expectedData);
 }
 
-TEST(ReadBodyTester, FixedLengthInvalid)
+TEST(ReadBodyTester, FixedLengthContentLengthTooLarge)
 {
   const std::string line("0123456789\r\n");
 
@@ -238,13 +238,45 @@ TEST(ReadBodyTester, FixedLengthInvalid)
   EXPECT_EQ(response.getStatusCode(), StatusCode::ContentTooLarge);
 }
 
-// TODO add when content-length grama available
-TEST(ReadBodyTester, DISABLED_FixedLengthInvalid)
+TEST(ReadBodyTester, ChunkedChunkSizeInvalid)
 {
-  const std::string line("0123456789\r\n");
+  const std::string line("a a\r\n"
+                         "0123456789\r\n"
+                         "0\r\n"
+                         "\r\n");
 
   const ft::unique_ptr<Client> client = ft::make_unique<Client>();
-  client->getRequest().getHeaders().addHeader("Content-Length", "10 afdadf");
+  client->getRequest().getHeaders().addHeader("Transfer-Encoding", "chunked");
+  StateTest(*client, line);
+  const Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadBodyTester, ChunkedChunkSizeInvalidHex)
+{
+  const std::string line("G\r\n"
+                         "0123456789\r\n"
+                         "0\r\n"
+                         "\r\n");
+
+  const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  client->getRequest().getHeaders().addHeader("Transfer-Encoding", "chunked");
+  StateTest(*client, line);
+  const Response& response = client->getResponse();
+
+  EXPECT_EQ(response.getStatusCode(), StatusCode::BadRequest);
+}
+
+TEST(ReadBodyTester, ChunkedChunkSizeNegative)
+{
+  const std::string line("-5\r\n"
+                         "0123456789\r\n"
+                         "0\r\n"
+                         "\r\n");
+
+  const ft::unique_ptr<Client> client = ft::make_unique<Client>();
+  client->getRequest().getHeaders().addHeader("Transfer-Encoding", "chunked");
   StateTest(*client, line);
   const Response& response = client->getResponse();
 
