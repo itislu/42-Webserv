@@ -152,13 +152,13 @@ bool Client::receive()
   static IInBuffer::RawBytes buffer(maxChunk);
   const ssize_t bytes = recv(getFd(), buffer.data(), buffer.size(), 0);
   if (bytes > 0) {
+    _log.info() << *this << " received " << bytes << " bytes\n";
     _inBuff.append(buffer, bytes);
   } else if (bytes == 0) {
-    std::cout << "[CLIENT] wants to disconnect\n";
+    _log.info() << *this << " wants to disconnect (recv returned 0)\n";
     return false;
-  } else // bytes < 0
-  {
-    std::cerr << ("[SERVER] recv failed, removing client\n");
+  } else { // bytes < 0
+    _log.error() << *this << " recv error: " << std::strerror(errno) << "\n";
     return false;
   }
   return true;
@@ -168,12 +168,11 @@ bool Client::sendTo()
 {
   const ssize_t bytes = _outBuffQueue.send(getFd(), maxChunk);
   if (bytes > 0) {
-    _log.info() << *this << "sent " << bytes << " bytes\n";
+    _log.info() << *this << " sent " << bytes << " bytes\n";
   } else if (bytes == 0) {
-    _log.warning() << *this << "no data sent to client fd=" << getFd() << "\n";
+    _log.warning() << *this << " no data sent\n";
   } else {
-    _log.error() << *this << "send error for client fd=" << getFd() << ": "
-                 << std::strerror(errno) << "\n";
+    _log.error() << *this << " send error: " << std::strerror(errno) << "\n";
     return false;
   }
   return true;
