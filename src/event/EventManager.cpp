@@ -14,7 +14,6 @@
 #include <socket/AutoFd.hpp>
 #include <socket/Socket.hpp>
 #include <socket/SocketManager.hpp>
-#include <stdexcept>
 #include <utils/logger/Logger.hpp>
 
 #include <algorithm>
@@ -24,7 +23,9 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
+#include <stdexcept>
 #include <sys/poll.h>
+#include <sys/socket.h>
 #include <vector>
 
 // Handles the main poll loop:
@@ -137,13 +138,14 @@ void EventManager::_acceptClient(int fdes, const unsigned events)
     return;
   }
 
-  AutoFd clientFd = _socketManager().acceptClient(fdes);
+  sockaddr_storage addr = {};
+  AutoFd clientFd = _socketManager().acceptClient(fdes, addr);
   const int clientFdRaw = clientFd.get();
   if (clientFdRaw > 0) {
     const Socket& socket = _socketManager().getSocket(fdes);
     const Server* const server = _serverManager().getInitServer(socket);
     ft::shared_ptr<Client> client(
-      new Client(ft::move(clientFd), server, &socket));
+      new Client(ft::move(clientFd), addr, server, &socket));
     ft::shared_ptr<ClientEventHandler> handler =
       ft::make_shared<ClientEventHandler>(clientFdRaw, ft::move(client));
     _addHandler(ft::move(handler));

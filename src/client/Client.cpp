@@ -60,9 +60,11 @@ Client::Client(int fdes)
 }
 
 Client::Client(ft::rvalue<AutoFd>& fdes,
+               const sockaddr_storage& addr,
                const Server* server,
                const Socket* socket)
   : _fd(ft::move(fdes))
+  , _addr(addr)
   , _server(server)
   , _socket(socket)
   , _stateHandler(this)
@@ -75,6 +77,11 @@ Client::Client(ft::rvalue<AutoFd>& fdes,
 int Client::getFd() const
 {
   return _fd.get();
+}
+
+const sockaddr_storage& Client::getAddr() const
+{
+  return _addr;
 }
 
 bool Client::hasServer() const

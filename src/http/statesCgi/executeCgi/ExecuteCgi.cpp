@@ -15,6 +15,7 @@
 #include <utils/Pipe.hpp>
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/buffer/IInOutBuffer.hpp>
+#include <utils/convert.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -91,6 +92,7 @@ void ExecuteCgi::_prepareEnv()
   _addEnvVar("GATEWAY_INTERFACE", "CGI/1.1");
   _addEnvVar("PATH_INFO", resource.getCgiPathInfo());
   _addEnvVar("QUERY_STRING", request.getUri().getQuery());
+  _addEnvVar("REMOTE_ADDR", utils::addrToString(_client->getAddr()));
   _addEnvVar("REQUEST_METHOD", request.getStrMethod());
   _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
   _addEnvVar("SERVER_PORT", ft::to_string(resource.getPort()));

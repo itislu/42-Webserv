@@ -96,9 +96,11 @@ pollfd* SocketManager::getPfdStart()
   return _pfds.data();
 }
 
-AutoFd SocketManager::acceptClient(int fdes)
+AutoFd SocketManager::acceptClient(int fdes, sockaddr_storage& addr)
 {
-  AutoFd clientFd(accept(fdes, FT_NULLPTR, FT_NULLPTR));
+  socklen_t addrLen = sizeof(addr);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  AutoFd clientFd(accept(fdes, reinterpret_cast<sockaddr*>(&addr), &addrLen));
   if (clientFd.get() < 0) {
     return ft::move(clientFd);
   }

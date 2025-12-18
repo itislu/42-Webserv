@@ -4,8 +4,16 @@
 
 #include <netinet/in.h>
 #include <string>
+#include <sys/socket.h>
 
 namespace utils {
+
+/**
+ * Converts a `sockaddr_storage` to a human-readable IPv4 or IPv6 string.
+ *
+ * @throws std::runtime_error If the address family is unknown.
+ */
+std::string addrToString(const sockaddr_storage& addr);
 
 /**
  * @returns `-1` If `chr` is not a valid hexadecimal character.
