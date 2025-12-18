@@ -66,8 +66,8 @@ void ChildProcessManager::collectChildren()
     }
 
     if (remove) {
-      _children.erase(_children.begin() +
-                      static_cast<PidVector::difference_type>(index));
+      _children[index] = _children.back();
+      _children.pop_back();
     } else {
       index++;
     }
