@@ -27,6 +27,27 @@
         background: white;
       }
 
+      .delete-box {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+      }
+
+      input {
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        width: 250px;
+      }
+
+      button {
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
       a {
         margin-top: 30px;
         color: white;
@@ -38,9 +59,40 @@
     <h1>Delete Tests</h1>
     <p>This page shows the server autoindex of the upload folder.</p>
 
-    <!-- Load nginx autoindex directly -->
-    <iframe src="/upload/index.html"></iframe>
+    <!-- DELETE input -->
+    <div class="delete-box">
+      <input
+        type="text"
+        id="filename"
+        placeholder="filename to delete (e.g. test.txt)"
+      />
+      <button onclick="deleteFile()">DELETE</button>
+    </div>
+
+    <!-- Autoindex -->
+    <iframe src="/upload/"></iframe>
 
     <a href="index.html">⬅ Back to Home</a>
+
+    <script>
+      function deleteFile() {
+        const name = document.getElementById("filename").value.trim();
+        if (!name) {
+          alert("Please enter a filename");
+          return;
+        }
+
+        fetch(`/delete/${name}`, {
+          method: "DELETE",
+        })
+          .then((res) => {
+            alert(`DELETE /upload/${name} → ${res.status}`);
+            document.querySelector("iframe").contentWindow.location.reload();
+          })
+          .catch(() => {
+            alert("Request failed");
+          });
+      }
+    </script>
   </body>
 </html>

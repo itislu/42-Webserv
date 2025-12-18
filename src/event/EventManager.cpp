@@ -1,45 +1,102 @@
 #include "EventManager.hpp"
-#include "socket/Socket.hpp"
 
 #include <client/Client.hpp>
-#include <client/ClientManager.hpp>
 #include <client/TimeStamp.hpp>
 #include <config/Config.hpp>
-#include <http/http.hpp>
+#include <event/ClientEventHandler.hpp>
+#include <event/EventHandler.hpp>
+#include <http/CgiContext.hpp>
 #include <http/states/readRequestLine/ReadRequestLine.hpp>
 #include <libftpp/memory.hpp>
 #include <libftpp/utility.hpp>
 #include <server/Server.hpp>
 #include <server/ServerManager.hpp>
+#include <socket/AutoFd.hpp>
+#include <socket/Socket.hpp>
 #include <socket/SocketManager.hpp>
 #include <utils/logger/Logger.hpp>
-#include <utils/state/StateHandler.hpp>
 
+#include <algorithm>
+#include <cassert>
+#include <climits>
 #include <cstddef>
 #include <cstring>
 #include <exception>
 #include <iostream>
 #include <sys/poll.h>
-#include <sys/socket.h>
 #include <vector>
-
-/* **************************************************************************
- */
-// INIT
-
-Logger& EventManager::_log = Logger::getInstance(LOG_SERVER);
-
-/* ************************************************************************** */
 
 // Handles the main poll loop:
 // Calls poll()
 // Calls checkActivity() (or delegate to ClientManager/SocketManager)
 // Checks timeouts
 
-ClientManager& EventManager::_clientManager()
+/* ***************************************************************************/
+// INIT
+
+Logger& EventManager::_log = Logger::getInstance(LOG_SERVER);
+
+/* ************************************************************************** */
+// PUBLIC
+
+EventManager& EventManager::getInstance()
 {
-  return ClientManager::getInstance();
+  static EventManager eventManager;
+
+  return eventManager;
 }
+
+int EventManager::check()
+{
+  const int timeout = _calculateTimeout();
+  const int ready = poll(
+    _socketManager().getPfdStart(), _socketManager().getPfdsSize(), timeout);
+  if (ready <= 0) {
+    return ready;
+  }
+  try {
+    _checkActivity();
+  } catch (const std::exception& e) {
+    _log.error() << "Error: " << e.what() << "\n";
+  }
+  return ready;
+}
+
+void EventManager::checkTimeouts()
+{
+  std::vector<ft::shared_ptr<EventHandler> > timedOut;
+  _getTimedOutHandlers(timedOut);
+  for (std::size_t i = 0; i < timedOut.size(); ++i) {
+    _log.info() << timedOut[i]->logName() << "timed out.\n";
+    _disconnectEventHandler(timedOut[i].get());
+  }
+}
+
+// NOLINTBEGIN(performance-unnecessary-value-param)
+void EventManager::_addHandler(ft::shared_ptr<EventHandler> handler)
+{
+  assert(handler->getFd() > 0);
+  _handlers[handler->getFd()] = handler;
+}
+// NOLINTEND(performance-unnecessary-value-param)
+
+EventHandler* EventManager::getHandler(RawFd fdes) const
+{
+  const const_iterHandler iter = _handlers.find(fdes);
+  if (iter == _handlers.end()) {
+    return FT_NULLPTR;
+  }
+  return iter->second.get();
+}
+
+void EventManager::addCgiHandler(ft::shared_ptr<EventHandler> handler)
+{
+  _socketManager().addCgiFd(handler->getFd());
+  _addHandler(ft::move(handler));
+}
+
+/* ************************************************************************** */
+// PRIVATE
 
 ServerManager& EventManager::_serverManager()
 {
@@ -51,185 +108,116 @@ SocketManager& EventManager::_socketManager()
   return SocketManager::getInstance();
 }
 
-bool EventManager::sendToClient(Client& client)
-{
-  const bool alive = client.sendTo();
-  if (alive && !client.hasDataToSend()) {
-    _socketManager().disablePollout(client.getFd());
-    _log.info() << "Pollout disabled\n";
-  }
-  return alive;
-}
-
-bool EventManager::receiveFromClient(Client& client)
-{
-  const bool alive = client.receive();
-  if (client.getStateHandler().isDone() && !client.getInBuff().isEmpty()) {
-    client.prepareForNewRequest();
-  }
-  return alive;
-}
-
-void EventManager::clientStateMachine(Client& client)
-{
-  StateHandler<Client>& handler = client.getStateHandler();
-
-  handler.setStateHasChanged(true);
-  while (!handler.isDone() && handler.stateHasChanged()) {
-    handler.setStateHasChanged(false);
-    handler.getState()->run();
-  }
-}
-
-/** // todo error when loong chunked sending
- * in WriteBody
- * got more requests wich can not be processed yet
- * writing done inBuffer not empty
- * how to trigger stateMachine again?
- */
-bool EventManager::handleClient(Client* client, unsigned events)
-try {
-  if (client == FT_NULLPTR) {
-    return false;
-  }
-  bool alive = true;
-  if (pollInEnabled(events) && alive) { // Receive Data
-    alive = receiveFromClient(*client);
-  }
-  if (alive) {
-    clientStateMachine(*client);
-  }
-  if (!pollOutEnabled(events) && alive && client->hasDataToSend()) {
-    _socketManager().enablePollout(client->getFd());
-    _log.info() << "Pollout enabled\n";
-  }
-  if (pollOutEnabled(events) && alive) { // Send Data
-    alive = sendToClient(*client);
-  }
-  if ((events & static_cast<unsigned>(POLLHUP | POLLERR)) != 0 && alive) {
-    return false; // disconnect client
-  }
-  return alive;
-} catch (const std::exception& e) {
-  _log.error() << *client << " EventManager: " << e.what() << '\n';
-  handleException(client);
-  return false;
-}
-
-void EventManager::disconnectClient(Client* client)
-{
-  if (client == FT_NULLPTR) {
-    return;
-  }
-  const int clientFd = client->getFd();
-  // Remove corresponding pollfd
-  _socketManager().removeFd(clientFd);
-
-  // remove from client map
-  _clientManager().removeClient(clientFd);
-
-  std::cout << "[SERVER] Client fd=" << clientFd << " disconnected\n";
-  _log.info() << "Client fd=" << clientFd << " disconnected\n";
-}
-
-void EventManager::acceptClient(int fdes, const unsigned events)
-{
-  if ((events & POLLIN) == 0) {
-    return;
-  }
-
-  const int clientFd = _socketManager().acceptClient(fdes);
-  if (clientFd > 0) {
-    const Socket& socket = SocketManager::getInstance().getSocket(fdes);
-    const Server* const server = _serverManager().getInitServer(socket);
-    _clientManager().addClient(clientFd, server, socket);
-    std::cout << "[SERVER] new client connected, fd=" << clientFd << '\n';
-  } else {
-    std::cerr << "[SERVER] accepting new client failed\n";
-  }
-}
-
-void EventManager::checkActivity()
+void EventManager::_checkActivity()
 {
   const SocketManager& socketManager = _socketManager();
   const std::vector<pollfd>& pfds = socketManager.getPfds();
   for (std::size_t i = 0; i < pfds.size();) {
     const unsigned events = static_cast<unsigned>(pfds[i].revents);
     if (socketManager.isListener(pfds[i].fd)) {
-      acceptClient(pfds[i].fd, events);
+      _acceptClient(pfds[i].fd, events);
       i++;
     } else {
-      Client* const client = _clientManager().getClient(pfds[i].fd);
-      if (!handleClient(client, events)) {
-        disconnectClient(client);
+      EventHandler* const handler = getHandler(pfds[i].fd);
+      const EventHandler::Result result = handler->handleEvent(events);
+      if (result == EventHandler::Disconnect) {
+        _disconnectEventHandler(handler);
       } else {
-        i++;
+        ++i;
       }
     }
   }
 }
 
-int EventManager::calculateTimeout()
+void EventManager::_acceptClient(int fdes, const unsigned events)
+{
+  if ((events & POLLIN) == 0) {
+    return;
+  }
+
+  AutoFd clientFd = _socketManager().acceptClient(fdes);
+  const int clientFdRaw = clientFd.get();
+  if (clientFdRaw > 0) {
+    const Socket& socket = _socketManager().getSocket(fdes);
+    const Server* const server = _serverManager().getInitServer(socket);
+    ft::shared_ptr<Client> client(
+      new Client(ft::move(clientFd), server, &socket));
+    ft::shared_ptr<ClientEventHandler> handler =
+      ft::make_shared<ClientEventHandler>(clientFdRaw, ft::move(client));
+    _addHandler(ft::move(handler));
+    _log.info() << "[SERVER] new client connected, fd=" << clientFdRaw << '\n';
+  } else {
+    _log.error() << "[SERVER] accepting new client failed\n";
+  }
+}
+
+void EventManager::_disconnectEventHandler(EventHandler* handler)
+{
+  if (handler == FT_NULLPTR) {
+    return;
+  }
+  _log.info() << handler->logName() << "disconnected\n";
+
+  const int handlerFd = handler->getFd();
+  // Remove corresponding pollfd
+  _socketManager().removeFd(handlerFd);
+
+  // remove from handler map
+  _removeHandler(handlerFd);
+}
+
+int EventManager::_calculateTimeout()
 {
   // No clients yet, get default
-  if (!_clientManager().hasClients()) {
+  if (_handlers.empty()) {
     const long timeout = Config::getDefaultTimeout();
     const int timeoutMs = convertSecondsToMs(timeout);
-    std::cout << "No clients - use default timeout: " << timeoutMs << "ms\n";
+    // _log.info() << "No clients - use default timeout: " << timeoutMs <<
+    // "ms\n";
     return timeoutMs;
   }
 
-  const long minRemaining = _clientManager().getMinTimeout();
+  const long minRemaining = _getMinTimeout();
   const int timeoutMs = convertSecondsToMs(minRemaining);
-  std::cout << "using client min remaining timeout: " << timeoutMs << "ms\n";
+  // _log.info() << "using client min remaining timeout: " << timeoutMs <<
+  // "ms\n";
 
   return timeoutMs;
 }
 
-int EventManager::check()
+long EventManager::_getMinTimeout() const
 {
-  const int timeout = calculateTimeout();
-  const int ready = poll(
-    _socketManager().getPfdStart(), _socketManager().getPfdsSize(), timeout);
-  if (ready <= 0) {
-    return ready;
+  const TimeStamp now;
+  long minRemaining = LONG_MAX;
+  for (const_iterHandler it = _handlers.begin(); it != _handlers.end(); ++it) {
+    const long clientTimeout = it->second->getTimeout();
+    const long remaining =
+      clientTimeout - (now - it->second->getLastActivity());
+    minRemaining = std::min(std::max(0L, remaining), minRemaining);
   }
-  try {
-    checkActivity();
-  } catch (const std::exception& e) {
-    std::cerr << "Error: " << e.what() << "\n";
+  return minRemaining;
+}
+
+void EventManager::_getTimedOutHandlers(
+  std::vector<ft::shared_ptr<EventHandler> >& timedOut) const
+{
+  const TimeStamp now;
+  for (const_iterHandler it = _handlers.begin(); it != _handlers.end(); ++it) {
+    EventHandler& handler = *(it->second);
+    const long timeout = handler.getTimeout();
+    if (now - handler.getLastActivity() >= timeout) {
+      const EventHandler::Result result = handler.onTimeout();
+      if (result == EventHandler::Disconnect) {
+        timedOut.push_back(it->second);
+      }
+    }
   }
-  return ready;
 }
 
-void EventManager::checkTimeouts()
+void EventManager::_removeHandler(RawFd fdes)
 {
-  std::vector<ft::shared_ptr<Client> > timedOut;
-  _clientManager().getTimedOutClients(timedOut);
-  for (std::size_t i = 0; i < timedOut.size(); ++i) {
-    std::cout << "[SERVER] Client fd=" << timedOut[i]->getFd()
-              << " timed out.\n";
-    disconnectClient(timedOut[i].get());
+  const iterHandler iter = _handlers.find(fdes);
+  if (iter != _handlers.end()) {
+    _handlers.erase(iter);
   }
-}
-
-bool EventManager::pollInEnabled(unsigned events)
-{
-  return (events & POLLIN) != 0;
-}
-
-bool EventManager::pollOutEnabled(unsigned events)
-{
-  return (events & POLLOUT) != 0;
-}
-
-void EventManager::handleException(Client* client)
-{
-  /**  //todo
-   * should send response message only if nothing has been sent yet.
-   * tricky for piped requests
-   */
-  const char* const msg = http::minResponse500;
-  const std::size_t msgLen = std::strlen(msg);
-  (void)send(client->getFd(), msg, msgLen, 0);
 }

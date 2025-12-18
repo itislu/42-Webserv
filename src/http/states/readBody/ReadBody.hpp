@@ -57,6 +57,8 @@ private:
   bool _contentTooLarge(std::size_t newBytes);
   bool _setBodyLength(const std::string& numStr, std::ios::fmtflags fmt);
 
+  void _updateCgi();
+
   static Logger& _log;
   static const std::size_t _readChunkSize = 1024;
 

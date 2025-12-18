@@ -63,7 +63,7 @@ void ReadRequestLine::_setNextState()
 {
   const StatusCode& statusCode = getContext()->getResponse().getStatusCode();
 
-  if (statusCode == StatusCode::Ok) {
+  if (statusCode.is2xxCode()) {
     getContext()->getStateHandler().setState<ReadHeaderLines>();
   } else {
     getContext()->getStateHandler().setState<PrepareResponse>();

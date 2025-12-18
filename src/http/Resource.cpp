@@ -2,6 +2,7 @@
 #include "config/LocationConfig.hpp"
 #include "libftpp/optional.hpp"
 #include "libftpp/utility.hpp"
+#include <cstddef>
 #include <sstream>
 #include <string>
 
@@ -9,6 +10,7 @@ Resource::Resource()
   : _type(Undefined)
   , _location(FT_NULLPTR)
   , _server(FT_NULLPTR)
+  , _port(0)
 {
 }
 
@@ -47,6 +49,11 @@ const ServerConfig* Resource::getServer() const
   return _server;
 }
 
+int Resource::getPort() const
+{
+  return _port;
+}
+
 void Resource::setType(Type type)
 {
   _type = type;
@@ -79,6 +86,17 @@ ft::optional<std::string> Resource::getErrorPage(int code) const
   return ft::nullopt;
 }
 
+std::size_t Resource::getMaxBodySize() const
+{
+  std::size_t maxBody = 0;
+  if (_location != FT_NULLPTR) {
+    maxBody = _location->getMaxBodySize();
+  } else if (_server != FT_NULLPTR) {
+    maxBody = _server->getMaxBodySize();
+  }
+  return maxBody;
+}
+
 std::string Resource::toString() const
 {
   std::ostringstream oss;
@@ -104,4 +122,9 @@ std::string Resource::_typeToString() const
       return "Error";
   }
   FT_UNREACHABLE();
+}
+
+void Resource::setPort(int port)
+{
+  _port = port;
 }

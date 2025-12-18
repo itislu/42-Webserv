@@ -138,9 +138,6 @@ void MemoryBuffer::replace(RawBytes& raw)
 
 void MemoryBuffer::moveBufferToFile(const std::string& filepath)
 {
-  if (_data.empty()) {
-    throw BufferException(errBufferEmpty);
-  }
   std::ofstream ofs(filepath.c_str(),
                     std::ios::out | std::ios::binary | std::ios::trunc);
 
@@ -148,9 +145,11 @@ void MemoryBuffer::moveBufferToFile(const std::string& filepath)
     throw BufferException(errOpen);
   }
 
-  ofs.write(_data.data(), static_cast<std::streamsize>(_data.size()));
-  if (!ofs.good()) {
-    throw BufferException(errWrite);
+  if (!_data.empty()) {
+    ofs.write(_data.data(), static_cast<std::streamsize>(_data.size()));
+    if (!ofs.good()) {
+      throw BufferException(errWrite);
+    }
   }
 
   _data.clear();
