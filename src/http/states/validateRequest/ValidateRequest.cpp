@@ -119,6 +119,7 @@ void ValidateRequest::_init()
     _setServerByHost();
   }
 
+  _server = &_client->getServer()->getConfig();
   _initResource();
   _path = request.getUri().getPath();
   _initRequestPath();
@@ -161,7 +162,6 @@ bool ValidateRequest::validateMethod(
 
 void ValidateRequest::_initConfigs()
 {
-  _server = &_client->getServer()->getConfig();
   _location = _server->getBestMatchLocation(_decoded);
   _client->getResource().setLocation(_location);
 }
