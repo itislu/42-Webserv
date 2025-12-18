@@ -115,6 +115,7 @@ void ValidateRequest::_init()
     _setServerByHost();
   }
 
+  _server = &_client->getServer()->getConfig();
   _initResource();
   _path = _client->getRequest().getUri().getPath();
   _initRequestPath();
@@ -479,7 +480,6 @@ void ValidateRequest::_setServerByHost()
     ServerManager::getInstance().getServerByHost(socket, _host);
   _log.info() << "Found server for host: " << _host << "\n";
   _client->setServer(server);
-  _server = &server->getConfig();
 }
 
 // Full Path: /cgi-bin/add.sh/path/whatever
