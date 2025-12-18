@@ -42,8 +42,8 @@ try {
 
 static void initSingletons()
 {
-  EventManager::getInstance();
-  ServerManager::getInstance();
-  SocketManager::getInstance();
   ChildProcessManager::getInstance();
+  SocketManager::getInstance();
+  ServerManager::getInstance();
+  EventManager::getInstance();
 }
