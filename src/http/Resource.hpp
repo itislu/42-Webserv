@@ -22,6 +22,7 @@ public:
 
   Resource();
   Type getType() const;
+  const std::string& getHost() const;
   const std::string& getPath() const;
   const std::string& getPathInfo() const;
   const std::string& getNoRootPath() const;
@@ -29,6 +30,7 @@ public:
   const ServerConfig* getServer() const;
   int getPort() const;
 
+  void setHost(const std::string& host);
   void setPath(const std::string& path);
   void setNoRootPath(const std::string& noRootPath);
   void setType(Type type);
@@ -46,6 +48,7 @@ private:
   std::string _typeToString() const;
 
   Type _type;
+  std::string _host;
   std::string _path;
   std::string _pathInfo;
   std::string _noRootPath;

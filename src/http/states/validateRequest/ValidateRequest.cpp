@@ -448,6 +448,7 @@ void ValidateRequest::_validateHost()
     return;
   }
   _client->getResource().setPort(port);
+  _client->getResource().setHost(_host);
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
