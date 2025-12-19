@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DON'T PANIC</title>
+    <style>
+      :root {
+        --bg: #050608;
+        --panel: rgba(0, 0, 0, 0.55);
+        --glow: 0 0 18px rgba(90, 255, 170, 0.25);
+        --text: #b8ffd6;
+        --accent: #74ffb8;
+        --warn: #ffd66e;
+        --border: rgba(116, 255, 184, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        background: radial-gradient(
+            1200px 700px at 50% 15%,
+            rgba(116, 255, 184, 0.12),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #050608, #020203);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .wrap {
+        width: min(980px, 100%);
+        border: 1px solid var(--border);
+        background: var(--panel);
+        box-shadow: var(--glow);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      header {
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .title {
+        font-size: 18px;
+        letter-spacing: 0.06em;
+      }
+      .tag {
+        color: var(--warn);
+        font-size: 13px;
+        opacity: 0.95;
+        white-space: nowrap;
+      }
+
+      .grid {
+        display: grid;
+        gap: 18px;
+        padding: 20px;
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .screen {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.35);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+        position: relative;
+        overflow: hidden;
+      }
+      .scanlines::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.03) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+        mix-blend-mode: overlay;
+        opacity: 0.35;
+      }
+
+      .prompt {
+        color: var(--accent);
+        margin: 0 0 10px 0;
+        font-size: 14px;
+      }
+
+      .log {
+        font-size: 14px;
+        line-height: 1.55;
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .side {
+        display: grid;
+        gap: 18px;
+        align-content: start;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.28);
+      }
+
+      button {
+        width: 100%;
+        border: 1px solid rgba(255, 214, 110, 0.55);
+        background: rgba(255, 214, 110, 0.08);
+        color: var(--warn);
+        padding: 12px 14px;
+        border-radius: 12px;
+        font: inherit;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: transform 120ms ease, background 120ms ease,
+          border-color 120ms ease;
+      }
+      button:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 214, 110, 0.12);
+      }
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .mini {
+        font-size: 12px;
+        opacity: 0.85;
+        margin-top: 10px;
+      }
+
+      .result {
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px dashed rgba(116, 255, 184, 0.45);
+        background: rgba(0, 0, 0, 0.25);
+        min-height: 44px;
+        display: grid;
+        align-items: center;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 214, 110, 0.25);
+        border-top-color: rgba(255, 214, 110, 0.95);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        vertical-align: -2px;
+        margin-right: 8px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* inline “computer image” */
+      .computer {
+        width: 100%;
+        height: auto;
+        display: block;
+        filter: drop-shadow(0 0 18px rgba(116, 255, 184, 0.18));
+      }
+      .footer {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        opacity: 0.85;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .mono-accent {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="title">
+          THE HITCHHIKER’S GUIDE // <span class="mono-accent">DON’T PANIC</span>
+        </div>
+        <div class="tag">Mostly harmless.</div>
+      </header>
+
+      <div class="grid">
+        <section class="screen scanlines">
+          <p class="prompt">GUIDE&gt; <span id="status">Ready.</span></p>
+          <pre class="log" id="log">
+Welcome, traveler.
+Insert towel. Remain calm.
+Press the button to compute the reason for life, the universe, and everything.</pre
+          >
+        </section>
+
+        <aside class="side">
+          <div class="card">
+            <!-- Retro computer “image” as SVG (no external files needed) -->
+            <svg
+              class="computer"
+              viewBox="0 0 520 360"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-label="Retro computer"
+            >
+              <defs>
+                <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#0b0f10" />
+                  <stop offset="1" stop-color="#020305" />
+                </linearGradient>
+                <linearGradient id="glass" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#0e2d1f" stop-opacity="0.9" />
+                  <stop offset="1" stop-color="#07160f" stop-opacity="0.95" />
+                </linearGradient>
+              </defs>
+
+              <!-- monitor -->
+              <rect
+                x="90"
+                y="30"
+                width="340"
+                height="220"
+                rx="22"
+                fill="url(#g)"
+                stroke="rgba(116,255,184,0.45)"
+                stroke-width="3"
+              />
+              <rect
+                x="120"
+                y="60"
+                width="280"
+                height="160"
+                rx="14"
+                fill="url(#glass)"
+                stroke="rgba(116,255,184,0.35)"
+                stroke-width="2"
+              />
+              <!-- screen text -->
+              <text
+                x="145"
+                y="115"
+                font-family="monospace"
+                font-size="18"
+                fill="#74ffb8"
+                opacity="0.95"
+              >
+                DON'T PANIC
+              </text>
+              <text
+                x="145"
+                y="145"
+                font-family="monospace"
+                font-size="14"
+                fill="#b8ffd6"
+                opacity="0.9"
+              >
+                Calculating...
+              </text>
+              <text
+                x="145"
+                y="175"
+                font-family="monospace"
+                font-size="14"
+                fill="#b8ffd6"
+                opacity="0.8"
+              >
+                life + universe + everything
+              </text>
+
+              <!-- monitor stand -->
+              <path
+                d="M230 252h60c0 22 14 30 34 36v14H196v-14c20-6 34-14 34-36z"
+                fill="#030405"
+                stroke="rgba(116,255,184,0.35)"
+                stroke-width="2"
+              />
+              <rect
+                x="150"
+                y="318"
+                width="220"
+                height="18"
+                rx="9"
+                fill="#030405"
+                stroke="rgba(116,255,184,0.35)"
+                stroke-width="2"
+              />
+
+              <!-- little LEDs -->
+              <circle cx="395" cy="242" r="5" fill="#ffd66e" opacity="0.9" />
+              <circle cx="415" cy="242" r="5" fill="#74ffb8" opacity="0.8" />
+            </svg>
+
+            <button id="btn">
+              Calculate Answer to the Ultimate Question of Life, the Universe,
+              and Everything
+            </button>
+            <div class="mini">
+              This will send a GET request to
+              <span class="mono-accent">/cgi-bin/42.sh</span>.
+            </div>
+
+            <div class="result" id="result">Result: —</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script>
+      const btn = document.getElementById("btn");
+      const statusEl = document.getElementById("status");
+      const logEl = document.getElementById("log");
+      const resultEl = document.getElementById("result");
+
+      function log(line) {
+        logEl.textContent += "\n" + line;
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        statusEl.innerHTML =
+          '<span class="spinner"></span>Requesting /cgi-bin/42.sh (GET)…';
+        resultEl.textContent = "Result: …";
+        log("GUIDE> Initiating improbability drive.");
+        log("GUIDE> Sending GET /cgi-bin/42.sh");
+
+        try {
+          const res = await fetch("/cgi-bin/42.sh", {
+            method: "GET",
+            cache: "no-store",
+          });
+
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+          // 42.sh should respond with plain text, e.g. "42"
+          const text = (await res.text()).trim();
+
+          statusEl.textContent = "Done.";
+          resultEl.textContent = `Result: ${text || "—"}`;
+          log(`GUIDE> Response received: "${text}"`);
+        } catch (err) {
+          statusEl.textContent = "Error.";
+          resultEl.textContent = "Result: (failed)";
+          log(`GUIDE> Error: ${err.message}`);
+          log(
+            "GUIDE> Make sure /cgi-bin/42.sh is served by a server that can execute it."
+          );
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
