@@ -18,7 +18,7 @@ collection:
     meta:
       id: fld_f49856e3f6ef4ef0999bf5eff55e1ee1
       created: 1764947791370
-      modified: 1766083587933
+      modified: 1766133736504
       sortKey: -1764947791370
       description: ""
     children:
@@ -106,16 +106,22 @@ collection:
         meta:
           id: req_05997aecc2fa404ba6fa9af59f119bb3
           created: 1764946608857
-          modified: 1764947797312
+          modified: 1766132959175
           isPrivate: false
           description: ""
-          sortKey: -1764947796116
+          sortKey: -1764947806250.375
         method: GOT
         headers:
           - name: User-Agent
             value: insomnia/12.1.0
             description: ""
             disabled: false
+        scripts:
+          afterResponse: |
+            
+            insomnia.test('Check if status is 405', () => {
+                insomnia.expect(insomnia.response.code).to.eql(405);
+            });
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -177,47 +183,6 @@ collection:
             disabled: false
           - name: Connection
             value: keep-alive
-            description: ""
-            disabled: false
-        scripts:
-          afterResponse: |+
-            
-
-            insomnia.test('Check if status is 201', () => {
-                insomnia.expect(insomnia.response.code).to.eql(201);
-            });
-
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: upload/
-        name: UploadRelative
-        meta:
-          id: req_31e8826032d94487baabf7bb9adad637
-          created: 1764952067561
-          modified: 1764952973512
-          isPrivate: false
-          description: ""
-          sortKey: -1764947812271
-        method: POST
-        body:
-          mimeType: text/plain
-          text: |
-            HelloWorld
-        headers:
-          - name: Content-Type
-            value: text/plain
-          - name: User-Agent
-            value: insomnia/12.1.0
-            description: ""
-            disabled: false
-          - name: Content-Length
-            value: "10"
             description: ""
             disabled: false
         scripts:
@@ -391,10 +356,10 @@ collection:
         meta:
           id: req_e9055872559642cbadf71ed31f904638
           created: 1765986287150
-          modified: 1765986334687
+          modified: 1766132897760
           isPrivate: false
           description: ""
-          sortKey: -1764947820298.5
+          sortKey: -1764947808257.25
         method: DELETE
         headers:
           - name: User-Agent
@@ -425,7 +390,7 @@ collection:
         meta:
           id: req_21329298c1974d7baf8a23b19b12a21d
           created: 1766083320212
-          modified: 1766083458990
+          modified: 1766132866605
           isPrivate: false
           description: ""
           sortKey: -1766083320212
@@ -461,6 +426,46 @@ collection:
             value: insomnia/12.1.0
             description: ""
             disabled: false
+        scripts:
+          afterResponse: |
+            
+            insomnia.test('Check if status is 413', () => {
+                insomnia.expect(insomnia.response.code).to.eql(413);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/upload/
+        name: Body0
+        meta:
+          id: req_73669e239a1e46d1884e91f032ed7a6e
+          created: 1766085925348
+          modified: 1766132809781
+          isPrivate: false
+          description: ""
+          sortKey: -1765515574269
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+          - name: Content-Length
+            value: "0"
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 201', () => {
+                insomnia.expect(insomnia.response.code).to.eql(201);
+            });
+
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -474,11 +479,11 @@ cookieJar:
   meta:
     id: jar_99d30891da4bdcebc63947a8fc17f076de878684
     created: 1761142460751
-    modified: 1766083587931
+    modified: 1766133736502
 environments:
   name: Base Environment
   meta:
     id: env_99d30891da4bdcebc63947a8fc17f076de878684
     created: 1761142460750
-    modified: 1766083587933
+    modified: 1766133736504
     isPrivate: false
