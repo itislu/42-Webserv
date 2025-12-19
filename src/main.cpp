@@ -37,6 +37,8 @@ try {
 } catch (const std::exception& e) {
   std::cerr << "Error: " << e.what() << '\n';
   return EXIT_FAILURE;
+} catch (...) {
+  return EXIT_FAILURE;
 }
 // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
