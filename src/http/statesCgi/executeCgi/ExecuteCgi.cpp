@@ -96,7 +96,7 @@ void ExecuteCgi::_prepareEnv()
   _addEnvVar("REMOTE_ADDR", utils::addrToString(_client->getAddr()));
   _addEnvVar("REQUEST_METHOD", request.getStrMethod());
   _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
-  // TODO SERVER_NAME
+  _addEnvVar("SERVER_NAME", resource.getHost());
   _addEnvVar("SERVER_PORT", ft::to_string(resource.getPort()));
   _addEnvVar("SERVER_PROTOCOL", http::HTTP_1_1);
   _addEnvVar("SERVER_SOFTWARE", "webserv/1.0");
