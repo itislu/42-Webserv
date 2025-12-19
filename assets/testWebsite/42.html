@@ -365,7 +365,7 @@ Press the button to compute the reason for life, the universe, and everything.</
 
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-          // calculate.sh should respond with plain text, e.g. "42"
+          // 42.sh should respond with plain text, e.g. "42"
           const text = (await res.text()).trim();
 
           statusEl.textContent = "Done.";
