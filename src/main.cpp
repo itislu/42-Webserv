@@ -13,7 +13,7 @@
 
 static void initSingletons();
 
-const char* const defaultConfigPath = "TODO.conf"; // TODO
+const char* const defaultConfigPath = "./assets/testWebsite/default.conf";
 
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic): argv.
 int main(int argc, char* argv[])
