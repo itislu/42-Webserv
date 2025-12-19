@@ -165,6 +165,10 @@ void ValidateRequest::_initResource()
 {
   _client->getResource().setType(Resource::File);
   _client->getResource().setServer(_server);
+  if (_host.empty()) {
+    _host = _server->getHostnames()[0];
+    _client->getResource().setHost(_host);
+  }
 }
 
 void ValidateRequest::_initMethodState(const Request::Method& method)
