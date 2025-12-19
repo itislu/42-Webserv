@@ -34,6 +34,7 @@ void HandleRedirect::run()
   _log.info() << "PATH: " << path << "\n";
 
   response.getHeaders().setHeader("Location", path);
+  response.getHeaders().setHeader("Content-Length", "0");
   getContext()->getStateHandler().setDone();
 }
 
