@@ -8,6 +8,7 @@
 #include <http/Resource.hpp>
 #include <http/StatusCode.hpp>
 #include <http/headerUtils.hpp>
+#include <http/http.hpp>
 #include <libftpp/algorithm.hpp>
 #include <libftpp/array.hpp>
 #include <libftpp/string.hpp>
@@ -15,6 +16,7 @@
 #include <utils/Pipe.hpp>
 #include <utils/buffer/IBuffer.hpp>
 #include <utils/buffer/IInOutBuffer.hpp>
+#include <utils/convert.hpp>
 #include <utils/logger/Logger.hpp>
 #include <utils/state/IState.hpp>
 
@@ -82,18 +84,22 @@ void ExecuteCgi::_prepareEnv()
 
   _contentLength = getContext()->getContentLength();
 
-  _addEnvVar("GATEWAY_INTERFACE", "CGI/1.1");
-  _addEnvVar("SERVER_PROTOCOL", "HTTP/1.1");
-  _addEnvVar("REQUEST_METHOD", request.getStrMethod());
   if (_contentLength > 0) {
     _addEnvVar("CONTENT_LENGTH", ft::to_string(_contentLength));
   }
   if (reqHeaders.contains(header::contentType)) {
     _addEnvVar("CONTENT_TYPE", reqHeaders.at(header::contentType));
   }
-  _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
+  _addEnvVar("GATEWAY_INTERFACE", "CGI/1.1");
+  _addEnvVar("PATH_INFO", resource.getCgiPathInfo());
   _addEnvVar("QUERY_STRING", request.getUri().getQuery());
+  _addEnvVar("REMOTE_ADDR", utils::addrToString(_client->getAddr()));
+  _addEnvVar("REQUEST_METHOD", request.getStrMethod());
+  _addEnvVar("SCRIPT_NAME", resource.getNoRootPath());
+  // TODO SERVER_NAME
   _addEnvVar("SERVER_PORT", ft::to_string(resource.getPort()));
+  _addEnvVar("SERVER_PROTOCOL", http::HTTP_1_1);
+  _addEnvVar("SERVER_SOFTWARE", "webserv/1.0");
   _addNonDefaultHeaders(reqHeaders);
   _state = ExecuteScript;
 }
@@ -117,6 +123,12 @@ bool ExecuteCgi::_isDefaultHeader(const std::string& headerName)
   return headerName == contentType || headerName == contentLength;
 }
 
+/**
+ * If the header name already contains underscores, prepend an additional
+ * underscore to make the environment variable name unambiguous.
+ *
+ * https://datatracker.ietf.org/doc/html/rfc9110#section-17.10-5
+ */
 std::string ExecuteCgi::_convertHeader(const std::string& headerName)
 {
   std::string cgiName = "HTTP_";
@@ -214,6 +226,8 @@ try {
   } catch (...) {
     // EMPTY: Exit in all cases.
   }
+  // std::exit() would make more sense here, but evaluation requirements require
+  // a clean valgrind report.
   ::close(STDIN_FILENO);
   ::close(STDOUT_FILENO);
   throw EXIT_FAILURE;
