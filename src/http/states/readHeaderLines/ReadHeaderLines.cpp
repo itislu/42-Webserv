@@ -55,7 +55,7 @@ try {
   _readLines();
 
   const StatusCode& statusCode = _client->getResponse().getStatusCode();
-  if (statusCode != StatusCode::Ok) {
+  if (!statusCode.isSuccessCode()) {
     getContext()->getStateHandler().setState<PrepareResponse>();
   } else if (_done) {
     getContext()->getStateHandler().setState<ValidateRequest>();
@@ -124,7 +124,7 @@ void ReadHeaderLines::_readLines()
       break;
     case HeaderParser::InvalidHeader:
       // Error code will be set by RequestHeaderValidator
-      if (response.getStatusCode() == StatusCode::Ok) {
+      if (response.getStatusCode().isSuccessCode()) {
         _log.error()
           << "ReadHeaderLines: validator failed to set error status\n";
         response.setStatusCode(StatusCode::BadRequest);

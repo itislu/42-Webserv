@@ -50,7 +50,7 @@ bool RequestHeaderValidator::isValid(const std::string& name,
     }
   }
 
-  return _client->getResponse().getStatusCode() == StatusCode::Ok;
+  return _client->getResponse().getStatusCode().isSuccessCode();
 }
 
 /* ************************************************************************** */
@@ -83,7 +83,6 @@ void RequestHeaderValidator::_validateContentLength(const std::string& value)
   const bool hasTransferEncoding = _headers->contains(header::transferEncoding);
   if (hasTransferEncoding) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _client->setCloseConnection(true);
     _log.error()
       << "RequestHeaderValidator: has Transfer-Encoding AND Content-Length\n";
     return;
@@ -106,7 +105,6 @@ void RequestHeaderValidator::_validateTransferEncoding(const std::string& value)
   const bool hasContentLength = _headers->contains("Content-Length");
   if (hasContentLength) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _client->setCloseConnection(true);
     _log.error()
       << "RequestHeaderValidator: has Transfer-Encoding AND Content-Length\n";
     return;
@@ -114,7 +112,6 @@ void RequestHeaderValidator::_validateTransferEncoding(const std::string& value)
 
   if (_client->getRequest().getVersion() == http::HTTP_1_0) {
     _client->getResponse().setStatusCode(StatusCode::BadRequest);
-    _client->setCloseConnection(true);
     _log.error() << "RequestHeaderValidator: has Transfer-Encoding with "
                     "version HTTP/1.0\n";
     return;

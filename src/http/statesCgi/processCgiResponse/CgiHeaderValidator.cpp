@@ -47,7 +47,7 @@ bool CgiHeaderValidator::isValid(const std::string& name,
     }
   }
 
-  return _client->getResponse().getStatusCode() == StatusCode::Ok;
+  return _client->getResponse().getStatusCode().isSuccessCode();
 }
 
 /* ************************************************************************** */

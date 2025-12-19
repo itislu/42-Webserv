@@ -143,6 +143,11 @@ ClientEventHandler::Result ClientEventHandler::_handlePollOutEvent()
     } else {
       return Disconnect;
     }
+  } else {
+    if (!_client->getResponse().getStatusCode().isSuccessCode() &&
+        _client->getStateHandler().isDone()) {
+      return Disconnect;
+    }
   }
   return Alive;
 }
@@ -153,7 +158,7 @@ void ClientEventHandler::_clientStateMachine()
   const Response& response = _client->getResponse();
 
   if (handler.isDone() && !_client->getInBuff().isEmpty() &&
-      !_client->closeConnection() && response.getStatusCode().is2xxCode()) {
+      response.getStatusCode().isSuccessCode()) {
     _client->prepareForNewRequest();
     _cgiEventHandlerAdded = false;
   }

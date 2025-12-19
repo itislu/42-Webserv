@@ -89,7 +89,7 @@ void WriteHeaderLines::_setConnectionHeader()
   const Headers& reqHeaders = request.getHeaders();
   Headers& headers = _client->getResponse().getHeaders();
 
-  if (_client->closeConnection() || !response.getStatusCode().is2xxCode()) {
+  if (!response.getStatusCode().isSuccessCode()) {
     headers.setHeader(header::connection, "close");
     return;
   }
