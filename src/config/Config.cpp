@@ -10,7 +10,7 @@
 #include <vector>
 
 int Config::_defaultTimeout = 0;
-const char* const Config::defaultRoot = "/var/www";
+const char* const Config::defaultRoot = "./assets/testWebsite/";
 const std::size_t Config::defaultMaxBodySize = 1024L * 1024;
 const int Config::defaultTimeout = 60;
 

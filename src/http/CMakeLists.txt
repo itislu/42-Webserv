@@ -18,6 +18,7 @@ add_library(${LIB_NAME} STATIC
   states/prepareResponse/HandleError.cpp
   states/prepareResponse/HandleGet.cpp
   states/prepareResponse/HandlePost.cpp
+  states/prepareResponse/HandleRedirect.cpp
   states/prepareResponse/PrepareResponse.cpp
   states/readBody/ReadBody.cpp
   states/readHeaderLines/ReadHeaderLines.cpp

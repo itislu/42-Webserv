@@ -1,105 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Post Tests</title>
-    <style>
-      body {
-        font-family: system-ui, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-        background: linear-gradient(135deg, #89f7fe, #66a6ff);
-        color: white;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Tests</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      color: white;
+      padding-bottom: 50px;
+    }
+
+    a {
+      margin-top: 30px;
+      color: white;
+      text-decoration: underline;
+    }
+
+    .card {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 10px;
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 400px;
+    }
+
+    label {
+      font-size: 0.9em;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    input[type="file"] {
+      margin-top: 5px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: white;
+      color: #66a6ff;
+      font-weight: bold;
+      transition: transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: none;
+      padding: 8px;
+      font-family: monospace;
+    }
+
+    /* Result Styles */
+    .result {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 12px;
+      border-radius: 8px;
+      width: 420px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Post Tests</h1>
+
+  <div class="card">
+    <label for="uploadPath">Upload Target Path:</label>
+    <input type="text" id="uploadPath" value="/upload/" />
+
+    <input type="file" id="fileInput" required />
+    <button onclick="sendFile()">Upload File</button>
+  </div>
+
+  <div class="card">
+    <label for="rawPath">Raw Target Path:</label>
+    <input type="text" id="rawPath" value="/upload/" />
+
+    <textarea id="rawInput" rows="4">hello world</textarea>
+    <button onclick="sendRaw()">Send Raw</button>
+  </div>
+
+  <div class="result" id="result">
+    Status: -<br />
+    Location: -<br />
+    Redirected: -
+  </div>
+
+  <a href="index.html">⬅ Back to Home</a>
+
+  <script>
+    // Helper to display results (Status/Headers only)
+    function showResponse(res) {
+      const resultDiv = document.getElementById("result");
+      const location = res.headers.get("Location");
+
+      resultDiv.innerHTML =
+        "Status: " + res.status + " " + res.statusText + "<br />" +
+        "Location: " + (location ? location : "(none)") + "<br />" +
+        "Redirected: " + (res.redirected ? "YES (url: " + res.url + ")" : "NO");
+    }
+
+    function showError(err) {
+      document.getElementById("result").innerHTML = "Network Error: " + err;
+    }
+
+    // 1. Send File Logic
+    function sendFile() {
+      const path = document.getElementById("uploadPath").value;
+      const fileInput = document.getElementById("fileInput");
+
+      if (fileInput.files.length === 0) {
+        alert("Please select a file first.");
+        return;
       }
 
-      a {
-        margin-top: 30px;
-        color: white;
-        text-decoration: underline;
-      }
+      const formData = new FormData();
+      formData.append("testFile", fileInput.files[0]);
 
-      form {
-        margin-top: 20px;
-        background: rgba(255, 255, 255, 0.15);
-        padding: 20px;
-        border-radius: 10px;
-        backdrop-filter: blur(4px);
-      }
+      fetch(path, {
+        method: "POST",
+        body: formData,
+      })
+        .then(showResponse)
+        .catch(showError);
+    }
 
-      input[type="file"] {
-        margin-bottom: 10px;
-      }
+    // 2. Send Raw Logic
+    function sendRaw() {
+      const path = document.getElementById("rawPath").value;
+      const text = document.getElementById("rawInput").value;
 
-      button {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-      }
+      fetch(path, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: text,
+      })
+        .then(showResponse)
+        .catch(showError);
+    }
+  </script>
+</body>
 
-      .result {
-        margin-top: 20px;
-        background: rgba(0, 0, 0, 0.25);
-        padding: 12px;
-        border-radius: 8px;
-        width: 420px;
-        font-family: monospace;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Post Tests</h1>
-    <p>This page allows you to upload a file for POST testing.</p>
-
-    <form action="/upload/" method="POST" enctype="multipart/form-data">
-      <input type="file" name="testFile" required />
-      <br />
-      <button type="submit">Upload File</button>
-    </form>
-
-    <br />
-
-    <textarea id="rawInput" rows="6" cols="40">hello world</textarea>
-    <br />
-    <button onclick="sendRaw()">Send Raw POST</button>
-
-    <div class="result" id="result">
-      Status: -<br />
-      Location: -
-    </div>
-
-    <a href="index.html">⬅ Back to Home</a>
-
-    <script>
-      function sendRaw() {
-        const text = document.getElementById("rawInput").value;
-        const result = document.getElementById("result");
-
-        fetch("/upload/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain",
-          },
-          body: text,
-        })
-          .then((res) => {
-            const location = res.headers.get("Location");
-            result.innerHTML =
-              "Status: " +
-              res.status +
-              "<br />" +
-              "Location: " +
-              (location ? location : "(none)");
-          })
-          .catch(() => {
-            result.innerHTML = "Request failed";
-          });
-      }
-    </script>
-  </body>
 </html>

@@ -16,6 +16,11 @@ public:
     Ok = 200,
     Created = 201,
     NoContent = 204,
+    MovedPermanently = 301,
+    Found = 302,
+    SeeOther = 303,
+    TemporaryRedirect = 307,
+    PermanentRedirect = 308,
     BadRequest = 400,
     Unauthorized = 401,
     Forbidden = 403,
@@ -37,6 +42,8 @@ public:
 
   StatusCode();
   explicit StatusCode(Code code);
+  explicit StatusCode(int code);
+
   StatusCode& operator=(Code code);
   bool operator==(Code code) const;
   bool operator!=(Code code) const;
@@ -46,12 +53,14 @@ public:
   std::string toString() const;
 
   bool is2xxCode() const;
+  bool isRedirectCode() const;
+  bool isSuccessCode() const;
 
 private:
   void _findReason();
 
   struct CodeEntry;
-  static const int _codes = 20;
+  static const int _codes = 25;
   static const ft::array<CodeEntry, _codes> _codeMap;
 
   Code _code;

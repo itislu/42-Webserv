@@ -1,4 +1,5 @@
 #include "ValidateRequest.hpp"
+#include "http/Response.hpp"
 #include "http/states/validateRequest/ValidateCgi.hpp"
 
 #include <client/Client.hpp>
@@ -67,7 +68,8 @@ try {
     _log.info() << "ValidateRequest result\n"
                 << _client->getResource().toString() << "\n";
     _log.info() << _client->getResponse().getStatusCode() << "\n";
-    if (getContext()->getResponse().getStatusCode() == StatusCode::Ok) {
+    const StatusCode& statusCode = _client->getResponse().getStatusCode();
+    if (statusCode.isSuccessCode()) {
       if (_client->getResource().getType() == Resource::Cgi) {
         getContext()->getStateHandler().setState<StartCgi>();
       } else {
@@ -106,8 +108,11 @@ StateHandler<ValidateRequest>& ValidateRequest::getStateHandler()
 
 void ValidateRequest::_init()
 {
+  const Request& request = _client->getRequest();
+  const Response& response = _client->getResponse();
+
   _validateHost();
-  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+  if (response.getStatusCode() != StatusCode::Ok) {
     return;
   }
 
@@ -117,18 +122,20 @@ void ValidateRequest::_init()
 
   _server = &_client->getServer()->getConfig();
   _initResource();
-  _path = _client->getRequest().getUri().getPath();
+  _path = request.getUri().getPath();
   _initRequestPath();
-  if (_client->getResponse().getStatusCode() != StatusCode::Ok) {
+  if (response.getStatusCode() != StatusCode::Ok) {
     return;
   }
 
-  _log.info() << "Root: " << _server->getRoot() << "\n";
+  if (_checkRedirection()) {
+    return;
+  }
 
   const std::set<std::string>& allowedMethods =
     _location != FT_NULLPTR ? _location->getAllowedMethods()
                             : _server->getAllowedMethods();
-  const Request::Method method = _client->getRequest().getMethod();
+  const Request::Method method = request.getMethod();
 
   if (!validateMethod(allowedMethods, method)) {
     _log.info() << "method is INVALID\n";
@@ -487,6 +494,20 @@ void ValidateRequest::_setServerByHost()
   _client->setServer(server);
 }
 
+bool ValidateRequest::_checkRedirection()
+{
+  if (_location == FT_NULLPTR || !_location->isRedirect()) {
+    return false;
+  }
+  _client->getResource().setPath(_location->getRedirection());
+  _client->getResource().setType(Resource::Redirect);
+
+  const StatusCode code(_location->getRedirectCode());
+  _client->getResponse().setStatusCode(code.getCode());
+
+  _stateHandler.setDone();
+  return true;
+}
 // Full Path: /cgi-bin/add.sh/path/whatever
 //      Path: /cgi-bin/add.sh
 //      Info: /path/whatever

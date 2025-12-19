@@ -272,7 +272,7 @@ void Entries<LocationConfig>::setRedirectCode(
   }
   int code = 0;
   try {
-    code = convert::toCode(values[0]);
+    code = convert::toRedirectCode(values[0]);
   } catch (const std::exception& e) {
     throw std::invalid_argument(
       std::string("redirect_code: invalid argument: ") + e.what());

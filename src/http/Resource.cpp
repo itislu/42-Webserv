@@ -138,6 +138,8 @@ std::string Resource::_typeToString() const
       return "Autoindex";
     case Cgi:
       return "Cgi";
+    case Redirect:
+      return "Redirect";
     case Error:
       return "Error";
   }

@@ -17,6 +17,11 @@ const ft::array<StatusCode::CodeEntry, StatusCode::_codes>
     { { Ok, "OK" },
       { Created, "Created" },
       { NoContent, "No Content" },
+      { MovedPermanently, "Moved Permanently" },
+      { Found, "Found" },
+      { SeeOther, "See Other" },
+      { TemporaryRedirect, "Temporary Redirect" },
+      { PermanentRedirect, "Permanent Redirect" },
       { BadRequest, "Bad Request" },
       { Unauthorized, "Unauthorized" },
       { Forbidden, "Forbidden" },
@@ -43,6 +48,13 @@ StatusCode::StatusCode()
   : _code(Ok)
   , _reason(_codeMap[0].reason)
 {
+}
+
+StatusCode::StatusCode(int code)
+  : _code(static_cast<Code>(code))
+  , _reason()
+{
+  _findReason();
 }
 
 StatusCode::StatusCode(Code code)
@@ -95,6 +107,20 @@ bool StatusCode::is2xxCode() const
 {
   const int begin = 200;
   const int end = 299;
+  return _code >= begin && _code <= end;
+}
+
+bool StatusCode::isRedirectCode() const
+{
+  const int begin = 300;
+  const int end = 399;
+  return _code >= begin && _code <= end;
+}
+
+bool StatusCode::isSuccessCode() const
+{
+  const int begin = 200;
+  const int end = 399;
   return _code >= begin && _code <= end;
 }
 

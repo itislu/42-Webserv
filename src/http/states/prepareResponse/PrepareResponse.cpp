@@ -1,4 +1,5 @@
 #include "PrepareResponse.hpp"
+#include "http/states/prepareResponse/HandleRedirect.hpp"
 
 #include <client/Client.hpp>
 #include <http/Request.hpp>
@@ -57,6 +58,11 @@ StateHandler<PrepareResponse>& PrepareResponse::getStateHandler()
 
 void PrepareResponse::_init()
 {
+  if (_client->getResponse().getStatusCode().isRedirectCode()) {
+    _stateHandler.setState<HandleRedirect>();
+    return;
+  }
+
   if (!_client->getResponse().getStatusCode().is2xxCode()) {
     _stateHandler.setState<HandleError>();
   } else {
