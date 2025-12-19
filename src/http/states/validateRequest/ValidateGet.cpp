@@ -57,39 +57,19 @@ void ValidateGet::validateFile()
     endState(StatusCode::Forbidden);
     return;
   }
-
-  if (_location != FT_NULLPTR && _location->isCgi()) {
-    // TODO??: check file extension if file is cgi
-    _client->getResource().setType(Resource::Cgi);
-    if (!isExecuteable(_path)) {
-      endState(StatusCode::Forbidden);
-      return;
-    }
-    // is CGI
-    endState(StatusCode::Ok);
-    return;
-  }
   endState(StatusCode::Ok);
 }
 
 void ValidateGet::validateDirectory()
 {
-  // if (_location != FT_NULLPTR && _location->isCgi()) {
-  //   endState(StatusCode::Forbidden);
-  //   return;
-  // }
-
   if (!isExecuteable(_path) || !isReadable(_path)) {
     endState(StatusCode::Forbidden);
     return;
   }
 
-  std::string indexName;
-  if (_location != FT_NULLPTR) {
-    indexName = _location->getIndex();
-  } else {
-    indexName = _server->getIndex();
-  }
+  const std::string indexName =
+    _location != FT_NULLPTR ? _location->getIndex() : _server->getIndex();
+
   _log.info() << "indexName: " << indexName << "\n";
   _log.info() << "Path: " << _path << "\n";
 

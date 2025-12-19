@@ -27,6 +27,7 @@ add_library(${LIB_NAME} STATIC
   states/readRequestLine/ParseVersion.cpp
   states/readRequestLine/ReadRequestLine.cpp
   states/startCgi/StartCgi.cpp
+  states/validateRequest/ValidateCgi.cpp
   states/validateRequest/ValidateDelete.cpp
   states/validateRequest/ValidateGet.cpp
   states/validateRequest/ValidatePost.cpp
