@@ -9,7 +9,8 @@
 namespace utils {
 
 /**
- * Converts a `sockaddr_storage` to a human-readable IPv4 or IPv6 string.
+ * Converts a `sockaddr_storage` to a human-readable string (IPv4 or
+ * non-compressed IPv6).
  *
  * @throws std::runtime_error If the address family is unknown.
  */

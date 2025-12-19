@@ -12,20 +12,20 @@ namespace utils {
 
 // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 std::string addrToString(const sockaddr_storage& addr)
 {
   if (addr.ss_family == AF_INET) {
     const sockaddr_in& ipv4Addr = reinterpret_cast<const sockaddr_in&>(addr);
-    const in_addr_t ipv4 = ipv4Addr.sin_addr.s_addr;
-    const unsigned octetSize = 8;
+    const unsigned char* const bytes =
+      reinterpret_cast<const unsigned char*>(&ipv4Addr.sin_addr);
     const unsigned numOctets = 4;
-    const unsigned byteMask = 0xFF;
     std::ostringstream oss;
     for (unsigned i = 0; i < numOctets; ++i) {
       if (i > 0) {
         oss << '.';
       }
-      oss << ((ipv4 >> (i * octetSize)) & byteMask);
+      oss << static_cast<unsigned>(bytes[i]);
     }
     return oss.str();
   }
@@ -41,8 +41,9 @@ std::string addrToString(const sockaddr_storage& addr)
       if (i > 0) {
         oss << ':';
       }
-      const unsigned topByte = static_cast<unsigned>(ipv6.s6_addr[i * 2]);
-      const unsigned botByte = static_cast<unsigned>(ipv6.s6_addr[(i * 2) + 1]);
+      // Reconstruct 16-bit group from 8-bit array.
+      const unsigned topByte = ipv6.s6_addr[i * 2];
+      const unsigned botByte = ipv6.s6_addr[(i * 2) + 1];
       oss << ((topByte << byteSize) | botByte);
     }
     return oss.str();
@@ -50,6 +51,7 @@ std::string addrToString(const sockaddr_storage& addr)
 
   throw std::runtime_error("addrToString: unknown address family");
 }
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
 
