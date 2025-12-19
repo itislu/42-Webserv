@@ -68,9 +68,8 @@ try {
     _log.info() << "ValidateRequest result\n"
                 << _client->getResource().toString() << "\n";
     _log.info() << _client->getResponse().getStatusCode() << "\n";
-    const StatusCode statusCode = _client->getResponse().getStatusCode();
-    if (statusCode.isSuccessCode())
-    {
+    const StatusCode& statusCode = _client->getResponse().getStatusCode();
+    if (statusCode.isSuccessCode()) {
       if (_client->getResource().getType() == Resource::Cgi) {
         getContext()->getStateHandler().setState<StartCgi>();
       } else {
