@@ -165,6 +165,10 @@ void ValidateRequest::_initResource()
 {
   _client->getResource().setType(Resource::File);
   _client->getResource().setServer(_server);
+  if (_host.empty()) {
+    _host = _server->getHostnames()[0];
+    _client->getResource().setHost(_host);
+  }
 }
 
 void ValidateRequest::_initMethodState(const Request::Method& method)
@@ -448,6 +452,7 @@ void ValidateRequest::_validateHost()
     return;
   }
   _client->getResource().setPort(port);
+  _client->getResource().setHost(_host);
 }
 
 void ValidateRequest::_splitHostHeader(const std::string& hostHeader, int& port)
@@ -503,8 +508,8 @@ bool ValidateRequest::_validateCgi()
       const std::string cgiPath = _path.substr(0, endPos);
       if (isFile(cgiPath)) {
         if (endPos < _path.length()) {
-          const std::string pathInfo = _path.substr(endPos);
-          _client->getResource().setPathInfo(pathInfo);
+          const std::string cgiPathInfo = _path.substr(endPos);
+          _client->getResource().setCgiPathInfo(cgiPathInfo);
         }
         _path = cgiPath;
         _client->getResource().setPath(cgiPath);
