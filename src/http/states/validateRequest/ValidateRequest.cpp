@@ -112,7 +112,7 @@ void ValidateRequest::_init()
   const Response& response = _client->getResponse();
 
   _validateHost();
-  if (response.getStatusCode() != StatusCode::Ok) {
+  if (!response.getStatusCode().isSuccessCode()) {
     return;
   }
 
@@ -124,7 +124,7 @@ void ValidateRequest::_init()
   _initResource();
   _path = request.getUri().getPath();
   _initRequestPath();
-  if (response.getStatusCode() != StatusCode::Ok) {
+  if (!response.getStatusCode().isSuccessCode()) {
     return;
   }
 

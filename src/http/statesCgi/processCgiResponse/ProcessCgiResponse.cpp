@@ -81,7 +81,7 @@ void ProcessCgiResponse::_setNextState()
 
 bool ProcessCgiResponse::_ok()
 {
-  return _client->getResponse().getStatusCode() == StatusCode::Ok;
+  return _client->getResponse().getStatusCode().isSuccessCode();
 }
 
 void ProcessCgiResponse::_readCgiResponse()
@@ -133,7 +133,7 @@ void ProcessCgiResponse::_parseCgiHeader()
       _log.error() << "ProcessCgiResponse: header too large\n";
       break;
     case HeaderParser::InvalidHeader:
-      if (response.getStatusCode() == StatusCode::Ok) {
+      if (response.getStatusCode().isSuccessCode()) {
         _log.error()
           << "ProcessCgiResponse: validator failed to set error status\n";
         response.setStatusCode(StatusCode::BadGateway);

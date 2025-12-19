@@ -43,7 +43,6 @@ Client::Client()
   , _server()
   , _socket()
   , _stateHandler(this)
-  , _closeConnection(false)
   , _alive(true)
 {
   _stateHandler.setState<ReadRequestLine>();
@@ -55,7 +54,6 @@ Client::Client(int fdes)
   , _server()
   , _socket()
   , _stateHandler(this)
-  , _closeConnection(false)
   , _alive(true)
 {
   _stateHandler.setState<ReadRequestLine>();
@@ -70,7 +68,6 @@ Client::Client(ft::rvalue<AutoFd>& fdes,
   , _server(server)
   , _socket(socket)
   , _stateHandler(this)
-  , _closeConnection(false)
   , _alive(true)
 {
   _stateHandler.setState<ReadRequestLine>();
@@ -210,16 +207,6 @@ void Client::prepareForNewRequest()
   _resource = Resource();
 
   _cgiContext.reset();
-}
-
-void Client::setCloseConnection(bool value)
-{
-  _closeConnection = value;
-}
-
-bool Client::closeConnection() const
-{
-  return _closeConnection;
 }
 
 void Client::setAlive(bool value)

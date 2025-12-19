@@ -49,10 +49,8 @@ public:
   void setSocket(const Socket* socket);
 
   long getTimeout() const;
-  bool closeConnection() const;
   bool alive() const;
 
-  void setCloseConnection(bool value);
   void setServer(const Server* server);
   void setAlive(bool value);
 
@@ -78,7 +76,6 @@ private:
   Resource _resource;
   ft::shared_ptr<CgiContext> _cgiContext;
 
-  bool _closeConnection;
   bool _alive;
 };
 

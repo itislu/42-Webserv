@@ -77,7 +77,7 @@ try {
 
   _updateCgi();
 
-  if (_done || _client->getResponse().getStatusCode() != StatusCode::Ok) {
+  if (_done || !_client->getResponse().getStatusCode().isSuccessCode()) {
     if (_client->getResource().getType() == Resource::Cgi) {
       getContext()->getStateHandler().setState<WaitForCgi>();
     } else {
