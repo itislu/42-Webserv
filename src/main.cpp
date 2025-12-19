@@ -13,18 +13,26 @@
 
 static void initSingletons();
 
+static const char* const defaultConfigPath =
+  "./assets/testWebsite/default.conf";
+
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic): argv.
 int main(int argc, char* argv[])
 try {
   Logger& logger = Logger::getInstance(LOG_GENERAL);
 
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " <configuration file>\n";
+  if (argc > 2) {
+    std::cerr << "Usage: " << argv[0] << " [configuration file]\n";
     return EXIT_FAILURE;
   }
 
-  logger.info() << "parsing config...\n";
-  config::ConfigParser(argv[1]).parseConfig();
+  const char* const configPath = (argc == 1) ? defaultConfigPath : argv[1];
+  if (argc == 1) {
+    std::cout << "Using default configuration file: " << configPath << '\n';
+  } else {
+    std::cout << "Using configuration file: " << configPath << '\n';
+  }
+  config::ConfigParser(configPath).parseConfig();
   std::cout << Config::getConfig();
 
   initSingletons();
