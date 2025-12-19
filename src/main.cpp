@@ -13,18 +13,21 @@
 
 static void initSingletons();
 
+const char* const defaultConfigPath = "TODO.conf"; // TODO
+
 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic): argv.
 int main(int argc, char* argv[])
 try {
   Logger& logger = Logger::getInstance(LOG_GENERAL);
 
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " <configuration file>\n";
+  if (argc > 2) {
+    std::cerr << "Usage: " << argv[0] << " [configuration file]\n";
     return EXIT_FAILURE;
   }
 
-  logger.info() << "parsing config...\n";
-  config::ConfigParser(argv[1]).parseConfig();
+  const char* const configPath = (argc == 2) ? argv[1] : defaultConfigPath;
+  logger.info() << "parsing config in \"" << configPath << "\"...\n";
+  config::ConfigParser(configPath).parseConfig();
   std::cout << Config::getConfig();
 
   initSingletons();
