@@ -123,6 +123,12 @@ bool ExecuteCgi::_isDefaultHeader(const std::string& headerName)
   return headerName == contentType || headerName == contentLength;
 }
 
+/**
+ * If the header name already contains underscores, prepend an additional
+ * underscore to make the environment variable name unambiguous.
+ *
+ * https://datatracker.ietf.org/doc/html/rfc9110#section-17.10-5
+ */
 std::string ExecuteCgi::_convertHeader(const std::string& headerName)
 {
   std::string cgiName = "HTTP_";
@@ -220,6 +226,8 @@ try {
   } catch (...) {
     // EMPTY: Exit in all cases.
   }
+  // std::exit() would make more sense here, but evaluation requirements require
+  // a clean valgrind report.
   ::close(STDIN_FILENO);
   ::close(STDOUT_FILENO);
   throw EXIT_FAILURE;
