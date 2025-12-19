@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <map>
 #include <sys/poll.h>
+#include <sys/socket.h>
 #include <vector>
 
 class SocketManager : public AutoFdSubscriber
@@ -24,7 +25,7 @@ public:
   const std::vector<pollfd>& getPfds() const;
   pollfd* getPfdStart();
 
-  AutoFd acceptClient(int fdes);
+  AutoFd acceptClient(int fdes, sockaddr_storage& addr);
   void addCgiFd(int fdes);
 
   void enablePollout(int fdes);

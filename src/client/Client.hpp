@@ -18,17 +18,22 @@
 #include <cstddef>
 #include <ostream>
 #include <string>
+#include <sys/socket.h>
 
 class Client
 {
 public:
   Client();
   explicit Client(int fdes);
-  Client(ft::rvalue<AutoFd>& fdes, const Server* server, const Socket* socket);
+  Client(ft::rvalue<AutoFd>& fdes,
+         const sockaddr_storage& addr,
+         const Server* server,
+         const Socket* socket);
 
   static const std::size_t maxChunk = 1024;
 
   int getFd() const;
+  const sockaddr_storage& getAddr() const;
   bool hasServer() const;
   const std::string& getHost() const;
   SmartBuffer& getInBuff();
@@ -61,6 +66,7 @@ private:
   static Logger& _log;
 
   AutoFd _fd;
+  sockaddr_storage _addr;
   const Server* _server;
   const Socket* _socket;
   std::string _host;
